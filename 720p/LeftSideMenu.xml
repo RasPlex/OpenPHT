@@ -277,7 +277,7 @@
 		<radiowidth>16</radiowidth>
 		<radioposy>6</radioposy>
 	</include>
-	<!-- preplay buttons -->
+	<!-- buttons -->
 	<include name="leftMenuBarIcon">
 		<width>74</width>
 		<height>30</height>
@@ -294,6 +294,107 @@
 		<height>30</height>
 		<onleft condition="[!Container.PlexContent(Albums) | [Container.PlexContent(Albums) + [Container.PlexFilter(Albums) | Container.PlexFilter(recentlyAdded)]]] + !Container.PlexContent(Songs) + !Container.PlexContent(Movie) + !Container.PlexContent(Seasons) + [!Container.PlexContent(Episodes) | [Container.PlexContent(Episodes) + !IsEmpty(Container.Property(primaryFilterActivated)) + IsEmpty(Container.Property(PlexPreplay))]] + !Container.PlexContent(Episode) + !Container.PlexContent(Clip) + ![Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode) | ListItem.Type(song)]] + !Control.IsVisible(88)">1300</onleft>
 		<onright>777</onright>
+	</include>
+	<include name="leftBarButtonFilters">
+		<texturefocus>left-menu-filters-icon-s.png</texturefocus>
+		<texturenofocus>left-menu-filters-icon-u.png</texturenofocus>
+		<onclick>Control.SetFocus(1300)</onclick>
+		<include>leftMenuBarButton</include>
+	</include>
+	<include name="leftBarButtonPlay">
+		<texturefocus>b-pp-play-s2.png</texturefocus>
+		<texturenofocus>b-pp-play2.png</texturenofocus>
+		<onclick>Plex.PlayAll()</onclick>
+		<include>leftMenuBarButton</include>
+	</include>
+	<include name="leftBarButtonShuffle">
+		<texturefocus>left-menu-shuffle-icon-s2.png</texturefocus>
+		<texturenofocus>left-menu-shuffle-icon-u2.png</texturenofocus>
+		<onclick>Plex.ShuffleAll()</onclick>
+		<include>leftMenuBarButton</include>
+	</include>
+	<include name="leftBarButtonAudio">
+		<texturefocus>b-pp-audio-s2.png</texturefocus>
+		<texturenofocus>b-pp-audio2.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>ActivateWindow(10205)</onclick>
+		<include>leftMenuBarButton</include>
+		<onfocus>Skin.SetString(DialogPos,audiostreampicker)</onfocus>
+		<onunfocus>Skin.Reset(DialogPos)</onunfocus>
+	</include>
+	<include name="leftBarButtonSubtitles">
+		<texturefocus>b-pp-subtitles-s.png</texturefocus>
+		<texturenofocus>b-pp-subtitles.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>ActivateWindow(10204)</onclick>
+		<include>leftMenuBarButton</include>
+		<onfocus>Skin.SetString(DialogPos,subtitlestreampicker)</onfocus>
+		<onunfocus>Skin.Reset(DialogPos)</onunfocus>
+	</include>
+	<include name="leftBarButtonExtras">
+		<texturefocus>b-pp-extras-s.png</texturefocus>
+		<texturenofocus>b-pp-extras.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>SetFocus(3)</onclick>
+		<include>leftMenuBarButton</include>
+	</include>
+	<include name="leftBarButtonRate">
+		<texturefocus>b-pp-rate-s.png</texturefocus>
+		<texturenofocus>b-pp-rate.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>ActivateWindow(10200,$INFO[ListItem(0).Path])</onclick>
+		<include>leftMenuBarButton</include>
+		<onfocus>Skin.SetString(DialogPos,rate)</onfocus>
+		<onunfocus>Skin.Reset(DialogPos)</onunfocus>
+	</include>
+	<include name="leftBarButtonRecommend">
+		<texturefocus>b-pp-recommend-s.png</texturefocus>
+		<texturenofocus>b-pp-recommend.png</texturenofocus>
+		<onup>105</onup>
+		<ondown>107</ondown>
+		<include>leftMenuBarButton</include>
+		<visible>!IsEmpty(ListItem(0).Property(canRecommend))</visible>
+		<onfocus>Skin.SetString(DialogPos,recommend)</onfocus>
+		<onunfocus>Skin.Reset(DialogPos)</onunfocus>
+	</include>
+	<include name="leftBarButtonShare">
+		<texturefocus>b-pp-share-s.png</texturefocus>
+		<texturenofocus>b-pp-share.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<include>leftMenuBarButton</include>
+		<visible>!IsEmpty(ListItem(0).Property(canShare))</visible>
+		<onfocus>Skin.SetString(DialogPos,share)</onfocus>
+		<onunfocus>Skin.Reset(DialogPos)</onunfocus>
+	</include>
+	<include name="leftBarButtonWatched">
+		<texturefocus>b-pp-watched-s.png</texturefocus>
+		<texturenofocus>b-pp-watched.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>markaswatched</onclick>
+		<include>leftMenuBarButton</include>
+		<visible>ListItem.Status(unwatched) | ListItem.Status(inprogress)</visible>
+	</include>
+	<include name="leftBarButtonUnwatched">
+		<texturefocus>b-pp-unwatched-s.png</texturefocus>
+		<texturenofocus>b-pp-unwatched.png</texturenofocus>
+		<onright>XBMC.NextItem</onright>
+		<onleft>XBMC.PrevItem</onleft>
+		<onclick>markasunwatched</onclick>
+		<include>leftMenuBarButton</include>
+		<visible>ListItem.Status(watched)</visible>
+	</include>
+	<include name="leftBarButtonNowPlaying">
+		<texturefocus>-</texturefocus>
+		<texturenofocus>-</texturenofocus>
+		<onclick>fullscreen</onclick>
+		<include>leftMenuBarButton</include>
+		<visible>Player.HasAudio | Player.HasVideo</visible>
 	</include>
 	<!-- Home menu -->
 	<include name="PivotMenuHome">
@@ -528,7 +629,8 @@
 			<!--><include>GlobalSearch</include>-->
 			<!-- sidebar global -->
 			<control type="grouplist" id="998">
-				<visible>!Container.PlexContent(Movie) + !Container.PlexContent(Episode) + !Container.PlexContent(Clip) + Control.IsVisible(995)</visible>
+				<!--><visible>!Container.PlexContent(Movie) + !Container.PlexContent(Episode) + !Container.PlexContent(Clip) + Control.IsVisible(995)</visible>-->
+				<visible>false</visible>
 				<posy>40</posy>
 				<posx>0</posx>
 				<width>74</width>
@@ -568,6 +670,32 @@
 					<onclick>fullscreen</onclick>
 					<include>leftMenuBarButton</include>
 					<visible>Player.HasAudio | Player.HasVideo</visible>
+				</control>
+			</control>
+			<!-- sidebar music -->
+			<control type="grouplist" id="998">
+				<visible>Container.PlexContent(Artists) | Container.PlexContent(Albums) | Container.PlexContent(Songs)</visible>
+				<posy>40</posy>
+				<posx>0</posx>
+				<width>74</width>
+				<aligny>top</aligny>
+				<onup>998</onup>
+				<ondown>998</ondown>
+				<orientation>vertical</orientation>
+				<itemgap>20</itemgap>
+				<control type="button" id="101">
+					<include>leftBarButtonFilters</include>
+					<visible>Container.PlexContent(Artists)</visible>
+				</control>
+				<control type="button" id="102">
+					<include>leftBarButtonPlay</include>
+				</control>
+				<control type="button" id="103">
+					<include>leftBarButtonShuffle</include>
+				</control>
+				<control type="button" id="104">
+					<include>leftBarButtonExtras</include>
+					<visible>false</visible>
 				</control>
 			</control>
 			<!-- sidebar preplay -->
