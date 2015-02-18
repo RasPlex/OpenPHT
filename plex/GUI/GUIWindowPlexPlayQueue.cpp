@@ -6,6 +6,8 @@
 #include "Application.h"
 #include "GUIPlexDefaultActionHandler.h"
 
+#define MEDIAITEMLIST_ID 54
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGUIWindowPlexPlayQueue::OnSelect(int iItem)
 {
@@ -210,7 +212,7 @@ bool CGUIWindowPlexPlayQueue::OnAction(const CAction &action)
     }
   }
 
-  if (action.GetID() == ACTION_SELECT_ITEM)
+  if ((action.GetID() == ACTION_SELECT_ITEM) && (GetFocusedControlID() == MEDIAITEMLIST_ID))
   {
     // select an item should start playback
     OnAction(CAction(ACTION_PLAYER_PLAY));
