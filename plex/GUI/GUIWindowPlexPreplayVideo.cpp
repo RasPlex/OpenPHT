@@ -302,7 +302,17 @@ bool CGUIWindowPlexPreplayVideo::OnBack(int actionID)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGUIWindowPlexPreplayVideo::Update(const CStdString &strDirectory, bool updateFilterPath)
 {
+  CLog::Log(LOGDEBUG,"CGUIWindowPlexPreplayVideo::Update");
+
+  CStdString plexExtras;
+
+  if (m_vecItems->Size())
+      plexExtras = m_vecItems->Get(0)->GetProperty("PlexExtras").asString();
+
   bool ret = CGUIMediaWindow::Update(strDirectory, updateFilterPath);
+
+  if (m_vecItems->Size())
+    m_vecItems->Get(0)->SetProperty("PlexExtras", plexExtras);
 
   CURL currentURL(strDirectory);
   if (!currentURL.HasOption("checkfiles"))
