@@ -159,6 +159,12 @@ bool CGUIWindowStartup::OnMessage(CGUIMessage& message)
     g_windowManager.PreviousWindow();
   }
 
+  if (message.GetMessage() == GUI_MSG_PLEX_USERLIST_FETCHED)
+  {
+    setUsersList(m_users);
+    return true;
+  }
+
   return CGUIWindow::OnMessage(message);
 }
 
@@ -233,7 +239,8 @@ void CGUIWindowStartup::OnJobComplete(unsigned int jobID, bool success, CJob *jo
         item->ClearProperty("admin");
     }
 
-    setUsersList(m_users);
+    CGUIMessage msg(GUI_MSG_PLEX_USERLIST_FETCHED, GetID(), GetID(), 0);
+    g_windowManager.SendThreadMessage(msg);
 
     m_currentToken = g_plexApplication.myPlexManager->GetCurrentUserInfo().authToken;
   }
@@ -374,7 +381,7 @@ void CGUIWindowStartup::setPinControlText(CStdString pin)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CGUIWindowStartup::setUsersList(CFileItemList &userlist)
 {
-  m_viewControl.SetItems(m_users);
+  m_viewControl.SetItems(userlist);
 
   // focus the user list control
   CGUIControl* list = (CGUIControl*)GetControl(CONTROL_LIST);
