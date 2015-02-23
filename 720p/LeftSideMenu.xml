@@ -692,7 +692,7 @@
 				</control>
 				<control type="button" id="104">
 					<include>leftBarButtonExtras</include>
-					<visible>!IsEmpty(ListItem.Property(PlexExtras))</visible>
+					<visible>!IsEmpty(Container.Property(PlexExtras))</visible>
 				</control>
 			</control>
 			<!-- sidebar preplay -->
