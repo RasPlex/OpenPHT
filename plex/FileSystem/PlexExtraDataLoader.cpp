@@ -45,7 +45,10 @@ bool CPlexExtraDataLoader::getDataForItem(CFileItemPtr pItem, ExtraDataType type
   m_type = type;
   CURL url = getItemURL(pItem, type);
 
-  return g_plexApplication.busy.blockWaitingForJob(new CPlexDirectoryFetchJob(url), this);
+  if (!url.GetFileName().IsEmpty())
+    return g_plexApplication.busy.blockWaitingForJob(new CPlexDirectoryFetchJob(url), this);
+  else
+    return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,13 +59,32 @@ CURL CPlexExtraDataLoader::getItemURL(CFileItemPtr pItem, CPlexExtraDataLoader::
   
   CURL url(pItem->GetPath());
   
-  PlexUtils::AppendPathToURL(url, "extras");
-  
-  url.SetOptions("");
-  if (type != NONE)
-    url.SetOption("extratype", boost::lexical_cast<std::string>((int)type));
-  
-  return url;
+  // we cut the url to metadata/X
+  int pos = url.GetFileName().find("metadata/");
+  int endpos = 0;
+  if (pos >= 0)
+  {
+    int endpos = url.GetFileName().find("/", pos + 10);
+    if (endpos >= 0)
+    {
+      url.SetFileName(url.GetFileName().substr(0, endpos));
+    }
+  }
+
+  if (pos > 0)
+  {
+    PlexUtils::AppendPathToURL(url, "extras");
+
+    url.SetOptions("");
+    if (type != NONE)
+      url.SetOption("extratype", boost::lexical_cast<std::string>((int)type));
+
+    return url;
+  }
+  else
+  {
+    return CURL();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

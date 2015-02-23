@@ -51,6 +51,8 @@
 
 #define XMIN(a,b) ((a)<(b)?(a):(b))
 
+#define EXTRAS_LIST_CONTROL_ID   3  // preplay window Extras list control ID
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
 {
@@ -188,6 +190,34 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
       UpdateButtons();
       break;
     }
+
+    case GUI_MSG_PLEX_EXTRA_DATA_LOADED :
+    {
+      CFileItemList extralist;
+      extralist.Copy(*(m_extraDataLoader.getItems()));
+      CLog::Log(LOGDEBUG,"CGUIWindowPlexPreplayVideo::OnMessage GUI_MSG_PLEX_EXTRA_DATA_LOADED (%d)", extralist.Size());
+
+      if (extralist.Size())
+      {
+        m_vecItems->Get(0)->SetProperty("PlexExtras", "1");
+
+        if (extralist.Size() > 1)
+          m_vecItems->SetProperty("PlexExtras", "extras");
+        else
+          m_vecItems->SetProperty("PlexExtras", "extra");
+      }
+      else
+      {
+        m_vecItems->Get(0)->SetProperty("PlexExtras", "");
+        m_vecItems->SetProperty("PlexExtras", "");
+      }
+
+      // feed the preplay list with the items
+      CGUIMessage msg(GUI_MSG_LABEL_BIND, 0, EXTRAS_LIST_CONTROL_ID, 0, 0, &extralist);
+      OnMessage(msg);
+    }
+      break;
+
   }
 
   return ret;
@@ -899,6 +929,14 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
     m_vecItems->SetProperty("PlexFilter", m_sectionFilter->currentPrimaryFilter());
 
   g_plexApplication.extraInfo->LoadExtraInfoForItem(m_vecItems);
+
+  // clear eventual extras
+  CFileItemList extralist;
+  CGUIMessage msg(GUI_MSG_LABEL_BIND, 0, EXTRAS_LIST_CONTROL_ID, 0, 0, &extralist);
+  OnMessage(msg);
+
+  // load new ones
+  m_extraDataLoader.loadDataForItem(m_vecItems);
 
   if (!updateFromFilter)
     g_plexApplication.themeMusicPlayer->playForItem(*m_vecItems);
