@@ -625,12 +625,9 @@
 			<include>leftMenuInitSlide</include>
 			<include>leftMenuSlide</include>
 			<include>leftMenuBg</include>
-			<!-- global search-->
-			<!--><include>GlobalSearch</include>-->
-			<!-- sidebar global -->
+			<!-- sidebar video -->
 			<control type="grouplist" id="998">
-				<!--><visible>!Container.PlexContent(Movie) + !Container.PlexContent(Episode) + !Container.PlexContent(Clip) + Control.IsVisible(995)</visible>-->
-				<visible>false</visible>
+				<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | Container.PlexContent(Seasons) | Container.PlexContent(Episodes)</visible>
 				<posy>40</posy>
 				<posx>0</posx>
 				<width>74</width>
@@ -645,7 +642,7 @@
 					<texturenofocus>left-menu-filters-icon-u.png</texturenofocus>
 					<onclick>Control.SetFocus(1300)</onclick>
 					<include>leftMenuBarButton</include>
-					<visible>[!Container.PlexContent(Albums) | [Container.PlexContent(Albums) + [Container.PlexFilter(Albums) | Container.PlexFilter(recentlyAdded)]]] + !Container.PlexContent(Songs) + !Container.PlexContent(Seasons) + [!Container.PlexContent(Episodes) | [Container.PlexContent(Episodes) + !IsEmpty(Container.Property(primaryFilterActivated)) + IsEmpty(Container.Property(PlexPreplay))]] + ![Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode) | ListItem.Type(song)]] + ![Control.IsVisible(88)]</visible>
+					<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | [Container.PlexContent(Episodes) + !IsEmpty.Container.Property(primaryFilterActivated)]</visible>
 				</control>
 				<!-- Play All -->
 				<control type="button" id="104">
@@ -653,7 +650,7 @@
 					<texturenofocus>b-pp-play2.png</texturenofocus>
 					<onclick>Plex.PlayAll()</onclick>
 					<include>leftMenuBarButton</include>
-					<visible>![Window.IsActive(501) + Container.PlexFilter(recentlyAdded)] + !Container.PlexFilter(recentlyViewedShows)</visible>
+					<visible>!Container.PlexFilter(recentlyViewedShows)</visible>
 				</control>
 				<!-- Shuffle All -->
 				<control type="button" id="105">
@@ -661,7 +658,7 @@
 					<texturenofocus>left-menu-shuffle-icon-u2.png</texturenofocus>
 					<onclick>Plex.ShuffleAll()</onclick>
 					<include>leftMenuBarButton</include>
-					<visible>![Window.IsActive(501) + Container.PlexFilter(recentlyAdded)] + !Container.PlexFilter(recentlyViewedShows)</visible>
+					<visible>!Container.PlexFilter(recentlyViewedShows)</visible>
 				</control>
 				<!-- Now Playing -->
 				<control type="button" id="106">
@@ -695,7 +692,7 @@
 				</control>
 				<control type="button" id="104">
 					<include>leftBarButtonExtras</include>
-					<visible>false</visible>
+					<visible>!IsEmpty(ListItem.Property(PlexExtras))</visible>
 				</control>
 			</control>
 			<!-- sidebar preplay -->
