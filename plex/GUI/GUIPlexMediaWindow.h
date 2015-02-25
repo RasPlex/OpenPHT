@@ -125,6 +125,7 @@ private:
     std::string GetFilteredURI(const CFileItem &item) const;
 
     CStdString GetLevelURL();
+    CFileItemPtr getSelectedExtraItem();
 
     bool m_hasAdvancedFilters;
     CCriticalSection m_filterValuesSection;

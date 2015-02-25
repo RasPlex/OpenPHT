@@ -195,7 +195,7 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
     {
       CFileItemList extralist;
       extralist.Copy(*(m_extraDataLoader.getItems()));
-      CLog::Log(LOGDEBUG,"CGUIWindowPlexPreplayVideo::OnMessage GUI_MSG_PLEX_EXTRA_DATA_LOADED (%d)", extralist.Size());
+      CLog::Log(LOGDEBUG,"CGUIPlexMediaWindow::OnMessage GUI_MSG_PLEX_EXTRA_DATA_LOADED (%d)", extralist.Size());
 
       if (extralist.Size())
       {
@@ -572,6 +572,17 @@ bool CGUIPlexMediaWindow::OnAction(const CAction &action)
           }
         }
       }
+    }
+  }
+
+  if (action.GetID() == ACTION_SELECT_ITEM)
+  {
+    // if we pick an extra, play it !
+    CFileItemPtr extraItem = getSelectedExtraItem();
+    if (extraItem)
+    {
+      g_application.PlayFile(*extraItem, extraItem->GetProperty("extratype").asInteger() == 1);
+      return true;
     }
   }
 
@@ -1466,4 +1477,21 @@ CStdString CGUIPlexMediaWindow::GetLevelURL()
     levelUrl += "/user/" + userName;
 
   return  levelUrl;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+CFileItemPtr CGUIPlexMediaWindow::getSelectedExtraItem()
+{
+  int focusedControl = GetFocusedControlID();
+  if (focusedControl == EXTRAS_LIST_CONTROL_ID)
+  {
+    CGUIBaseContainer* container = (CGUIBaseContainer*)(GetControl(focusedControl));
+    if (container)
+    {
+      CGUIListItemPtr listItem = container->GetListItem(0);
+      if (listItem && listItem->IsFileItem())
+        return boost::static_pointer_cast<CFileItem>(listItem);
+    }
+  }
+  return CFileItemPtr();
 }
