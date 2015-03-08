@@ -130,6 +130,7 @@
 				<posx>-54</posx>
 				<posy>-34</posy>
 				<visible>[Container.PlexContent(Albums) + !Container.PlexFilter(Albums)] + !Container.Content(addons) + !Container.Content(plugins) + !Container.PlexContent(Secondary) + IsEmpty(Container.Property(mixedParents)) + Control.IsVisible(53)</visible>
+				<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
 				<!-- backgrounds & plot -->
 				<control type="group">
 					<!-- backgrounds -->
@@ -297,6 +298,7 @@
 				<posx>-54</posx>
 				<posy>-34</posy>
 				<visible>Container.PlexContent(Songs) + !Container.Content(addons) + !Container.Content(plugins) + !Container.PlexContent(Secondary)</visible>
+				<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
 				<!-- backgrounds & plot -->
 				<control type="group">
 					<visible>Control.IsVisible(54)</visible>
@@ -498,6 +500,87 @@
 							<animation effect="fade" start="0" end="100" time="100" delay="50" reversible="false" condition="Container.OnPrevious">Focus</animation>
 						</control>
 					</focusedlayout>
+				</control>
+			</control>
+			<!-- Music Extras -->
+			<control type="group">
+				<!-- extras bg's -->
+				<control type="group">
+					<posy>0</posy>
+					<posx>-224</posx>
+					<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
+					<control type="image">
+						<posy>0</posy>
+						<width>297</width>
+						<height>720</height>
+						<texture border="10">black.png</texture>
+						<animation effect="fade" start="0" end="50" time="0" condition="true">Conditional</animation>
+					</control>
+				</control>
+				<!-- extras -->
+				<include>leftMenuBg</include>
+				<control type="group">
+					<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
+					<posx>-224</posx>
+					<control type="group">
+						<posx>0</posx>
+						<posy>20</posy>
+						<control type="label">
+							<posx>36</posx>
+							<posy>40</posy>
+							<label>$LOCALIZE[41008] ($INFO[Container(3).NumItems])</label>
+							<font>Bold-36</font>
+							<include>WhiteShadow</include>
+						</control>
+						<control type="group">
+							<posy>68</posy>
+							<posx>26</posx>
+							<control type="list" id="3">
+								<width>260</width>
+								<height>600</height>
+								<onleft>998</onleft>
+								<onright>998</onright>
+								<onup>3</onup>
+								<ondown>3</ondown>
+								<pagecontrol>61</pagecontrol>
+								<scrolltime>200</scrolltime>
+								<itemlayout height="200">
+									<include>ExtraThumb</include>
+									<include>ExtraThumbCard</include>
+									<control type="label">
+										<include>ExtraTypeTitle</include>
+									</control>
+									<control type="label">
+										<include>ExtraTitle</include>
+									</control>
+									<include>ExtraSecondTitle</include>
+								</itemlayout>
+								<focusedlayout height="200">
+									<include>ExtraThumb</include>
+									<include>ExtraThumbCard</include>
+									<!--><include>ExtraIconPlay</include>-->
+									<control type="label">
+										<include>ExtraTypeTitle</include>
+										<textcolor>orangeLight</textcolor>
+									</control>
+									<control type="label">
+										<include>ExtraTitle</include>
+										<textcolor>orangeLight</textcolor>
+									</control>
+									<include>ExtraSecondTitle</include>
+									<include>ExtraThumbSelectedBorder</include>
+								</focusedlayout>
+							</control>
+							<control type="scrollbar" id="61">
+								<description>Scroll Bar</description>
+								<posy>3</posy>
+								<posx>250</posx>
+								<width>20</width>
+								<height>584</height>
+								<animation effect="fade" start="0" end="100" time="500" condition="true" delay="500">WindowOpen</animation>
+							</control>
+						</control>
+					</control>
 				</control>
 			</control>
 		</control>
