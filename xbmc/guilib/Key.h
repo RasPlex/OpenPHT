@@ -331,6 +331,7 @@
 #define ACTION_PLEX_PQ_ADDUPTONEXT    312
 #define ACTION_PLEX_PL_ADDTO          313
 #define ACTION_PLEX_PL_CREATE         314
+#define ACTION_PLEX_PLAY_EXTRA        315
 /* END PLEX */
 
 // Window ID defines to make the code a bit more readable

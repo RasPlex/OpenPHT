@@ -18,7 +18,7 @@
 #include "Client/PlexServer.h"
 #include "guilib/GUIKeyboardFactory.h"
 #include "LocalizeStrings.h"
-
+#include "PlexDirectory.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CGUIPlexDefaultActionHandler::CGUIPlexDefaultActionHandler()
@@ -99,6 +99,10 @@ CGUIPlexDefaultActionHandler::CGUIPlexDefaultActionHandler()
 
   action = new ACTION_SETTING(ACTION_PLEX_PL_CREATE);
   action->WindowSettings[WINDOW_HOME].contextMenuVisisble = true;
+  action->WindowSettings[WINDOW_VIDEO_NAV].contextMenuVisisble = true;
+  m_ActionSettings.push_back(*action);
+
+  action = new ACTION_SETTING(ACTION_PLEX_PLAY_EXTRA);
   action->WindowSettings[WINDOW_VIDEO_NAV].contextMenuVisisble = true;
   m_ActionSettings.push_back(*action);
 
@@ -329,6 +333,29 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
         }
         break;
       }
+
+      case ACTION_PLEX_PLAY_EXTRA:
+      {
+        // build the extra url;
+        CURL url(item->GetPath());
+        url.SetFileName(item->GetProperty("primaryExtraKey").asString());
+
+        // get the extra information
+        XFILE::CPlexDirectory dir;
+        CFileItemList list;
+        if (dir.GetDirectory(url.Get(), list))
+        {
+          if (list.Size())
+          {
+            g_application.PlayFile(*list.Get(0));
+          }
+          else
+          {
+            CLog::Log(LOGERROR, "Extra URL didn't return any entry.")
+          }
+        }
+        break;
+      }
     }
   }
 
@@ -490,6 +517,15 @@ void CGUIPlexDefaultActionHandler::GetContextButtonsForAction(int actionID, CFil
       if (IsItemPlaylistCompatible(item))
       {
         buttons.Add(actionID, 52613);
+      }
+      break;
+    }
+
+    case ACTION_PLEX_PLAY_EXTRA:
+    {
+      if (item->HasProperty("primaryExtraKey"))
+      {
+        buttons.Add(actionID, 52633);
       }
       break;
     }

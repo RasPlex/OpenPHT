@@ -1147,3 +1147,7 @@ msgstr "Please sign in again"
 msgctxt "#52632"
 msgid "Your credentials have expired. Please sign in again."
 msgstr "Your credentials have expired. Please sign in again."
+
+msgctxt "#52633"
+msgid "Play extra"
+msgstr "Play extra"
