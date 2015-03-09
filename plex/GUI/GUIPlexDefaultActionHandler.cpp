@@ -351,7 +351,7 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
           }
           else
           {
-            CLog::Log(LOGERROR, "Extra URL didn't return any entry.")
+            CLog::Log(LOGERROR, "Extra URL didn't return any entry.");
           }
         }
         break;
