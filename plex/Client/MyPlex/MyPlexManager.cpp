@@ -177,8 +177,6 @@ void CMyPlexManager::BroadcastState()
     {
       g_guiSettings.SetString("myplex.status", g_localizeStrings.Get(44011) + " (" + CStdString(m_currentUserInfo.username) + ")");
 
-      if (!g_application.IsPlayingFullScreenVideo())
-        CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, g_localizeStrings.Get(44105), m_currentUserInfo.username, 5000, false);
       break;
     }
     case STATE_NOT_LOGGEDIN:
