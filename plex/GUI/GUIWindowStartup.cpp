@@ -282,6 +282,8 @@ void CGUIWindowStartup::SelectUserByName(CStdString user)
     if (m_users.Get(i)->GetLabel() == user)
     {
       m_viewControl.SetSelectedItem(i);
+      CGUIListItemPtr item =  m_users.Get(i);
+      item->Select(true);
       break;
     }
   }
