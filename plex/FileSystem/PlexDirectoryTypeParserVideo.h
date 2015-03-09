@@ -22,6 +22,7 @@ class CPlexDirectoryTypeParserVideo : public CPlexDirectoryTypeParserBase
     void ParseMediaNodes(CFileItem& item, XML_ELEMENT* element);
     void ParseMediaParts(CFileItem& mediaItem, XML_ELEMENT* element);
     void ParseMediaStreams(CFileItem& mediaPart, XML_ELEMENT* element);
+    void ParseOverlays(CFileItem &item, XML_ELEMENT *element);
     virtual void ParseTag(CFileItem& item, CFileItem& tagItem);
 
     static void DebugPrintVideoItem(const CFileItem &item);

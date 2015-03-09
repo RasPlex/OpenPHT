@@ -186,7 +186,21 @@ CPlexDirectoryTypeParserVideo::Process(CFileItem &item, CFileItem &mediaContaine
     mediaContainer.SetProperty("__containerItemIndex", ++ id);
   }
   
-  //DebugPrintVideoItem(item);
+  ParseOverlays(item, itemElement);
+}
+
+/* Loop over <Overlay> tags under <Video> */
+void
+CPlexDirectoryTypeParserVideo::ParseOverlays(CFileItem &item, XML_ELEMENT *element)
+{
+  for (XML_ELEMENT* overlay = element->first_node(); overlay; overlay = overlay->next_sibling())
+  {
+    if (CStdString(overlay->name()) == "Overlay")
+    {
+      CFileItemPtr overlayItem = CPlexDirectory::NewPlexElement(overlay, item, item.GetPath());
+      item.m_overlayItems.push_back(overlayItem);
+    }
+  }
 }
 
 /* Loop over <Media> tags under <Video> */

@@ -426,6 +426,7 @@ public:
   std::vector<CFileItemPtr> m_mediaItems;
   std::vector<CFileItemPtr> m_mediaParts;
   std::vector<CFileItemPtr> m_mediaPartStreams;
+  std::vector<CFileItemPtr> m_overlayItems;
 
   CFileItemPtr m_selectedMediaPart;
 
