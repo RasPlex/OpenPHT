@@ -110,6 +110,10 @@ public:
 
   // output scaling
   const RESOLUTION_INFO &GetResInfo() const;
+  /* PLEX */
+  const RESOLUTION_INFO &GetWindowResInfo() { return m_windowResolution; };
+  /* END PLEX */
+
   void SetRenderingResolution(const RESOLUTION_INFO &res, bool needsScaling);  ///< Sets scaling up for rendering
   void SetScalingResolution(const RESOLUTION_INFO &res, bool needsScaling);    ///< Sets scaling up for skin loading etc.
   float GetScalingPixelRatio() const;

@@ -51,6 +51,11 @@ private:
   void FillInTVGroups();
   void ToggleOSD();
 
+  /* PLEX */
+  void createOverlays();
+  void deleteOverlays();
+  /* END PLEX */
+
   enum SEEK_TYPE { SEEK_ABSOLUTE, SEEK_RELATIVE };
   enum SEEK_DIRECTION { SEEK_FORWARD, SEEK_BACKWARD };
 

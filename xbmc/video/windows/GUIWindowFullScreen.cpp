@@ -66,6 +66,9 @@
 /* PLEX */
 #include "PlexApplication.h"
 #include "Client/PlexServerManager.h"
+#include "guilib/GUIImage.h"
+
+#define CONTROL_OVERLAY_START 99000
 /* END PLEX */
 
 using namespace PVR;
@@ -695,6 +698,58 @@ void CGUIWindowFullScreen::OnWindowLoaded()
   FillInTVGroups();
 }
 
+/* PLEX */
+void CGUIWindowFullScreen::createOverlays()
+{
+  // VEVO Overlay handling
+  if (g_application.CurrentFileItemPtr() && g_application.CurrentFileItemPtr()->m_overlayItems.size())
+  {
+    for (int i=0; i<g_application.CurrentFileItemPtr()->m_overlayItems.size(); i++)
+    {
+      CFileItemPtr overlayItem = g_application.CurrentFileItemPtr()->m_overlayItems[i];
+
+      // setup the overlay image path
+      CTextureInfo overlayInfo;
+      overlayInfo.filename = overlayItem->GetPath();
+
+      RESOLUTION_INFO res = g_graphicsContext.GetWindowResInfo();
+      float scaleX = (float)res.iScreenWidth / (float)g_graphicsContext.GetWidth();
+      float scaleY = (float)res.iScreenHeight / (float)g_graphicsContext.GetHeight();
+
+      // compute the overlay position
+      int x1 = overlayItem->GetProperty("marginLeft").asInteger() * scaleX;
+      int y1 = overlayItem->GetProperty("marginTop").asInteger() * scaleY;
+      int w = overlayItem->GetProperty("width").asInteger() * scaleX;
+      int h = overlayItem->GetProperty("height").asInteger() * scaleY;
+
+      // add the overlay control
+      CGUIControl *overlayControl = new CGUIImage(GetID(), CONTROL_OVERLAY_START + i,
+                                                  x1,
+                                                  y1,
+                                                  w,
+                                                  h,
+                                                  overlayInfo, 1);
+      AddControl(overlayControl);
+    }
+  }
+}
+
+void CGUIWindowFullScreen::deleteOverlays()
+{
+  // remove all the overlays controls
+  if (g_application.CurrentFileItemPtr() && g_application.CurrentFileItemPtr()->m_overlayItems.size())
+  {
+    for (int i=0; i<g_application.CurrentFileItemPtr()->m_overlayItems.size(); i++)
+    {
+      CGUIControl *overlayControl = (CGUIControl*)GetControl(CONTROL_OVERLAY_START + i);
+      if (overlayControl)
+        RemoveControl(overlayControl);
+    }
+  }
+}
+
+/* END PLEX */
+
 bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
 {
   switch (message.GetMessage())
@@ -744,6 +799,10 @@ bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
       }
       else
         m_subsLayout = NULL;
+
+      /* PLEX */
+      createOverlays();
+      /* END PLEX */
 
       return true;
     }
@@ -795,6 +854,10 @@ bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
         delete m_subsLayout;
         m_subsLayout = NULL;
       }
+
+      /* PLEX */
+      deleteOverlays();
+      /* END PLEX */
 
       return true;
     }
