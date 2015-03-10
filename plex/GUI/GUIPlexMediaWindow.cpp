@@ -264,6 +264,7 @@ bool CGUIPlexMediaWindow::RestoreSelection()
       }
     }
   }
+  m_viewControl.SetSelectedItem(0);
   return false;
 }
 
