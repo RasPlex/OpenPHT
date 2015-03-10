@@ -663,6 +663,9 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
 #ifdef USE_PAGING
   if (items.HasProperty("totalSize"))
   {
+    if (NeededRangeEnd > items.GetProperty("totalSize").asInteger())
+      NeededRangeEnd = items.GetProperty("totalSize").asInteger() - 1;
+
     if (items.GetProperty("totalSize").asInteger() > items.Size())
     {
      
@@ -694,7 +697,7 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
         }
       }
       
-      for (int i = 0; i < NeededRangeStart; i++)
+      for (int i = NeededRangeStart-1; i >= 0; i--)
       {
         CFileItemPtr item = CFileItemPtr(new CFileItem);
         item->SetPath(boost::lexical_cast<std::string>(i));
