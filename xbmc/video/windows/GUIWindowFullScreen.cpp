@@ -712,15 +712,31 @@ void CGUIWindowFullScreen::createOverlays()
       CTextureInfo overlayInfo;
       overlayInfo.filename = overlayItem->GetPath();
 
-      RESOLUTION_INFO res = g_graphicsContext.GetWindowResInfo();
-      float scaleX = (float)res.iScreenWidth / (float)g_graphicsContext.GetWidth();
-      float scaleY = (float)res.iScreenHeight / (float)g_graphicsContext.GetHeight();
+      // compute the overlay position,
+      // we're lucky rendering into 720p surface makes UI pixels -> physical pixels ratio to be 1:1
+      int x1, y1;
+      int frameBufferWidth = 1280;
+      int frameBufferHeight = 720;
 
-      // compute the overlay position
-      int x1 = overlayItem->GetProperty("marginLeft").asInteger() * scaleX;
-      int y1 = overlayItem->GetProperty("marginTop").asInteger() * scaleY;
-      int w = overlayItem->GetProperty("width").asInteger() * scaleX;
-      int h = overlayItem->GetProperty("height").asInteger() * scaleY;
+      // x1
+      if (overlayItem->GetProperty("alignHorizontal").asString() == "left")
+        x1 = overlayItem->GetProperty("marginLeft").asInteger();
+      else if (overlayItem->GetProperty("alignHorizontal").asString() == "right")
+        x1 = frameBufferWidth - overlayItem->GetProperty("width").asInteger() - overlayItem->GetProperty("marginRight").asInteger();
+      else if (overlayItem->GetProperty("alignHorizontal").asString() == "center")
+        x1 = frameBufferWidth - overlayItem->GetProperty("width").asInteger();
+
+      // y1
+      if (overlayItem->GetProperty("alignVertical").asString() == "top")
+        y1 = overlayItem->GetProperty("marginTop").asInteger();
+      else if (overlayItem->GetProperty("alignVertical").asString() == "bottom")
+        y1 = frameBufferHeight - overlayItem->GetProperty("height").asInteger() - overlayItem->GetProperty("marginBottom").asInteger();
+      else if (overlayItem->GetProperty("alignVertical").asString() == "center")
+        y1 = frameBufferHeight  - overlayItem->GetProperty("height").asInteger();
+
+      // width & height
+      int w = overlayItem->GetProperty("width").asInteger();
+      int h = overlayItem->GetProperty("height").asInteger();
 
       // add the overlay control
       CGUIControl *overlayControl = new CGUIImage(GetID(), CONTROL_OVERLAY_START + i,
