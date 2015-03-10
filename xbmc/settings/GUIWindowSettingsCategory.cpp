@@ -1125,6 +1125,22 @@ void CGUIWindowSettingsCategory::UpdateSettings()
         pControl->SetLabel(g_localizeStrings.Get(label));
       }
     }
+    else if (strSetting.Equals("myplex.automaticlogin"))
+    {
+      CGUIButtonControl *pControl = (CGUIButtonControl *)GetControl(GetSetting(strSetting)->GetID());
+
+      if ((g_plexApplication.myPlexManager) && (pControl))
+      {
+        if (g_plexApplication.myPlexManager->IsPinProtected() || g_plexApplication.myPlexManager->GetCurrentUserInfo().home)
+        {
+          pControl->SetEnabled(true);
+        }
+        else
+        {
+          pControl->SetEnabled(false);
+        }
+      }
+    }
     else if (strSetting.Equals("plexmediaserver.address"))
     {
       bool enabled = g_guiSettings.GetBool("plexmediaserver.manualaddress");
