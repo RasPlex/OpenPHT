@@ -1001,8 +1001,8 @@ msgid "Show queue and recommendations"
 msgstr "Show queue and recommendations"
 
 msgctxt "#52211"
-msgid "Automatic login"
-msgstr "Automatic login"
+msgid "Automatic sign in"
+msgstr "Automatic sign in"
 
 msgctxt "#52300"
 msgid "Media Server went away"
