@@ -261,7 +261,8 @@ void CGUIWindowStartup::OnJobComplete(unsigned int jobID, bool success, CJob *jo
 
         m_users.Add(oldUser);
 
-        setUsersList(m_users);
+        CGUIMessage msg(GUI_MSG_PLEX_USERLIST_FETCHED, GetID(), GetID(), 0);
+        g_windowManager.SendThreadMessage(msg);
       }
     }
 
