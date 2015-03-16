@@ -87,6 +87,7 @@ bool CPlexMediaDecisionEngine::resolveItem(const CFileItem& _item, CFileItem &re
         return false;
       item.SetProperty("selectedMediaItem", selectedMedia);
       offset = CGUIDialogPlexMedia::ProcessResumeChoice(item);
+      item.m_lStartOffset = offset;
       
       // if we have trailers and that we restart movie from beginning, create a new PQ askign for trailers.
       if (item.HasProperty("viewOffset") && (g_guiSettings.GetInt("videoplayer.playtrailercount") > 0) &&
