@@ -376,3 +376,19 @@ TEST(PlexUtilsSetItemStartOffset, setStartPosition_audioTrack)
   EXPECT_EQ(item->m_lStartOffset, (120 / 1000) * 75);
   EXPECT_TRUE(item->GetProperty("forceStartOffset").asBoolean());
 }
+
+TEST(PlexUtilsIsLocalNetworkIP, basic)
+{
+  EXPECT_TRUE(PlexUtils::IsLocalNetworkIP("127.0.0.1"));
+  EXPECT_TRUE(PlexUtils::IsLocalNetworkIP("192.168.1.2"));
+  EXPECT_TRUE(PlexUtils::IsLocalNetworkIP("172.16.0.1"));
+  EXPECT_FALSE(PlexUtils::IsLocalNetworkIP("172.10.0.1"));
+  EXPECT_FALSE(PlexUtils::IsLocalNetworkIP("87.12.99.1"));
+}
+
+TEST(PlexUtilsIsLocalNetworkIP, plexDirect)
+{
+  EXPECT_TRUE(PlexUtils::IsLocalNetworkIP("10-0-42-200.1b628659f0f64451ade0911c6981c784.plex.direct"));
+  EXPECT_TRUE(PlexUtils::IsLocalNetworkIP("192-168-42-0.abc1234.plex.direct"));
+  EXPECT_FALSE(PlexUtils::IsLocalNetworkIP("87-12-199-1.abc1234.plex.direct"));
+}

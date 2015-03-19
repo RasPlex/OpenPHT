@@ -45,9 +45,22 @@ using namespace boost;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool PlexUtils::IsLocalNetworkIP(const CStdString &host)
+bool PlexUtils::IsLocalNetworkIP(const CStdString &_host)
 {
   bool isLocal = false;
+  CStdString host(_host);
+
+  if (ends_with(host, ".plex.direct"))
+  {
+    // plex direct can point to local IP addresses, so handle this here
+    int delimeter = host.Find('.');
+    if (delimeter > 0)
+    {
+      host = host.substr(0, delimeter);
+      host.Replace('-', '.');
+    }
+  }
+
   if (starts_with(host, "10.") || starts_with(host, "192.168.") || starts_with(host, "127.0.0.1"))
   {
     isLocal = true;

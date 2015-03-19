@@ -26,7 +26,7 @@ namespace PlexUtils
 
   std::string GetMachinePlatform();
   std::string GetMachinePlatformVersion();
-  bool IsLocalNetworkIP(const CStdString &host);
+  bool IsLocalNetworkIP(const CStdString &_host);
 
   std::string GetStreamCodecName(CFileItemPtr item);
   std::string GetStreamChannelName(CFileItemPtr item);
