@@ -87,6 +87,8 @@ public:
 
   bool Equals(const CPlexConnectionPtr &other);
 
+  bool isSSL() const { return m_url.GetProtocol() == "https"; }
+
   int m_type;
 
   XFILE::CCurlFile m_http;
@@ -98,7 +100,6 @@ private:
   CStdString m_token;
 
   bool m_refreshed;
-
 };
 
 class CMyPlexConnection : public CPlexConnection

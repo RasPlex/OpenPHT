@@ -25,9 +25,9 @@ void CPlexServerConnTestThread::Process()
 {
   CPlexTimer t;
 
-  if (!m_conn->IsLocal())
+  if (!m_conn->IsLocal() || m_conn->m_type != CPlexConnection::CONNECTION_MYPLEX)
   {
-    // Delay for 50 ms to make sure we select a local connection first if possible
+    // Delay for 50 ms to make sure we select a local connection from plex.tv first if possible
     CLog::Log(LOGDEBUG, "CPlexServerConnTestThread::Process delaying 50ms for connection %s", m_conn->toString().c_str());
     Sleep(50);
   }
@@ -259,15 +259,6 @@ bool CPlexServer::UpdateReachability()
       CLog::Log(LOGWARNING, "CPlexServer::UpdateReachability waited 2 minutes and connection testing didn't finish.");
   }
 
-  /* kill any left over threads */
-  lk.lock();
-  BOOST_FOREACH(CPlexServerConnTestThread* thread, m_connTestThreads)
-  {
-    CLog::Log(LOGWARNING, "CPlexServer::UpdateReachability done but threads are still running: %s", thread->m_conn->toString().c_str());
-    thread->Cancel();
-  }
-  lk.unlock();
-
   CSingleLock tlk(m_testingLock);
   m_complete = true;
   m_activeConnection = m_bestConnection;
@@ -315,7 +306,7 @@ void CPlexServer::OnConnectionTest(CPlexServerConnTestThread* thread, CPlexConne
   {
     CSingleLock lk(m_connTestThreadLock);
     if (std::find(m_connTestThreads.begin(), m_connTestThreads.end(), thread) != m_connTestThreads.end())
-      m_connTestThreads.erase(std::remove(m_connTestThreads.begin(), m_connTestThreads.end(), thread),
+      m_connTestThreads.erase(std::remove(m_connTestThreads.begin(),m_connTestThreads.end(), thread),
                               m_connTestThreads.end());
     else
       return;
@@ -332,10 +323,16 @@ void CPlexServer::OnConnectionTest(CPlexServerConnTestThread* thread, CPlexConne
       if (!m_complete)
         m_testEvent.Set();
     }
-    else if (conn->IsLocal() && !m_bestConnection->IsLocal())
+    else
     {
-      CLog::Log(LOGDEBUG, "CPlexServer::OnConnectionTest found better connection on %s to %s", GetName().c_str(), conn->GetAddress().Get().c_str());
-      m_activeConnection = conn;
+      bool isBetterLocal = !m_bestConnection->IsLocal() && conn->IsLocal();
+      bool isBetterSSL = !m_bestConnection->isSSL() && conn->isSSL();
+
+      if ((isBetterSSL && conn->IsLocal()) || isBetterLocal)
+      {
+        CLog::Log(LOGDEBUG, "CPlexServer::OnConnectionTest found better connection on %s to %s", GetName().c_str(), conn->GetAddress().Get().c_str());
+        m_activeConnection = conn;
+      }
     }
   }
 
