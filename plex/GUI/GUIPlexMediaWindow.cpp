@@ -651,6 +651,11 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
     }
   }
   
+  if (IsMusicContainer())
+  {
+    u.SetOption("includeRelated","1");
+  }
+
   bool ret = CGUIMediaWindow::GetDirectory(u.Get(), items);
 
 #ifndef TARGET_RASPBERRY_PI
