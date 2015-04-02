@@ -332,6 +332,10 @@
 #define ACTION_PLEX_PL_ADDTO          313
 #define ACTION_PLEX_PL_CREATE         314
 #define ACTION_PLEX_PLAY_EXTRA        315
+
+// related items action range (ie Plex/mix)
+#define ACTION_PLEX_RELATED_START     500
+#define ACTION_PLEX_RELATED_END       510
 /* END PLEX */
 
 // Window ID defines to make the code a bit more readable

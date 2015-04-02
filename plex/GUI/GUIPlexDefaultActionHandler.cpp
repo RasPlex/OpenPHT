@@ -1,4 +1,7 @@
 
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include "URL.h"
 #include "GUIPlexDefaultActionHandler.h"
 #include "PlexExtraDataLoader.h"
 #include "Application.h"
@@ -120,6 +123,14 @@ void CGUIPlexDefaultActionHandler::GetContextButtons(int windowID, CFileItemPtr 
       GetContextButtonsForAction(it->actionID, item, container, buttons);
     }
   }
+
+  // Add the Related items action button
+  int relatedIndex = 0;
+  BOOST_FOREACH(CFileItemPtr it, item->m_relatedItems)
+  {
+    buttons.Add(ACTION_PLEX_RELATED_START + relatedIndex, "Start " + it->GetProperty("title").asString());
+    relatedIndex++;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,22 +140,25 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
   int actionID = action.GetID();
 
   // if the action is not known, then just exit
-  ACTION_SETTING* setting = NULL;
-  for (ActionsSettingListIterator it = m_ActionSettings.begin(); it != m_ActionSettings.end(); ++it)
+  if ((action.GetID() < ACTION_PLEX_RELATED_START) || (action.GetID() > ACTION_PLEX_RELATED_END))
   {
-    if (it->actionID == action.GetID())
+    ACTION_SETTING* setting = NULL;
+    for (ActionsSettingListIterator it = m_ActionSettings.begin(); it != m_ActionSettings.end(); ++it)
     {
-      setting = &(*it);
-      break;
+      if (it->actionID == action.GetID())
+      {
+        setting = &(*it);
+        break;
+      }
     }
+
+    if (!setting)
+      return false;
+
+    // if the action is known, but not available for the window, then exit
+    if (setting->WindowSettings.find(windowID) == setting->WindowSettings.end())
+      return false;
   }
-
-  if (!setting)
-    return false;
-
-  // if the action is known, but not available for the window, then exit
-  if (setting->WindowSettings.find(windowID) == setting->WindowSettings.end())
-    return false;
 
   if (item)
   {
@@ -356,6 +370,16 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
         }
         break;
       }
+    }
+
+    // Handle related items actions
+    if ((actionID >= ACTION_PLEX_RELATED_START) && (actionID <= ACTION_PLEX_RELATED_START))
+    {
+      CPlexPlayQueueOptions options;
+      options.startPlaying = true;
+
+      CFileItemPtr relatedItem = item->m_relatedItems[actionID - ACTION_PLEX_RELATED_START];
+      g_plexApplication.playQueueManager->create(*item.get(), CPlexPlayQueueManager::getURIFromItem(*relatedItem.get()), options);
     }
   }
 
