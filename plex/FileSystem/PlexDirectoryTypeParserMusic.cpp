@@ -13,8 +13,10 @@
 #include "music/Song.h"
 #include "utils/StringUtils.h"
 #include "music/tags/MusicInfoTag.h"
+#include "PlexDirectory.h"
 
 using namespace MUSIC_INFO;
+using namespace XFILE;
 
 void
 CPlexDirectoryTypeParserAlbum::Process(CFileItem &item, CFileItem &mediaContainer, XML_ELEMENT *itemElement)
@@ -138,6 +140,8 @@ CPlexDirectoryTypeParserTrack::Process(CFileItem &item, CFileItem &mediaContaine
 
   ParseMediaNodes(item, itemElement);
 
+  ParseRelatedNodes(item,itemElement);
+
   /* Now we have the Media nodes, we need to "borrow" some properties from it */
   if (item.m_mediaItems.size() > 0)
   {
@@ -168,6 +172,29 @@ CPlexDirectoryTypeParserTrack::Process(CFileItem &item, CFileItem &mediaContaine
     // just try to get unique id for this certain container
     item.GetMusicInfoTag()->SetDatabaseId(id, "video");
     mediaContainer.SetProperty("__containerItemIndex", ++ id);
+  }
+}
+
+void
+CPlexDirectoryTypeParserTrack::ParseRelatedNodes(CFileItem &item, XML_ELEMENT *element)
+{  
+#ifndef USE_RAPIDXML
+  for (XML_ELEMENT* media = element->FirstChildElement(); media; media = media->NextSiblingElement())
+#else
+  for (XML_ELEMENT* related = element->first_node(); related; related = related->next_sibling())
+#endif
+  {
+    if (CStdString(related->name()) == "Related")
+    {
+      for (XML_ELEMENT* directory = related->first_node(); directory; directory = directory->next_sibling())
+      {
+        CFileItemPtr relatedItem = CPlexDirectory::NewPlexElement(directory, item, item.GetPath());
+
+        PlexUtils::PrintItemProperties(relatedItem);
+        relatedItem->m_bIsFolder = true;
+        item.m_relatedItems.push_back(relatedItem);
+      }
+    }
   }
 }
 

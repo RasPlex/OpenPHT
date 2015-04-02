@@ -25,6 +25,7 @@ class CPlexDirectoryTypeParserTrack : public CPlexDirectoryTypeParserVideo
 public:
   CPlexDirectoryTypeParserTrack() {}
   virtual void Process(CFileItem& item, CFileItem& mediaContainer, XML_ELEMENT* itemElement);
+  virtual void ParseRelatedNodes(CFileItem &item, XML_ELEMENT *element);
 };
 
 class CPlexDirectoryTypeParserArtist : public CPlexDirectoryTypeParserAlbum

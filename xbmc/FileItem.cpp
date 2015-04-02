@@ -549,6 +549,7 @@ const CFileItem& CFileItem::operator=(const CFileItem& item)
   m_mediaItems = item.m_mediaItems;
   m_mediaPartStreams = item.m_mediaPartStreams;
   m_overlayItems = item.m_overlayItems;
+  m_relatedItems = item.m_relatedItems;
 
   m_plexDirectoryType = item.m_plexDirectoryType;
   m_selectedMediaPart = item.m_selectedMediaPart;
