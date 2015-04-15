@@ -359,6 +359,15 @@
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>Container.PlexContent(Channels) + ListItem.Type(photos)</visible>
 						</control>
+						<control type="image">
+							<posx>325</posx>
+							<posy>34</posy>
+							<width>30</width>
+							<height>12</height>
+							<texture>icon-music-video.png</texture>
+							<aspectratio>keep</aspectratio>
+							<visible>!IsEmpty(ListItem.Property(primaryExtraKey))</visible>
+						</control>
 						<control type="textbox" id="111">
 							<posy>115</posy>
 							<width>315</width>
