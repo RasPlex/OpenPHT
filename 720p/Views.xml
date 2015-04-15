@@ -226,6 +226,7 @@
 				<animation effect="fade" end="40" time="0" condition="true">Conditional</animation>
 			</control>
 			<visible>!Container.PlexContent(Movie) + !Container.PlexContent(Episode) + !Container.PlexContent(Folders) + !Container.PlexContent(Clip) + !Container.PlexContent(Clips)</visible>
+			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
 			<!-- selected item bg -->
 			<control type="image">
 				<posx>465</posx>

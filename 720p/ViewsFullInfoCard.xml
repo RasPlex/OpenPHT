@@ -190,6 +190,7 @@
 			<visible>Control.IsVisible(58) | Control.IsVisible(88)</visible>
 			<include>rightSideSlide</include>
 			<include>ListItemFullInfoLeftSlide</include>
+			<animation effect="slide" start="0" end="296" time="500" condition="Control.HasFocus(3)">Conditional</animation>
 			<control type="group" id="999">
 				<posx>74</posx>
 				<posy>0</posy>
@@ -197,11 +198,12 @@
 				<control type="group">
 					<!-- bg -->
 					<control type="image">
-						<posx>-889</posx>
+						<posx>0</posx>
 						<posy>0</posy>
-						<width>1280</width>
+						<width>390</width>
 						<height>720</height>
-						<texture>bg-overlay-grainy.png</texture>
+						<texture diffuse="base.png">bg-overlay-grainy.png</texture>
+						<aspectratio scalediffuse="false" align="center" aligny="top">scale</aspectratio>
 						<animation effect="fade" start="0" end="100" time="400" condition="true">Conditional</animation>
 						<colordiffuse>FF555555</colordiffuse>
 						<visible>true</visible>
