@@ -141,38 +141,38 @@
 			</control>
 			<!-- "new list" focused item fanart while using inside the list -->
 			<!-- on deck -->
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7002).HasFocus</visible>
-				<info background="true">Container(11001).ListItem.Property(fanart_image)</info>
+				<texture background="true">$INFO[Container(11001).ListItem.Property(fanart_image)]</texture>
 			</control>
 			<!-- recently added -->
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7001).HasFocus</visible>
-				<info background="true">Container(11000).ListItem.Property(fanart_image)</info>
+				<texture background="true">$INFO[Container(11000).ListItem.Property(fanart_image)]</texture>
 			</control>
 			<!-- recently used -->
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7004).HasFocus</visible>
-				<info background="true">Container(11002).ListItem.Property(fanart_image)</info>
+				<texture background="true">$INFO[Container(11002).ListItem.Property(fanart_image)]</texture>
 			</control>
 			<!-- queue & recommendations (a dirty, dirty hack this one, not pretty) -->
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7003).HasFocus</visible>
-				<info background="true">Container(11003).ListItem.Art(thumb)</info>
+				<texture background="true">$INFO[Container(11003).ListItem.Art(thumb)]</texture>
 			</control>
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7005).HasFocus</visible>
-				<info background="true">Container(11004).ListItem.Art(thumb)</info>
+				<texture background="true">$INFO[Container(11004).ListItem.Art(thumb)]</texture>
 			</control>
-			<control type="multiimage">
+			<control type="image">
 				<include>BGHomeList</include>
 				<visible>ControlGroup(7005).HasFocus + System.PlexPlayQueue(Clip)</visible>
-				<info background="true">Container(11005).ListItem.Art(thumb)</info>
+				<texture background="true">$INFO[Container(11005).ListItem.Art(thumb)]</texture>
 			</control>
 			<control type="image">
 				<include>FullScreenScaled</include>
