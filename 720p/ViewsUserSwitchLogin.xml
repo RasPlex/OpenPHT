@@ -159,7 +159,7 @@
 		<control type="group">
 			<!-- Sans PIN kb -->
 			<control type="group">
-				<visible>IsEmpty(ListItem.Property(protected)) | [!IsEmpty(ListItem.Property(protected)) + IsEmpty(Control.GetLabel(4)) + !ControlGroup(500).HasFocus]</visible>
+				<visible>!ControlGroup(500).HasFocus</visible>
 				<!-- card -->
 				<control type="group">
 					<control type="image">
@@ -170,6 +170,14 @@
 						<aspectratio scalediffuse="false" align="center">scale</aspectratio>
 						<texture>mask-userswitch-selected-grey.png</texture>
 						<animation effect="fade" start="0" end="100" time="0" condition="true">Conditional</animation>
+					</control>
+					<control type="image">
+						<posx>4</posx>
+						<posy>4</posy>
+						<width>204</width>
+						<height>254</height>
+						<aspectratio scalediffuse="false" align="center">scale</aspectratio>
+						<texture diffuse="mask-userswitch-selected.png" blur="20">$INFO[Container(3).ListItem(0).Art(thumb)]</texture>
 					</control>
 					<control type="image">
 						<posx>4</posx>
@@ -225,13 +233,21 @@
 						<width>140</width>
 						<height>140</height>
 						<aspectratio scalediffuse="false" align="center">scale</aspectratio>
+						<texture diffuse="round-big.png">$INFO[Container(3).ListItem(0).Art(thumb)]</texture>
+					</control>
+					<control type="image">
+						<posy>5</posy>
+						<posx>5</posx>
+						<width>140</width>
+						<height>140</height>
+						<aspectratio scalediffuse="false" align="center">scale</aspectratio>
 						<texture diffuse="round-big.png">$INFO[ListItem.Art(thumb)]</texture>
 					</control>
 				</control>
 			</control>
 			<!-- With PIN kb -->
 			<control type="group">
-				<visible>!IsEmpty(Control.GetLabel(4)) | ControlGroup(500).HasFocus</visible>
+				<visible>ControlGroup(500).HasFocus</visible>
 				<!-- card -->
 				<control type="group">
 					<control type="image">
@@ -318,6 +334,7 @@
 					<label>$INFO[ListItem.Label]</label>
 					<font>Regular-18</font>
 					<textcolor>Focused</textcolor>
+					<selectedcolor>Focused</selectedcolor>
 					<align>center</align>
 					<visible>IsEmpty(Container.Property(LoginFailed))</visible>
 				</control>
@@ -346,7 +363,7 @@
 						<disabledcolor>white</disabledcolor>
 						<font>Bold-48</font>
 						<textcolor>Focused</textcolor>
-						<visible>!IsEmpty(Control.GetLabel(4))</visible>
+						<visible>!IsEmpty(Container(3).ListItem(0).Property(protected)) + !IsEmpty(Control.GetLabel(4))</visible>
 						<animation effect="fade" time="100">VisibleChange</animation>
 					</control>
 					<control type="label">
