@@ -210,6 +210,16 @@ bool CGUIWindowStartup::OnAction(const CAction& action)
 
     return true;
   }
+  else if ((action.GetID() == ACTION_MOVE_RIGHT) || (action.GetID() == ACTION_MOVE_LEFT))
+  {
+    CGUIControl *listControl = GetFocusedControl();
+
+    if (listControl && listControl->GetID() == CONTROL_LIST)
+    {
+      m_pin = "";
+      setPinControlText(m_pin);
+    }
+  }
 
   return CGUIWindow::OnAction(action);
 }
