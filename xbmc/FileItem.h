@@ -429,6 +429,9 @@ public:
   std::vector<CFileItemPtr> m_overlayItems;
   std::vector<CFileItemPtr> m_relatedItems;
 
+  // for device declarations
+  std::vector<CFileItemPtr> m_connections;
+
   CFileItemPtr m_selectedMediaPart;
 
   bool IsPlexMediaServer() const;

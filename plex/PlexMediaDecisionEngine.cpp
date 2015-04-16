@@ -288,6 +288,10 @@ CFileItemPtr CPlexMediaDecisionJob::ResolveIndirect(CFileItemPtr item)
     if (!i || i->m_mediaItems.size() == 0)
       return CFileItemPtr();
 
+    /* check if we got some httpHeaders from indirect item */
+    if (i->HasProperty("httpHeaders"))
+      i->m_mediaItems[0]->SetProperty("httpHeaders", i->GetProperty("httpHeaders"));
+
     item = i->m_mediaItems[0];
   }
 

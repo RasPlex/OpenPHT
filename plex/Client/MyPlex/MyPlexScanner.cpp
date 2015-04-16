@@ -20,8 +20,8 @@
 CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
 {
   CPlexServerPtr myplex = g_plexApplication.serverManager->FindByUUID("myplex");
-  CURL url = myplex->BuildPlexURL("pms/servers");
-  url.SetOption("includeLite", "1");
+  CURL url = myplex->BuildPlexURL("pms/resources");
+  url.SetOption("includeHttps", "1");
 
   XFILE::CPlexDirectory dir;
   CFileItemList list;
@@ -40,7 +40,7 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
   for (int i = 0; i < list.Size(); i ++)
   {
     CFileItemPtr serverItem = list.Get(i);
-    if (serverItem && serverItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_SERVER)
+    if (serverItem && serverItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_DEVICE)
     {
       bool synced = serverItem->GetProperty("synced").asBoolean();
 
@@ -50,8 +50,9 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
         continue;
       }
 
-      CStdString uuid = serverItem->GetProperty("machineIdentifier").asString();
+      CStdString uuid = serverItem->GetProperty("clientIdentifier").asString();
       CStdString name = serverItem->GetProperty("name").asString();
+      CStdString token = serverItem->GetProperty("accessToken").asString();
       bool owned = serverItem->GetProperty("owned").asBoolean();
       bool home = serverItem->GetProperty("home").asBoolean(false);
 
@@ -64,29 +65,29 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
         server->SetOwner(serverItem->GetProperty("sourceTitle").asString());
       server->SetHome(home);
 
-      CStdString address = serverItem->GetProperty("address").asString();
-      CStdString token = serverItem->GetProperty("accessToken").asString();
-      CStdString localAddresses = serverItem->GetProperty("localAddresses").asString();
-      CStdString schema = serverItem->GetProperty("scheme").asString();
-      int port = serverItem->GetProperty("port").asInteger();
-
-      if (token.empty())
-        continue;
-
-      if (!address.empty())
+      BOOST_FOREACH(const CFileItemPtr& connection, serverItem->m_connections)
       {
-        CPlexConnectionPtr connection = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_MYPLEX, address, port, schema, token));
-        server->AddConnection(connection);
-      }
+        CStdString uri = connection->GetProperty("uri").asString();
+        CURL connectionurl(uri);
 
-      /* only add localConnections for non-shared servers */
-      if ((owned || home) && !localAddresses.empty())
-      {
-        CStdStringArray addressList = StringUtils::SplitString(localAddresses, ",", 0);
-        BOOST_FOREACH(CStdString laddress, addressList)
+        CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(
+          CPlexConnection::CONNECTION_MYPLEX,
+          connectionurl.GetHostName(),
+          connectionurl.GetPort(),
+          connectionurl.GetProtocol(),
+          token));
+
+        server->AddConnection(conn);
+
+        if (connectionurl.GetProtocol() == "https")
         {
-          CPlexConnectionPtr lconn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_MYPLEX, laddress, DEFAULT_PORT, schema, token));
-          server->AddConnection(lconn);
+          CPlexConnectionPtr plainConn = CPlexConnectionPtr(new CPlexConnection(
+            CPlexConnection::CONNECTION_MYPLEX,
+            connectionurl.GetHostName(),
+            connectionurl.GetPort(),
+            "http",
+            token));
+          server->AddConnection(plainConn);
         }
       }
 

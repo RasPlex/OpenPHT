@@ -14,6 +14,7 @@
 #include "PlexDirectoryTypeParserMusic.h"
 #include "PlexDirectoryTypeParserPicture.h"
 #include "PlexDirectoryTypeParserRelease.h"
+#include "PlexDirectoryTypeParserDevice.h"
 
 static CPlexDirectoryTypeParserBase* videoParser = new CPlexDirectoryTypeParserVideo;
 static CPlexDirectoryTypeParserBase* albumParser = new CPlexDirectoryTypeParserAlbum;
@@ -22,6 +23,7 @@ static CPlexDirectoryTypeParserBase* trackParser = new CPlexDirectoryTypeParserT
 static CPlexDirectoryTypeParserBase* artistParser = new CPlexDirectoryTypeParserArtist;
 static CPlexDirectoryTypeParserBase* pictureParser = new CPlexDirectoryTypeParserPicture;
 static CPlexDirectoryTypeParserBase* releaseParser = new CPlexDirectoryTypeParserRelease;
+static CPlexDirectoryTypeParserBase* deviceParser = new CPlexDirectoryTypeParserDevice;
 
 CPlexDirectoryTypeParserBase*
 CPlexDirectoryTypeParserBase::GetDirectoryTypeParser(EPlexDirectoryType type)
@@ -49,6 +51,9 @@ CPlexDirectoryTypeParserBase::GetDirectoryTypeParser(EPlexDirectoryType type)
 
   else if (type == PLEX_DIR_TYPE_RELEASE)
     return releaseParser;
+
+  else if (type == PLEX_DIR_TYPE_DEVICE)
+    return deviceParser;
 
   return baseParser;
 }

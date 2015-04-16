@@ -416,11 +416,21 @@ CURL CPlexServer::GetActiveConnectionURL() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CURL CPlexServer::BuildPlexURL(const CStdString& path) const
 {
-  CURL url;
-  url.SetProtocol("plexserver");
-  url.SetHostName(m_uuid);
-  url.SetFileName(path);
-  return url.Get();
+  if (m_uuid.empty() == false)
+  {
+    CURL url;
+    url.SetProtocol("plexserver");
+    url.SetHostName(m_uuid);
+    url.SetFileName(path);
+    return url.Get();
+  }
+  else
+  {
+    // this means that we have a synthesized server without a uuid
+    // so we can't use plexserver:// url's. Maybe try to return a
+    // real URL instead?
+    return BuildURL(path);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
