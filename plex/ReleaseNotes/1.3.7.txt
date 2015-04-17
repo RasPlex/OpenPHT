@@ -1,0 +1,9 @@
+NEW:
+  - Smoother background transition when changing section (Jonas Karlman)
+
+FIXES:
+  - Fix Extras button disappear shortly after entering the preplay screen
+  - Fix some channel related playback with channels that need custom HTTP headers (Jonas Karlman)
+  - Fix problems with credentials stored (Steven Hartland)
+  - Fix crashes on Linux.
+  - Fix resume of transcoded content
