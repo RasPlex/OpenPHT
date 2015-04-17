@@ -176,6 +176,11 @@ MsgQueueReturnCode CDVDMessageQueue::Get(CDVDMsg** pMsg, unsigned int iTimeoutIn
       DVDMessageListItem& item(m_list.back());
       priority = item.priority;
 
+      /* PLEX */
+      if (item.message == NULL)
+        continue;
+      /* END PLEX */
+
       if (item.message->IsType(CDVDMsg::DEMUXER_PACKET) && item.priority == 0)
       {
         DemuxPacket* packet = ((CDVDMsgDemuxerPacket*)item.message)->GetPacket();
