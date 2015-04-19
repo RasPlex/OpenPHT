@@ -73,9 +73,5 @@
       <activate>Notify.wav</activate>
       <deactivate>Out.wav</deactivate>
     </window>
-    <window>
-      <name>Startup</name>
-      <activate>Start.wav</activate>
-    </window>
   </windows>
 </sounds>
