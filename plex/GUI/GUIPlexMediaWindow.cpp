@@ -655,7 +655,7 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
 
   // we eventually add music extras request if the server allows it.
   CPlexServerVersion serverVersion(server->GetVersion());
-  CPlexServerVersion needVersion("0.9.11.17.0-abc123");
+  CPlexServerVersion needVersion("0.9.11.17.9999-ffffff");
   if ((serverVersion > needVersion) && IsMusicContainer())
   {
     u.SetOption("includeRelated","1");
