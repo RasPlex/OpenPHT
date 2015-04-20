@@ -246,7 +246,7 @@ bool CPlexServerDataLoaderJob::DoWork()
     myPlexSection->SetProperty("serverUUID", "myplex");
     myPlexSection->SetPath("plexserver://myplex/pms/playlists");
     myPlexSection->SetLabel(g_localizeStrings.Get(44021));
-    myPlexSection->SetPlexDirectoryType(PLEX_DIR_TYPE_PLAYLIST);
+    myPlexSection->SetPlexDirectoryType(PLEX_DIR_TYPE_MOVIE);
     m_sectionList->Add(myPlexSection);
   }
 
