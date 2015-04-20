@@ -32,6 +32,17 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
     return;
   }
 
+  string uri = service->getParam("Host");
+  if (!uri.empty())
+  {
+    CURL u(uri);
+    u.SetProtocol("https");
+    u.SetPort(port);
+    CLog::Log(LOGDEBUG, "CPlexNetworkServiceBrowser::handleServiceArrival adding SSL connection: %s", u.Get().c_str());
+    CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, u.GetHostName(), u.GetPort(), u.GetProtocol()));
+    server->AddConnection(conn);
+  }
+
   CPlexConnectionPtr conn =
       CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, address, port));
   server->AddConnection(conn);
