@@ -653,12 +653,13 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
   
   CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(u.GetHostName());
 
-  // we eventually add music extras request if the server allows it.
-  CPlexServerVersion serverVersion(server->GetVersion());
-  CPlexServerVersion needVersion("0.9.11.17.9999-ffffff");
-  if ((serverVersion > needVersion) && IsMusicContainer())
+  if (server)
   {
-    u.SetOption("includeRelated","1");
+    // we eventually add music extras request if the server allows it.
+    CPlexServerVersion serverVersion(server->GetVersion());
+    CPlexServerVersion needVersion("0.9.11.17.9999-ffffff");
+    if ((serverVersion > needVersion) && IsMusicContainer())
+      u.SetOption("includeRelated", "1");
   }
 
   bool ret = CGUIMediaWindow::GetDirectory(u.Get(), items);
