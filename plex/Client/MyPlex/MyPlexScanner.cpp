@@ -83,8 +83,8 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
         {
           CPlexConnectionPtr plainConn = CPlexConnectionPtr(new CPlexConnection(
             CPlexConnection::CONNECTION_MYPLEX,
-            connectionurl.GetHostName(),
-            connectionurl.GetPort(),
+            connection->GetProperty("address").asString(),
+            connection->GetProperty("port").asInteger(),
             "http",
             token));
           server->AddConnection(plainConn);
