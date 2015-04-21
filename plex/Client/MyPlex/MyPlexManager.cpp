@@ -85,6 +85,9 @@ void CMyPlexManager::Process()
     if (m_bStop)
       break;
 
+    // reset error before we enter processing
+    m_lastError = ERROR_NOERROR;
+
     switch(m_state)
     {
       case STATE_REFRESH:
@@ -208,8 +211,6 @@ void CMyPlexManager::BroadcastState()
       break;
   }
 
-  m_lastError = ERROR_NOERROR;
-
   if (m_state == STATE_LOGGEDIN || m_state == STATE_NOT_LOGGEDIN)
   {
     /* Update settings */
@@ -228,6 +229,9 @@ TiXmlElement* CMyPlexManager::GetXml(const CURL &url, bool POST)
   CStdString data;
   bool returnval;
   XFILE::CPlexFile file;
+
+  // use a lower default timeout
+  file.SetTimeout(3);
 
   if (POST)
     returnval = file.Post(url.Get(), "", data);
