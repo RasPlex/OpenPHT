@@ -226,8 +226,15 @@ bool CPlexServerCacheDatabase::getCachedServers(std::vector<CPlexServerPtr>& ser
         CPlexAES aes(g_guiSettings.GetString("system.uuid"));
         token = aes.decrypt(Base64::Decode(token));
 
-        CPlexConnectionPtr connection = CPlexConnectionPtr(new CPlexConnection(type, address, port, schema, token));
-        server->AddConnection(connection);
+        if (address.IsEmpty())
+        {
+          CLog::Log(LOGWARNING, "CPlexServerCacheDatabase::getCachedServers refusing to add server with null address.");
+        }
+        else
+        {
+          CPlexConnectionPtr connection = CPlexConnectionPtr(new CPlexConnection(type, address, port, schema, token));
+          server->AddConnection(connection);
+        }
 
         m_pDS->next();
       }
