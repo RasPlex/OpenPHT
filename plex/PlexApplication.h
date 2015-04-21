@@ -83,7 +83,7 @@ class PlexApplication : public IMsgTargetCallback,
 {
 public:
   PlexApplication()
-    : myPlexManager(NULL), remoteSubscriberManager(NULL), m_networkLoggingOn(false) {};
+    : myPlexManager(NULL), remoteSubscriberManager(NULL), m_networkLoggingOn(false), m_hasAuthed(false) {};
   void Start();
 
   /// Destructor
@@ -137,12 +137,24 @@ public:
   void Shutdown();
   void preShutdown();
 
+  bool hasAuthed() const
+  {
+    return m_hasAuthed;
+  }
+
+  void setHasAuthed(bool hasAuthed)
+  {
+    PlexApplication::m_hasAuthed = hasAuthed;
+  }
+
+
 private:
   /// Members
   CPlexServiceListenerPtr m_serviceListener;
   CStdString m_ipAddress;
   bool m_networkLoggingOn;
   bool m_triedToRestart;
+  bool m_hasAuthed; // if the user has entered the PIN at some point.
 
   virtual void Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char* sender,
                         const char* message, const CVariant& data);

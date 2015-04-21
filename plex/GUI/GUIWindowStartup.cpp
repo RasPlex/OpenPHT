@@ -37,6 +37,7 @@
 #include "GUILabelControl.h"
 #include "PlexJobs.h"
 #include "Client/MyPlex/MyPlexManager.h"
+#include "PlexApplication.h"
 
 #define CONTROL_LIST 3
 #define CONTROL_INPUT_LABEL 4
@@ -303,20 +304,28 @@ void CGUIWindowStartup::SelectUserByName(CStdString user)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CGUIWindowStartup::OnUserSelected(CFileItemPtr item)
 {
-  bool isAdmin = item->GetProperty("admin").asBoolean();
   bool close = false;
+
+  std::string currentUserName = g_plexApplication.myPlexManager->GetCurrentUserInfo().username;
+
+  CFileItemPtr currentUserItem;
+  for (int i = 0; i < m_users.Size(); i ++)
+  {
+    if (m_users.Get(i)->GetLabel() == currentUserName)
+      currentUserItem = m_users.Get(i);
+  }
+
+  assert(currentUserItem);
+  bool isAdmin = currentUserItem->GetProperty("admin").asBoolean(false);
 
   m_selectedUser = item->GetProperty("title").asString();
   m_selectedUserThumb = item->GetArt("thumb");
 
-  if (!item->GetProperty("protected").asBoolean())
+  if ((isAdmin && g_plexApplication.hasAuthed()) || !item->GetProperty("protected").asBoolean())
   {
     // no PIN needed.
-    if (g_plexApplication.myPlexManager->GetCurrentUserInfo().id !=
-        item->GetProperty("id").asInteger())
-    {
+    if (g_plexApplication.myPlexManager->GetCurrentUserInfo().id != item->GetProperty("id").asInteger())
       g_plexApplication.myPlexManager->SwitchHomeUser(item->GetProperty("id").asInteger(-1));
-    }
 
     m_selectedUser = "";
     m_selectedUserThumb = "";
@@ -346,6 +355,8 @@ void CGUIWindowStartup::OnNumber(unsigned int num)
     // we got a full pin (4 chars), check it its valid
     if (g_plexApplication.myPlexManager->VerifyPin(m_pin, item->GetProperty("id").asInteger()))
     {
+      g_plexApplication.setHasAuthed(true);
+
       if (g_plexApplication.myPlexManager->GetCurrentUserInfo().id !=
           item->GetProperty("id").asInteger())
       {
