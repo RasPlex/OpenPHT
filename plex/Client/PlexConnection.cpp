@@ -9,6 +9,10 @@ using namespace XFILE;
 CPlexConnection::CPlexConnection(int type, const CStdString& host, int port, const CStdString& schema, const CStdString& token) :
   m_type(type), m_state(CONNECTION_STATE_UNKNOWN), m_token(token)
 {
+  if (host.IsEmpty() || port == 0 || schema.IsEmpty())
+  {
+    CLog::Log(LOGWARNING, "CPlexConnection::CPlexConnection inited with something that was empty");
+  }
   m_url.SetHostName(host);
   m_url.SetPort(port);
   m_url.SetProtocol(schema);

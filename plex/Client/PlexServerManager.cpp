@@ -152,6 +152,8 @@ void CPlexServerManager::RemoveAllServers()
 {
   CSingleLock lk(m_serverManagerLock);
 
+  CLog::Log(LOGDEBUG, "CPlexServerManager::RemoveAllServers nuclear remove.");
+
   // The "nuclear" option. We probably have changed users
   // or something like that.
   //
