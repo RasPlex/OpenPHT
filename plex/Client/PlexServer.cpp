@@ -10,6 +10,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/timer.hpp>
+#include <settings/AdvancedSettings.h>
 
 using namespace std;
 
@@ -239,11 +240,15 @@ bool CPlexServer::UpdateReachability()
   BOOST_FOREACH(CPlexConnectionPtr conn, sortedConnections)
   {
     CLog::Log(LOGDEBUG, "CPlexServer::UpdateReachability testing connection %s", conn->toString().c_str());
-    if (g_plexApplication.myPlexManager &&
-        g_plexApplication.myPlexManager->GetCurrentUserInfo().restricted &&
-        conn->GetAccessToken().IsEmpty())
+    if ((g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->GetCurrentUserInfo().restricted && conn->GetAccessToken().IsEmpty()))
     {
       CLog::Log(LOGINFO, "CPlexServer::UpdateReachability skipping connection %s since we are restricted", conn->toString().c_str());
+      m_connectionsLeft --;
+      continue;
+    }
+    else if (g_advancedSettings.m_bRequireEncryptedConnection && conn->isSSL() == false)
+    {
+      CLog::Log(LOGINFO, "CPlexServer::UpdateReachability skipping connection %s since it's not encrypted", conn->toString().c_str());
       m_connectionsLeft --;
       continue;
     }
