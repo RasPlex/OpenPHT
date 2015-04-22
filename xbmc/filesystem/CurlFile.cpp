@@ -49,6 +49,7 @@
 #include "FileItem.h"
 #include "Variant.h"
 #include "PlexUtils.h"
+#include "StringUtils.h"
 /* END PLEX */
 
 using namespace XFILE;
@@ -389,6 +390,7 @@ CCurlFile::CCurlFile()
   /* PLEX */
   m_clearCookies = false;
   m_userAgent = PLEX_HOME_THEATER_USER_AGENT;
+  m_dnsLookupList = NULL;
   /* END PLEX */
 }
 
@@ -411,6 +413,12 @@ void CCurlFile::Close()
     g_curlInterface.slist_free_all(m_curlAliasList);
   if( m_curlHeaderList && g_curlInterface.IsLoaded() ) // PLEX
     g_curlInterface.slist_free_all(m_curlHeaderList);
+
+  /* PLEX */
+  if (m_dnsLookupList && g_curlInterface.IsLoaded())
+    g_curlInterface.slist_free_all(m_dnsLookupList);
+  m_dnsLookupList = NULL;
+  /* END PLEX */
 
   m_curlAliasList = NULL;
   m_curlHeaderList = NULL;
@@ -527,6 +535,25 @@ void CCurlFile::SetCommonOptions(CReadState* state)
   // If we are talking to plex.tv we use our own CA's certificate instead of the generic one.
   if (boost::starts_with(m_url, "https://plex.tv") && !boost::starts_with(m_url, "https://plex.tv:443/sync") && !boost::starts_with(m_url, "https://plex.tv/sync"))
     g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, CSpecialProtocol::TranslatePath("special://xbmc/system/plexca.pem").c_str());
+
+  CURL u(m_url);
+  if (u.GetProtocol() == "https" && boost::ends_with(u.GetHostName(), ".plex.direct"))
+  {
+    // for plex.direct domains we take control and resolve it ourselves this works around dns-rebinding
+    CStdString host = u.GetHostName();
+    int delimeter = host.Find('.');
+    if (delimeter > 0)
+    {
+      host = host.substr(0, delimeter);
+      host.Replace('-', '.');
+
+      CStdString lookupstr;
+      lookupstr.Format("%s:%d:%s", u.GetHostName(), u.GetPort(), host);
+
+      m_dnsLookupList = g_curlInterface.slist_append(NULL, lookupstr.c_str());
+      g_curlInterface.easy_setopt(h, CURLOPT_RESOLVE, m_dnsLookupList);
+    }
+  }
   /* END PLEX */
 
   // setup Referer header if needed

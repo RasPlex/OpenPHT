@@ -206,6 +206,7 @@ namespace XFILE
       /* PLEX */
       CStdString      m_verb;
       bool            m_clearCookies;
+      struct XCURL::curl_slist* m_dnsLookupList;
       /* END PLEX */
   };
 }
