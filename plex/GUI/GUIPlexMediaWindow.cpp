@@ -717,7 +717,7 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
         items.AddFront(item, 0);
       }
 
-      for (int i = NeededRangeEnd; i < items.GetProperty("totalSize").asInteger(); i++)
+      for (int i = NeededRangeEnd; i < (items.GetProperty("totalSize").asInteger() - 1); i++)
       {
         CFileItemPtr item = CFileItemPtr(new CFileItem);
         item->SetPath(boost::lexical_cast<std::string>(i));
