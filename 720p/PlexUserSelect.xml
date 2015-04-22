@@ -8,6 +8,11 @@
 			<include>UserSwitchLogin</include>
 			<include>KbPIN</include>
 		</control>
+		<!-- Loading indicator -->
+		<control type="group">
+			<visible>true</visible>
+			<include>UserSwitchLoginLoadingIndicator</include>
+		</control>
 		<!-- top-level ui (Debug.xml + grid) -->
 		<include>debugInfos</include>
 		<include>Grid</include>
