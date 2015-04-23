@@ -892,9 +892,6 @@ void CGUIWindowHome::UpdateSections()
       g_plexApplication.serverManager->GetBestServer() &&
       g_plexApplication.dataLoader->AnyOwnedServerHasPlaylists())
     AddPlaylists(newList, listUpdated);
-  
-  if ((!havePlayqueues) && g_plexApplication.playQueueManager->getPlayQueuesCount())
-    AddPlayQueues(newList, listUpdated);
 
   if (listUpdated)
   {
@@ -922,24 +919,6 @@ void CGUIWindowHome::AddPlaylists(std::vector<CGUIListItemPtr>& list, bool& upda
 
   AddSection(path, CPlexSectionFanout::SECTION_TYPE_PLAYLISTS, true);
 
-  list.push_back(item);
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void CGUIWindowHome::AddPlayQueues(std::vector<CGUIListItemPtr>& list, bool& updated)
-{
-  updated = true;
-  
-  CGUIStaticItemPtr item = CGUIStaticItemPtr(new CGUIStaticItem);
-  CStdString path("plexserver://playQueues/");
-  
-  item->SetLabel("Now Playing");
-  item->SetProperty("playqueues", true);
-  item->SetProperty("sectionPath", path);
-  item->SetProperty("navigateDirectly", true);
-  
-  AddSection(path, CPlexSectionFanout::SECTION_TYPE_PLAYQUEUES, true);
-  
   list.push_back(item);
 }
 
