@@ -197,7 +197,7 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
       extralist.Copy(*(m_extraDataLoader.getItems()));
       CLog::Log(LOGDEBUG,"CGUIPlexMediaWindow::OnMessage GUI_MSG_PLEX_EXTRA_DATA_LOADED (%d)", extralist.Size());
 
-      if (extralist.Size())
+      if (extralist.Size() > 0)
       {
         m_vecItems->Get(0)->SetProperty("PlexExtras", "1");
 
@@ -208,7 +208,6 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
       }
       else
       {
-        m_vecItems->Get(0)->SetProperty("PlexExtras", "");
         m_vecItems->SetProperty("PlexExtras", "");
       }
 
