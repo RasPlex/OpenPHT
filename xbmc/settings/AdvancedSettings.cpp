@@ -125,7 +125,7 @@ void CAdvancedSettings::Initialize()
 
   m_slideshowPanAmount = 2.5f;
   m_slideshowZoomAmount = 5.0f;
-  m_slideshowBlackBarCompensation = 20.0f;
+  m_slideshowBlackBarCompensation = 2.0f;
 
   m_lcdHeartbeat = false;
   m_lcdDimOnScreenSave = false;
