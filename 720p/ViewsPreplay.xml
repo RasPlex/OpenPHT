@@ -1063,7 +1063,7 @@
 		<!-- extras -->
 		<include>leftMenuBg</include>
 		<control type="group">
-			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
+			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(30)">Conditional</animation>
 			<posx>-224</posx>
 			<control type="group">
 				<posx>0</posx>
@@ -1071,20 +1071,20 @@
 				<control type="label">
 					<posx>36</posx>
 					<posy>40</posy>
-					<label>$LOCALIZE[41008] ($INFO[Container(3).NumItems])</label>
+					<label>$LOCALIZE[41008] ($INFO[Container(30).NumItems])</label>
 					<font>Bold-36</font>
 					<include>WhiteShadow</include>
 				</control>
 				<control type="group">
 					<posy>68</posy>
 					<posx>26</posx>
-					<control type="list" id="3">
+					<control type="list" id="30">
 						<width>260</width>
 						<height>600</height>
 						<onleft>998</onleft>
 						<onright>998</onright>
-						<onup>3</onup>
-						<ondown>3</ondown>
+						<onup>30</onup>
+						<ondown>30</ondown>
 						<pagecontrol>61</pagecontrol>
 						<scrolltime>200</scrolltime>
 						<itemlayout height="200">
@@ -1130,7 +1130,7 @@
 			<posy>-28</posy>
 			<visible>Container.PlexContent(Movie) | [Container.PlexContent(Channel) + ListItem.Type(movie)]</visible>
 			<include>FadeDialog</include>
-			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(3)">Conditional</animation>
+			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(30)">Conditional</animation>
 			<!-- backgrounds -->
 			<control type="group">
 				<control type="largeimage">
