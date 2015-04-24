@@ -44,6 +44,14 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
     {
       bool synced = serverItem->GetProperty("synced").asBoolean();
 
+      // only process Devices that provides server.
+      CStdString provides = serverItem->GetProperty("provides").asString();
+      if (provides.Find("server") == -1)
+      {
+        CLog::Log(LOGDEBUG, "CMyPlexScanner::DoScan skipping %s since it doesn't provide server", serverItem->GetProperty("name").asString().c_str());
+        continue;
+      }
+
       if (synced && g_guiSettings.GetBool("myplex.hidecloudsync"))
       {
         CLog::Log(LOGDEBUG, "CMyPlexScanner::DoScan hiding cloudsync server");
