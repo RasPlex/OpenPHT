@@ -27,7 +27,7 @@
 #include "Application.h"
 #include "GUIUserMessages.h"
 
-#define EXTRAS_LIST_CONTROL_ID   3  // preplay window Extras list control ID
+#define EXTRAS_LIST_CONTROL_ID   30  // preplay window Extras list control ID
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CGUIWindowPlexPreplayVideo::CGUIWindowPlexPreplayVideo(void)
