@@ -625,9 +625,9 @@
 			<include>leftMenuInitSlide</include>
 			<include>leftMenuSlide</include>
 			<include>leftMenuBg</include>
-			<!-- sidebar video -->
+			<!-- sidebar video & photos -->
 			<control type="grouplist" id="998">
-				<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | Container.PlexContent(Seasons) | Container.PlexContent(Episodes)</visible>
+				<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | Container.PlexContent(Seasons) | Container.PlexContent(Clips) | Container.PlexContent(Episodes) | Container.PlexContent(Homemovies) | Container.PlexContent(Channel) | Container.PlexContent(Photos)</visible>
 				<posy>40</posy>
 				<posx>0</posx>
 				<width>74</width>
@@ -642,7 +642,7 @@
 					<texturenofocus>left-menu-filters-icon-u.png</texturenofocus>
 					<onclick>Control.SetFocus(1300)</onclick>
 					<include>leftMenuBarButton</include>
-					<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | [Container.PlexContent(Episodes) + !IsEmpty.Container.Property(primaryFilterActivated)]</visible>
+					<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | Container.PlexContent(Homemovies) | Container.PlexContent(Clips) | [Container.PlexContent(Channel) + !ListItem.Type(Clip)] | Container.PlexContent(Photos) | [Container.PlexContent(Episodes) + !IsEmpty.Container.Property(primaryFilterActivated)]</visible>
 				</control>
 				<!-- Play All -->
 				<control type="button" id="104">

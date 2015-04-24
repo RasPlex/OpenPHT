@@ -526,6 +526,25 @@
 		<texturenofocus>mask-userswitch-kb-zero.png</texturenofocus>
 		<focusedcolor>black</focusedcolor>
 	</include>
+	<include name="UserSwitchLoginLoadingIndicator">
+		<!-- Loading indicator -->
+		<control type="group">
+			<posx>624</posx>
+			<posy>300</posy>
+			<control type="image">
+				<texture>ActivityIndicator.gif</texture>
+				<width>32</width>
+				<height>32</height>
+			</control>
+			<control type="label">
+				<label>Loading users...</label>
+				<font>Bold-16</font>
+				<posx>-50</posx>
+				<posy>60</posy>
+				<textcolor>FF888888</textcolor>
+			</control>
+		</control>
+	</include>
 	<!-- list -->
 	<include name="UserSwitchLogin">
 		<control type="group">
