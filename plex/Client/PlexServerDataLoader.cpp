@@ -264,9 +264,16 @@ CFileItemListPtr CPlexServerDataLoader::GetAllSharedSections() const
     for (int i = 0; i < pair.second->Size(); i++)
     {
       CFileItemPtr item = pair.second->Get(i);
-      item->SetProperty("serverName", pair.second->GetProperty("serverName"));
-      item->SetProperty("serverUUID", pair.second->GetProperty("serverUUID"));
-      list->Add(item);
+
+      CStdString uuid = pair.second->GetProperty("serverUUID").asString();
+      CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(uuid);
+      if (server)
+      {
+        item->SetProperty("serverName", server->GetName());
+        item->SetProperty("serverUUID", server->GetUUID());
+        item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
+        list->Add(item);
+      }
     }
   }
 
@@ -290,17 +297,23 @@ CFileItemListPtr CPlexServerDataLoader::GetAllSections() const
       CFileItemPtr item = pair.second->Get(i);
       if (item)
       {
-        item->SetProperty("serverName", pair.second->GetProperty("serverName"));
-        item->SetProperty("serverUUID", pair.second->GetProperty("serverUUID"));
-        list->Add(item);
-
-        if (sectionNameMap.find(item->GetLabel()) != sectionNameMap.end())
+        CStdString serverUUID = pair.second->GetProperty("serverUUID").asString();
+        CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(serverUUID);
+        if (server)
         {
-          sectionNameMap[item->GetLabel()]->SetProperty("SectionNameCollision", "yes");
-          item->SetProperty("sectionNameCollision", "yes");
-        }
+          item->SetProperty("serverName", server->GetName());
+          item->SetProperty("serverUUID", server->GetUUID());
+          item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
+          list->Add(item);
 
-        sectionNameMap[item->GetLabel()] = item;
+          if (sectionNameMap.find(item->GetLabel()) != sectionNameMap.end())
+          {
+            sectionNameMap[item->GetLabel()]->SetProperty("SectionNameCollision", "yes");
+            item->SetProperty("sectionNameCollision", "yes");
+          }
+
+          sectionNameMap[item->GetLabel()] = item;
+        }
       }
     }
   }
