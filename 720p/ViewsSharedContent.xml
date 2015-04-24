@@ -52,16 +52,42 @@
 		<shadowcolor>FF222222</shadowcolor>
 	</include>	
 	<include name="SharedContentLeafsTitle2">
-		<posy>295</posy>
-		<posx>119</posx>
-		<width>238</width>
-		<height>30</height>
-		<align>center</align>
-		<aligny>center</aligny>
-		<label>$INFO[ListItem.Property(serverOwner)] &#xB7; $INFO[ListItem.Property(serverName)]</label>
-		<textcolor>greyLighter</textcolor>
-		<font>Regular-17</font>
-		<shadowcolor>FF222222</shadowcolor>
+		<control type="group">
+		<posy>290</posy>
+			<control type="label">
+				<posx>130</posx>
+				<width>243</width>
+				<height>30</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<label>$INFO[ListItem.Property(serverOwner)] &#xB7; $INFO[ListItem.Property(serverName)]</label>
+				<textcolor>greyLighter</textcolor>
+				<font>Regular-17</font>
+				<shadowcolor>FF222222</shadowcolor>
+				<visible>IsEmpty(ListItem.Property(isSecure))</visible>
+			</control>
+			<control type="label">
+				<posx>120</posx>
+				<width>220</width>
+				<height>30</height>
+				<align>center</align>
+				<aligny>center</aligny>
+				<label>$INFO[ListItem.Property(serverOwner)] &#xB7; $INFO[ListItem.Property(serverName)]</label>
+				<textcolor>greyLighter</textcolor>
+				<font>Regular-17</font>
+				<shadowcolor>FF222222</shadowcolor>
+				<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+			</control>
+			<control type="image">
+				<posy>5</posy>
+				<posx>235</posx>
+				<width>18</width>
+				<height>18</height>
+				<texture>icon-lock-round-simplified.png</texture>
+				<colordiffuse>CC5CB85C</colordiffuse>
+				<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+			</control>
+		</control>
 	</include>	
 	<include name="SharedContent">
 		<control type="group">
@@ -83,9 +109,7 @@
 						<control type="label">
 							<include>SharedContentLeafsTitle</include>
 						</control>
-						<control type="label">
-							<include>SharedContentLeafsTitle2</include>
-						</control>
+						<include>SharedContentLeafsTitle2</include>
 					</itemlayout>
 					<focusedlayout width="223" height="315">
 						<include>SharedContentLeafs</include>
@@ -93,9 +117,7 @@
 							<include>SharedContentLeafsTitle</include>
 							<textcolor>orangeLight</textcolor>
 						</control>
-						<control type="label">
-							<include>SharedContentLeafsTitle2</include>
-						</control>
+						<include>SharedContentLeafsTitle2</include>
 						<include>SharedContentLeafsSelectedBorder</include>
 					</focusedlayout>
 				</control>
