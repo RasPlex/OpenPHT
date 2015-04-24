@@ -10,7 +10,7 @@
 		</control>
 		<!-- Loading indicator -->
 		<control type="group">
-			<visible>false</visible>
+			<visible>!IsEmpty(Container.Property(UsersLoading))</visible>
 			<include>UserSwitchLoginLoadingIndicator</include>
 		</control>
 		<!-- top-level ui (Debug.xml + grid) -->
