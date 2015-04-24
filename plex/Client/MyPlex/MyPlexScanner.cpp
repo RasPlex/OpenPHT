@@ -86,17 +86,6 @@ CMyPlexManager::EMyPlexError CMyPlexScanner::DoScan()
           token));
 
         server->AddConnection(conn);
-
-        if (connectionurl.GetProtocol() == "https")
-        {
-          CPlexConnectionPtr plainConn = CPlexConnectionPtr(new CPlexConnection(
-            CPlexConnection::CONNECTION_MYPLEX,
-            connection->GetProperty("address").asString(),
-            connection->GetProperty("port").asInteger(),
-            "http",
-            token));
-          server->AddConnection(plainConn);
-        }
       }
 
       serverList.push_back(server);
