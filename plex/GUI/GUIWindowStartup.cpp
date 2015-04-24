@@ -78,7 +78,7 @@ bool CGUIWindowStartup::OnMessage(CGUIMessage& message)
 
       CPlexDirectoryFetchJob * job = new CPlexDirectoryFetchJob(CURL("plexserver://myplex/api/home/users"));
       m_fetchUsersJobID = CJobManager::GetInstance().AddJob(job, this);
-
+      m_vecItems->SetProperty("UsersLoading", "1");
     }
     else
     {
@@ -233,6 +233,7 @@ void CGUIWindowStartup::OnJobComplete(unsigned int jobID, bool success, CJob *jo
   if (!fjob)
     return;
 
+  m_vecItems->SetProperty("UsersLoading", "");
   m_users.Clear();
 
   if (success)
