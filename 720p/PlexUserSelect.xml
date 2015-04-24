@@ -10,7 +10,7 @@
 		</control>
 		<!-- Loading indicator -->
 		<control type="group">
-			<visible>true</visible>
+			<visible>false</visible>
 			<include>UserSwitchLoginLoadingIndicator</include>
 		</control>
 		<!-- top-level ui (Debug.xml + grid) -->
