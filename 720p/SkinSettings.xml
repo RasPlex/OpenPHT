@@ -125,7 +125,7 @@
 				<posy>0</posy>
 				<posx>105</posx>
 				<width>625</width>
-				<height>400</height>
+				<height>450</height>
 				<onup>201</onup>
 				<onleft>101</onleft>
 				<itemgap>0</itemgap>
@@ -187,6 +187,13 @@
 					<label>$LOCALIZE[32119]</label>
 					<onclick>Skin.ToggleSetting(HideFanart)</onclick>
 					<selected>Skin.HasSetting(HideFanart)</selected>
+				</control>
+				<control type="radiobutton" id="219">
+					<description>Hide Secure Server Icons</description>
+					<width>625</width>
+					<label>$LOCALIZE[32120]</label>
+					<onclick>Skin.ToggleSetting(DontIndicateSecureServers)</onclick>
+					<selected>Skin.HasSetting(DontIndicateSecureServers)</selected>
 				</control>
 			</control>
 			<!-- Scrollbar -->

@@ -64,7 +64,7 @@
 				<textcolor>greyLighter</textcolor>
 				<font>Regular-17</font>
 				<shadowcolor>FF222222</shadowcolor>
-				<visible>IsEmpty(ListItem.Property(isSecure))</visible>
+				<visible>IsEmpty(ListItem.Property(isSecure)) | Skin.HasSetting(DontIndicateSecureServers)</visible>
 			</control>
 			<control type="label">
 				<posx>120</posx>
@@ -76,7 +76,7 @@
 				<textcolor>greyLighter</textcolor>
 				<font>Regular-17</font>
 				<shadowcolor>FF222222</shadowcolor>
-				<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+				<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
 			</control>
 			<control type="image">
 				<posy>5</posy>
@@ -85,7 +85,7 @@
 				<height>18</height>
 				<texture>icon-lock-round-simplified.png</texture>
 				<colordiffuse>CC5CB85C</colordiffuse>
-				<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+				<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
 			</control>
 		</control>
 	</include>	

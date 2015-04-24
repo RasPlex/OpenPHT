@@ -179,7 +179,7 @@
 						<font>Bold-16</font>
 						<textcolor>white</textcolor>
 						<shadowcolor>FF222222</shadowcolor>
-						<visible>IsEmpty(ListItem.Property(isSecure))</visible>
+						<visible>[!Skin.HasSetting(DontIndicateSecureServers) + IsEmpty(ListItem.Property(isSecure))] | [Skin.HasSetting(DontIndicateSecureServers) + !IsEmpty(ListItem.Property(SectionNameCollision))]</visible>
 					</control>
 					<control type="label">
 						<posx>336</posx>
@@ -192,7 +192,7 @@
 						<font>Bold-16</font>
 						<textcolor>white</textcolor>
 						<shadowcolor>FF222222</shadowcolor>
-						<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+						<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
 					</control>
 					<control type="image">
 						<posy>75</posy>
@@ -201,7 +201,7 @@
 						<height>18</height>
 						<texture>icon-lock-round-simplified.png</texture>
 						<colordiffuse>CC5CB85C</colordiffuse>
-						<visible>!IsEmpty(ListItem.Property(isSecure))</visible>
+						<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->

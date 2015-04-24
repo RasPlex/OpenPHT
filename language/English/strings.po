@@ -1131,6 +1131,10 @@ msgctxt "#32119"
 msgid "Disable all Slideshows"
 msgstr ""
 
+msgctxt "#32120"
+msgid "Hide Secure Server Indicators"
+msgstr ""
+
 msgctxt "#41000"
 msgid "System Settings"
 msgstr ""
