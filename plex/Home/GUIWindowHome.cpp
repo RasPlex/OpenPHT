@@ -689,6 +689,7 @@ CGUIStaticItemPtr CGUIWindowHome::ItemToSection(CFileItemPtr item)
   newItem->SetProperty("sectionNameCollision", item->GetProperty("sectionNameCollision"));
   newItem->SetProperty("plex", true);
   newItem->SetProperty("sectionPath", item->GetPath());
+  newItem->SetProperty("isSecure", item->GetProperty("isSecure"));
   newItem->SetPlexDirectoryType(item->GetPlexDirectoryType());
   newItem->m_bIsFolder = true;
 

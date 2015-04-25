@@ -848,6 +848,8 @@ bool CPlexDirectory::GetSharedServerDirectory(CFileItemList &items)
     item->SetProperty("machineIdentifier", server->GetUUID());
     item->SetProperty("serverOwner", server->GetOwner());
     item->SetProperty("serverName", server->GetName());
+    if (server->GetActiveConnection())
+      item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
     item->SetPlexDirectoryType(sectionItem->GetPlexDirectoryType());
 
     if (sectionItem->HasProperty("composite"))
