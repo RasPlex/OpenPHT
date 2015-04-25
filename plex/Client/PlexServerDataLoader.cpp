@@ -271,7 +271,8 @@ CFileItemListPtr CPlexServerDataLoader::GetAllSharedSections() const
       {
         item->SetProperty("serverName", server->GetName());
         item->SetProperty("serverUUID", server->GetUUID());
-        item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
+        if (server->GetActiveConnection())
+          item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
         list->Add(item);
       }
     }
