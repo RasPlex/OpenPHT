@@ -41,7 +41,7 @@ CPlexServerManager::CPlexServerManager() : m_stopped(false)
 {
   CPlexConnectionPtr conn;
   
-  _myPlexServer = CPlexServerPtr(new CPlexServer("myplex", "myPlex", true));
+  _myPlexServer = CPlexServerPtr(new CPlexServer("myplex", "plex.tv", true));
   conn = CPlexConnectionPtr(new CMyPlexConnection);
   _myPlexServer->AddConnection(conn);
   _myPlexServer->SetActiveConnection(conn);
