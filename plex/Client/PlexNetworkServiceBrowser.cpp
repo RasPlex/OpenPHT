@@ -10,8 +10,7 @@ using namespace std;
 
 void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service)
 {
-  CPlexServerPtr server = CPlexServerPtr(
-  new CPlexServer(service->getResourceIdentifier(), service->getParam("Name"), true));
+  CPlexServerPtr server = CPlexServerPtr(new CPlexServer(service->getResourceIdentifier(), service->getParam("Name"), true));
 
   int port = 32400;
   try
@@ -33,8 +32,12 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
     return;
   }
 
+  // Secure connections are only available if the GDM Host header is set
+  // if the Host contains the servers UUID and if we are signed into plex.tv
+  //
   string uri = service->getParam("Host");
-  if (!uri.empty())
+  if (!uri.empty() && uri.find(server->GetUUID()) != string::npos &&
+      (g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn()))
   {
     string addr(address);
     StringUtils::Replace(addr, ".", "-");
@@ -48,9 +51,11 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
     CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, u.GetHostName(), u.GetPort(), u.GetProtocol()));
     server->AddConnection(conn);
   }
-
-  CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, address, port));
-  server->AddConnection(conn);
+  else
+  {
+    CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, address, port));
+    server->AddConnection(conn);
+  }
 
   g_plexApplication.serverManager->UpdateFromDiscovery(server);
 
