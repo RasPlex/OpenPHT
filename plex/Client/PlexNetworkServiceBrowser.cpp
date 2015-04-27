@@ -8,6 +8,7 @@
 
 using namespace std;
 
+/////////////////////////////////////////////////////////////////////////////////////////
 void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service)
 {
   CPlexServerPtr server = CPlexServerPtr(new CPlexServer(service->getResourceIdentifier(), service->getParam("Name"), true));
@@ -69,6 +70,7 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
   g_plexApplication.timer->RestartTimeout(5000, this);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
 void CPlexNetworkServiceBrowser::handleServiceDeparture(NetworkServicePtr& service)
 {
   CLog::Log(LOGDEBUG,
@@ -92,6 +94,7 @@ void CPlexNetworkServiceBrowser::handleServiceDeparture(NetworkServicePtr& servi
   g_plexApplication.timer->RestartTimeout(5000, this);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
 void CPlexNetworkServiceBrowser::handleNetworkChange(const vector<NetworkInterface>& interfaces)
 {
   NetworkServiceBrowser::handleNetworkChange(interfaces);
@@ -108,6 +111,7 @@ void CPlexNetworkServiceBrowser::handleNetworkChange(const vector<NetworkInterfa
   g_plexApplication.timer->RestartTimeout(5000, this);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
 void CPlexNetworkServiceBrowser::OnTimeout()
 {
   CSingleLock lk(m_serversSection);
@@ -125,6 +129,7 @@ void CPlexNetworkServiceBrowser::OnTimeout()
   g_plexApplication.timer->RestartTimeout(5 * 60 * 1000, this);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
 void CPlexServiceListener::Process()
 {
   dprintf("CPlexServiceListener: Initializing.");
