@@ -234,7 +234,7 @@ void CGUIPlexMediaWindow::SaveSelection()
     int idx = m_viewControl.GetSelectedItem();
     if (idx >= 0)
     {
-      m_lastSelectedIndex[key] = m_vecItems->Get(idx)->GetProperty("index").asInteger();;
+      m_lastSelectedIndex[key] = m_vecItems->Get(idx)->GetProperty("index").asInteger();
       CLog::Log(LOGDEBUG, "SaveSelection index for %s is %d", key.c_str(), m_lastSelectedIndex[key]);
     }
   }
