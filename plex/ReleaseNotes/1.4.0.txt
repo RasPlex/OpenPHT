@@ -1,0 +1,16 @@
+NEW:
+  - Support for upcoming features in the server that is soon announced.
+  - Server names are now showed for all sections in the home window by default, they can be
+    disabled in Skin settings.
+
+FIXED:
+  - Apply some ATMOS support patches. Seems to work better than before, but still not 100%.
+  - Fixed warning when navigating Music sections
+  - Fixed watch later listing and navigation
+  - Fixed cropping in Photo slide show
+  - Removed the Now Playing entry from the home window since it was broken in many ways
+  - Fixed a crash that could happen if you played the last Episode and unwatched filter was applied
+  - Fixed a problem where Android mobile app would show up in the home list even if it was disabled
+  - With the next version of the Media Server the transcoding profile will no longer request AC3/DTS audio
+    when it's disabled in PHT.
+  - HLS transcode streams are now removed since MKV streaming seems to work much better for all scenarios
