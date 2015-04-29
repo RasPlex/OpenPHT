@@ -65,12 +65,8 @@ bool CPlexMediaDecisionEngine::resolveItem(const CFileItem& _item, CFileItem &re
   if (item.GetProperty("plexDidTranscode").asBoolean())
   {
     CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(item.GetProperty("plexserver").asString());
-
-    if ((CPlexTranscoderClient::getServerTranscodeMode(server) == CPlexTranscoderClient::PLEX_TRANSCODE_MODE_MKV))
-    {
-      CStdString transcodeURL = CPlexTranscoderClient::GetTranscodeURL(server, item).Get();
-      item.SetPath(transcodeURL);
-    }
+    CStdString transcodeURL = CPlexTranscoderClient::GetTranscodeURL(server, item).Get();
+    item.SetPath(transcodeURL);
   }
 
   if (!checkItemPlayability(item))

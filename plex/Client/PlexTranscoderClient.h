@@ -32,8 +32,7 @@ public:
   enum PlexTranscodeMode
   {
     PLEX_TRANSCODE_MODE_NONE = 0,
-    PLEX_TRANSCODE_MODE_HLS = 1,
-    PLEX_TRANSCODE_MODE_MKV = 2
+    PLEX_TRANSCODE_MODE_MKV = 1
   };
 
   virtual bool transcodeForced() const { return g_guiSettings.GetBool("plexmediaserver.forcetranscode"); }
@@ -54,7 +53,6 @@ public:
   static PlexIntStringMap getOnlineQualties();
   static int SelectAOnlineQuality(int currentQuality);
   static int getBandwidthForQuality(int quality);
-  static PlexTranscodeMode getServerTranscodeMode(const CPlexServerPtr& server);
   static PlexTranscodeMode getItemTranscodeMode(const CFileItem& item);
   static int getIntegerRepresentation(int qualitySetting);
   static int autoSelectQuality(const CFileItem &file, int target);
