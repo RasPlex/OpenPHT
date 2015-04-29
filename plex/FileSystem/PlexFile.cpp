@@ -43,17 +43,34 @@ vector<stringPair> CPlexFile::GetHeaderList()
   // Build a description of what we support, this is old school, but needed when
   // want PMS to select the correct audio track for us.
   CStdString protocols = "protocols=shoutcast,http-video;videoDecoders=h264{profile:high&resolution:1080&level:51};audioDecoders=mp3,aac";
+  CStdString augment = "";
   
   if (AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode")))
   {
     if (g_guiSettings.GetBool("audiooutput.dtspassthrough"))
+    {
       protocols += ",dts{bitrate:800000&channels:8}";
+      augment = "dca";
+    }
     
     if (g_guiSettings.GetBool("audiooutput.ac3passthrough"))
+    {
       protocols += ",ac3{bitrate:800000&channels:8}";
+      if (augment.IsEmpty())
+        augment = "ac3";
+      else
+        augment += ",ac3";
+    }
   }
   
   hdrs.push_back(stringPair("X-Plex-Client-Capabilities", protocols));
+
+  if (augment.IsEmpty() == false)
+  {
+    CStdString argstring = "add-transcode-target-audio-codec(type=videoProfile&context=streaming&protocol=*&audioCodec=" + augment + ")";
+    hdrs.push_back(stringPair("X-Plex-Client-Profile-Extra", argstring));
+    CLog::Log(LOGDEBUG, "PlexFile::GetHeaderList Set Client-Profile-Extra: %s", argstring.c_str());
+  }
   
   if (g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn())
     hdrs.push_back(stringPair("X-Plex-Username", g_plexApplication.myPlexManager->GetCurrentUserInfo().username));
