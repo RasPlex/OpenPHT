@@ -151,12 +151,12 @@ CStdString CPlexNavigationHelper::navigateToItem(CFileItemPtr item, const CURL &
     else
       window = WINDOW_VIDEO_NAV;
   }
-  else if (type == PLEX_DIR_TYPE_PLAYLIST)
+  else if (type == PLEX_DIR_TYPE_PLAYLIST && (StringUtils::StartsWith(originalUrl, "plexserver://myplex/pms/playlists") == false))
     window = WINDOW_PLEX_PLAY_QUEUE;
   
   if (windowId != window)
   {
-    CLog::Log(LOGDEBUG, "CPlexNavigationHelper::navigateToItem navigating to %s (%s)", originalUrl.c_str(), item->GetLabel().c_str());
+    CLog::Log(LOGDEBUG, "CPlexNavigationHelper::navigateToItem navigating to %s (%s) using window %d", originalUrl.c_str(), item->GetLabel().c_str(), window);
     std::vector<CStdString> args;
     args.push_back(originalUrl);
     CApplicationMessenger::Get().ActivateWindow(window, args, swap);
