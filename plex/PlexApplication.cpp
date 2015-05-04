@@ -353,6 +353,7 @@ void PlexApplication::Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char* 
   {
     if (!g_application.IsPlaying() && g_plexApplication.myPlexManager->IsPinProtected() && !g_guiSettings.GetBool("myplex.automaticlogin"))
     {
+      m_hasAuthed = false;
       CLog::Log(LOGDEBUG, "PlexApplication::Announce resuming from screensaver");
       g_windowManager.ActivateWindow(WINDOW_STARTUP_ANIM);
 
