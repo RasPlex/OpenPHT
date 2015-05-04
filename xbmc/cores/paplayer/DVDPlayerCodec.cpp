@@ -114,14 +114,14 @@ bool DVDPlayerCodec::Init(const CStdString &strFile, unsigned int filecache)
 
   CDemuxStream* pStream = NULL;
   m_nAudioStream = -1;
+  bool hasVideoStream = false;
   for (int i = 0; i < m_pDemuxer->GetNrOfStreams(); i++)
   {
     pStream = m_pDemuxer->GetStream(i);
-    if (pStream && pStream->type == STREAM_AUDIO)
-    {
+    if (pStream && pStream->type == STREAM_AUDIO && m_nAudioStream == -1)
       m_nAudioStream = i;
-      break;
-    }
+    else if (pStream && pStream->type == STREAM_VIDEO)
+      hasVideoStream = true;
   }
 
   if (m_nAudioStream == -1)
@@ -135,8 +135,9 @@ bool DVDPlayerCodec::Init(const CStdString &strFile, unsigned int filecache)
   }
 
   CDVDStreamInfo hint(*pStream, true);
+  hint.isAudioOnly = !hasVideoStream;
 
-  bool passthrough = AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode"));
+  bool passthrough = (AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode")) && hint.isAudioOnly);
   m_pAudioCodec = CDVDFactoryCodec::CreateAudioCodec(hint, passthrough);
   if (!m_pAudioCodec)
   {

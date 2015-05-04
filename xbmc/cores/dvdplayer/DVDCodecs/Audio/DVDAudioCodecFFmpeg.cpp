@@ -18,6 +18,7 @@
  *
  */
 
+#include <cores/dvdplayer/DVDCodecs/DVDCodecs.h>
 #include "DVDAudioCodecFFmpeg.h"
 #ifdef _LINUX
 #include "XMemUtils.h"
@@ -74,7 +75,7 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
 #if defined(TARGET_DARWIN)
   int audioMode = g_guiSettings.GetInt("audiooutput.mode");
   if (audioMode == AUDIO_HDMI)
-    m_bLpcmMode = g_guiSettings.GetBool("audiooutput.multichannellpcm");
+    m_bLpcmMode = g_guiSettings.GetBool("audiooutput.multichannellpcm") && !hints.isAudioOnly;
 #endif
 
   m_pCodecContext = m_dllAvCodec.avcodec_alloc_context3(pCodec);

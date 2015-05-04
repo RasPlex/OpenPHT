@@ -42,6 +42,7 @@ void CDVDStreamInfo::Clear()
   type = STREAM_NONE;
   software = false;
   codec_tag  = 0;
+  isAudioOnly = false;
 
   if( extradata && extrasize ) free(extradata);
 
