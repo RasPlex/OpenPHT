@@ -37,8 +37,7 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
   // if the Host contains the servers UUID and if we are signed into plex.tv
   //
   string uri = service->getParam("Host");
-  if (!uri.empty() && uri.find(server->GetUUID()) != string::npos &&
-      (g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn()))
+  if (!uri.empty() && (g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn()))
   {
     string addr(address);
     StringUtils::Replace(addr, ".", "-");
