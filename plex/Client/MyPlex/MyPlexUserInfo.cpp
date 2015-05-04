@@ -36,6 +36,7 @@ bool CMyPlexUserInfo::SetFromXmlElement(TiXmlElement* root)
   root->QueryStringAttribute("pin", &pin);
   root->QueryBoolAttribute("restricted", &restricted);
   root->QueryBoolAttribute("home", &home);
+  root->QueryBoolAttribute("secure", &secure);
 
   for (TiXmlElement* element = root->FirstChildElement(); element; element = element->NextSiblingElement())
   {

@@ -26,7 +26,7 @@ public:
     ROLE_USER = 16
   };
   
-  CMyPlexUserInfo() : roles(ROLE_USER), id(-1), restricted(false), home(false) {}
+  CMyPlexUserInfo() : roles(ROLE_USER), id(-1), restricted(false), home(false), secure(false) {}
   
   bool SetFromXmlElement(TiXmlElement* root);
   
@@ -42,6 +42,7 @@ public:
   
   bool subscription;
   bool home;
+  bool secure;
   std::string subscriptionStatus;
   std::string subscriptionPlan;
   std::vector<std::string> features;
@@ -74,6 +75,7 @@ public:
     restricted = other.restricted;
     home = other.home;
     pin = other.pin;
+    secure = other.secure;
   }
 };
 
