@@ -44,8 +44,9 @@ namespace Shaders {
     virtual bool Compile() = 0;
     virtual void Free() = 0;
     virtual GLuint Handle() = 0;
-    virtual void SetSource(const string& src) { m_source = src; }
-    virtual bool LoadSource(const string& filename, const string& prefix = "");
+    virtual void SetSource(const std::string& src) { m_source = src; }
+    virtual bool LoadSource(const std::string& filename, const std::string& prefix = "");
+    virtual bool AppendSource(const std::string& filename);
     bool OK() const { return m_compiled; }
 
   protected:
