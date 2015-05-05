@@ -644,6 +644,7 @@ std::string CGUIPlexDefaultActionHandler::GetFilteredURI(const CFileItem& item) 
 
   itemUrl.RemoveOption("X-Plex-Container-Start");
   itemUrl.RemoveOption("X-Plex-Container-Size");
+  itemUrl.RemoveOption("includeRelated");
 
   // set sourceType
   if (item.m_bIsFolder)
