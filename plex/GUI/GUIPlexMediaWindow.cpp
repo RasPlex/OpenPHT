@@ -134,6 +134,10 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
         AddFilters();
 
         g_plexApplication.filterManager->saveFiltersToDisk();
+
+        // make sure we update the window, as update might already have occured
+        CGUIMessage msg(GUI_MSG_UPDATE, 0, 0, 0, 0);
+        g_windowManager.SendThreadMessage(msg);
       }
       break;
     }
