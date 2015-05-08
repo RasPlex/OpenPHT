@@ -167,7 +167,6 @@ void CPlexFilterManager::loadFilterForSection(const std::string &sectionUrl, boo
 
   if (filter && filter->isLoaded() && !forceReload)
   {
-    onFilterLoaded(sectionUrl);
     return;
   }
   else if (!filter)
