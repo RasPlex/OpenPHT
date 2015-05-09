@@ -258,6 +258,8 @@ void PlexApplication::sendNetworkLog(int level, const std::string& logline)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void PlexApplication::preShutdown()
 {
+  ANNOUNCEMENT::CAnnouncementManager::RemoveAnnouncer(this);
+
   analytics->stopLogging();
   remoteSubscriberManager->Stop();
   timer->StopAllTimers();
@@ -303,6 +305,9 @@ void PlexApplication::Shutdown()
 
   directoryCache.reset();
   defaultActionHandler.reset();
+
+  themeMusicPlayer.reset();
+  playQueueManager.reset();
 
   OnTimeout();
 
