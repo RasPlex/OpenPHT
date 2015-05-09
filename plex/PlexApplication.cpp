@@ -128,7 +128,8 @@ public:
 void PlexApplication::OnWakeUp()
 {
   /* Scan servers */
-  m_serviceListener->ScanNow();
+  if (m_serviceListener)
+    m_serviceListener->ScanNow();
   myPlexManager->Poke();
 
 #ifdef TARGET_DARWIN_OSX
