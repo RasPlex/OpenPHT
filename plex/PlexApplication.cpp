@@ -280,10 +280,10 @@ void PlexApplication::Shutdown()
 {
   CLog::Log(LOGINFO, "CPlexApplication shutting down!");
 
-  delete extraInfo;
+  SAFE_DELETE(extraInfo);
 
-  delete myPlexManager;
-  delete analytics;
+  SAFE_DELETE(myPlexManager);
+  SAFE_DELETE(analytics);
 
   timer.reset();
 
@@ -311,14 +311,13 @@ void PlexApplication::Shutdown()
 
   OnTimeout();
 
-  delete remoteSubscriberManager;
-  remoteSubscriberManager = NULL;
+  SAFE_DELETE(remoteSubscriberManager);
 
 #ifdef ENABLE_AUTOUPDATE
-  delete autoUpdater;
+  SAFE_DELETE(autoUpdater);
 #endif
 
-  delete thumbCacher;
+  SAFE_DELETE(thumbCacher);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
