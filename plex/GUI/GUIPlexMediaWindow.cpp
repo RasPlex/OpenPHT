@@ -921,6 +921,8 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
 
   SaveSelection();
   
+  EPlexDirectoryType oldDirType = m_vecItems->GetPlexDirectoryType();
+
   if (strDirectory == m_startDirectory)
   {
     m_sectionRoot = strDirectory;
@@ -957,6 +959,12 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
     m_vecItems->SetProperty("PlexFilter", m_sectionFilter->currentPrimaryFilter());
 
   g_plexApplication.extraInfo->LoadExtraInfoForItem(m_vecItems);
+
+  // make sure we force the filters to reload if section type changed
+  if (oldDirType != m_vecItems->GetPlexDirectoryType())
+  {
+    g_plexApplication.filterManager->loadFilterForSection(m_sectionRoot.Get(), true);
+  }
 
   // clear eventual extras
   CFileItemList extralist;
