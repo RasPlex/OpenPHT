@@ -65,10 +65,10 @@ public:
   {
     StopAdvertisement();
     
-    m_pmsBrowser.reset();
     m_ioService.stop();
-    
     StopThread(true);
+
+    m_pmsBrowser.reset();
   }
 
   void StopAdvertisement()
