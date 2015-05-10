@@ -912,6 +912,13 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
 {
   CSingleLock lock(m_fetchMapsSection);
   m_fetchedPages.clear();
+
+  // make sure we clear any pending job on an update
+  BOOST_FOREACH(FetchJobPair p, m_fetchJobs)
+  {
+    CJobManager::GetInstance().CancelJob(p.second);
+  }
+
   m_fetchJobs.clear();
   lock.Leave();
 
