@@ -1,0 +1,10 @@
+FIXES:
+  - PIN check when returning from screensaver reinstated
+  - OSX: Fix an issue where playing AAC tracks could make progress to the next track hang
+  - Screenshot functionality could still show up because of a bad keymapping
+  - Fix an issue where music could not be shuffled
+  - Make sure we clear the VEVO logo after we have played a music video
+  - Make it possible to mark an episode in progress as unwatched
+  - Fix several issues with filters not being loaded and updated correctly when switching libraries
+  - Fix a bug that could lead to the wrong navigation window being loaded from slower servers
+  - Fixed playback of ATMOS audio on Windows
