@@ -88,6 +88,10 @@ CGUIPlexDefaultActionHandler::CGUIPlexDefaultActionHandler()
   action->WindowSettings[WINDOW_PLEX_PLAY_QUEUE].contextMenuVisisble = true;
   m_ActionSettings.push_back(*action);
 
+  action = new ACTION_SETTING(ACTION_PLEX_PQ_PLAYFROMHERE);
+  action->WindowSettings[WINDOW_VIDEO_NAV].contextMenuVisisble = true;
+  m_ActionSettings.push_back(*action);
+
   action = new ACTION_SETTING(ACTION_DELETE_ITEM);
   action->WindowSettings[WINDOW_HOME].contextMenuVisisble = true;
   action->WindowSettings[WINDOW_PLEX_PLAY_QUEUE].contextMenuVisisble = true;
@@ -291,6 +295,18 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
           return true;
         }
         break;
+
+      case ACTION_PLEX_PQ_PLAYFROMHERE:
+      {
+        CPlexPlayQueueOptions options;
+        options.resumeOffset = 0;
+        options.startItemKey = item->GetProperty("key").asString();
+        options.startPlaying = true;
+
+        CStdString uri = g_plexApplication.playQueueManager->getURIFromItem(*container);
+        g_plexApplication.playQueueManager->create(*container, uri, options);
+        break;
+      }
         
       case ACTION_PLEX_PL_ADDTO:
       {
@@ -467,6 +483,20 @@ void CGUIPlexDefaultActionHandler::GetContextButtonsForAction(int actionID, CFil
     case ACTION_PLEX_PQ_CLEAR:
       if (IsPlayQueueContainer(container) || item->HasProperty("playQueueItemID"))
         buttons.Add(actionID, 192);
+      break;
+
+    case ACTION_PLEX_PQ_PLAYFROMHERE:
+      switch(container->GetPlexDirectoryType())
+      {
+        case PLEX_DIR_TYPE_MOVIE:
+        case PLEX_DIR_TYPE_EPISODE:
+        case PLEX_DIR_TYPE_TRACK:
+          buttons.Add(actionID, 52634);
+          break;
+
+        default:
+          break;
+      }
       break;
 
     case ACTION_DELETE_ITEM:
