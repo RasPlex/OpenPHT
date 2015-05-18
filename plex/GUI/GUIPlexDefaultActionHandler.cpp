@@ -299,12 +299,26 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
       case ACTION_PLEX_PQ_PLAYFROMHERE:
       {
         CPlexPlayQueueOptions options;
-        options.resumeOffset = 0;
-        options.startItemKey = item->GetProperty("key").asString();
-        options.startPlaying = true;
+        CStdString uri;
 
-        CStdString uri = g_plexApplication.playQueueManager->getURIFromItem(*container);
-        g_plexApplication.playQueueManager->create(*container, uri, options);
+        switch(container->GetPlexDirectoryType())
+        {
+          case PLEX_DIR_TYPE_MOVIE:
+          case PLEX_DIR_TYPE_EPISODE:
+          case PLEX_DIR_TYPE_TRACK:
+
+            options.resumeOffset = 0;
+            options.startItemKey = item->GetProperty("key").asString();
+            options.startPlaying = true;
+
+            uri = g_plexApplication.playQueueManager->getURIFromItem(*container);
+            g_plexApplication.playQueueManager->create(*container, uri, options);
+            break;
+
+          default:
+            break;
+        }
+
         break;
       }
         
