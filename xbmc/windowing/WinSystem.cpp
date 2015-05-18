@@ -259,6 +259,24 @@ bool CWinSystemBase::UseLimitedColor()
 #endif
 }
 
+bool CWinSystemBase::UseDithering()
+{
+#if defined(HAS_GL)
+  return g_guiSettings.GetBool("videoscreen.dither");
+#else
+  return false;
+#endif
+}
+
+unsigned CWinSystemBase::DitherDepth()
+{
+#if defined(HAS_GL)
+  return g_guiSettings.GetInt("videoscreen.ditherdepth");
+#else
+  return 8;
+#endif
+}
+
 std::string CWinSystemBase::GetClipboardText(void)
 {
   return "";

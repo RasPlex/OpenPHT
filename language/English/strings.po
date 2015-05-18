@@ -11556,6 +11556,16 @@ msgctxt "#36043"
 msgid "Boost center channel when downmixing"
 msgstr ""
 
+#: system/settings/settings.xml
+msgctxt "#36099"
+msgid "Dithering"
+msgstr ""
+
+#: system/settings/settings.xml
+msgctxt "#36100"
+msgid "Dither depth"
+msgstr ""
+
 msgctxt "#36434"
 msgid "Allow hardware acceleration - MMAL"
 msgstr ""
