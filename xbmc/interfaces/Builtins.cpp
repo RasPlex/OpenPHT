@@ -121,6 +121,7 @@ const BUILT_IN commands[] = {
   { "ShuffleAll",                 false,  "Shuffle all files in this container" },
   { "NextItem",                   false,  "Move to the next item. Good for preplay" },
   { "PrevItem",                   false,  "Move to previous item, good for preplay" },
+  { "PlayFromHere",               false,  "Start playback from curretn selected item" },
   /* END PLEX */
   { "Help",                       false,  "This help message" },
   { "Reboot",                     false,  "Reboot the system" },
@@ -1686,6 +1687,9 @@ int CBuiltins::Execute(const CStdString& execString)
     g_application.OnAction(CAction(ACTION_PLEX_MOVE_NEXT_ITEM));
   else if (execute.Equals("previtem"))
     g_application.OnAction(CAction(ACTION_PLEX_MOVE_PREV_ITEM));
+  else if (execute.Equals("playfromhere"))
+    g_application.OnAction(CAction(ACTION_PLEX_PQ_PLAYFROMHERE));
+
   /* PLEX */
     return -1;
   return 0;
