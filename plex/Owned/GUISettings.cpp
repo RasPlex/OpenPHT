@@ -640,6 +640,10 @@ void CGUISettings::Initialize()
 #else
   AddBool(NULL, "videoscreen.limitedrange", 36042, false);
 #endif
+#if defined(HAS_GL)
+  AddBool(advs, "videoscreen.dither", 36099, true);
+  AddInt(advs, "videoscreen.ditherdepth", 36100, 8, 2, 1, 8, SPIN_CONTROL_INT);
+#endif
 #if defined(HAS_LCD)
   AddBool(advs, "videoscreen.haslcd", 4501, false);
 #endif
