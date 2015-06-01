@@ -147,7 +147,7 @@ public:
   virtual void         ReleaseImage(int source, bool preserve = false);
   virtual bool         AddVideoPicture(DVDVideoPicture* picture, int index);
   virtual void         FlipPage(int source);
-  virtual unsigned int PreInit();
+  virtual void         PreInit();
   virtual void         UnInit();
   virtual void         Reset(); /* resets renderer after seek for example */
   virtual bool         IsConfigured() { return m_bConfigured; }
@@ -155,6 +155,8 @@ public:
 
   virtual CRenderInfo GetRenderInfo();
 
+  // Feature support
+  virtual bool         SupportsMultiPassRendering() { return false; }
   virtual bool         Supports(ERENDERFEATURE feature);
   virtual bool         Supports(EDEINTERLACEMODE mode);
   virtual bool         Supports(EINTERLACEMETHOD method);
@@ -162,7 +164,7 @@ public:
 
   virtual EINTERLACEMETHOD AutoInterlaceMethod();
 
-  void                 RenderUpdate(bool clear, DWORD flags = 0, DWORD alpha = 255);
+  void                 RenderUpdate(bool clear, unsigned int flags = 0, unsigned int alpha = 255);
 
   virtual void         SetBufferSize(int numBuffers) { m_neededBuffers = numBuffers; }
   virtual void         ReleaseBuffer(int idx);

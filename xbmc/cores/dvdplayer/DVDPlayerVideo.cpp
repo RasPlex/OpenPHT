@@ -153,7 +153,6 @@ CDVDPlayerVideo::CDVDPlayerVideo( CDVDClock* pClock
   m_iFrameRateLength = 0;
   m_bFpsInvalid = false;
   m_bAllowFullscreen = false;
-  memset(&m_output, 0, sizeof(m_output));
 }
 
 CDVDPlayerVideo::~CDVDPlayerVideo()
@@ -919,30 +918,6 @@ void CDVDPlayerVideo::ProcessOverlays(DVDVideoPicture* pSource, double pts)
 }
 #endif
 
-static std::string GetRenderFormatName(ERenderFormat format)
-{
-  switch(format)
-  {
-    case RENDER_FMT_YUV420P:   return "YV12";
-    case RENDER_FMT_YUV420P16: return "YV12P16";
-    case RENDER_FMT_YUV420P10: return "YV12P10";
-    case RENDER_FMT_NV12:      return "NV12";
-    case RENDER_FMT_UYVY422:   return "UYVY";
-    case RENDER_FMT_YUYV422:   return "YUY2";
-    case RENDER_FMT_VDPAU:     return "VDPAU";
-    case RENDER_FMT_VDPAU_420: return "VDPAU_420";
-    case RENDER_FMT_DXVA:      return "DXVA";
-    case RENDER_FMT_VAAPI:     return "VAAPI";
-    case RENDER_FMT_VAAPINV12: return "VAAPI_NV12";
-    case RENDER_FMT_OMXEGL:    return "OMXEGL";
-    case RENDER_FMT_CVBREF:    return "BGRA";
-    case RENDER_FMT_BYPASS:    return "BYPASS";
-    case RENDER_FMT_MMAL:      return "MMAL";
-    case RENDER_FMT_NONE:      return "NONE";
-  }
-  return "UNKNOWN";
-}
-
 std::string CDVDPlayerVideo::GetStereoMode()
 {
   std::string  stereo_mode;
@@ -974,91 +949,39 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
 
 #ifdef HAS_VIDEO_PLAYBACK
   double config_framerate = m_bFpsInvalid ? 0.0 : m_fFrameRate;
-  bool changerefresh = !m_bFpsInvalid &&
-                       (m_output.framerate == 0.0 || fmod(m_output.framerate, config_framerate) != 0.0);
 
-  /* check so that our format or aspect has changed. if it has, reconfigure renderer */
-  if (!g_renderManager.IsConfigured()
-   || ( m_output.width           != pPicture->iWidth )
-   || ( m_output.height          != pPicture->iHeight )
-   || ( m_output.dwidth          != pPicture->iDisplayWidth )
-   || ( m_output.dheight         != pPicture->iDisplayHeight )
-   || changerefresh
-   || ( m_output.color_format    != (unsigned int)pPicture->format )
-   || ( m_output.extended_format != pPicture->extended_format )
-   || ( m_output.color_matrix    != pPicture->color_matrix    && pPicture->color_matrix    != 0 ) // don't reconfigure on unspecified
-   || ( m_output.chroma_position != pPicture->chroma_position && pPicture->chroma_position != 0 )
-   || ( m_output.color_primaries != pPicture->color_primaries && pPicture->color_primaries != 0 )
-   || ( m_output.color_transfer  != pPicture->color_transfer  && pPicture->color_transfer  != 0 )
-   || ( m_output.color_range     != pPicture->color_range )
-   || ( m_output.stereo_flags    != stereo_flags))
+  unsigned flags = 0;
+  if(pPicture->color_range == 1)
+    flags |= CONF_FLAGS_YUV_FULLRANGE;
+
+  flags |= GetFlagsChromaPosition(pPicture->chroma_position)
+              |  GetFlagsColorMatrix(pPicture->color_matrix, pPicture->iWidth, pPicture->iHeight)
+              |  GetFlagsColorPrimaries(pPicture->color_primaries)
+              |  GetFlagsColorTransfer(pPicture->color_transfer);
+
+
+  if(m_bAllowFullscreen)
   {
-    CLog::Log(LOGNOTICE, " fps: %f, pwidth: %i, pheight: %i, dwidth: %i, dheight: %i"
-                       , config_framerate
-                       , pPicture->iWidth
-                       , pPicture->iHeight
-                       , pPicture->iDisplayWidth
-                       , pPicture->iDisplayHeight);
+    flags |= CONF_FLAGS_FULLSCREEN;
+    m_bAllowFullscreen = false; // only allow on first configure
+  }
 
-    unsigned flags = 0;
-    if(pPicture->color_range == 1)
-      flags |= CONF_FLAGS_YUV_FULLRANGE;
+  flags |= stereo_flags;
 
-    flags |= GetFlagsChromaPosition(pPicture->chroma_position)
-          |  GetFlagsColorMatrix(pPicture->color_matrix, pPicture->iWidth, pPicture->iHeight)
-          |  GetFlagsColorPrimaries(pPicture->color_primaries)
-          |  GetFlagsColorTransfer(pPicture->color_transfer);
-
-    std::string formatstr = GetRenderFormatName(pPicture->format);
-
-    if(m_bAllowFullscreen)
-    {
-      flags |= CONF_FLAGS_FULLSCREEN;
-      m_bAllowFullscreen = false; // only allow on first configure
-    }
-
-    flags |= stereo_flags;
-
-    CLog::Log(LOGDEBUG,"%s - change configuration. %dx%d. framerate: %4.2f. format: %s",__FUNCTION__,pPicture->iWidth, pPicture->iHeight, config_framerate, formatstr.c_str());
-    if(!g_renderManager.Configure(pPicture->iWidth
-                                , pPicture->iHeight
-                                , pPicture->iDisplayWidth
-                                , pPicture->iDisplayHeight
-                                , config_framerate
-                                , flags
-                                , pPicture->format
-                                , pPicture->extended_format
-                                , m_hints.orientation
-                                , m_pVideoCodec->GetAllowedReferences()))
-    {
-      CLog::Log(LOGERROR, "%s - failed to configure renderer", __FUNCTION__);
-      return EOS_ABORT;
-    }
-
-    m_output.width           = pPicture->iWidth;
-    m_output.height          = pPicture->iHeight;
-    m_output.dwidth          = pPicture->iDisplayWidth;
-    m_output.dheight         = pPicture->iDisplayHeight;
-    m_output.framerate       = config_framerate;
-    m_output.color_format    = pPicture->format;
-    m_output.extended_format = pPicture->extended_format;
-    m_output.color_matrix    = pPicture->color_matrix;
-    m_output.chroma_position = pPicture->chroma_position;
-    m_output.color_primaries = pPicture->color_primaries;
-    m_output.color_transfer  = pPicture->color_transfer;
-    m_output.color_range     = pPicture->color_range;
-    m_output.stereo_flags    = stereo_flags;
+  if(!g_renderManager.Configure(picture,
+                                config_framerate,
+                                flags,
+                                m_hints.orientation,
+                                m_pVideoCodec->GetAllowedReferences()))
+  {
+    CLog::Log(LOGERROR, "%s - failed to configure renderer", __FUNCTION__);
+    return EOS_ABORT;
   }
 
   int    result  = 0;
 
-  if (!g_renderManager.IsStarted()) {
-    CLog::Log(LOGERROR, "%s - renderer not started", __FUNCTION__);
-    return EOS_ABORT;
-  }
-
   //correct any pattern in the timestamps
-  if (m_output.color_format != RENDER_FMT_BYPASS)
+  if (picture.format != RENDER_FMT_BYPASS)
   {
     m_pullupCorrection.Add(pts);
     pts += m_pullupCorrection.GetCorrection();
@@ -1079,7 +1002,7 @@ int CDVDPlayerVideo::OutputPicture(const DVDVideoPicture* src, double pts)
     pts -= DVD_TIME_BASE * interval;
   }
 
-  if (m_output.color_format != RENDER_FMT_BYPASS)
+  if (picture.format != RENDER_FMT_BYPASS)
   {
     // Correct pts by user set delay and rendering delay
     pts += m_iVideoDelay - DVD_SEC_TO_TIME(g_renderManager.GetDisplayLatency());

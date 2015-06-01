@@ -4249,7 +4249,7 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
     else if(m_pPlayer->IsPlayingVideo())
     {
       // if player didn't manange to switch to fullscreen by itself do it here
-      if (options.fullscreen && g_renderManager.IsStarted() &&
+      if (options.fullscreen && g_renderManager.IsConfigured() &&
           g_windowManager.GetActiveWindow() != WINDOW_FULLSCREEN_VIDEO )
        SwitchToFullScreen();
     }
