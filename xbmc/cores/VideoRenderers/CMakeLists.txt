@@ -1,3 +1,4 @@
+add_subdirectory(HwDecRender)
 add_subdirectory(VideoShaders)
 find_all_sources(. videorenderers_SRCS)
 

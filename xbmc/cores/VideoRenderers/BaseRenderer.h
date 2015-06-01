@@ -27,6 +27,7 @@
 #include "guilib/Geometry.h"
 #include "RenderFormats.h"
 #include "RenderFeatures.h"
+#include "settings/VideoSettings.h"
 
 #define MAX_PLANES 3
 #define MAX_FIELDS 3
@@ -71,9 +72,9 @@ public:
   virtual int GetImage(YV12Image *image, int source = -1, bool readonly = false) = 0;
   virtual void ReleaseImage(int source, bool preserve = false) = 0;
   virtual bool AddVideoPicture(DVDVideoPicture* picture, int index) { return false; }
-  virtual void AddVideoPictureHW(DVDVideoPicture &picture, int index) = 0;
+  virtual void AddVideoPictureHW(DVDVideoPicture &picture, int index) {};
   virtual void FlipPage(int source) = 0;
-  virtual unsigned int PreInit() = 0;
+  virtual void PreInit() = 0;
   virtual void UnInit() = 0;
   virtual void Reset() = 0;
   virtual void Flush() {};
@@ -95,6 +96,8 @@ public:
   virtual bool Supports(EDEINTERLACEMODE mode) = 0;
   virtual bool Supports(EINTERLACEMETHOD method) = 0;
   virtual bool Supports(ESCALINGMETHOD method) = 0;
+
+  ERenderFormat GetRenderFormat() { return m_format; }
 
   void SetViewMode(int viewMode);
   RESOLUTION GetResolution() const;
@@ -123,7 +126,7 @@ protected:
   virtual void       ReorderDrawPoints();//might be overwritten (by egl e.x.)
   void       saveRotatedCoords();//saves the current state of m_rotatedDestCoords
   void       syncDestRectToRotatedPoints();//sync any changes of m_destRect to m_rotatedDestCoords
-  void       restoreRotatedCoords();//restore the current state of m_rotatedDestCoords from saveRotatedCoords 
+  void       restoreRotatedCoords();//restore the current state of m_rotatedDestCoords from saveRotatedCoords
   void       MarkDirty();
 
   RESOLUTION m_resolution;    // the resolution we're running in

@@ -135,7 +135,7 @@ void CWinRenderer::SelectRenderMethod()
     if (!m_processor || !m_processor->Open(m_sourceWidth, m_sourceHeight, m_iFlags, m_format, m_extended_format))
     {
       CLog::Log(LOGNOTICE, "D3D: unable to open DXVA processor");
-      if (m_processor)  
+      if (m_processor)
         m_processor->Close();
       m_renderMethod = RENDER_INVALID;
     }
@@ -345,7 +345,7 @@ void CWinRenderer::Update()
   ManageDisplay();
 }
 
-void CWinRenderer::RenderUpdate(bool clear, DWORD flags, DWORD alpha)
+void CWinRenderer::RenderUpdate(bool clear, unsigned int flags, unsigned int alpha)
 {
   LPDIRECT3DDEVICE9 pD3DDevice = g_Windowing.Get3DDevice();
 
@@ -357,7 +357,7 @@ void CWinRenderer::RenderUpdate(bool clear, DWORD flags, DWORD alpha)
   else
     pD3DDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, FALSE );
 
-  if (!m_bConfigured) 
+  if (!m_bConfigured)
     return;
 
   ManageTextures();
@@ -392,7 +392,7 @@ void CWinRenderer::FlipPage(int source)
   return;
 }
 
-unsigned int CWinRenderer::PreInit()
+void CWinRenderer::PreInit()
 {
   CSingleLock lock(g_graphicsContext);
   m_bConfigured = false;
@@ -446,7 +446,6 @@ unsigned int CWinRenderer::PreInit()
     m_formats.push_back(RENDER_FMT_YUYV422);
     m_formats.push_back(RENDER_FMT_UYVY422);
   }
-  return 0;
 }
 
 void CWinRenderer::UnInit()
@@ -461,7 +460,7 @@ void CWinRenderer::UnInit()
 
   SAFE_DELETE(m_colorShader);
   SAFE_DELETE(m_scalerShader);
-  
+
   m_bConfigured = false;
   m_bFilterInitialized = false;
 
@@ -644,7 +643,7 @@ void CWinRenderer::UpdatePSVideoFilter()
   if (m_renderMethod == RENDER_DXVA)
   {
     // we'd use m_IntermediateTarget as rendering target for possible anaglyph stereo with dxva processor.
-    if (!m_bUseHQScaler) 
+    if (!m_bUseHQScaler)
       CreateIntermediateRenderTarget(m_destWidth, m_destHeight);
 
     // When using DXVA, we are already setup at this point, color shader is not needed
@@ -772,7 +771,7 @@ void CWinRenderer::RenderSW()
       srcStride[idx] = srclr[idx].Pitch;
     }
   }
-  
+
   D3DLOCKED_RECT destlr = {0,0};
   if (!m_SWTarget.LockRect(0, &destlr, NULL, D3DLOCK_DISCARD))
     CLog::Log(LOGERROR, __FUNCTION__" - failed to lock swtarget texture into memory");
@@ -799,7 +798,7 @@ void CWinRenderer::RenderSW()
 }
 
 /*
-Code kept for reference, as a basis to re-enable StretchRect and 
+Code kept for reference, as a basis to re-enable StretchRect and
 do the color conversion with it.
 See IDirect3D9::CheckDeviceFormat() for support of non-standard fourcc textures
 and IDirect3D9::CheckDeviceFormatConversion for color conversion support
@@ -985,7 +984,7 @@ void CWinRenderer::Stage1()
     // Restore the render target
     pD3DDevice->SetRenderTarget(0, oldRT);
 
-    // MSDN says: Setting a new render target will cause the viewport 
+    // MSDN says: Setting a new render target will cause the viewport
     // to be set to the full size of the new render target.
     // So we need restore our viewport
     g_Windowing.RestoreViewPort();
@@ -1035,7 +1034,7 @@ void CWinRenderer::RenderProcessor(DWORD flags)
     return;
 
   IDirect3DSurface9* target;
-  if ( m_bUseHQScaler 
+  if ( m_bUseHQScaler
     || g_graphicsContext.GetStereoMode() == RENDER_STEREO_MODE_ANAGLYPH_RED_CYAN
     || g_graphicsContext.GetStereoMode() == RENDER_STEREO_MODE_ANAGLYPH_GREEN_MAGENTA
     || g_graphicsContext.GetStereoMode() == RENDER_STEREO_MODE_ANAGLYPH_YELLOW_BLUE)
