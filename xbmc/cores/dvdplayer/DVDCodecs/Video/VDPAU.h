@@ -21,14 +21,14 @@
  */
 
 #include "system_gl.h"
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+#include <GL/glext.h>
 
 #include "DVDVideoCodec.h"
 #include "DVDVideoCodecFFmpeg.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#define GLX_GLXEXT_PROTOTYPES
-#include <GL/glx.h>
-
 #include "DVDVideoCodec.h"
 #include "DVDVideoCodecFFmpeg.h"
 #include "threads/CriticalSection.h"
@@ -38,6 +38,7 @@
 #include "threads/Event.h"
 #include "threads/Thread.h"
 #include "utils/ActorProtocol.h"
+#include "guilib/Geometry.h"
 #include <list>
 #include <map>
 

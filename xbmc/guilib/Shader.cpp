@@ -68,14 +68,6 @@ bool CGLSLVertexShader::Compile()
 
   Free();
 
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-  {
-    CLog::Log(LOGERROR, "GL: GLSL vertex shaders not supported");
-    return false;
-  }
-#endif
-
   m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
   const char *ptr = m_source.c_str();
   glShaderSource(m_vertexShader, 1, &ptr, 0);
@@ -105,11 +97,6 @@ bool CGLSLVertexShader::Compile()
 
 void CGLSLVertexShader::Free()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-    return;
-#endif
-
   if (m_vertexShader)
     glDeleteShader(m_vertexShader);
   m_vertexShader = 0;
@@ -167,14 +154,6 @@ void CARBVertexShader::Free()
 //////////////////////////////////////////////////////////////////////
 bool CGLSLPixelShader::Compile()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-  {
-    CLog::Log(LOGERROR, "GL: GLSL pixel shaders not supported");
-    return false;
-  }
-#endif
-
   GLint params[4];
 
   Free();
@@ -214,10 +193,6 @@ bool CGLSLPixelShader::Compile()
 
 void CGLSLPixelShader::Free()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-    return;
-#endif
   if (m_pixelShader)
     glDeleteShader(m_pixelShader);
   m_pixelShader = 0;
@@ -279,10 +254,6 @@ void CARBPixelShader::Free()
 //////////////////////////////////////////////////////////////////////
 void CGLSLShaderProgram::Free()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-    return;
-#endif
   m_pVP->Free();
   VerifyGLState();
   m_pFP->Free();
@@ -298,15 +269,6 @@ void CGLSLShaderProgram::Free()
 
 bool CGLSLShaderProgram::CompileAndLink()
 {
-#ifdef HAS_GL
-  // check that we support shaders
-  if(!GLEW_VERSION_2_0)
-  {
-    CLog::Log(LOGERROR, "GL: GLSL shaders not supported");
-    return false;
-  }
-#endif
-
   GLint params[4];
 
   // free resources
@@ -375,11 +337,6 @@ bool CGLSLShaderProgram::CompileAndLink()
 
 bool CGLSLShaderProgram::Enable()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-    return false;
-#endif
-
   if (OK())
   {
     glUseProgram(m_shaderProgram);
@@ -415,11 +372,6 @@ bool CGLSLShaderProgram::Enable()
 
 void CGLSLShaderProgram::Disable()
 {
-#ifdef HAS_GL
-  if(!GLEW_VERSION_2_0)
-    return;
-#endif
-
   if (OK())
   {
     glUseProgram(0);
