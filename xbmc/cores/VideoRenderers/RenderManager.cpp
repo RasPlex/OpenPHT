@@ -426,7 +426,8 @@ void CXBMCRenderManager::FrameWait(int ms)
 bool CXBMCRenderManager::HasFrame()
 {
   CSingleLock lock(m_presentlock);
-  if (m_presentstep == PRESENT_FRAME || m_presentstep == PRESENT_FRAME2)
+  if (m_presentstep == PRESENT_READY ||
+      m_presentstep == PRESENT_FRAME || m_presentstep == PRESENT_FRAME2)
     return true;
   else
     return false;
