@@ -439,10 +439,6 @@ bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
       // switch resolution
       g_graphicsContext.SetFullScreenVideo(true);
 
-#ifdef HAS_VIDEO_PLAYBACK
-      // make sure renderer is uptospeed
-      g_renderManager.Update();
-#endif
       // now call the base class to load our windows
       CGUIWindow::OnMessage(message);
 
@@ -466,12 +462,6 @@ bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
       CSingleLock lock (g_graphicsContext);
       g_graphicsContext.SetFullScreenVideo(false);
       lock.Leave();
-
-#ifdef HAS_VIDEO_PLAYBACK
-      // make sure renderer is uptospeed
-      g_renderManager.Update();
-      g_renderManager.FrameFinish();
-#endif
 
       /* PLEX */
       deleteOverlays();
@@ -760,8 +750,6 @@ void CGUIWindowFullScreen::FrameMove()
     SET_CONTROL_HIDDEN(BLUE_BAR);
     SET_CONTROL_HIDDEN(CONTROL_GROUP_CHOOSER);
   }
-
-  g_renderManager.FrameMove();
 }
 
 void CGUIWindowFullScreen::Process(unsigned int currentTime, CDirtyRegionList &dirtyregion)
@@ -790,7 +778,6 @@ void CGUIWindowFullScreen::RenderEx()
   g_graphicsContext.SetRenderingResolution(g_graphicsContext.GetVideoResolution(), false);
 #ifdef HAS_VIDEO_PLAYBACK
   g_renderManager.Render(false, 0, 255, false);
-  g_renderManager.FrameFinish();
 #endif
 }
 
