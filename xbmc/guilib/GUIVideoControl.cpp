@@ -38,8 +38,6 @@ CGUIVideoControl::~CGUIVideoControl(void)
 
 void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
-  g_renderManager.FrameMove();
-
   // TODO Proper processing which marks when its actually changed. Just mark always for now.
   if (g_renderManager.IsGuiLayer())
     MarkDirtyRegion();
@@ -101,7 +99,6 @@ void CGUIVideoControl::RenderEx()
 #ifdef HAS_VIDEO_PLAYBACK
   if (g_application.m_pPlayer->IsPlayingVideo() && g_renderManager.IsConfigured())
     g_renderManager.Render(false, 0, 255, false);
-  g_renderManager.FrameFinish();
 #endif
   CGUIControl::RenderEx();
 }

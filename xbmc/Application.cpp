@@ -2348,6 +2348,8 @@ void CApplication::Render()
   // render video layer
   g_windowManager.RenderEx();
 
+  g_renderManager.FrameFinish();
+
   g_Windowing.EndRender();
 
   // reset our info cache - we do this at the end of Render so that it is
@@ -2391,9 +2393,6 @@ void CApplication::Render()
 
   m_lastFrameTime = XbmcThreads::SystemClockMillis();
   CTimeUtils::UpdateFrameTime(flip, vsync);
-
-  g_renderManager.UpdateResolution();
-  g_renderManager.ManageCaptures();
 }
 
 void CApplication::SetStandAlone(bool value)
@@ -3032,13 +3031,13 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
     {
       if (!m_skipGuiRender)
         g_windowManager.Process(CTimeUtils::GetFrameTime());
-#if defined(TARGET_RASPBERRY_PI) || defined(HAS_IMXVPU)
-      else if (!g_graphicsContext.IsFullScreenVideo())
-        g_renderManager.FrameMove();
-#endif
     }
     g_windowManager.FrameMove();
   }
+
+  g_renderManager.FrameMove();
+  g_renderManager.UpdateResolution();
+  g_renderManager.ManageCaptures();
 }
 
 bool CApplication::ProcessGamepad(float frameTime)
