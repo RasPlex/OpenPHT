@@ -286,8 +286,8 @@ std::string OMXPlayerVideo::GetStereoMode()
 
 void OMXPlayerVideo::Output(double pts, bool bDropPacket)
 {
-  if (!g_renderManager.IsStarted()) {
-    CLog::Log(LOGINFO, "%s - renderer not started", __FUNCTION__);
+  if (!g_renderManager.IsConfigured()) {
+    CLog::Log(LOGINFO, "%s - renderer not configured", __FUNCTION__);
     return;
   }
 
@@ -758,9 +758,16 @@ void OMXPlayerVideo::ResolutionUpdateCallBack(uint32_t width, uint32_t height, f
   CLog::Log(LOGDEBUG,"%s - change configuration. video:%dx%d. framerate: %4.2f. %dx%d format: BYPASS",
       __FUNCTION__, video_width, video_height, m_fFrameRate, iDisplayWidth, iDisplayHeight);
 
-  if(!g_renderManager.Configure(width, height,
-        iDisplayWidth, iDisplayHeight, m_fFrameRate, flags, format, 0,
-        m_hints.orientation, 3))
+  DVDVideoPicture picture;
+  memset(&picture, 0, sizeof(DVDVideoPicture));
+
+  picture.iWidth = width;
+  picture.iHeight = height;
+  picture.iDisplayWidth = iDisplayWidth;
+  picture.iDisplayHeight = iDisplayHeight;
+  picture.format = format;
+
+  if(!g_renderManager.Configure(picture, m_fFrameRate, flags, m_hints.orientation, 3))
   {
     CLog::Log(LOGERROR, "%s - failed to configure renderer", __FUNCTION__);
     return;
