@@ -602,7 +602,11 @@ bool CGUIPlexMediaWindow::OnAction(const CAction &action)
 #ifdef USE_PAGING
   if ((action.GetID() > ACTION_NONE &&
       action.GetID() <= ACTION_PAGE_DOWN) ||
+      (action.GetID() >= ACTION_NEXT_LETTER &&
+      action.GetID() <= ACTION_JUMP_SMS9) ||
       action.GetID() >= KEY_ASCII || // KEY_ASCII means that we letterjumped.
+      action.GetID() == ACTION_FIRST_PAGE ||
+      action.GetID() == ACTION_LAST_PAGE ||
       action.GetID() == ACTION_MOUSE_WHEEL_UP ||
       action.GetID() == ACTION_MOUSE_WHEEL_DOWN)
   {
