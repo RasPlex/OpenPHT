@@ -9,6 +9,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CPlexBusyIndicator::CPlexBusyIndicator()
+  : m_blockEvent(true)
 {
 }
 
@@ -17,13 +18,16 @@ bool CPlexBusyIndicator::blockWaitingForJob(CJob* job, IJobCallback* callback, C
 {
   CSingleLock lk(m_section);
   m_blockEvent.Reset();
-  int id = CJobManager::GetInstance().AddJob(job, this);
+  int id = CJobManager::GetInstance().AddJob(job, this, CJob::PRIORITY_HIGH);
 
   m_callbackMap[id] = callback;
   m_resultMap[id] = result;
 
   lk.Leave();
-  m_blockEvent.WaitMSec(300); // wait an initial 300ms if this is a fast operation.
+
+  // wait an initial 300ms if this is a fast operation.
+  if (m_blockEvent.WaitMSec(300))
+    return true;
 
   CGUIDialogBusy* busy = NULL;
 
@@ -42,9 +46,10 @@ bool CPlexBusyIndicator::blockWaitingForJob(CJob* job, IJobCallback* callback, C
     lk.Leave();
     while (!m_blockEvent.WaitMSec(20))
     {
-      lk.Enter();
+      g_windowManager.ProcessRenderLoop(false);
       if (busy && busy->IsCanceled())
       {
+        lk.Enter();
         std::pair<int, IJobCallback*> p;
         BOOST_FOREACH(p, m_callbackMap)
           CJobManager::GetInstance().CancelJob(p.first);
@@ -54,14 +59,14 @@ bool CPlexBusyIndicator::blockWaitingForJob(CJob* job, IJobCallback* callback, C
         m_resultMap.clear();
         m_blockEvent.Set();
         success = false;
+        lk.Leave();
+        break;
       }
-      lk.Leave();
-      g_windowManager.ProcessRenderLoop();
     }
     lk.Enter();
   }
 
-  if (busy && busy->IsActive())
+  if (busy)
     busy->Close();
 
   return success;
@@ -75,9 +80,14 @@ void CPlexBusyIndicator::OnJobComplete(unsigned int jobID, bool success, CJob* j
   if (m_callbackMap.find(jobID) != m_callbackMap.end())
   {
     IJobCallback* cb = m_callbackMap[jobID];
-    lk.Leave();
+    m_callbackMap.erase(jobID);
+
     if (cb)
+    {
+      lk.Leave();
       cb->OnJobComplete(jobID, success, job);
+      lk.Enter();
+    }
 
     if (m_resultMap[jobID])
     {
@@ -88,8 +98,6 @@ void CPlexBusyIndicator::OnJobComplete(unsigned int jobID, bool success, CJob* j
       }
     }
 
-    lk.Enter();
-    m_callbackMap.erase(jobID);
     m_resultMap.erase(jobID);
 
     if (m_callbackMap.size() == 0)
