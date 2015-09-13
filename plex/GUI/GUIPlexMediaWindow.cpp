@@ -203,8 +203,6 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
 
       if (extralist.Size() > 0)
       {
-        m_vecItems->Get(0)->SetProperty("PlexExtras", "1");
-
         if (extralist.Size() > 1)
           m_vecItems->SetProperty("PlexExtras", "extras");
         else
@@ -392,7 +390,8 @@ void CGUIPlexMediaWindow::OnFilterButton(int filterButtonId)
     {
       currentFilter->setSelected(!currentFilter->isSelected());
       m_sectionFilter->addSecondaryFilter(currentFilter);
-      m_clearFilterButton->SetVisible(m_sectionFilter->hasActiveSecondaryFilters());
+      if (m_clearFilterButton)
+        m_clearFilterButton->SetVisible(m_sectionFilter->hasActiveSecondaryFilters());
     }
     else
     {
@@ -491,7 +490,8 @@ void CGUIPlexMediaWindow::OnFilterSelected(const std::string &filterKey, int fil
       button->SetLabel(filter->getFilterTitle());
   }
 
-  m_clearFilterButton->SetVisible(m_sectionFilter->hasActiveSecondaryFilters());
+  if (m_clearFilterButton)
+    m_clearFilterButton->SetVisible(m_sectionFilter->hasActiveSecondaryFilters());
 
   g_plexApplication.filterManager->saveFiltersToDisk();
 }
@@ -1288,7 +1288,8 @@ void CGUIPlexMediaWindow::AddFilters()
           hasActiveFilters = true;
       }
 
-      m_clearFilterButton->SetVisible(hasActiveFilters);
+      if (m_clearFilterButton)
+        m_clearFilterButton->SetVisible(hasActiveFilters);
     }
 
     CGUIControlGroupList *sortButtons = (CGUIControlGroupList*)GetControl(SORT_LIST);

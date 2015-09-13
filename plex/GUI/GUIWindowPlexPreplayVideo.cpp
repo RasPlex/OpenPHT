@@ -80,7 +80,8 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
 
     if (extralist.Size())
     {
-      m_vecItems->Get(0)->SetProperty("PlexExtras", "1");
+      if (m_vecItems->Size())
+        m_vecItems->Get(0)->SetProperty("PlexExtras", "1");
 
       if (extralist.Size() > 1)
         m_vecItems->SetProperty("PlexExtras", "extras");
@@ -89,7 +90,8 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
     }
     else
     {
-      m_vecItems->Get(0)->SetProperty("PlexExtras", "");
+      if (m_vecItems->Size())
+        m_vecItems->Get(0)->SetProperty("PlexExtras", "");
       m_vecItems->SetProperty("PlexExtras", "");
     }
 
