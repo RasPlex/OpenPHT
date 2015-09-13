@@ -1038,7 +1038,7 @@ void CGUIWindowHome::OnTimeout()
   if (GetCurrentItemName() == m_lastSelectedItem)
   {
     CFileItemPtr pItem = GetCurrentListItem();
-    if (!ShowSection(pItem->GetProperty("sectionPath").asString()) && !m_globalArt)
+    if (pItem && !ShowSection(pItem->GetProperty("sectionPath").asString()) && !m_globalArt)
     {
       HideAllLists();
       ShowSection("global://art/");
