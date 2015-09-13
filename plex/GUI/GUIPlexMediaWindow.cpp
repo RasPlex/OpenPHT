@@ -970,6 +970,13 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
 
   bool ret = CGUIMediaWindow::Update(newUrl.Get(), updateFilterPath);
 
+  // if the update failed we want to get back up
+  if (!ret)
+  {
+    CLog::Log(LOGDEBUG, "Update failed, going to previous window.");
+    g_windowManager.PreviousWindow();
+  }
+
   m_vecItems->SetProperty("PlexContent", PlexUtils::GetPlexContent(*m_vecItems));
 
   m_vecItems->SetProperty("PlexFilter", "all");
@@ -1000,13 +1007,6 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
   if (RestoreSelection())
   {
     FetchItemPage(m_viewControl.GetSelectedItem());
-  }
-
-  // if the update failed we want to get back up
-  if (!ret)
-  {
-    CLog::Log(LOGDEBUG, "Update failed, going to previous window.");
-    g_windowManager.PreviousWindow();
   }
 
   return ret;
