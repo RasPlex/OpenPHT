@@ -50,8 +50,6 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
   {
     if (!message.GetStringParam(2).empty())
       m_parentPath = message.GetStringParam(2);
-
-    UpdateItem();
   }
   else if (message.GetMessage() == GUI_MSG_WINDOW_DEINIT)
   {
@@ -99,6 +97,8 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
     CGUIMessage msg(GUI_MSG_LABEL_BIND, 0, EXTRAS_LIST_CONTROL_ID, 0, 0, &extralist);
     OnMessage(msg);
     m_focusSaver.RestoreFocus(true);
+
+    SetInvalid();
   }
   else if (message.GetMessage() == GUI_MSG_PLAYBACK_STARTED)
   {
@@ -305,32 +305,44 @@ bool CGUIWindowPlexPreplayVideo::OnBack(int actionID)
 bool CGUIWindowPlexPreplayVideo::Update(const CStdString &strDirectory, bool updateFilterPath)
 {
   CLog::Log(LOGDEBUG,"CGUIWindowPlexPreplayVideo::Update");
+  CURL currentURL(strDirectory);
+  bool reload = !currentURL.HasOption("checkFiles");
 
+  CStdString plexExtrasContainer;
   CStdString plexExtras;
 
-  if (m_vecItems->Size())
+  if (currentURL.GetUrlWithoutOptions() == CURL(m_vecItems->GetPath()).GetUrlWithoutOptions())
+  {
+    plexExtrasContainer = m_vecItems->GetProperty("PlexExtras").asString();
+    if (m_vecItems->Size())
       plexExtras = m_vecItems->Get(0)->GetProperty("PlexExtras").asString();
+  }
+  else
+  {
+    CLog::Log(LOGDEBUG,"CGUIWindowPlexPreplayVideo::Update Path has changed, forcing reload");
+    reload = true;
+  }
 
   bool ret = CGUIMediaWindow::Update(strDirectory, updateFilterPath);
 
+  m_vecItems->SetProperty("PlexExtras", plexExtrasContainer);
   if (m_vecItems->Size())
     m_vecItems->Get(0)->SetProperty("PlexExtras", plexExtras);
 
-  CURL currentURL(strDirectory);
-  if (!currentURL.HasOption("checkfiles"))
+  UpdateItem(reload);
+
+  if (reload)
   {
     currentURL.SetOption("checkFiles", "1");
     CPlexDirectoryFetchJob *job = new CPlexDirectoryFetchJob(currentURL, CPlexDirectoryCache::CACHE_STRATEGY_ALWAYS);
     CJobManager::GetInstance().AddJob(job, this);
   }
-  if (ret)
-    UpdateItem();
 
   return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void CGUIWindowPlexPreplayVideo::UpdateItem()
+void CGUIWindowPlexPreplayVideo::UpdateItem(bool reload)
 {
   if (m_vecItems->GetContent() == "movies")
     m_vecItems->SetContent("movie");
@@ -342,12 +354,15 @@ void CGUIWindowPlexPreplayVideo::UpdateItem()
   m_vecItems->SetProperty("PlexPreplay", "yes");
   m_vecItems->SetProperty("PlexContent", PlexUtils::GetPlexContent(*m_vecItems));
 
-  if (m_vecItems->Size() > 0 && m_vecItems->Get(0))
+  if (m_vecItems->Size())
   {
     g_plexApplication.m_preplayItem = m_vecItems->Get(0);
-    g_plexApplication.themeMusicPlayer->playForItem(*m_vecItems->Get(0));
 
-    m_extraDataLoader.loadDataForItem(m_vecItems->Get(0));
+    if (reload)
+    {
+      m_extraDataLoader.loadDataForItem(m_vecItems->Get(0));
+      g_plexApplication.themeMusicPlayer->playForItem(*m_vecItems->Get(0));
+    }
   }
 }
 

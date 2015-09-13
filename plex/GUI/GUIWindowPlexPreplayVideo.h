@@ -23,7 +23,7 @@ public:
 
   void OnJobComplete(unsigned int jobID, bool success, CJob *job);
   bool Update(const CStdString &strDirectory, bool updateFilterPath);
-  void UpdateItem();
+  void UpdateItem(bool reload);
   bool OnBack(int actionID);
 
   std::string m_parentPath;
