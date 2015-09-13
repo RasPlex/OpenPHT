@@ -632,11 +632,11 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
   int NeededRangeStart = Index - PLEX_DEFAULT_PAGE_SIZE / 2;
   int NeededRangeEnd = Index + PLEX_DEFAULT_PAGE_SIZE / 2;
 
-  if (NeededRangeStart <  0)
-  {
-    NeededRangeEnd -= NeededRangeStart;
-    NeededRangeStart = 0;
-  }
+  int startPage = GetPageFromItemIndex(NeededRangeStart);
+  int endPage = GetPageFromItemIndex(NeededRangeEnd);
+
+  NeededRangeStart = startPage * PLEX_DEFAULT_PAGE_SIZE;
+  NeededRangeEnd = endPage * PLEX_DEFAULT_PAGE_SIZE + PLEX_DEFAULT_PAGE_SIZE;
   
   if (!boost::ends_with(u.GetFileName(), "url/lookup") &&
       !boost::starts_with(u.GetFileName(), "library/metadata"))
@@ -679,10 +679,13 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
     g_directoryCache.ClearDirectory(u.Get());
   
 #ifdef USE_PAGING
+  m_fetchedPages.insert(startPage);
+  m_fetchedPages.insert(endPage);
+
   if (items.HasProperty("totalSize"))
   {
     if (NeededRangeEnd > items.GetProperty("totalSize").asInteger())
-      NeededRangeEnd = items.GetProperty("totalSize").asInteger() - 1;
+      NeededRangeEnd = items.GetProperty("totalSize").asInteger();
 
     if (items.GetProperty("totalSize").asInteger() > items.Size())
     {
@@ -724,7 +727,7 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
         items.AddFront(item, 0);
       }
 
-      for (int i = NeededRangeEnd; i < (items.GetProperty("totalSize").asInteger() - 1); i++)
+      for (int i = NeededRangeEnd; i < items.GetProperty("totalSize").asInteger(); i++)
       {
         CFileItemPtr item = CFileItemPtr(new CFileItem);
         item->SetPath(boost::lexical_cast<std::string>(i));
