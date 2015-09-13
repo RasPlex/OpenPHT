@@ -85,7 +85,7 @@ void CPlexPlayQueueManager::clear()
 
   m_playQueues.clear();
  
-  CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, PLEX_PLAYQUEUE_MANAGER, 0);
+  CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, 0, 0);
   g_windowManager.SendThreadMessage(msg);
 }
 
@@ -98,7 +98,7 @@ void CPlexPlayQueueManager::clear(ePlexMediaType type)
   m_playQueues.erase(type);
     
   // TODO : Save here by type
-  CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, PLEX_PLAYQUEUE_MANAGER, 0);
+  CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, 0, 0);
   g_windowManager.SendThreadMessage(msg);
   
 }
@@ -155,7 +155,7 @@ void CPlexPlayQueueManager::playQueueUpdated(const ePlexMediaType& type, bool st
   
   if (hasChanged)
   {
-    CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, PLEX_PLAYQUEUE_MANAGER, 0);
+    CGUIMessage msg(GUI_MSG_PLEX_PLAYQUEUE_UPDATED, 0, 0);
     g_windowManager.SendThreadMessage(msg);
 
     g_plexApplication.timelineManager->RefreshSubscribers();

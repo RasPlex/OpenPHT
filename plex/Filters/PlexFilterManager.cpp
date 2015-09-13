@@ -178,9 +178,9 @@ void CPlexFilterManager::loadFilterForSection(const std::string &sectionUrl, boo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlexFilterManager::onFilterLoaded(const std::string &sectionUrl)
 {
-  CGUIMessage msg(GUI_MSG_FILTER_LOADED, PLEX_FILTER_MANAGER, 0, 0, 0);
+  CGUIMessage msg(GUI_MSG_FILTER_LOADED, 0, 0);
   msg.SetStringParam(sectionUrl);
-  g_windowManager.SendThreadMessage(msg);
+  g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

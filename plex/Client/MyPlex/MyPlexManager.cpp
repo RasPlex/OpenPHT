@@ -168,7 +168,7 @@ std::string CMyPlexManager::errorToString(CMyPlexManager::EMyPlexError error)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CMyPlexManager::BroadcastState()
 {
-  CGUIMessage msg(GUI_MSG_MYPLEX_STATE_CHANGE, PLEX_MYPLEX_MANAGER, 0);
+  CGUIMessage msg(GUI_MSG_MYPLEX_STATE_CHANGE, 0, 0);
   msg.SetParam1((int)m_state);
   msg.SetParam2((int)m_lastError);
 

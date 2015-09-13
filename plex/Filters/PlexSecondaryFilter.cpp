@@ -161,7 +161,7 @@ void CPlexSecondaryFilter::OnJobComplete(unsigned int jobID, bool success, CJob 
       m_filterValues.push_back(pair);
     }
 
-    CGUIMessage msg(GUI_MSG_FILTER_VALUES_LOADED, PLEX_FILTER_MANAGER, 0, 0, 0);
+    CGUIMessage msg(GUI_MSG_FILTER_VALUES_LOADED, 0, 0);
     msg.SetStringParam(getFilterKey());
     g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
   }

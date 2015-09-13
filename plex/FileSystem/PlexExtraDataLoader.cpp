@@ -114,8 +114,8 @@ void CPlexExtraDataLoader::OnJobComplete(unsigned int jobID, bool success, CJob*
     // send the dataloaded event to listeners
     CLog::Log(LOGDEBUG, "CPlexExtraInfoLoader : job %d succeeded for %s, (%d extra found)", jobID,
               m_path.c_str(), fjob->m_items.Size());
-    CGUIMessage msg(GUI_MSG_PLEX_EXTRA_DATA_LOADED, PLEX_EXTRADATA_LOADER, 0, 0, 0);
-    g_windowManager.SendThreadMessage(msg);
+    CGUIMessage msg(GUI_MSG_PLEX_EXTRA_DATA_LOADED, 0, 0);
+    g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
   }
   else
   {

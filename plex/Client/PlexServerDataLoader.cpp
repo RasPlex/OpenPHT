@@ -110,8 +110,8 @@ void CPlexServerDataLoader::OnJobComplete(unsigned int jobID, bool success, CJob
       // server has new / no more playlists, we kick a message to notify
       if (havePlaylists != AnyOwnedServerHasPlaylists())
       {
-        CGUIMessage msg(GUI_MSG_PLEX_PLAYLIST_STATUS_CHANGED, PLEX_DATA_LOADER, 0);
-        g_windowManager.SendThreadMessage(msg);
+        CGUIMessage msg(GUI_MSG_PLEX_PLAYLIST_STATUS_CHANGED, 0, 0);
+        g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
       }
     }
 
