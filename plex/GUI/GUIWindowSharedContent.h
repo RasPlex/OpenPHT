@@ -37,7 +37,7 @@ class CGUIWindowSharedContent : public CGUIPlexMediaWindow
   {
     bool ret = CGUIPlexMediaWindow::OnMessage(message);
     
-    if (message.GetMessage() == GUI_MSG_PLEX_SERVER_DATA_LOADED)
+    if (message.GetMessage() == GUI_MSG_NOTIFY_ALL && message.GetParam1() == GUI_MSG_PLEX_SERVER_DATA_LOADED)
     {
       CStdString uuid = message.GetStringParam();
       CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(uuid);
