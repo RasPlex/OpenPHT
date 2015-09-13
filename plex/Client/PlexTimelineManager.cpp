@@ -144,17 +144,25 @@ void CPlexTimelineManager::ReportProgress(const CFileItemPtr &newItem, ePlexMedi
   {
     if (oldTimeline->getState() != PLEX_MEDIA_STATE_STOPPED && oldTimeline)
     {
-      // we need to stop the old media before playing the new one.
-      CLog::Log(LOGDEBUG, "CPlexTimelineManager::ReportProgress Old item was never stopped, sending stop timeline now.");
-
-      // We need to save the item, otherwise the Report function will fail badly.
       CFileItemPtr oldItem = oldTimeline->getItem();
-      oldTimeline = ResetTimeline(type, true);
-      if (oldItem) oldTimeline->setItem(oldItem);
+      if (oldItem->HasProperty("playQueueID") && newItem->HasProperty("playQueueID") && oldItem->GetProperty("playQueueID").asString() == newItem->GetProperty("playQueueID").asString())
+      {
+        // do not stop the old media before playing the new one.
+        CLog::Log(LOGDEBUG, "CPlexTimelineManager::ReportProgress Old item was never stopped, continuing on same playQueue.");
+      }
+      else
+      {
+        // we need to stop the old media before playing the new one.
+        CLog::Log(LOGDEBUG, "CPlexTimelineManager::ReportProgress Old item was never stopped, sending stop timeline now.");
 
-      ReportProgress(oldTimeline, true);
+        // We need to save the item, otherwise the Report function will fail badly.
+        oldTimeline = ResetTimeline(type, true);
+        if (oldItem) oldTimeline->setItem(oldItem);
+
+        ReportProgress(oldTimeline, true);
+      }
     }
- }
+  }
 
   /* now we need to check the other types because we can start
    * playing a video when music is playing which will stop the music

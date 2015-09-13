@@ -4670,10 +4670,6 @@ void CApplication::OnPlayBackEnded()
 
   CGUIMessage msg(GUI_MSG_PLAYBACK_ENDED, 0, 0);
   g_windowManager.SendThreadMessage(msg);
-
-  /* PLEX */
-  UpdateFileState("stopped");
-  /* END PLEX */
 }
 
 void CApplication::OnPlayBackStarted()
@@ -5491,6 +5487,16 @@ bool CApplication::OnMessage(CGUIMessage& message)
         m_progressTrackingVideoResumeBookmark.timeInSeconds = -1.0f;
       }
 
+      /* PLEX */
+      // set stopped state if end of playlist
+      int iSong = g_playlistPlayer.GetNextSong(1);
+      CPlayList& playlist = g_playlistPlayer.GetPlaylist(g_playlistPlayer.GetCurrentPlaylist());
+      if ((message.GetMessage() != GUI_MSG_PLAYBACK_ENDED) || (iSong < 0) || (iSong >= playlist.size()) || (playlist.GetPlayable() <= 0))
+      {
+        UpdateFileState("stopped");
+      }
+      /* END PLEX */
+
       // reset the current playing file
       m_itemCurrentFile->Reset();
       g_infoManager.ResetCurrentItem();
@@ -5856,7 +5862,7 @@ void CApplication::Restart(bool bSamePosition)
 
   /* PLEX */
   //SaveFileState();
-  UpdateFileState("playing");
+  UpdateFileState("playing", true);
   /* END PLEX */
 
   // do we want to return to the current position in the file
