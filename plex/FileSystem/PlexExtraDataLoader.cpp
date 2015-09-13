@@ -29,7 +29,8 @@ void CPlexExtraDataLoader::loadDataForItem(CFileItemPtr pItem, ExtraDataType typ
   m_type = type;
   CURL url = getItemURL(pItem, type);
 
-  CJobManager::GetInstance().AddJob(new CPlexDirectoryFetchJob(url), this);
+  if (!url.GetFileName().IsEmpty())
+    CJobManager::GetInstance().AddJob(new CPlexDirectoryFetchJob(url), this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
