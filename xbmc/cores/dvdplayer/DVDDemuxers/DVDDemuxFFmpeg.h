@@ -148,5 +148,8 @@ protected:
   unsigned m_program;
   XbmcThreads::EndTime  m_timeout;
 
+  /* PLEX */
+  bool m_bPlexTranscode;
+  /* END PLEX */
 };
 

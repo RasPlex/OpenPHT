@@ -219,6 +219,7 @@ CDVDDemuxFFmpeg::CDVDDemuxFFmpeg() : CDVDDemux()
   m_bAVI = false;
   m_speed = DVD_PLAYSPEED_NORMAL;
   m_program = UINT_MAX;
+  m_bPlexTranscode = false;
 }
 
 CDVDDemuxFFmpeg::~CDVDDemuxFFmpeg()
@@ -246,6 +247,7 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput)
   m_iCurrentPts = DVD_NOPTS_VALUE;
   m_speed = DVD_PLAYSPEED_NORMAL;
   m_program = UINT_MAX;
+  m_bPlexTranscode = false;
   const AVIOInterruptCB int_cb = { interrupt_cb, this };
 
   if (!pInput) return false;
@@ -507,6 +509,9 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput)
   // print some extra information
   m_dllAvFormat.av_dump_format(m_pFormatContext, 0, strFile.c_str(), 0);
 
+  // check if plex transcoding
+  m_bPlexTranscode = m_dllAvUtil.av_dict_get(m_pFormatContext->metadata, "plex.start_offset", NULL, 0) != NULL;
+
   UpdateCurrentPTS();
 
   // add the ffmpeg streams to our own stream array
@@ -685,7 +690,7 @@ double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num)
   // for dvd's we need the original time
   if(dynamic_cast<CDVDInputStream::IMenus*>(m_pInput))
     starttime = dynamic_cast<CDVDInputStream::IMenus*>(m_pInput)->GetTimeStampCorrection() / DVD_TIME_BASE;
-  else if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE)
+  else if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE && !m_bPlexTranscode)
     starttime = (double)m_pFormatContext->start_time / AV_TIME_BASE;
 
   if(timestamp > starttime)
@@ -820,7 +825,7 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
         {
           int64_t duration;
           duration = pkt.dts;
-          if(stream->start_time != (int64_t)AV_NOPTS_VALUE)
+          if(stream->start_time != (int64_t)AV_NOPTS_VALUE && !m_bPlexTranscode)
             duration -= stream->start_time;
 
           if(duration > stream->duration)
@@ -879,6 +884,14 @@ DemuxPacket* CDVDDemuxFFmpeg::Read()
 
 bool CDVDDemuxFFmpeg::SeekTime(int time, bool backwords, double *startpts)
 {
+  if (m_bPlexTranscode)
+  {
+    if(startpts)
+      *startpts = DVD_NOPTS_VALUE;
+
+    return true;
+  }
+
   if(time < 0)
     time = 0;
 
