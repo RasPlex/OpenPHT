@@ -134,6 +134,7 @@ bool DVDPlayerCodec::Init(const CStdString &strFile, unsigned int filecache)
     return false;
   }
 
+  pStream = m_pDemuxer->GetStream(m_nAudioStream);
   CDVDStreamInfo hint(*pStream, true);
   hint.isAudioOnly = !hasVideoStream;
 
