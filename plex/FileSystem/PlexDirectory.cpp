@@ -355,6 +355,8 @@ static AttributeMap g_attributeMap = boost::assign::list_of<AttributePair>
                                      ("parentRatingKey", g_parserKey)
                                      ("grandparentKey", g_parserKey)
                                      ("composite", g_parserKey)
+                                     ("parentTheme", g_parserKey)
+                                     ("grandparentTheme", g_parserKey)
 
                                      ("thumb", g_parserMediaUrl)
                                      ("art", g_parserMediaUrl)
