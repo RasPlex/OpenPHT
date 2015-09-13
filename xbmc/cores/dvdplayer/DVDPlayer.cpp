@@ -1027,7 +1027,6 @@ bool CDVDPlayer::ReadPacket(DemuxPacket*& packet, CDemuxStream*& stream)
             SelectionStream& s = m_SelectionStreams.Get(STREAM_SUBTITLE, i);
             if (s.plexID == m_vobsubToDisplay && OpenSubtitleStream(s.id, s.source))
             {
-              OpenSubtitleStream(s.id, s.source);
               break;
             }
           }
@@ -2984,13 +2983,9 @@ void CDVDPlayer::SetSubtitleVisible(bool bVisible)
 
   /* PLEX */
   // Send the change to the Media Server.
-  CFileItemPtr item = g_application.CurrentFileItemPtr();
-  int partID = GetPlexMediaPartID();
-  int subtitleStreamID = GetSubtitlePlexID();
-
   // Don't send the message over if we're just hiding the initial sub.
   if (m_hidingSub == false)
-    g_plexApplication.mediaServerClient->SelectStream(item, partID, g_settings.m_currentVideoSettings.m_SubtitleOn ? subtitleStreamID : 0, -1);
+    g_plexApplication.mediaServerClient->SelectStream(g_application.CurrentFileItemPtr(), GetPlexMediaPartID(), g_settings.m_currentVideoSettings.m_SubtitleOn ? GetSubtitlePlexID() : 0, -1);
   /* END PLEX */
 }
 
@@ -4451,7 +4446,6 @@ void CDVDPlayer::OpenDefaultStreams(bool reset)
         if (streamType == PLEX_STREAM_AUDIO && selected)
         {
           // ...see if we can match it up with our stream.
-          count = m_SelectionStreams.Count(STREAM_AUDIO);
           for (int i=0; i<count && !valid; i++)
           {
             SelectionStream& s = m_SelectionStreams.Get(STREAM_AUDIO, i);
@@ -4488,6 +4482,7 @@ void CDVDPlayer::OpenDefaultStreams(bool reset)
     return;
 
   // open subtitle stream
+  count = m_SelectionStreams.Count(STREAM_SUBTITLE);
   valid = false;
   m_dvdPlayerVideo.EnableSubtitle(true);
 
@@ -4500,8 +4495,6 @@ void CDVDPlayer::OpenDefaultStreams(bool reset)
       // If we've found the selected subtitle stream...
       if (stream->GetProperty("streamType").asInteger() == PLEX_STREAM_SUBTITLE && stream->GetProperty("selected").asBoolean())
       {
-        count = m_SelectionStreams.Count(STREAM_SUBTITLE);
-
         for (int i = 0; i<count && !valid; i++)
         {
           SelectionStream& s = m_SelectionStreams.Get(STREAM_SUBTITLE, i);
