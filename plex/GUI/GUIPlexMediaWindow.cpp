@@ -164,7 +164,8 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
 
     case GUI_MSG_PLEX_PAGE_LOADED:
     {
-      InsertPage((CFileItemList*)message.GetPointer(), message.GetParam2());
+      if (IsActive())
+        InsertPage((CFileItemList*)message.GetPointer(), message.GetParam2());
       break;
     }
 
@@ -197,6 +198,9 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
 
     case GUI_MSG_PLEX_EXTRA_DATA_LOADED :
     {
+      if (!IsActive())
+        break;
+
       CFileItemList extralist;
       extralist.Copy(*(m_extraDataLoader.getItems()));
       CLog::Log(LOGDEBUG,"CGUIPlexMediaWindow::OnMessage GUI_MSG_PLEX_EXTRA_DATA_LOADED (%d)", extralist.Size());
@@ -777,7 +781,7 @@ void CGUIPlexMediaWindow::OnJobComplete(unsigned int jobID, bool success, CJob* 
   int rangeStart = boost::lexical_cast<int>(fjob->m_url.GetOption("X-Plex-Container-Start"));
   int pageNum = GetPageFromItemIndex(rangeStart);
 
-  if (success)
+  if (success && IsActive())
   {
     CFileItemList* list = new CFileItemList;
     list->Copy(fjob->m_items);

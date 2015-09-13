@@ -72,7 +72,7 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
     else if (message.GetSenderId() == 107)
       Share();
   }
-  else if (message.GetMessage() == GUI_MSG_PLEX_EXTRA_DATA_LOADED)
+  else if (message.GetMessage() == GUI_MSG_PLEX_EXTRA_DATA_LOADED && IsActive())
   {
     CFileItemList extralist;
     extralist.Copy(*(m_extraDataLoader.getItems()));
@@ -104,7 +104,7 @@ bool CGUIWindowPlexPreplayVideo::OnMessage(CGUIMessage &message)
   {
     m_focusSaver.SaveFocus(this);
   }
-  else if (message.GetMessage() == GUI_MSG_UPDATE)
+  else if (message.GetMessage() == GUI_MSG_UPDATE && IsActive())
   {
      Refresh(false);
   }
@@ -355,7 +355,7 @@ void CGUIWindowPlexPreplayVideo::UpdateItem()
 void CGUIWindowPlexPreplayVideo::OnJobComplete(unsigned int jobID, bool success, CJob *job)
 {
   CPlexDirectoryFetchJob *fjob = static_cast<CPlexDirectoryFetchJob*>(job);
-  if (success && fjob)
+  if (success && fjob && IsActive())
   {
     if (fjob->m_url.GetFileName() == "pms/friends/all.xml")
       m_friends.Copy(fjob->m_items);
