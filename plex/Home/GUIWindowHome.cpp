@@ -1165,7 +1165,7 @@ void CGUIWindowHome::RestoreSection()
             m_lastSelectedItem == fItem->GetLabel())
         {
           CGUIMessage msg(GUI_MSG_SETFOCUS, GetID(), pControl->GetID(), idx+1, 0);
-          g_windowManager.SendThreadMessage(msg);
+          g_windowManager.SendThreadMessage(msg, GetID());
 
           if (fItem->HasProperty("sectionPath"))
             ShowSection(fItem->GetProperty("sectionPath").asString());

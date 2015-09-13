@@ -152,7 +152,7 @@ void CPlexSectionFanout::LoadArts(bool force)
   {
     CGUIMessage msg(GUI_MSG_PLEX_SECTION_LOADED, WINDOW_HOME, 300, CONTENT_LIST_FANART);
     msg.SetStringParam(m_url.Get());
-    g_windowManager.SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
     return;
   }
 
@@ -248,14 +248,14 @@ void CPlexSectionFanout::OnJobComplete(unsigned int jobID, bool success, CJob* j
   {
     CGUIMessage msg(GUI_MSG_PLEX_SECTION_LOADED, WINDOW_HOME, 300, m_sectionType);
     msg.SetStringParam(m_url.Get());
-    g_windowManager.SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
   }
   else if (load->m_contentType == CONTENT_LIST_FANART)
   {
     m_artsAge.restart();
     CGUIMessage msg(GUI_MSG_PLEX_SECTION_LOADED, WINDOW_HOME, 300, CONTENT_LIST_FANART);
     msg.SetStringParam(m_url.Get());
-    g_windowManager.SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
   }
 }
 
@@ -269,11 +269,11 @@ void CPlexSectionFanout::Show()
     /* we are up to date, just send the messages */
     CGUIMessage msg(GUI_MSG_PLEX_SECTION_LOADED, WINDOW_HOME, 300, m_sectionType);
     msg.SetStringParam(m_url.Get());
-    g_windowManager.SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg, g_windowManager.GetActiveWindow());
 
     CGUIMessage msg2(GUI_MSG_PLEX_SECTION_LOADED, WINDOW_HOME, 300, CONTENT_LIST_FANART);
     msg2.SetStringParam(m_url.Get());
-    g_windowManager.SendThreadMessage(msg2);
+    g_windowManager.SendThreadMessage(msg2, g_windowManager.GetActiveWindow());
   }
 }
 

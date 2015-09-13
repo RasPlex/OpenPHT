@@ -365,8 +365,8 @@ void CGUIWindowPlexPreplayVideo::OnJobComplete(unsigned int jobID, bool success,
     if (fjob->m_url.HasOption("checkFiles"))
     {
       m_vecItems->SetPath(fjob->m_url.Get());
-      CGUIMessage msg(GUI_MSG_UPDATE, WINDOW_PLEX_PREPLAY_VIDEO, g_windowManager.GetActiveWindow(), 0, 0);
-      g_windowManager.SendThreadMessage(msg, WINDOW_PLEX_PREPLAY_VIDEO);
+      CGUIMessage msg(GUI_MSG_UPDATE, GetID(), g_windowManager.GetActiveWindow(), 0, 0);
+      g_windowManager.SendThreadMessage(msg, GetID());
     }
   }
 }

@@ -252,7 +252,7 @@ void CGUIWindowStartup::OnJobComplete(unsigned int jobID, bool success, CJob *jo
     }
 
     CGUIMessage msg(GUI_MSG_PLEX_USERLIST_FETCHED, GetID(), GetID(), 0);
-    g_windowManager.SendThreadMessage(msg);
+    g_windowManager.SendThreadMessage(msg, GetID());
 
     m_currentToken = g_plexApplication.myPlexManager->GetCurrentUserInfo().authToken;
   }
@@ -274,7 +274,7 @@ void CGUIWindowStartup::OnJobComplete(unsigned int jobID, bool success, CJob *jo
         m_users.Add(oldUser);
 
         CGUIMessage msg(GUI_MSG_PLEX_USERLIST_FETCHED, GetID(), GetID(), 0);
-        g_windowManager.SendThreadMessage(msg);
+        g_windowManager.SendThreadMessage(msg, GetID());
       }
     }
 
@@ -388,8 +388,8 @@ void CGUIWindowStartup::OnBackSpace()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CGUIWindowStartup::PreviousWindow()
 {
-  CGUIMessage msg(GUI_MSG_PLEX_EXIT_USER_WINDOW, 0, 0, 0);
-  g_windowManager.SendThreadMessage(msg);
+  CGUIMessage msg(GUI_MSG_PLEX_EXIT_USER_WINDOW, 0, 0);
+  g_windowManager.SendThreadMessage(msg, GetID());
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
