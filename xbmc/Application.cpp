@@ -6032,7 +6032,7 @@ void CApplication::SetPlaySpeed(int iSpeed)
   {
     if (m_iPlaySpeed == 1)
     { // restore volume
-      m_pPlayer->SetVolume(VOLUME_MAXIMUM);
+      m_pPlayer->SetVolume(g_settings.m_fVolumeLevel);
     }
     else
     { // mute volume
