@@ -330,6 +330,7 @@ void CGUIListItem::Archive(CArchive &ar)
       ar >> value;
       m_artFallbacks.insert(make_pair(key, value));
     }
+    SetInvalid();
   }
 }
 void CGUIListItem::Serialize(CVariant &value)
@@ -429,12 +430,15 @@ bool CGUIListItem::HasProperty(const CStdString &strKey) const
 void CGUIListItem::ClearProperty(const CStdString &strKey)
 {
   /* PLEX */
-  CStdString _key(strKey);
-  _key.ToLower();
+  std::string _key = strKey;
+  std::transform(_key.begin(), _key.end(), _key.begin(), ::tolower);
 
   PropertyMap::iterator _iter = m_mapProperties.find(_key);
   if (_iter != m_mapProperties.end())
+  {
     m_mapProperties.erase(_iter);
+    SetInvalid();
+  }
 
   return;
   /* END PLEX */
@@ -446,7 +450,11 @@ void CGUIListItem::ClearProperty(const CStdString &strKey)
 
 void CGUIListItem::ClearProperties()
 {
-  m_mapProperties.clear();
+  if (!m_mapProperties.empty())
+  {
+    m_mapProperties.clear();
+    SetInvalid();
+  }
 }
 
 void CGUIListItem::IncrementProperty(const CStdString &strKey, int nVal)

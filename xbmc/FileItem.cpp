@@ -1577,12 +1577,18 @@ void CFileItem::UpdateInfo(const CFileItem &item, bool replaceLabels /*=true*/)
     if (HasPVRRecordingInfoTag())
       GetPVRRecordingInfoTag()->CopyClientInfo(GetVideoInfoTag());
     SetOverlayImage(ICON_OVERLAY_UNWATCHED, GetVideoInfoTag()->m_playCount > 0);
+    SetInvalid();
   }
   if (item.HasMusicInfoTag())
+  {
     *GetMusicInfoTag() = *item.GetMusicInfoTag();
+    SetInvalid();
+  }
   if (item.HasPictureInfoTag())
+  {
     *GetPictureInfoTag() = *item.GetPictureInfoTag();
-
+    SetInvalid();
+  }
   if (replaceLabels && !item.GetLabel().IsEmpty())
     SetLabel(item.GetLabel());
   if (replaceLabels && !item.GetLabel2().IsEmpty())

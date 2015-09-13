@@ -165,7 +165,17 @@ public:
     std::string _key = strKey;
     std::transform(_key.begin(), _key.end(), _key.begin(), ::tolower);
 
-    m_mapProperties[_key] = value;
+    PropertyMap::iterator iter = m_mapProperties.find(_key);
+    if (iter == m_mapProperties.end())
+    {
+      m_mapProperties.insert(make_pair(_key, value));
+      SetInvalid();
+    }
+    else if (iter->second != value)
+    {
+      iter->second = value;
+      SetInvalid();
+    }
   }
 #else
   void SetProperty(const CStdString &strKey, const CVariant &value);
