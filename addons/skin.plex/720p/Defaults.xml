@@ -57,6 +57,26 @@
 		<radioheight>27</radioheight>
 		<pulseonselect>false</pulseonselect>
 	</default>
+	<default type="filterorderbutton">
+		<description>Default Filterorderbutton</description>
+		<height>50</height>
+		<align>left</align>
+		<aligny>center</aligny>
+		<textoffsetx>20</textoffsetx>
+		<textoffsety>0</textoffsety>
+		<font>DefaultFont</font>
+		<textcolor>Unfocused</textcolor>
+		<focusedcolor>Focused</focusedcolor>
+		<disabledcolor>Disabled</disabledcolor>
+		<selectedcolor>Selected</selectedcolor>
+		<texturefocus border="5">black-bottom-grey.png</texturefocus>
+		<texturenofocus border="5">border-bottom-grey.png</texturenofocus>
+		<textureradiofocus>b-radio-on.png</textureradiofocus>
+		<textureradionofocus>b-radio-off.png</textureradionofocus>
+		<radiowidth>27</radiowidth>
+		<radioheight>27</radioheight>
+		<pulseonselect>false</pulseonselect>
+	</default>
 	<default type="spincontrolex">
 		<height>50</height>
 		<align>left</align>

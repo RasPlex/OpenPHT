@@ -11,10 +11,11 @@
 #include "SpecialProtocol.h"
 #include "PlexApplication.h"
 #include "Client/MyPlex/MyPlexManager.h"
+#include "Client/PlexServerDataLoader.h"
 
 #include "XBMCTinyXML.h"
 
-#define PLEX_FILTER_MANAGER_XML_PATH "special://plexprofile/plexfiltermanager.xml"
+#define PLEX_FILTER_MANAGER_XML_PATH "special://plexprofile/plexfiltermanager2.xml"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 std::string CPlexFilterManager::getFilterXMLPath()
@@ -34,6 +35,8 @@ void CPlexFilterManager::loadFiltersFromDisk()
   CLog::Log(LOGDEBUG, "CPlexFilterManager::loadFiltersFromDisk loading from %s", CSpecialProtocol::TranslatePath(getFilterXMLPath()).c_str());
   if (!XFILE::CFile::Exists(getFilterXMLPath()))
     return;
+
+  CSingleLock lk(m_filterSection);
 
   CXBMCTinyXML doc;
   doc.LoadFile(getFilterXMLPath());
@@ -157,22 +160,31 @@ CPlexSectionFilterPtr CPlexFilterManager::getFilterForSection(const std::string 
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void CPlexFilterManager::loadFilterForSection(const std::string &sectionUrl, bool forceReload)
+CPlexSectionFilterPtr CPlexFilterManager::loadFilterForSection(const std::string &sectionUrl, bool forceReload)
 {
   CSingleLock lk(m_filterSection);
 
-  CPlexSectionFilterPtr filter;
-  if (m_filtersMap.find(sectionUrl) != m_filtersMap.end())
-    filter = m_filtersMap[sectionUrl];
-
-  if (filter && filter->isLoaded() && !forceReload)
+  CPlexSectionFilterPtr filter = getFilterForSection(sectionUrl);
+  if (filter)
   {
-    return;
+    if (filter->isLoaded() && !forceReload)
+      onFilterLoaded(filter->getFilterUrl());
+    else
+      CJobManager::GetInstance().AddJob(new CPlexSectionFilterLoadJob(filter), this, CJob::PRIORITY_LOW);
+    return filter;
   }
-  else if (!filter)
-    filter = CPlexSectionFilterPtr(new CPlexSectionFilter(CURL(sectionUrl)));
 
-  CJobManager::GetInstance().AddJob(new CPlexSectionFilterLoadJob(filter), this, CJob::PRIORITY_LOW);
+  CURL url(sectionUrl);
+  CFileItemPtr section = g_plexApplication.dataLoader->GetSection(url);
+  if (section)
+  {
+    filter = CPlexSectionFilterPtr(new CPlexSectionFilter(url));
+    m_filtersMap[filter->getFilterUrl()] = filter;
+    CJobManager::GetInstance().AddJob(new CPlexSectionFilterLoadJob(filter), this, CJob::PRIORITY_LOW);
+    return filter;
+  }
+
+  return CPlexSectionFilterPtr();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,9 +202,6 @@ void CPlexFilterManager::OnJobComplete(unsigned int jobID, bool success, CJob *j
   if (ljob && success)
   {
     CPlexSectionFilterPtr filter = ljob->m_sectionFilter;
-    CSingleLock lk(m_filterSection);
-    if (m_filtersMap.find(filter->getFilterUrl()) == m_filtersMap.end())
-      m_filtersMap[filter->getFilterUrl()] = filter;
     onFilterLoaded(filter->getFilterUrl());
   }
 }

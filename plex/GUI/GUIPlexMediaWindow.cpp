@@ -75,8 +75,6 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
 
     SaveSelection();
   }
-  else if (message.GetMessage() == GUI_MSG_WINDOW_DEINIT)
-    m_sectionFilter.reset();
 
   bool ret = CGUIMediaWindow::OnMessage(message);
 
@@ -134,10 +132,7 @@ bool CGUIPlexMediaWindow::OnMessage(CGUIMessage &message)
         AddFilters();
 
         g_plexApplication.filterManager->saveFiltersToDisk();
-
-        // make sure we update the window, as update might already have occured
-        CGUIMessage msg(GUI_MSG_UPDATE, 0, 0, 0, 0);
-        g_windowManager.SendThreadMessage(msg);
+        SetInvalid();
       }
       break;
     }
@@ -299,6 +294,9 @@ void CGUIPlexMediaWindow::InsertPage(CFileItemList* items, int Where)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CGUIPlexMediaWindow::updateFilterButtons(CPlexSectionFilterPtr filter, bool clear, bool disable)
 {
+  if (m_clearFilterButton && clear)
+    m_clearFilterButton->SetVisible(false);
+
   for (int i = FILTER_SECONDARY_BUTTONS_START; i < SORT_BUTTONS_START; i ++)
   {
     CGUIRadioButtonControl* button = (CGUIRadioButtonControl*)GetControl(i);
@@ -320,7 +318,7 @@ void CGUIPlexMediaWindow::updateFilterButtons(CPlexSectionFilterPtr filter, bool
     button->SetEnabled(!disable);
   }
 
-  for (int i = SORT_BUTTONS_START; i < SORT_BUTTONS_START + 30; i++)
+  for (int i = SORT_BUTTONS_START; i < FILTER_BUTTONS_STOP; i++)
   {
     CGUIFilterOrderButtonControl* button = (CGUIFilterOrderButtonControl*)GetControl(i);
     if (!button)
@@ -407,6 +405,7 @@ void CGUIPlexMediaWindow::OnFilterButton(int filterButtonId)
       m_filterValuesEvent.Reset();
       m_waitingForFilter = currentFilter->getFilterKey();
 
+      bool canceled = false;
       m_sectionFilter->loadFilterValues(currentFilter);
       CGUIDialogBusy *busy = (CGUIDialogBusy*)g_windowManager.GetWindow(WINDOW_DIALOG_BUSY);
       if (busy)
@@ -420,22 +419,25 @@ void CGUIPlexMediaWindow::OnFilterButton(int filterButtonId)
             CSingleLock lk(m_filterValuesSection);
             m_filterValuesEvent.Set();
             m_waitingForFilter.clear();
+			canceled = true;
             break;
           }
         }
         busy->Close();
       }
 
-      CGUIDialogFilterSort* dialog = (CGUIDialogFilterSort*)g_windowManager.GetWindow(WINDOW_DIALOG_FILTER_SORT);
-      if (dialog)
+      if (!canceled)
       {
-        dialog->SetFilter(currentFilter, filterButtonId);
-        dialog->DoModal();
+        CGUIDialogFilterSort* dialog = (CGUIDialogFilterSort*)g_windowManager.GetWindow(WINDOW_DIALOG_FILTER_SORT);
+        if (dialog)
+        {
+          dialog->SetFilter(currentFilter, filterButtonId);
+          dialog->DoModal();
+        }
 
+        if (radio)
+          radio->SetSelected(currentFilter->isSelected());
       }
-
-      if (radio)
-        radio->SetSelected(currentFilter->isSelected());
     }
   }
   else
@@ -468,8 +470,8 @@ void CGUIPlexMediaWindow::OnFilterButton(int filterButtonId)
     m_sectionFilter->setSortOrderAscending(state == CGUIFilterOrderButtonControl::ASCENDING);
   }
 
-  Update(m_sectionRoot.Get(), false, true);
   g_plexApplication.filterManager->saveFiltersToDisk();
+  Update(m_sectionRoot.Get(), false, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -481,8 +483,6 @@ void CGUIPlexMediaWindow::OnFilterSelected(const std::string &filterKey, int fil
   CPlexSecondaryFilterPtr filter = m_sectionFilter->addSecondaryFilter(filterKey);
   if (!filter)
     return;
-
-  Update(m_sectionRoot.Get(), false, true);
 
   CGUIButtonControl* button = (CGUIButtonControl*)GetControl(filterButtonId);
   if (button)
@@ -498,6 +498,7 @@ void CGUIPlexMediaWindow::OnFilterSelected(const std::string &filterKey, int fil
     m_clearFilterButton->SetVisible(m_sectionFilter->hasActiveSecondaryFilters());
 
   g_plexApplication.filterManager->saveFiltersToDisk();
+  Update(m_sectionRoot.Get(), false, true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -520,10 +521,7 @@ bool CGUIPlexMediaWindow::OnAction(const CAction &action)
           ctrl->SetFocus(true);
 
         if (m_clearFilterButton)
-        {
           m_clearFilterButton->SetFocus(false);
-          m_clearFilterButton->SetVisible(false);
-        }
 
         g_plexApplication.filterManager->saveFiltersToDisk();
         Update(m_sectionRoot.Get(), false, true);
@@ -939,34 +937,25 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
 
   SaveSelection();
   
-  EPlexDirectoryType oldDirType = m_vecItems->GetPlexDirectoryType();
-
+  // Load filter when opening a section
   if (strDirectory == m_startDirectory)
   {
+    CLog::Log(LOGDEBUG, "CGUIPlexMediaWindow::Update m_sectionRoot=%s", strDirectory.c_str());
     m_sectionRoot = strDirectory;
-    g_plexApplication.filterManager->loadFilterForSection(m_sectionRoot.Get());
-  }
 
-  // since the filters might not have been loaded yet we should really make sure that we
-  // use *a* primaryFilter here. We just default to all since that seems sane.
-  CStdString primaryFilter = "all";
-  if (m_sectionFilter)
-  {
-    primaryFilter = m_sectionFilter->currentPrimaryFilter();
+    m_sectionFilter = g_plexApplication.filterManager->loadFilterForSection(m_sectionRoot.Get());
 
-    // A hack to handle by Albums
-    if (primaryFilter == "albums")
-      primaryFilter = "all";
-  }
-
-  if (boost::ends_with(newUrl.GetFileName(), primaryFilter))
-  {
     CLog::Log(LOGDEBUG, "CGUIPlexMediaWindow::Update m_startDirectory=%s", newUrl.GetUrlWithoutOptions().c_str());
     m_startDirectory = newUrl.GetUrlWithoutOptions();
   }
 
+  // Reset start directory and history if new filter is selected
   if (updateFromFilter)
+  {
+    CLog::Log(LOGDEBUG, "CGUIPlexMediaWindow::Update m_startDirectory=%s", newUrl.GetUrlWithoutOptions().c_str());
+    m_startDirectory = newUrl.GetUrlWithoutOptions();
     m_history.RemoveParentPath();
+  }
 
   bool ret = CGUIMediaWindow::Update(newUrl.Get(), updateFilterPath);
 
@@ -979,17 +968,12 @@ bool CGUIPlexMediaWindow::Update(const CStdString &strDirectory, bool updateFilt
 
   m_vecItems->SetProperty("PlexContent", PlexUtils::GetPlexContent(*m_vecItems));
 
-  m_vecItems->SetProperty("PlexFilter", "all");
-  if (m_sectionFilter && !m_sectionFilter->currentPrimaryFilter().empty())
+  if (m_sectionFilter && boost::starts_with(m_vecItems->GetPath(), m_sectionFilter->getFilterUrl()))
     m_vecItems->SetProperty("PlexFilter", m_sectionFilter->currentPrimaryFilter());
+  else
+    m_vecItems->SetProperty("PlexFilter", "");
 
   g_plexApplication.extraInfo->LoadExtraInfoForItem(m_vecItems);
-
-  // make sure we force the filters to reload if section type changed
-  if (oldDirType != m_vecItems->GetPlexDirectoryType())
-  {
-    g_plexApplication.filterManager->loadFilterForSection(m_sectionRoot.Get(), true);
-  }
 
   // clear eventual extras
   CFileItemList extralist;
@@ -1017,7 +1001,7 @@ void CGUIPlexMediaWindow::CheckPlexFilters(CFileItemList &list)
 {
   m_contentMatch.clear();
 
-  if (m_sectionFilter)
+  if (m_sectionFilter && boost::starts_with(list.GetPath(), m_sectionFilter->getFilterUrl()))
   {
     list.SetProperty("hasAdvancedFilters", m_sectionFilter->hasAdvancedFilters() ? "yes" : "");
     list.SetProperty("primaryFilterActivated", m_sectionFilter->secondaryFiltersActivated() ? "" : "yes");
@@ -1031,7 +1015,7 @@ void CGUIPlexMediaWindow::CheckPlexFilters(CFileItemList &list)
     list.SetProperty("sectionType", (int)section->GetPlexDirectoryType());
   }
 
-  if (m_sectionFilter && m_sectionFilter->currentPrimaryFilter() == "folder")
+  if (m_sectionFilter && m_sectionFilter->currentPrimaryFilter() == "folder" && boost::starts_with(m_vecItems->GetPath(), m_sectionFilter->getFilterUrl()))
     list.SetContent("folders");
 
   /* check if we have gone deeper down or not */
@@ -1345,10 +1329,6 @@ void CGUIPlexMediaWindow::AddFilters()
       }
     }
   }
-
-#ifdef USE_PAGING
-  FetchItemPage(m_viewControl.GetSelectedItem());
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1403,7 +1383,7 @@ bool CGUIPlexMediaWindow::MatchPlexFilter(const CStdString &matchStr)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGUIPlexMediaWindow::IsFiltered()
 {
-  if (m_sectionFilter)
+  if (m_sectionFilter && boost::starts_with(m_vecItems->GetPath(), m_sectionFilter->getFilterUrl()))
   {
     if (m_sectionFilter->secondaryFiltersActivated())
       return true;
@@ -1414,7 +1394,7 @@ bool CGUIPlexMediaWindow::IsFiltered()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CGUIPlexMediaWindow::CanFilterAdvanced()
 {
-  if (m_sectionFilter)
+  if (m_sectionFilter && boost::starts_with(m_vecItems->GetPath(), m_sectionFilter->getFilterUrl()))
     return m_sectionFilter->hasAdvancedFilters();
   return false;
 }
