@@ -73,8 +73,6 @@ bool SoLoader::Load()
 
 void SoLoader::Unload()
 {
-  CLog::Log(LOGDEBUG, "Unloading: %s\n", GetName());
-
   if (m_soHandle)
   {
 #if defined(TARGET_ANDROID)

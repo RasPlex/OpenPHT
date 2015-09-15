@@ -51,6 +51,7 @@ namespace XBMC
   {
     // cleanup
     /* PLEX */
+    XbmcCommons::Exception::SetLogger(NULL);
     CThread::SetLogger(NULL);
     /* END PLEX */
     delete impl->loggerImpl;

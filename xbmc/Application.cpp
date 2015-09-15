@@ -3725,7 +3725,6 @@ bool CApplication::Cleanup()
     g_windowManager.Remove(WINDOW_DIALOG_VOLUME_BAR);
 
 
-#ifndef __PLEX__
     CAddonMgr::Get().DeInit();
 
 #if defined(HAS_LIRC) || defined(HAS_IRSERVERSUITE)
@@ -3763,7 +3762,6 @@ bool CApplication::Cleanup()
     g_settings.Clear();
     g_guiSettings.Clear();
     g_advancedSettings.Clear();
-#endif // __PLEX__
 
 #ifdef _LINUX
     CXHandle::DumpObjectTracker();
@@ -3818,9 +3816,6 @@ void CApplication::Stop(int exitCode)
       m_pLaunchHost->OnShutdown();
     /* END PLEX */
 
-    // cancel any jobs from the jobmanager
-    CJobManager::GetInstance().CancelJobs();
-
     g_alarmClock.StopThread();
 
     if( m_bSystemScreenSaverEnable )
@@ -3843,6 +3838,9 @@ void CApplication::Stop(int exitCode)
     m_AppFocused = false;
     m_ExitCode = exitCode;
     CLog::Log(LOGNOTICE, "stop all");
+
+    // cancel any jobs from the jobmanager
+    CJobManager::GetInstance().CancelJobs();
 
     // stop scanning before we kill the network and so on
     if (m_musicInfoScanner->IsScanning())
@@ -3914,10 +3912,8 @@ void CApplication::Stop(int exitCode)
     CSFTPSessionManager::DisconnectAllSessions();
 #endif
 
-#ifndef __PLEX__
     CLog::Log(LOGNOTICE, "unload skin");
     UnloadSkin();
-#endif
 
 #if defined(TARGET_DARWIN_OSX)
 #ifndef __PLEX__
