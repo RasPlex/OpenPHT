@@ -800,7 +800,7 @@
 				</control>
 			</control>
 			<!-- filters & sorting menu -->
-			<control type="group" id="1300">
+			<control type="grouplist" id="1300">
 				<animation type="Conditional" condition="!Window.IsActive(10202)" reversible="false">
 					<effect type="rotatey" center="-120" start="80" end="0" time="300"/>
 					<effect type="fade" start="0" end="100" time="0" delay="0"/>
@@ -812,60 +812,68 @@
 				<posx>-253</posx>
 				<posy>0</posy>
 				<width>253</width>
-				<height>730</height>
-				<ondown>1300</ondown>
+				<height>720</height>
+				<onup>-</onup>
+				<ondown>-</ondown>
+				<onright>777</onright>
 				<orientation>vertical</orientation>
 				<scrolltime>150</scrolltime>
 				<!-- FILTERS -->
 				<!-- primary filter list title -->
 				<control type="label" id="19008">
 					<description>Title</description>
-					<posy>22</posy>
 					<posx>255</posx>
 					<include>leftMenuTitle</include>
 				</control>
 				<!-- primary filters list -->
 				<control type="grouplist" id="19000">
-					<posy>77</posy>
-					<posx>0</posx>
-					<onup>19010</onup>
+					<height max="1000">auto</height>
+					<onup>-</onup>
 					<ondown>29999</ondown>
 					<onright>777</onright>
 					<itemgap>0</itemgap>
-					<animation effect="slide" end="0,0" time="0" condition="Container.PlexContent(Movies)">Conditional</animation>
 				</control>
 				<!-- secondary filters list title -->
 				<control type="label" id="19009">
 					<description>Secondary Title</description>
-					<posy>263</posy>
 					<posx>255</posx>
 					<include>leftMenuTitle</include>
 					<label>FILTER</label>
-					<animation effect="slide" end="0,-107" time="0" condition="Skin.String(SectionType,movies) | Container.PlexContent(Movies)">Conditional</animation>
-					<animation effect="slide" end="0,-20" time="0" condition="Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)">Conditional</animation>
-					<animation effect="slide" end="0,-115" time="0" condition="Skin.String(SectionType,photos) | Window.IsVisible(2)">Conditional</animation>
-					<animation effect="slide" end="0,-95" time="0" condition="Skin.String(SectionType,music) | Window.IsVisible(501)">Conditional</animation>
-					<visible>!IsEmpty(Container.Property(HasAdvancedFilters))</visible>
+					<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
 				</control>
 				<!-- secondary filters list -->
 				<control type="grouplist" id="19001">
-					<posy>318</posy>
-					<posx>0</posx>
+					<height max="1000">auto</height>
 					<onup>19000</onup>
 					<ondown>32000</ondown>
 					<onright>777</onright>
 					<itemgap>0</itemgap>
-					<animation effect="slide" end="0,-107" time="0" condition="Skin.String(SectionType,movies) | Container.PlexContent(Movies)">Conditional</animation>
-					<animation effect="slide" end="0,-20" time="0" condition="Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)">Conditional</animation>
-					<animation effect="slide" end="0,-115" time="0" condition="Skin.String(SectionType,photos) | Window.IsActive(2)">Conditional</animation>
-					<animation effect="slide" end="0,-95" time="0" condition="Skin.String(SectionType,music) | Window.IsActive(501)">Conditional</animation>
 				</control>
+				<!-- SORTING -->
+				<!-- sorting list title -->
+				<control type="label" id="19019">
+					<description>Title</description>
+					<posx>255</posx>
+					<include>leftMenuTitle</include>
+					<label>SORT</label>
+					<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
+				</control>
+				<!-- sorting list -->
+				<control type="grouplist" id="19010">
+					<height max="1000">auto</height>
+					<onup>19001</onup>
+					<ondown>30000</ondown>
+					<onright>777</onright>
+					<itemgap>0</itemgap>
+				</control>
+			</control>
+			<control type="group">
+				<visible>false</visible>
 				<!-- filters buttons -->
 				<control type="button" id="19005">
 					<textoffsetx>35</textoffsetx>
 					<onup>19000</onup>
-					<ondown>19000</ondown>
-					<onright>777</onright>
+					<ondown>31000</ondown>
 					<include>leftMenuClearFilters</include>
 				</control>
 				<control type="radiobutton" id="19006">
@@ -879,41 +887,6 @@
 					<font>Regular-14</font>
 					<shadowcolor>ff222222</shadowcolor>
 					<textcolor>FFFFCCCC</textcolor>
-				</control>
-				<!-- SORTING -->
-				<!-- sorting list title -->
-				<control type="label" id="19019">
-					<description>Title</description>
-					<posy>502</posy>
-					<posx>255</posx>
-					<include>leftMenuTitle</include>
-					<label>SORT</label>
-					<animation effect="slide" end="0,-40" time="0" condition="[Skin.String(SectionType,movies) | Container.PlexContent(Movies)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-20" time="0" condition="[Skin.String(SectionType,movies) | Container.PlexContent(Movies)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-60" time="0" condition="[Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-40" time="0" condition="[Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-85" time="0" condition="[Skin.String(SectionType,photos) | Window.IsActive(2)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-65" time="0" condition="[Skin.String(SectionType,photos) | Window.IsActive(2)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-210" time="0" condition="[Skin.String(SectionType,music) | Window.IsActive(501)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-190" time="0" condition="[Skin.String(SectionType,music) | Window.IsActive(501)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<visible>!IsEmpty(Container.Property(HasAdvancedFilters))</visible>
-				</control>
-				<!-- sorting list -->
-				<control type="grouplist" id="19010">
-					<posy>556</posy>
-					<posx>0</posx>
-					<onup>19001</onup>
-					<ondown>30000</ondown>
-					<onright>777</onright>
-					<itemgap>0</itemgap>
-					<animation effect="slide" end="0,-40" time="0" condition="[Skin.String(SectionType,movies) | Container.PlexContent(Movies)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-20" time="0" condition="[Skin.String(SectionType,movies) | Container.PlexContent(Movies)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-60" time="0" condition="[Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-40" time="0" condition="[Skin.String(SectionType,tvshows) | Container.PlexContent(TVShows)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-85" time="0" condition="[Skin.String(SectionType,photos) | Window.IsActive(2)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-65" time="0" condition="[Skin.String(SectionType,photos) | Window.IsActive(2)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-210" time="0" condition="[Skin.String(SectionType,music) | Window.IsActive(501)] + IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
-					<animation effect="slide" end="0,-190" time="0" condition="[Skin.String(SectionType,music) | Window.IsActive(501)] + !IsEmpty(Container.Property(secondaryFilterActivated))">Conditional</animation>
 				</control>
 				<!-- sorting buttons -->
 				<control type="filterorderbutton" id="19011">

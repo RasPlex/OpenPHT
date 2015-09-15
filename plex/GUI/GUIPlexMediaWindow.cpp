@@ -1229,6 +1229,9 @@ void CGUIPlexMediaWindow::AddFilters()
   CGUIControlGroupList *primaryFilters = (CGUIControlGroupList*)GetControl(FILTER_PRIMARY_CONTAINER);
   if (primaryFilters)
   {
+    int primaryFiltersEndId = FILTER_PRIMARY_CONTAINER;
+    int selectedPrimaryFilterId = 0;
+    primaryFilters->SetNavigationAction(ACTION_MOVE_DOWN, CGUIAction(m_hasAdvancedFilters ? FILTER_CLEAR_FILTER_BUTTON : FILTER_PRIMARY_BUTTONS_START));
     primaryFilters->ClearAll();
 
     PlexStringPairVector pfilterLabel = m_sectionFilter->getPrimaryFilters();
@@ -1239,19 +1242,37 @@ void CGUIPlexMediaWindow::AddFilters()
       if (button)
       {
         button->SetID(id ++);
+        primaryFiltersEndId = button->GetID();
 
         primaryFilters->AddControl(button);
         if (p.first == m_sectionFilter->currentPrimaryFilter())
+        {
           button->SetSelected(true);
+          selectedPrimaryFilterId = button->GetID();
+        }
         else
           button->SetSelected(false);
       }
     }
 
+    CGUIControlGroup *filtersContainer = (CGUIControlGroup*)GetControl(1300);
+    if (filtersContainer)
+    {
+      CGUIMessage msg1(GUI_MSG_ITEM_SELECT, GetID(), filtersContainer->GetID(), 0);
+      filtersContainer->OnMessage(msg1);
+    }
+
+    CGUIMessage msg2(GUI_MSG_ITEM_SELECT, GetID(), primaryFilters->GetID(), selectedPrimaryFilterId);
+    primaryFilters->OnMessage(msg2);
+
+    int secondaryFiltersEndId = FILTER_SECONDARY_CONTAINER;
+
     CGUIControlGroupList *secondaryFilters = (CGUIControlGroupList*)GetControl(FILTER_SECONDARY_CONTAINER);
     if(secondaryFilters)
     {
       bool hasActiveFilters = false;
+      secondaryFilters->SetNavigationAction(ACTION_MOVE_UP, CGUIAction(primaryFiltersEndId));
+      secondaryFilters->SetNavigationAction(ACTION_MOVE_DOWN, CGUIAction(SORT_BUTTONS_START));
       secondaryFilters->ClearAll();
 
       CGUIButtonControl *origButton = (CGUIButtonControl*)GetControl(FILTER_BUTTON);
@@ -1261,6 +1282,7 @@ void CGUIPlexMediaWindow::AddFilters()
         m_clearFilterButton->SetLabel(g_localizeStrings.Get(44032));
         m_clearFilterButton->AllocResources();
         m_clearFilterButton->SetID(FILTER_CLEAR_FILTER_BUTTON);
+        secondaryFiltersEndId = m_clearFilterButton->GetID();
         secondaryFilters->AddControl(m_clearFilterButton);
       }
 
@@ -1271,6 +1293,7 @@ void CGUIPlexMediaWindow::AddFilters()
         if (button)
         {
           button->SetID(id ++);
+          secondaryFiltersEndId = button->GetID();
 
           if (!m_sectionFilter->secondaryFiltersActivated())
             button->SetEnabled(false);
@@ -1287,9 +1310,13 @@ void CGUIPlexMediaWindow::AddFilters()
         m_clearFilterButton->SetVisible(hasActiveFilters);
     }
 
+    int sortButtonsEndId = secondaryFiltersEndId;
+
     CGUIControlGroupList *sortButtons = (CGUIControlGroupList*)GetControl(SORT_LIST);
     if (sortButtons)
     {
+      sortButtons->SetNavigationAction(ACTION_MOVE_UP, CGUIAction(secondaryFiltersEndId));
+      sortButtons->SetNavigationAction(ACTION_MOVE_DOWN, CGUIAction(FILTER_PRIMARY_BUTTONS_START));
       sortButtons->ClearAll();
 
       PlexStringPairVector sorts = m_sectionFilter->getSortOrders();
@@ -1311,6 +1338,7 @@ void CGUIPlexMediaWindow::AddFilters()
           if (button)
           {
             button->SetID(id ++);
+            sortButtonsEndId = button->GetID();
 
             if (!m_sectionFilter->secondaryFiltersActivated())
             {
@@ -1326,8 +1354,23 @@ void CGUIPlexMediaWindow::AddFilters()
       {
         SET_CONTROL_HIDDEN(SORT_LIST);
         SET_CONTROL_HIDDEN(SORT_LABEL);
+
+        CGUIFilterOrderButtonControl* button = factory.getSortButton("Hidden", CGUIFilterOrderButtonControl::OFF);
+        if (button)
+        {
+            button->SetID(SORT_BUTTONS_START);
+            sortButtonsEndId = button->GetID();
+            button->SetEnabled(false);
+            button->SetVisible(false);
+            sortButtons->AddControl(button);
+        }
       }
     }
+
+    primaryFilters->SetNavigationAction(ACTION_MOVE_UP, CGUIAction(sortButtonsEndId));
+    CGUIRadioButtonControl* primaryFilterButton = (CGUIRadioButtonControl*)GetControl(FILTER_PRIMARY_BUTTONS_START);
+    if (primaryFilterButton)
+      primaryFilterButton->SetNavigationAction(ACTION_MOVE_UP, CGUIAction(sortButtonsEndId));
   }
 }
 

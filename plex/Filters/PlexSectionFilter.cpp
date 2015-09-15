@@ -43,21 +43,10 @@ bool CPlexSectionFilter::loadFilters()
           continue;
       }
 
-      if (advancedFilters && (m_sectionType == PLEX_DIR_TYPE_MOVIE))
-      {
-        if (primaryFilter->GetProperty("unprocessed_key").asString() == "all" ||
-            primaryFilter->GetProperty("unprocessed_key").asString() == "onDeck" ||
-            primaryFilter->GetProperty("unprocessed_key").asString() == "folder" ||
-            primaryFilter->GetProperty("unprocessed_key").asString() == "recentlyViewed")
-          m_primaryFilters[primaryFilter->GetProperty("unprocessed_key").asString()] = primaryFilter->GetLabel();
-      }
-      else
-      {
-        if (!primaryFilter->GetProperty("secondary").asBoolean() &&
-            !primaryFilter->GetProperty("search").asBoolean() &&
-            primaryFilter->GetProperty("unprocessed_key").asString() != "unwatched")
-          m_primaryFilters[primaryFilter->GetProperty("unprocessed_key").asString()] = primaryFilter->GetLabel();
-      }
+      if (!primaryFilter->GetProperty("secondary").asBoolean() &&
+          !primaryFilter->GetProperty("search").asBoolean() &&
+          primaryFilter->GetProperty("unprocessed_key").asString() != "unwatched")
+        m_primaryFilters[primaryFilter->GetProperty("unprocessed_key").asString()] = primaryFilter->GetLabel();
     }
   }
 
