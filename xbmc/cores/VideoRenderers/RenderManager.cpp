@@ -43,10 +43,11 @@
 #if defined(TARGET_DARWIN_OSX)
 #include "HwDecRender/RendererVDA.h"
 #endif
-#elif defined(HAS_MMAL)
-  #include "HwDecRender/MMALRenderer.h"
 #elif HAS_GLES == 2
   #include "LinuxRendererGLES.h"
+#if defined(HAS_MMAL)
+#include "HwDecRender/MMALRenderer.h"
+#endif
 #elif defined(HAS_DX)
   #include "WinRenderer.h"
 #elif defined(HAS_SDL)
@@ -126,7 +127,7 @@ static std::string GetRenderFormatName(ERenderFormat format)
 
 CXBMCRenderManager::CXBMCRenderManager()
 {
-  m_pRenderer = NULL;
+  m_pRenderer = nullptr;
   m_renderState = STATE_UNCONFIGURED;
 
   m_presentstep = PRESENT_IDLE;
@@ -626,14 +627,6 @@ void CXBMCRenderManager::CreateRenderer()
 {
   if (!m_pRenderer)
   {
-#if defined(HAS_MMAL)
-    m_pRenderer = new CMMALRenderer();
-#elif HAS_GLES == 2
-    m_pRenderer = new CLinuxRendererGLES();
-#elif defined(HAS_DX)
-    m_pRenderer = new CWinRenderer();
-#endif
-#if defined(HAS_GL)
     if (m_format == RENDER_FMT_VAAPI || m_format == RENDER_FMT_VAAPINV12)
     {
 #if defined(HAVE_LIBVA)
@@ -652,13 +645,42 @@ void CXBMCRenderManager::CreateRenderer()
       m_pRenderer = new CRendererVDA;
 #endif
     }
+    else if (m_format == RENDER_FMT_MMAL)
+    {
+#if defined(HAS_MMAL)
+      m_pRenderer = new CMMALRenderer;
+#endif
+    }
+    else if (m_format == RENDER_FMT_OMXEGL)
+    {
+#if defined(HAVE_LIBOPENMAX)
+      m_pRenderer = new CRendererOMX;
+#endif
+    }
+    else if (m_format == RENDER_FMT_DXVA)
+    {
+#if defined(HAS_DX)
+      m_pRenderer = new CWinRenderer();
+#endif
+    }
     else if (m_format != RENDER_FMT_NONE)
     {
+#if defined(HAS_GL)
       m_pRenderer = new CLinuxRendererGL;
+#elif HAS_GLES == 2
+      m_pRenderer = new CLinuxRendererGLES;
+#elif defined(HAS_DX)
+      m_pRenderer = new CWinRenderer();
+#endif
     }
+#if defined(HAS_MMAL)
+    if (!m_pRenderer)
+      m_pRenderer = new CMMALRenderer;
 #endif
     if (m_pRenderer)
       m_pRenderer->PreInit();
+    else
+      CLog::Log(LOGERROR, "RenderManager::CreateRenderer: failed to create renderer");
   }
 }
 
