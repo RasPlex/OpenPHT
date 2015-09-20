@@ -85,6 +85,7 @@ public:
   void SetRefreshed(bool r) { m_refreshed = r; }
   bool GetRefreshed() const { return m_refreshed; }
 
+  CStdString GetHttpUrl() const;
   bool Equals(const CPlexConnectionPtr &other);
 
   bool isSSL() const { return m_url.GetProtocol() == "https"; }

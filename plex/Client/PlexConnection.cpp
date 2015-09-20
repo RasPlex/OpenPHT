@@ -77,7 +77,9 @@ CPlexConnection::TestReachability(CPlexServerPtr server)
 void
 CPlexConnection::Merge(CPlexConnectionPtr otherConnection)
 {
-  m_url = otherConnection->m_url;
+  if (!isSSL() || otherConnection->isSSL())
+    m_url = otherConnection->m_url;
+
   m_type |= otherConnection->m_type;
 
   // If we don't have a token or if the otherConnection have a new token, then we
@@ -88,12 +90,31 @@ CPlexConnection::Merge(CPlexConnectionPtr otherConnection)
   m_refreshed = true;
 }
 
+CStdString CPlexConnection::GetHttpUrl() const
+{
+  if (m_url.GetProtocol() == "https" && boost::ends_with(m_url.GetHostName(), ".plex.direct"))
+  {
+    CStdString host = m_url.GetHostName();
+    int delimeter = host.Find('.');
+    if (delimeter > 0)
+    {
+      host = host.substr(0, delimeter);
+      host.Replace('-', '.');
+
+      CStdString url;
+      url.Format("http://%s:%d/", host, m_url.GetPort());
+      return url;
+    }
+  }
+  return m_url.Get();
+}
+
 bool CPlexConnection::Equals(const CPlexConnectionPtr &other)
 {
   if (!other) return false;
 
-  CStdString url1 = m_url.Get();
-  CStdString url2 = other->m_url.Get();
+  CStdString url1 = GetHttpUrl();
+  CStdString url2 = other->GetHttpUrl();
 
   bool uriMatches = url1.Equals(url2);
   bool tokenMatches;
