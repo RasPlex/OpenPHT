@@ -17,11 +17,10 @@ using namespace std;
 CPlexSectionFanout::CPlexSectionFanout(const CStdString& url, SectionTypes sectionType,
                                        bool useGlobalSlideshow)
   : m_sectionType(sectionType),
-    m_needsRefresh(false),
+    m_needsRefresh(true),
     m_url(url),
     m_useGlobalSlideshow(useGlobalSlideshow)
 {
-  Refresh();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -233,8 +232,10 @@ void CPlexSectionFanout::OnJobComplete(unsigned int jobID, bool success, CJob* j
     m_fileLists[type] = newList;
 
     /* Pre-cache stuff */
+#if 0
     if (type != CONTENT_LIST_FANART)
       g_plexApplication.thumbCacher->Load(*newList);
+#endif
 
   }
 

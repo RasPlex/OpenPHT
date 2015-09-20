@@ -74,6 +74,7 @@ private:
   bool GetContentTypesFromSection(const CStdString& url, std::vector<int> &types);
   bool GetContentListFromSection(const CStdString& url, int contentType, CFileItemList &list);
   void SectionNeedsRefresh(const CStdString& url);
+  void SectionsNeedsRefresh();
   void OpenItem(CFileItemPtr item);
   bool OnClick(const CGUIMessage& message);
   void OnSectionLoaded(const CGUIMessage& message);
