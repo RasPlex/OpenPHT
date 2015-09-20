@@ -17,7 +17,7 @@
 				<fadetime>1000</fadetime>
 				<randomize>true</randomize>
 				<loop>yes</loop>
-				<imagepath background="true">plexserver://best:32400/library/arts</imagepath>
+				<imagepath background="true">plexserver://best:32400/library/arts?sort=random&X-Plex-Container-Start=0&X-Plex-Container-Size=50</imagepath>
 				<animation effect="fade" end="50" time="400" condition="true">Conditional</animation>
 				<animation type="WindowClose">
 					<effect type="fade" start="100" end="0" time="800"/>
@@ -222,7 +222,7 @@
 			<fadetime>1000</fadetime>
 			<randomize>true</randomize>
 			<loop>yes</loop>
-			<imagepath background="true">plexserver://best:32400/library/arts</imagepath>
+			<imagepath background="true">plexserver://best:32400/library/arts?sort=random&X-Plex-Container-Start=0&X-Plex-Container-Size=50</imagepath>
 			<animation effect="fade" end="15" time="400" condition="true">Conditional</animation>
 		</control>
 		<control type="image">
@@ -242,7 +242,7 @@
 			<fadetime>1000</fadetime>
 			<randomize>true</randomize>
 			<loop>yes</loop>
-			<imagepath background="true">plexserver://best:32400/library/arts</imagepath>
+			<imagepath background="true">plexserver://best:32400/library/arts?sort=random&X-Plex-Container-Start=0&X-Plex-Container-Size=50</imagepath>
 			<animation effect="fade" end="15" time="400" condition="true">Conditional</animation>
 			<animation type="WindowClose">
 				<effect type="fade" start="100" end="0" time="800"/>
