@@ -202,7 +202,11 @@ void CPlexServerManager::UpdateFromDiscovery(const CPlexServerPtr& server)
 
   CPlexServerPtr mergedServer = MergeServer(server);
   if (mergedServer->GetActiveConnection())
+  {
+    if (mergedServer->GetActiveConnection()->IsLocal())
+      mergedServer->CancelReachabilityTests();
     NotifyAboutServer(mergedServer, true);
+  }
 
   SetBestServer(mergedServer, false);
 }

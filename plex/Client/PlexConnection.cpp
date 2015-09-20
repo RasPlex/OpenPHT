@@ -87,6 +87,9 @@ CPlexConnection::Merge(CPlexConnectionPtr otherConnection)
   if (m_token.IsEmpty() || (!otherConnection->m_token.IsEmpty() && m_token != otherConnection->m_token))
     m_token = otherConnection->m_token;
 
+  if (m_state != CONNECTION_STATE_REACHABLE && otherConnection->m_state == CONNECTION_STATE_REACHABLE)
+    m_state = otherConnection->m_state;
+
   m_refreshed = true;
 }
 

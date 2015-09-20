@@ -37,7 +37,8 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
   // if the Host contains the servers UUID and if we are signed into plex.tv
   //
   string uri = service->getParam("Host");
-  if (!uri.empty() && (g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn()))
+  CPlexConnectionPtr conn;
+  if (!uri.empty())
   {
     string addr(address);
     StringUtils::Replace(addr, ".", "-");
@@ -48,14 +49,17 @@ void CPlexNetworkServiceBrowser::handleServiceArrival(NetworkServicePtr& service
     u.SetPort(port);
 
     CLog::Log(LOGDEBUG, "CPlexNetworkServiceBrowser::handleServiceArrival adding SSL connection: %s", u.Get().c_str());
-    CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, u.GetHostName(), u.GetPort(), u.GetProtocol()));
+    conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, u.GetHostName(), u.GetPort(), u.GetProtocol()));
     server->AddConnection(conn);
   }
   else
   {
-    CPlexConnectionPtr conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, address, port));
+    conn = CPlexConnectionPtr(new CPlexConnection(CPlexConnection::CONNECTION_DISCOVERED, address, port));
     server->AddConnection(conn);
   }
+
+  if (conn->TestReachability(server) == CPlexConnection::CONNECTION_STATE_REACHABLE)
+    server->SetActiveConnection(conn);
 
   g_plexApplication.serverManager->UpdateFromDiscovery(server);
 

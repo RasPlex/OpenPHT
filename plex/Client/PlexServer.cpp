@@ -26,7 +26,7 @@ void CPlexServerConnTestThread::Process()
 {
   CPlexTimer t;
 
-  if (!m_conn->IsLocal() || m_conn->m_type != CPlexConnection::CONNECTION_MYPLEX)
+  if (!m_conn->IsLocal())
   {
     // Delay for 50 ms to make sure we select a local connection from plex.tv first if possible
     CLog::Log(LOGDEBUG, "CPlexServerConnTestThread::Process delaying 50ms for connection %s", m_conn->toString().c_str());
@@ -336,7 +336,7 @@ void CPlexServer::OnConnectionTest(CPlexServerConnTestThread* thread, CPlexConne
       if ((isBetterSSL && conn->IsLocal()) || isBetterLocal)
       {
         CLog::Log(LOGDEBUG, "CPlexServer::OnConnectionTest found better connection on %s to %s", GetName().c_str(), conn->GetAddress().Get().c_str());
-        m_activeConnection = conn;
+        m_bestConnection = m_activeConnection = conn;
       }
     }
   }
@@ -354,6 +354,7 @@ void CPlexServer::OnConnectionTest(CPlexServerConnTestThread* thread, CPlexConne
 void CPlexServer::Merge(CPlexServerPtr otherServer)
 {
   CSingleLock lk(m_serverLock);
+  CSingleLock tlk(m_testingLock);
 
   m_name = otherServer->m_name;
   if (!otherServer->m_version.empty())
@@ -379,12 +380,24 @@ void CPlexServer::Merge(CPlexServerPtr otherServer)
       {
         mappedConn->Merge(conn);
         found = true;
+        if (otherServer->m_activeConnection == conn && (!m_activeConnection || !m_activeConnection->IsLocal() && mappedConn->IsLocal()))
+        {
+          CLog::Log(LOGDEBUG, "CPlexServer::Merge found better connection on %s to %s", m_name.c_str(), mappedConn->GetAddress().Get().c_str());
+          m_bestConnection = m_activeConnection = mappedConn;
+        }
         break;
       }
     }
 
     if (!found)
+    {
       AddConnection(conn);
+      if (otherServer->m_activeConnection == conn && (!m_activeConnection || !m_activeConnection->IsLocal() && conn->IsLocal()))
+      {
+        CLog::Log(LOGDEBUG, "CPlexServer::Merge found better connection on %s to %s", m_name.c_str(), conn->GetAddress().Get().c_str());
+        m_bestConnection = m_activeConnection = conn;
+      }
+    }
   }
 }
 
