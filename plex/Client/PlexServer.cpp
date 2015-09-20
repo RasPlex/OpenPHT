@@ -172,8 +172,12 @@ bool CPlexServer::MarkUpdateFinished(int connType)
 
   BOOST_FOREACH(CPlexConnectionPtr conn, m_connections)
   {
+    bool disconnected = false;
     if (conn->GetRefreshed() == false)
     {
+      if ((conn->m_type & CPlexConnection::CONNECTION_DISCOVERED) == CPlexConnection::CONNECTION_DISCOVERED &&
+          (connType & CPlexConnection::CONNECTION_DISCOVERED) == CPlexConnection::CONNECTION_DISCOVERED)
+        disconnected = true;
       conn->m_type &= ~connType;
       if ((connType & CPlexConnection::CONNECTION_MYPLEX) == CPlexConnection::CONNECTION_MYPLEX && !conn->GetAccessToken().empty())
       {
@@ -186,6 +190,11 @@ bool CPlexServer::MarkUpdateFinished(int connType)
 
     if (conn->m_type == 0)
       connsToRemove.push_back(conn);
+    else if (disconnected && m_activeConnection && m_activeConnection->Equals(conn))
+    {
+      CLog::Log(LOGDEBUG, "CPlexServer::MarkUpdateFinished Lost activeConnection for server %s", GetName().c_str());
+      m_activeConnection.reset();
+    }
   }
 
   BOOST_FOREACH(CPlexConnectionPtr conn, connsToRemove)

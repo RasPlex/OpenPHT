@@ -237,11 +237,25 @@ CPlexServerPtr CPlexServerManager::MergeServer(const CPlexServerPtr& server)
 void CPlexServerManager::ServerRefreshComplete(int connectionType)
 {
   vector<CStdString> serversToRemove;
+  vector<CStdString> serversToDisconnect;
 
   BOOST_FOREACH(PlexServerPair p, m_serverMap)
   {
+    bool connected = p.second->GetActiveConnection();
     if (!p.second->MarkUpdateFinished(connectionType))
       serversToRemove.push_back(p.first);
+    else if (connected && !p.second->GetActiveConnection())
+      serversToDisconnect.push_back(p.first);
+  }
+
+  BOOST_FOREACH(CStdString uuid, serversToDisconnect)
+  {
+    CLog::Log(LOGDEBUG, "CPlexServerManager::ServerRefreshComplete disconnect server %s", uuid.c_str());
+    NotifyAboutServer(m_serverMap.find(uuid)->second, false);
+
+    // if this is currently the best we have, let's remove that.
+    if (m_bestServer && m_bestServer->GetUUID() == uuid)
+      ClearBestServer();
   }
 
   BOOST_FOREACH(CStdString uuid, serversToRemove)
