@@ -32,13 +32,17 @@ class NetworkServiceBase
     boost::asio::ip::udp::endpoint listenEndpoint(boost::asio::ip::address::from_string(bindAddress), port);
     socket->open(listenEndpoint.protocol());
     
+    // Reuse.
+    try { socket->set_option(boost::asio::ip::udp::socket::reuse_address(true)); }
+    catch (std::exception& ex) { eprintf("NetworkService: Couldn't reuse address: %s", ex.what()); }
+
+    // Broadcast.
+    try { socket->set_option(boost::asio::socket_base::broadcast(true)); }
+    catch (std::exception& ex) { eprintf("NetworkService: Couldn't broadcast: %s", ex.what()); }
+
     // Bind.
     try { socket->bind(listenEndpoint); }
     catch (std::exception& ex) { eprintf("NetworkService: Couldn't bind to port %d: %s", port, ex.what()); }
-    
-    // Reuse.
-    try { socket->set_option(boost::asio::ip::udp::socket::reuse_address(true)); }
-    catch (std::exception& ex) { eprintf("NetworkService: Couldn't reuse address: %s", ex.what()); }    
   }
   
   /// Utility to set up a multicast listener/broadcaster for a single interface.
@@ -54,15 +58,15 @@ class NetworkServiceBase
     socket->set_option(boost::asio::ip::multicast::enable_loopback(true));
     
     // Join the multicast group after leaving it (just in case).
-    try { socket->set_option(boost::asio::ip::multicast::leave_group(groupAddr)); } 
+    boost::asio::ip::address_v4 localInterface = boost::asio::ip::address_v4::from_string(bindAddress);
+    try { socket->set_option(boost::asio::ip::multicast::leave_group(groupAddr.to_v4(), localInterface)); }
     catch (std::exception&) { }
-    try { socket->set_option(boost::asio::ip::multicast::join_group(groupAddr)); }
+    try { socket->set_option(boost::asio::ip::multicast::join_group(groupAddr.to_v4(), localInterface)); }
     catch (std::exception& ex) { eprintf("NetworkService: Couldn't join multicast group: %s", ex.what()); }
     
     if (outboundInterface)
     {
       // Send out multicast packets on the specified interface.
-      boost::asio::ip::address_v4 localInterface = boost::asio::ip::address_v4::from_string(bindAddress);
       boost::asio::ip::multicast::outbound_interface option(localInterface);
       try { socket->set_option(option); }
       catch (std::exception&) { eprintf("NetworkService: Unable to set option on socket."); }

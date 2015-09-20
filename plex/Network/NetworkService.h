@@ -10,15 +10,11 @@
 #include <boost/asio.hpp>
 
 #define NS_BROWSE_REFRESH_INTERVAL  5000
-#define NS_REMOVAL_INTERVAL         2000
-#define NS_DEAD_SERVER_TIME        10000
 
 #define NS_MAX_PACKET_SIZE    8096
-#define NS_BROADCAST_ADDR_OLD boost::asio::ip::address::from_string("239.255.255.250")
 #define NS_BROADCAST_ADDR     boost::asio::ip::address::from_string("239.0.0.250")
 #define NS_SEARCH_MSG         "M-SEARCH * HTTP/1.1\r\n"
 
-#define NS_PLEX_MEDIA_SERVER_PORT_OLD 32410
 #define NS_PLEX_MEDIA_CLIENT_PORT     32412
 #define NS_PLEX_MEDIA_SERVER_PORT     32414
 

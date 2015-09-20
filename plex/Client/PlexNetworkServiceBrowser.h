@@ -87,7 +87,7 @@ public:
     if(g_guiSettings.GetBool("services.plexplayer"))
     {
       dprintf("NetworkService: starting player advertisement");
-      m_plexAdvertiser = NetworkServiceAdvertiserPtr(new PlexNetworkServiceAdvertiser(m_ioService));
+      m_plexAdvertiser = NetworkServiceAdvertiserPtr(new PlexNetworkServiceAdvertiser(m_ioService, NS_PLEX_MEDIA_CLIENT_PORT));
       m_plexAdvertiser->start();
     }
   }

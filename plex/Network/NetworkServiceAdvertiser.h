@@ -21,6 +21,7 @@
 
 class NetworkServiceAdvertiser;
 typedef boost::shared_ptr<NetworkServiceAdvertiser> NetworkServiceAdvertiserPtr;
+typedef pair<udp_socket_ptr, std::string> socket_string_pair;
 
 /////////////////////////////////////////////////////////////////////////////
 class NetworkServiceAdvertiser : public NetworkServiceBase
@@ -28,12 +29,12 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
  public:
   
   /// Constructor.
-  NetworkServiceAdvertiser(boost::asio::io_service& ioService, const boost::asio::ip::address& groupAddr, unsigned short port)
+  NetworkServiceAdvertiser(boost::asio::io_service& ioService, unsigned short port)
    : NetworkServiceBase(ioService)
    , m_port(port)
   {
     // This is where we'll send notifications.
-    m_notifyEndpoint = boost::asio::ip::udp::endpoint(groupAddr, m_port+1);
+    m_notifyEndpoint = boost::asio::ip::udp::endpoint(NS_BROADCAST_ADDR, m_port + 1);
   }
   
   /// Destructor.
@@ -50,20 +51,22 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
   {
     doStop();
     
-    // Send out the BYE message synchronously and close the socket.
-    if (m_socket)
-    {
-      dprintf("NetworkService: Stopping advertisement.");
-      string hello = "BYE * HTTP/1.0\r\n" + createReplyMessage();
-      try { m_socket->send_to(boost::asio::buffer(hello), m_notifyEndpoint); } catch (...) { eprintf("Couldn't send BYE packet."); }
-      m_socket->close();
-    }
+    // Send out the BYE message synchronously and close the sockets.
+    dprintf("NetworkService: Stopping advertisement.");
+    broadcastMessage("BYE");
+    if (m_broadcastSocket)
+      m_broadcastSocket->close();
+    m_broadcastSocket.reset();
+    BOOST_FOREACH(const socket_string_pair& pair, m_sockets)
+      pair.first->close();
+    m_sockets.clear();
+    m_ignoredAddresses.clear();
   }
   
   /// Advertise an update to the service.
   void update(const string& parameter="")
   {
-    broadcastMessage(m_socket, "UPDATE", parameter);
+    broadcastMessage("UPDATE", parameter);
   }
   
   /// For subclasses to fill in.
@@ -84,50 +87,90 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
   /// Handle network change.
   virtual void handleNetworkChange(const vector<NetworkInterface>& interfaces)
   {
-    dprintf("Network change for advertiser.");
+    dprintf("Network change for advertiser, closing %lu advertiser sockets.", m_sockets.size());
 
-    // Create a socket if we need to.
-    if (!m_socket)
+    // Close the old sockets.
+    if (m_broadcastSocket)
+      m_broadcastSocket->close();
+    m_broadcastSocket.reset();
+    BOOST_FOREACH(const socket_string_pair& pair, m_sockets)
+      pair.first->close();
+    m_sockets.clear();
+    m_ignoredAddresses.clear();
+
+    // Create new broadcast socket.
+    m_broadcastSocket = udp_socket_ptr(new boost::asio::ip::udp::socket(m_ioService));
+    setupListener(m_broadcastSocket, "0.0.0.0", m_port);
+
+    // Wait for data.
+    m_broadcastSocket->async_receive_from(boost::asio::buffer(m_data, NS_MAX_PACKET_SIZE), m_endpoint, boost::bind(&NetworkServiceAdvertiser::handleRead, this, m_broadcastSocket, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, -1));
+
+    int interfaceIndex = 0;
+    BOOST_FOREACH(const NetworkInterface& xface, interfaces)
     {
-      // Start up new socket.
-      m_socket = udp_socket_ptr(new boost::asio::ip::udp::socket(m_ioService));
+      // Don't add loopback or virtual interfaces.
+      if (!xface.loopback() && xface.name()[0] != 'v')
+      {
+        string broadcast = xface.broadcast();
+        dprintf("NetworkService: Advertising on interface %s on broadcast address %s (index: %d)", xface.address().c_str(), broadcast.c_str(), interfaceIndex);
 
-      // Listen, send out HELLO, and start reading data.
-      setupMulticastListener(m_socket, "0.0.0.0", m_notifyEndpoint.address(), m_port);
+        // Create new multicast socket for network interface.
+        udp_socket_ptr socket = udp_socket_ptr(new boost::asio::ip::udp::socket(m_ioService));
+        setupMulticastListener(socket, xface.address(), m_notifyEndpoint.address(), m_port, true);
+        m_sockets.push_back(socket_string_pair(socket, broadcast));
 
-      // Listen for the first packet.
-      m_socket->async_receive_from(boost::asio::buffer(m_data, NS_MAX_PACKET_SIZE), m_endpoint, boost::bind(&NetworkServiceAdvertiser::handleRead, this, m_socket, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+        // Wait for data.
+        socket->async_receive_from(boost::asio::buffer(m_data, NS_MAX_PACKET_SIZE), m_endpoint, boost::bind(&NetworkServiceAdvertiser::handleRead, this, socket, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, interfaceIndex));
+        interfaceIndex++;
+      }
+      else
+      {
+        // Sometimes we get packets from these interfaces, not sure why, but we'll ignore them.
+        // We get packets from these interfaces because we are listening on 0.0.0.0
+        m_ignoredAddresses.insert(xface.address());
+      }
     }
-    
+
     // Always send out the HELLO packet, just in case.
-    broadcastMessage(m_socket, "HELLO");
+    broadcastMessage("HELLO");
   }
 
-  void broadcastMessage(const udp_socket_ptr& socket, const string& action, const string& parameter="")
+  void broadcastMessage(const string& action, const string& parameter="")
   {
     // Send out the message.
-    if (socket)
+    try
     {
-      try 
-      { 
-        string hello = action + " * HTTP/1.0\r\n" + createReplyMessage(parameter);
-        socket->send_to(boost::asio::buffer(hello), m_notifyEndpoint); 
-      } 
-      catch (std::exception& e) 
+      string msg = action + " * HTTP/1.0\r\n" + createReplyMessage(parameter);
+      BOOST_FOREACH(const socket_string_pair& pair, m_sockets)
       {
-        eprintf("Error broadcasting message: %s", e.what());
+        //// Multicast.
+        //pair.first->send_to(boost::asio::buffer(msg), m_notifyEndpoint);
+
+        // Broadcast.
+        boost::asio::ip::udp::endpoint broadcastEndpoint(boost::asio::ip::address::from_string(pair.second), m_port + 1);
+        pair.first->send_to(boost::asio::buffer(msg), broadcastEndpoint);
       }
+    }
+    catch (std::exception& e)
+    {
+      eprintf("NetworkServiceAdvertiser: Error broadcasting message: %s", e.what());
     }
   }
   
-  void handleRead(const udp_socket_ptr& socket, const boost::system::error_code& error, size_t bytes)
+  /// Handle incoming data.
+  void handleRead(const udp_socket_ptr& socket, const boost::system::error_code& error, size_t bytes, int interfaceIndex)
   {
     const char Search[] = "M-SEARCH * ";
 
     if (!error)
     {
+      if (m_ignoredAddresses.find(m_endpoint.address().to_string()) != m_ignoredAddresses.end())
+      {
+        // Ignore this packet.
+        iprintf("NetworkService: Ignoring a packet from this uninteresting interface %s.", m_endpoint.address().to_string().c_str());
+      }
       // We only reply if the search query at least begins with Search
-      if (memcmp(Search, m_data, sizeof(Search)-sizeof(Search[0])) == 0)
+      else if (memcmp(Search, m_data, sizeof(Search)-sizeof(Search[0])) == 0)
       {
         try
         {
@@ -139,25 +182,24 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
         }
         catch (std::exception& e)
         {
-          wprintf("Error replying to broadcast packet: %s", e.what());
+          eprintf("NetworkServiceAdvertiser: Error replying to broadcast packet: %s", e.what());
         }
       }
     }
-
-    if (error && error.value() == 995)
+    else if (error == boost::asio::error::operation_aborted)
     {
       iprintf("Network service: socket shutdown or aborted. bye!");
       return;
     }
-    else if (error)
+    else
     {
-      eprintf("Network Service: Error in advertiser handle read: %d (%s) socket=%d", error.value(), error.message().c_str(), m_socket->native());
+      eprintf("Network Service: Error in advertiser handle read: %d (%s) socket=%d", error.value(), error.message().c_str(), socket->native());
       usleep(1000 * 100);
     }
     
     // If the socket is open, keep receiving (On XP we need to abandon a socket for 10022 - An invalid argument was supplied - as well).
-    if (socket->is_open() && error.value() != 10022)
-      socket->async_receive_from(boost::asio::buffer(m_data, NS_MAX_PACKET_SIZE), m_endpoint, boost::bind(&NetworkServiceAdvertiser::handleRead, this, socket, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));      
+    if (socket->is_open() && error != boost::asio::error::invalid_argument)
+      socket->async_receive_from(boost::asio::buffer(m_data, NS_MAX_PACKET_SIZE), m_endpoint, boost::bind(&NetworkServiceAdvertiser::handleRead, this, socket, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, interfaceIndex));
     else
       iprintf("Network Service: Abandoning advertise socket, it was closed.");
   }
@@ -190,9 +232,11 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
     return reply;
   }
   
-  udp_socket_ptr    m_socket;
-  unsigned short    m_port;
-  boost::asio::ip::udp::endpoint m_endpoint;
-  boost::asio::ip::udp::endpoint m_notifyEndpoint;
-  char              m_data[NS_MAX_PACKET_SIZE];
+  unsigned short                   m_port;
+  udp_socket_ptr                   m_broadcastSocket;
+  vector<socket_string_pair>       m_sockets;
+  std::set<std::string>            m_ignoredAddresses;
+  boost::asio::ip::udp::endpoint   m_endpoint;
+  boost::asio::ip::udp::endpoint   m_notifyEndpoint;
+  char                             m_data[NS_MAX_PACKET_SIZE];
 };
