@@ -262,6 +262,23 @@ void CPlexServerManager::UpdateReachability(bool force)
 {
   CSingleLock lk(m_serverManagerLock);
 
+  if (force && m_reachabilityThreads.size() > 0)
+  {
+    CLog::Log(LOGDEBUG, "CPlexServerManager::UpdateReachability still running reachability tests...");
+    std::pair<std::string, CPlexServerReachabilityThread*> p;
+    BOOST_FOREACH(p, m_reachabilityThreads)
+    {
+      CLog::Log(LOGDEBUG, "CPlexServerManager::UpdateReachability canceling reachtests for server %s", p.second->m_server->GetName().c_str());
+      p.second->m_server->CancelReachabilityTests();
+    }
+
+    if (!m_reachabilityTestEvent.WaitMSec(10 * 1000))
+    {
+      CLog::Log(LOGWARNING, "CPlexServerManager::UpdateReachability waited 10 seconds for the reachability stuff to finish, will just move on.");
+      return;
+    }
+  }
+
   if (m_reachabilityThreads.size() > 0)
     return;
 
