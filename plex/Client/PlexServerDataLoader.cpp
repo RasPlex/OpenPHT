@@ -271,6 +271,8 @@ CFileItemListPtr CPlexServerDataLoader::GetAllSharedSections() const
       {
         item->SetProperty("serverName", server->GetName());
         item->SetProperty("serverUUID", server->GetUUID());
+        item->SetProperty("serverOwner", server->GetOwner());
+        item->SetProperty("sectionNameCollision", "yes");
         if (server->GetActiveConnection() && g_plexApplication.myPlexManager && g_plexApplication.myPlexManager->IsSignedIn() && g_plexApplication.myPlexManager->GetCurrentUserInfo().secure)
           item->SetProperty("isSecure", server->GetActiveConnection()->isSSL() ? "1" : "");
         list->Add(item);

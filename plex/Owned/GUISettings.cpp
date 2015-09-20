@@ -300,6 +300,7 @@ void CGUISettings::Initialize()
   AddString(myPlex, "myplex.signin", isSignedIn ? 44002 : 44100, "", BUTTON_CONTROL_STANDARD);
   AddBool(myPlex, "myplex.searchsharedlibraries", 13143, true);
   AddBool(myPlex, "myplex.enablequeueandrec", 52210, true);
+  AddBool(myPlex, "myplex.sharedsectionsonhome", 52209, false);
   AddBool(myPlex, "myplex.hidecloudsync", 52505, false);
   AddBool(myPlex, "myplex.automaticlogin", 52211, false);
 

@@ -996,6 +996,10 @@ msgctxt "#52203"
 msgid "Online video quality"
 msgstr "Online video quality"
 
+msgctxt "#52209"
+msgid "Show shared libraries in menu"
+msgstr "Show shared libraries in menu"
+
 msgctxt "#52210"
 msgid "Show queue and recommendations"
 msgstr "Show queue and recommendations"
