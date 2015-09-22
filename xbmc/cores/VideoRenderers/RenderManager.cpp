@@ -133,7 +133,7 @@ CXBMCRenderManager::CXBMCRenderManager()
   m_presentstep = PRESENT_IDLE;
   m_rendermethod = 0;
   m_presentsource = 0;
-  m_bReconfigured = false;
+  m_bTriggerUpdateResolution = false;
   m_hasCaptures = false;
   m_displayLatency = 0.0f;
   m_presentcorr = 0.0;
@@ -381,7 +381,7 @@ bool CXBMCRenderManager::Configure()
 
     m_bRenderGUI = true;
     m_waitForBufferCount = 0;
-    m_bReconfigured = true;
+    m_bTriggerUpdateResolution = true;
     m_presentstep = PRESENT_IDLE;
     m_presentpts = DVD_NOPTS_VALUE;
     m_sleeptime = 1.0;
@@ -1096,17 +1096,29 @@ void CXBMCRenderManager::UpdateDisplayLatency()
 
 void CXBMCRenderManager::UpdateResolution()
 {
-  if (m_bReconfigured)
+  if (m_bTriggerUpdateResolution)
   {
     CRetakeLock<CExclusiveLock> lock(m_sharedSection);
     if (g_graphicsContext.IsFullScreenVideo() && g_graphicsContext.IsFullScreenRoot())
     {
-      RESOLUTION res = GetResolution();
-      g_graphicsContext.SetVideoResolution(res);
+      if (g_guiSettings.GetInt("videoplayer.adjustrefreshrate") != ADJUST_REFRESHRATE_OFF && m_fps > 0.0f)
+      {
+        RESOLUTION res = GetResolution();
+        g_graphicsContext.SetVideoResolution(res);
+        UpdateDisplayLatency();
+      }
     }
-    m_bReconfigured = false;
+    m_bTriggerUpdateResolution = false;
     g_dataCacheCore.SignalVideoInfoChange();
   }
+}
+
+void CXBMCRenderManager::TriggerUpdateResolution(float fps, int width, int flags)
+{
+  m_fps = fps;
+  m_width = width;
+  m_flags = flags;
+  m_bTriggerUpdateResolution = true;
 }
 
 // Get renderer info, can be called before configure

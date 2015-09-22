@@ -66,6 +66,7 @@ public:
   bool IsVideoLayer();
   RESOLUTION GetResolution();
   void UpdateResolution();
+  void TriggerUpdateResolution(float fps, int width, int flags);
   void SetViewMode(int iViewMode);
   void Recover(); // called after resolution switch if something special is needed
   void PreInit();
@@ -182,7 +183,7 @@ protected:
   CBaseRenderer *m_pRenderer;
   OVERLAY::CRenderer m_overlays;
   CSharedSection m_sharedSection;
-  bool m_bReconfigured;
+  bool m_bTriggerUpdateResolution;
   bool m_bRenderGUI;
   int m_waitForBufferCount;
   int m_rendermethod;

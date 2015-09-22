@@ -35,6 +35,7 @@
 #include "threads/SystemClock.h"
 #include "threads/Thread.h"
 #include "utils/StreamDetails.h"
+#include "guilib/DispResource.h"
 
 #ifdef HAS_OMXPLAYER
 #include "OMXCore.h"
@@ -214,7 +215,7 @@ public:
 #define DVDPLAYER_SUBTITLE 3
 #define DVDPLAYER_TELETEXT 4
 
-class CDVDPlayer : public IPlayer, public CThread, public IDVDPlayer
+class CDVDPlayer : public IPlayer, public CThread, public IDVDPlayer, public IDispResource
 {
 public:
   CDVDPlayer(IPlayerCallback& callback);
@@ -291,6 +292,10 @@ public:
 
   virtual bool SwitchChannel(const PVR::CPVRChannelPtr &channel);
   virtual bool CachePVRStream(void) const;
+
+  // IDispResource interface
+  virtual void OnLostDevice();
+  virtual void OnResetDevice();
 
   enum ECacheState
   { CACHESTATE_DONE = 0
@@ -579,6 +584,8 @@ protected:
   bool m_HasAudio;
 
   bool m_DemuxerPausePending;
+
+  bool m_displayLost;
 
   // omxplayer variables
   struct SOmxPlayerState m_OmxPlayerState;
