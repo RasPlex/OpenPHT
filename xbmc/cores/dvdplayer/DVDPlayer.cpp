@@ -48,6 +48,7 @@
 #include "DVDDemuxers/DVDDemuxCC.h"
 #ifdef HAS_VIDEO_PLAYBACK
 #include "cores/VideoRenderers/RenderManager.h"
+#include "cores/VideoRenderers/RenderFlags.h"
 #endif
 #ifdef HAS_PERFORMANCE_SAMPLE
 #include "xbmc/utils/PerformanceSample.h"
@@ -83,6 +84,8 @@
 #include "cores/omxplayer/OMXHelper.h"
 #endif
 #include "DVDPlayerAudio.h"
+#include "windowing/WindowingFactory.h"
+#include "DVDCodecs/DVDCodecUtils.h"
 
 /* PLEX */
 #include "FileSystem/PlexDirectory.h"
@@ -534,10 +537,19 @@ CDVDPlayer::CDVDPlayer(IPlayerCallback& callback)
 #endif
 
   CreatePlayers();
+
+  m_displayLost = false;
+#ifndef HAS_DX
+  g_Windowing.Register(this);
+#endif
 }
 
 CDVDPlayer::~CDVDPlayer()
 {
+#ifndef HAS_DX
+  g_Windowing.Unregister(this);
+#endif
+
   CloseFile();
   DestroyPlayers();
 }
@@ -1253,6 +1265,17 @@ void CDVDPlayer::Process()
         m_messenger.Put(new CDVDMsgPlayerSeek(GetTime(), true, true, true, true, true));
     }
 #endif
+
+    // check display lost
+    {
+      CSingleLock lock(m_StateSection);
+      if (m_displayLost)
+      {
+        Sleep(50);
+        continue;
+      }
+    }
+
     // handle messages send to this thread, like seek or demuxer reset requests
     HandleMessages();
 
@@ -2566,7 +2589,7 @@ void CDVDPlayer::HandleMessages()
           SAFE_DELETE(m_pDemuxer);
           m_playSpeed = DVD_PLAYSPEED_NORMAL;
 #ifdef HAS_VIDEO_PLAYBACK
-          // when using fast channel switching some shortcuts are taken which 
+          // when using fast channel switching some shortcuts are taken which
           // means we'll have to update the view mode manually
           g_renderManager.SetViewMode(g_settings.m_currentVideoSettings.m_ViewMode);
 #endif
@@ -2624,7 +2647,7 @@ void CDVDPlayer::HandleMessages()
 
               g_infoManager.SetDisplayAfterSeek();
 #ifdef HAS_VIDEO_PLAYBACK
-              // when using fast channel switching some shortcuts are taken which 
+              // when using fast channel switching some shortcuts are taken which
               // means we'll have to update the view mode manually
               g_renderManager.SetViewMode(g_settings.m_currentVideoSettings.m_ViewMode);
 #endif
@@ -2848,7 +2871,7 @@ void CDVDPlayer::Seek(bool bPlus, bool bLargeStep, bool bChapterOverride)
   else
     seek = bPlus ? g_advancedSettings.m_videoTimeSeekForward : g_advancedSettings.m_videoTimeSeekBackward;
   seek *= 1000;
-  
+
   // if we are over movie length, then just move one sec before the end
   // that's the maximum seek offset DVDPlayer will take into account.
   if (seek + GetTime() > GetTotalTimeInMsec())
@@ -3516,6 +3539,17 @@ bool CDVDPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
 
   if(hint.flags & AV_DISPOSITION_ATTACHED_PIC)
     return false;
+
+  // set desired refresh rate
+  if (m_PlayerOptions.fullscreen && g_graphicsContext.IsFullScreenRoot() &&
+      hint.fpsrate != 0 && hint.fpsscale != 0)
+  {
+    if (g_guiSettings.GetInt("videoplayer.adjustrefreshrate") != ADJUST_REFRESHRATE_OFF)
+    {
+      float framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
+      g_renderManager.TriggerUpdateResolution(framerate, hint.width, RenderManager::GetStereoModeFlags(hint.stereo_mode));
+    }
+  }
 
   if(!OpenStreamPlayer(m_CurrentVideo, hint, reset))
     return false;
@@ -4641,7 +4675,7 @@ bool CDVDPlayer::GetStreamDetails(CStreamDetails &details)
     bool result = CDVDFileInfo::DemuxerToStreamDetails(m_pInputStream, m_pDemuxer, details);
     if (result && details.GetStreamCount(CStreamDetail::VIDEO) > 0) // this is more correct (dvds in particular)
     {
-      /* 
+      /*
        * We can only obtain the aspect & duration from dvdplayer when the Process() thread is running
        * and UpdatePlayState() has been called at least once. In this case dvdplayer duration/AR will
        * return 0 and we'll have to fallback to the (less accurate) info from the demuxer.
@@ -4693,6 +4727,21 @@ bool CDVDPlayer::CachePVRStream(void) const
   return m_pInputStream->IsStreamType(DVDSTREAM_TYPE_PVRMANAGER) &&
       !g_PVRManager.IsPlayingRecording() &&
       g_advancedSettings.m_bPVRCacheInDvdPlayer;
+}
+
+// IDispResource interface
+void CDVDPlayer::OnLostDevice()
+{
+  CLog::Log(LOGNOTICE, "CDVDPlayer: OnLostDevice received");
+  CSingleLock lock(m_StateSection);
+  m_displayLost = true;
+}
+
+void CDVDPlayer::OnResetDevice()
+{
+  CLog::Log(LOGNOTICE, "CDVDPlayer: OnResetDevice received");
+  CSingleLock lock(m_StateSection);
+  m_displayLost = false;
 }
 
 /* PLEX */
