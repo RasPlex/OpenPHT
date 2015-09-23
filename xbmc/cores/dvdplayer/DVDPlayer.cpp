@@ -2526,6 +2526,11 @@ void CDVDPlayer::HandleMessages()
           m_CurrentVideo.started = true;
         CLog::Log(LOGDEBUG, "CDVDPlayer::HandleMessages - player started %d", player);
       }
+      else if (pMsg->IsType(CDVDMsg::GENERAL_SYNCHRONIZE))
+      {
+        if (((CDVDMsgGeneralSynchronize*)pMsg)->Wait(100, SYNCSOURCE_OWNER))
+          CLog::Log(LOGDEBUG, "CDVDPlayer - CDVDMsg::GENERAL_SYNCHRONIZE");
+      }
     }
     catch (...)
     {
