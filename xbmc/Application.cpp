@@ -3798,6 +3798,9 @@ void CApplication::Stop(int exitCode)
     CVariant vExitCode(exitCode);
     CAnnouncementManager::Announce(System, "xbmc", "OnQuit", vExitCode);
 
+    // Abort any active screensaver
+    WakeUpScreenSaverAndDPMS();
+
 #ifndef __PLEX__
     SaveFileState(true);
 #else
@@ -3839,6 +3842,10 @@ void CApplication::Stop(int exitCode)
     m_ExitCode = exitCode;
     CLog::Log(LOGNOTICE, "stop all");
 
+    /* PLEX */
+    g_plexApplication.preShutdown();
+    /* END PLEX */
+
     // cancel any jobs from the jobmanager
     CJobManager::GetInstance().CancelJobs();
 
@@ -3851,13 +3858,11 @@ void CApplication::Stop(int exitCode)
 
     CApplicationMessenger::Get().Cleanup();
 
+    CAnnouncementManager::Deinitialize();
+
     StopPVRManager();
     StopServices();
     //Sleep(5000);
-
-    /* PLEX */
-    g_plexApplication.preShutdown();
-    /* END PLEX */
 
 #ifdef HAS_WEB_SERVER
   CWebServer::UnregisterRequestHandler(&m_httpImageHandler);
@@ -3895,6 +3900,12 @@ void CApplication::Stop(int exitCode)
     g_sapsessions.StopThread();
 #endif
 #ifdef HAS_ZEROCONF
+    if(CZeroconf::IsInstantiated())
+    {
+      CLog::Log(LOGNOTICE, "stopping zeroconf publishing");
+      CZeroconf::GetInstance()->Stop();
+      CZeroconf::ReleaseInstance();
+    }
     if(CZeroconfBrowser::IsInstantiated())
     {
       CLog::Log(LOGNOTICE, "stop zeroconf browser");
@@ -3955,6 +3966,7 @@ void CApplication::Stop(int exitCode)
     g_Windowing.DestroyWindow();
     g_Windowing.DestroyWindowSystem();
 
+    g_audioManager.DeInitialize();
     // shutdown the AudioEngine
     CAEFactory::Shutdown();
     CAEFactory::UnLoadEngine();

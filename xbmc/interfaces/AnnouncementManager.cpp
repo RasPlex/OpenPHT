@@ -38,9 +38,18 @@ using namespace ANNOUNCEMENT;
 
 #define m_announcers XBMC_GLOBAL_USE(ANNOUNCEMENT::CAnnouncementManager::Globals).m_announcers
 #define m_critSection XBMC_GLOBAL_USE(ANNOUNCEMENT::CAnnouncementManager::Globals).m_critSection
+bool g_announcementManagerDeinitialized = false;
+
+void CAnnouncementManager::Deinitialize()
+{
+  g_announcementManagerDeinitialized = true;
+  CSingleLock lock (m_critSection);
+  m_announcers.clear();
+}
 
 void CAnnouncementManager::AddAnnouncer(IAnnouncer *listener)
 {
+  if (g_announcementManagerDeinitialized) return;
   if (!listener)
     return;
 
@@ -50,6 +59,7 @@ void CAnnouncementManager::AddAnnouncer(IAnnouncer *listener)
 
 void CAnnouncementManager::RemoveAnnouncer(IAnnouncer *listener)
 {
+  if (g_announcementManagerDeinitialized) return;
   if (!listener)
     return;
 
@@ -66,26 +76,33 @@ void CAnnouncementManager::RemoveAnnouncer(IAnnouncer *listener)
 
 void CAnnouncementManager::Announce(AnnouncementFlag flag, const char *sender, const char *message)
 {
+  if (g_announcementManagerDeinitialized) return;
   CVariant data;
   Announce(flag, sender, message, data);
 }
 
 void CAnnouncementManager::Announce(AnnouncementFlag flag, const char *sender, const char *message, CVariant &data)
 {
+  if (g_announcementManagerDeinitialized) return;
   CLog::Log(LOGDEBUG, "CAnnouncementManager - Announcement: %s from %s", message, sender);
   CSingleLock lock (m_critSection);
-  for (unsigned int i = 0; i < m_announcers.size(); i++)
-    m_announcers[i]->Announce(flag, sender, message, data);
+
+  // Make a copy of announers. They may be removed or even remove themselves during execution of IAnnouncer::Announce()!
+  std::vector<IAnnouncer *> announcers(m_announcers); 
+  for (unsigned int i = 0; i < announcers.size(); i++)
+    announcers[i]->Announce(flag, sender, message, data);
 }
 
 void CAnnouncementManager::Announce(AnnouncementFlag flag, const char *sender, const char *message, CFileItemPtr item)
 {
+  if (g_announcementManagerDeinitialized) return;
   CVariant data;
   Announce(flag, sender, message, item, data);
 }
 
 void CAnnouncementManager::Announce(AnnouncementFlag flag, const char *sender, const char *message, CFileItemPtr item, CVariant &data)
 {
+  if (g_announcementManagerDeinitialized) return;
   if (!item.get())
   {
     Announce(flag, sender, message, data);
