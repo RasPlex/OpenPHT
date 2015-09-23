@@ -815,10 +815,12 @@ bool CxImage::Decode(CxFile *hFile, DWORD imagetype)
             if (newima.Decode( &hMemFile ))
             {
               Transfer(newima);
+              free(buffer);
               return true;
             }
             else
               hFile->Seek(pos, SEEK_SET);
+            free(buffer);
           }
           else
           {
@@ -1063,11 +1065,13 @@ bool CxImage::Decode(CxFile *hFile, DWORD imagetype)
         if (newima.Decode( &hMemFile ))
         {
           Transfer(newima);
+          free(buffer);
           return true;
         }
         else
         {
           strcpy(info.szLastError,newima.GetLastError());
+          free(buffer);
           return false;
         }
        }
@@ -1119,7 +1123,7 @@ bool CxImage::CheckFormat(CxFile * hFile, DWORD imagetype)
 ////////////////////////////////////////////////////////////////////////////////
 bool CxImage::CheckFormat(BYTE * buffer, DWORD size, DWORD imagetype)
 {
-	if (buffer==NULL || size==NULL){
+	if (buffer==NULL || size==0){
 		strcpy(info.szLastError,"invalid or empty buffer");
 		return false;
 	}

@@ -783,7 +783,8 @@ enough to decode Canon, Kodak and Adobe DNG images.
 
 int DCR_CLASS dcr_ljpeg_start (DCRAW* p, struct dcr_jhead *jh, int info_only)
 {
-	int c, tag, len;
+	int c, tag;
+	ushort len;
 	uchar data[0x10000], *dp;
 
 	dcr_init_decoder(p);
@@ -836,6 +837,9 @@ int DCR_CLASS dcr_ljpeg_start (DCRAW* p, struct dcr_jhead *jh, int info_only)
 int DCR_CLASS dcr_ljpeg_diff (DCRAW* p, struct dcr_decode *dindex)
 {
 	int len, diff;
+
+	if (!dindex)
+		longjmp (p->failure, 2);
 
 	while (dindex->branch[0])
 		dindex = dindex->branch[dcr_getbits(p, 1)];
@@ -894,6 +898,10 @@ void DCR_CLASS dcr_lossless_jpeg_load_raw(DCRAW* p)
 	ushort *rp;
 
 	if (!dcr_ljpeg_start (p,&jh, 0)) return;
+
+	if (jh.wide<1 || jh.high<1 || jh.clrs<1 || jh.bits<1)
+		longjmp (p->failure, 2);
+
 	jwide = jh.wide * jh.clrs;
 
 	for (jrow=0; jrow < jh.high; jrow++) {
@@ -913,6 +921,8 @@ void DCR_CLASS dcr_lossless_jpeg_load_raw(DCRAW* p)
 			}
 			if (p->raw_width == 3984 && (col -= 2) < 0)
 				col += (row--,p->raw_width);
+			if (row > p->raw_height)
+				longjmp (p->failure, 3);
 			if ((unsigned) (row-p->top_margin) < p->height) {
 				if ((unsigned) (col-p->left_margin) < p->width) {
 					BAYER(row-p->top_margin,col-p->left_margin) = val;
@@ -2462,8 +2472,12 @@ void DCR_CLASS dcr_sony_decrypt (DCRAW *p, unsigned *data, int len, int start, i
 		for (p->sony_decrypt_p=0; p->sony_decrypt_p < 127; p->sony_decrypt_p++)
 			p->sony_decrypt_pad[p->sony_decrypt_p] = htonl(p->sony_decrypt_pad[p->sony_decrypt_p]);
 	}
-	while (len--)
-		*data++ ^= p->sony_decrypt_pad[p->sony_decrypt_p++ & 127] = p->sony_decrypt_pad[(p->sony_decrypt_p+1) & 127] ^ p->sony_decrypt_pad[(p->sony_decrypt_p+65) & 127];
+	while (len--) {
+		p->sony_decrypt_pad[p->sony_decrypt_p & 127] = p->sony_decrypt_pad[(p->sony_decrypt_p+1) & 127] ^ p->sony_decrypt_pad[(p->sony_decrypt_p+65) & 127];
+		*data ^= p->sony_decrypt_pad[p->sony_decrypt_p & 127];
+		data++;
+		p->sony_decrypt_p++;
+	}
 }
 
 void DCR_CLASS dcr_sony_load_raw(DCRAW* p)
@@ -4735,7 +4749,7 @@ void DCR_CLASS dcr_romm_coeff (DCRAW* p, float romm_cam[3][3])
 void DCR_CLASS dcr_parse_mos (DCRAW* p, int offset)
 {
 	char data[40];
-	int skip, from, i=0, c, neut[4], planes=0, frot=0;
+	int skip, from, i=0, j, c, neut[4], planes=0, frot=0;
 	static const char *mod[] =
 	{ "","DCB2","Volare","Cantare","CMost","Valeo 6","Valeo 11","Valeo 22",
     "Valeo 11p","Valeo 17","","Aptus 17","Aptus 22","Aptus 75","Aptus 65",
@@ -4763,13 +4777,15 @@ void DCR_CLASS dcr_parse_mos (DCRAW* p, int offset)
 				strcpy (p->model, mod[i]);
 		}
 		if (!strcmp(data,"icc_camera_to_tone_matrix")) {
-			for (i=0; i < 9; i++)
-				romm_cam[0][i] = dcr_int_to_float(dcr_get4(p));
+			for (i=0; i < 3; i++)
+				for (j=0; j < 3; j++)
+					romm_cam[i][j] = dcr_int_to_float(dcr_get4(p));
 			dcr_romm_coeff (p,romm_cam);
 		}
 		if (!strcmp(data,"CaptProf_color_matrix")) {
-			for (i=0; i < 9; i++)
-				dcr_fscanf(p->obj_, "%f", &romm_cam[0][i]);
+			for (i=0; i < 3; i++)
+				for (j=0; j < 3; j++)
+					dcr_fscanf(p->obj_, "%f", &romm_cam[i][j]);
 			dcr_romm_coeff (p,romm_cam);
 		}
 		if (!strcmp(data,"CaptProf_number_of_planes"))
@@ -4971,6 +4987,7 @@ int DCR_CLASS dcr_parse_tiff_ifd (DCRAW* p, int base)
 				p->data_offset = dcr_get4(p)+base;
 				ifd++;  break;
 			}
+			if(len > 1000) len=1000; /* 1000 SubIFDs is enough */
 			while (len--) {
 				i = dcr_ftell(p->obj_);
 				dcr_fseek(p->obj_, dcr_get4(p)+base, SEEK_SET);
@@ -5159,7 +5176,7 @@ guess_cfa_pc:
 		case 50714:			/* BlackLevel */
 		case 50715:			/* BlackLevelDeltaH */
 		case 50716:			/* BlackLevelDeltaV */
-			for (dblack=i=0; i < (int)len; i++)
+			for (dblack=i=0; i < (int)len && i < 65536; i++)
 				dblack += dcr_getreal(p, type);
 			p->black += (unsigned int)(dblack/len + 0.5);
 			break;
@@ -5273,9 +5290,11 @@ void DCR_CLASS dcr_parse_tiff (DCRAW* p, int base)
 	if (p->thumb_offset) {
 		dcr_fseek(p->obj_, p->thumb_offset, SEEK_SET);
 		if (dcr_ljpeg_start (p,&jh, 1)) {
-			p->thumb_misc   = jh.bits;
-			p->thumb_width  = jh.wide;
-			p->thumb_height = jh.high;
+			if ((unsigned)jh.bits<17 && (unsigned)jh.wide < 0x10000 && (unsigned)jh.high < 0x10000) {
+				p->thumb_misc   = jh.bits;
+				p->thumb_width  = jh.wide;
+				p->thumb_height = jh.high;
+			}
 		}
 	}
 	for (i=0; i < (int)p->tiff_nifds; i++) {
@@ -5283,6 +5302,8 @@ void DCR_CLASS dcr_parse_tiff (DCRAW* p, int base)
 			max_samp = p->tiff_ifd[i].samples;
 		if (max_samp > 3) max_samp = 3;
 		if ((p->tiff_ifd[i].comp != 6 || p->tiff_ifd[i].samples != 3) &&
+		        (unsigned)(p->tiff_ifd[i].width | p->tiff_ifd[i].height) < 0x10000 &&
+			(unsigned)p->tiff_ifd[i].bps < 33 && (unsigned)p->tiff_ifd[i].samples < 13 &&
 			p->tiff_ifd[i].width*p->tiff_ifd[i].height > p->raw_width*p->raw_height) {
 			p->raw_width     = p->tiff_ifd[i].width;
 			p->raw_height    = p->tiff_ifd[i].height;
@@ -5346,6 +5367,8 @@ void DCR_CLASS dcr_parse_tiff (DCRAW* p, int base)
 	if (p->tiff_bps == 8 && p->tiff_samples == 4) p->is_raw = 0;
 	for (i=0; i < (int)p->tiff_nifds; i++)
 		if (i != raw && p->tiff_ifd[i].samples == max_samp &&
+			p->tiff_ifd[i].bps>0 && p->tiff_ifd[i].bps < 33 &&
+			(unsigned)(p->tiff_ifd[i].width | p->tiff_ifd[i].height) < 0x10000 &&
 			p->tiff_ifd[i].width * p->tiff_ifd[i].height / SQR(p->tiff_ifd[i].bps+1) >
 			(int)(p->thumb_width *       p->thumb_height / SQR(p->thumb_misc+1))) {
 			p->thumb_width  = p->tiff_ifd[i].width;
