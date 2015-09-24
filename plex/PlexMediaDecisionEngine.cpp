@@ -87,7 +87,7 @@ bool CPlexMediaDecisionEngine::resolveItem(const CFileItem& _item, CFileItem &re
       
       // if we have trailers and that we restart movie from beginning, create a new PQ askign for trailers.
       if (item.HasProperty("viewOffset") && (g_guiSettings.GetInt("videoplayer.playtrailercount") > 0) &&
-         (offset == 0) && !item.IsHomeMovie())
+         (offset == 0) && !item.IsHomeMovie() && !item.GetProperty("avoidPrompts").asBoolean())
       {
         CPlexPlayQueuePtr pq = g_plexApplication.playQueueManager->getPlayQueueOfType(PLEX_MEDIA_TYPE_VIDEO);
         if (pq && !pq->m_options.isFlung)
@@ -95,6 +95,8 @@ bool CPlexMediaDecisionEngine::resolveItem(const CFileItem& _item, CFileItem &re
           CPlexPlayQueueOptions pqOptions;
           pqOptions.startPlaying = true;
           pqOptions.forceTrailers = true;
+          pqOptions.showPrompts = false;
+          pqOptions.resumeOffset = 0;
           g_plexApplication.playQueueManager->create(item, "", pqOptions);
           return false;
         }
