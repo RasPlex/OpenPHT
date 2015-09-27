@@ -189,6 +189,11 @@ bool CGUIWindowStartup::OnAction(const CAction& action)
   // pin keys input
   if (action.GetID() >= REMOTE_0 && action.GetID() <= REMOTE_9)
     OnNumber(action.GetID() - REMOTE_0);
+  else if (action.GetID() >= ACTION_JUMP_SMS2 && action.GetID() <= ACTION_JUMP_SMS9)
+  {
+    OnNumber(action.GetID() - ACTION_JUMP_SMS2 + 2);
+    return true;
+  }
   else if (action.GetID() == ACTION_BACKSPACE)
     OnBackSpace();
   else if (action.GetID() >= KEY_VKEY && action.GetID() < KEY_ASCII)
@@ -208,7 +213,8 @@ bool CGUIWindowStartup::OnAction(const CAction& action)
   {
     if (m_allowEscOut)
       PreviousWindow();
-
+    else
+      OnBackSpace();
     return true;
   }
   else if ((action.GetID() == ACTION_MOVE_RIGHT) || (action.GetID() == ACTION_MOVE_LEFT))
