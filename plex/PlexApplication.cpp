@@ -260,9 +260,9 @@ void PlexApplication::preShutdown()
 {
   ANNOUNCEMENT::CAnnouncementManager::RemoveAnnouncer(this);
 
+  timer->StopAllTimers();
   analytics->stopLogging();
   remoteSubscriberManager->Stop();
-  timer->StopAllTimers();
   themeMusicPlayer->stop();
   if (m_serviceListener)
   {
