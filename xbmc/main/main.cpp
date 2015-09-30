@@ -44,6 +44,8 @@
 
 int main(int argc, char* argv[])
 {
+  int result = 0;
+  {
   // set up some xbmc specific relationships
   XBMC::Context context;
 
@@ -74,5 +76,8 @@ int main(int argc, char* argv[])
   CAppParamParser appParamParser;
   appParamParser.Parse((const char **)argv, argc);
 #endif
-  return XBMC_Run(renderGUI);
+  result = XBMC_Run(renderGUI);
+  }
+  _exit(result);
+  return result;
 }
