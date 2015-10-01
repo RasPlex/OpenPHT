@@ -402,7 +402,7 @@ void CWinRenderer::PreInit()
     m_resolution = RES_DESKTOP;
 
   // setup the background colour
-  m_clearColour = (g_advancedSettings.m_videoBlackBarColour & 0xff) * 0x010101;
+  m_clearColour = g_Windowing.UseLimitedColor() ? (16 * 0x010101) : 0;
 
   g_Windowing.Get3DDevice()->GetDeviceCaps(&m_deviceCaps);
 
