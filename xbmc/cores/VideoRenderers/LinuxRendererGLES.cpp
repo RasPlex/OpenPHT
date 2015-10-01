@@ -558,7 +558,7 @@ void CLinuxRendererGLES::PreInit()
 #endif
 
   // setup the background colour
-  m_clearColour = (float)(g_advancedSettings.m_videoBlackBarColour & 0xff) / 0xff;
+  m_clearColour = g_Windowing.UseLimitedColor() ? (16.0f / 0xff) : 0.0f;
 }
 
 void CLinuxRendererGLES::UpdateVideoFilter()
