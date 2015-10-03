@@ -1,0 +1,17 @@
+NEW:
+  - Play from here, create a play queue starting from selected movie/episode
+  - Now plays theme music on episode preplay
+  - Option to show shared libraries in main menu on home screen in preferences
+
+FIXES:
+  - Fix resume and seek when playing a transcoded stream
+  - Send stopped timeline state at the end of a play queue or when playback is stopped
+  - Restore volume when play speed is restored to normal after ff/rw
+  - Fix for crashes when browsing tv-shows libraries
+  - Fetch items on sms jump, next/prev letter or first/last page actions
+  - Several fixes for filters not loading or displaying correctly
+  - Fix advertising as a player on the network
+  - Fixes for crashes in dvdplayer and on exit
+  - Fix start from beginning option when no trailers was found
+  - Fix use of sms jump actions when entering a user pin
+  - Fix GetDirectory error when loading music channels
