@@ -3,7 +3,7 @@
 
 set SourceRoot=%1
 set SymStoreRoot=symbols
-rd /s /- "%SymStoreRoot%"
+rd /s /q "%SymStoreRoot%"
 md "%SymStoreRoot%"
 
 symstore add /s "%SymStoreRoot%" /f "plex\Plex Home Theater.exe" /t PHT /compress
