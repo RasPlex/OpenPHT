@@ -146,6 +146,7 @@ plex_get_soname(CURL_SONAME ${CURL_LIBRARY})
 ####
 if(DEFINED X11_FOUND)
   set(HAVE_X11 1)
+  plex_find_library(EGL 0 0  system/usr/lib 1)
 endif()
 
 if(DEFINED OPENGL_FOUND)

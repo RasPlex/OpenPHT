@@ -179,7 +179,6 @@
 #endif
 #define HAS_GL
 #ifdef HAVE_X11
-#define HAS_GLX
 #define HAS_X11_WIN_EVENTS
 #endif
 #ifdef HAVE_SDL
@@ -224,6 +223,13 @@
 //#define GIT_REV "Unknown"
 //#endif
 
+#if defined(HAVE_X11)
+#define HAS_EGL
+#if !defined(HAVE_LIBGLESV2)
+#define HAS_GLX
+#endif
+#endif
+
 /****************************************
  * Additional platform specific includes
  ****************************************/
@@ -263,9 +269,7 @@
 #undef HAS_LCD
 #endif
 
-// EGL detected. Dont use GLX!
 #ifdef HAVE_LIBEGL
-#undef HAS_GLX
 #define HAS_EGL
 #endif
 
