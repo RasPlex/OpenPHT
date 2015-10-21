@@ -21,13 +21,9 @@
 #pragma once
 
 #if defined(HAVE_X11)
-#include "GL/glx.h"
-#include "EGL/egl.h"
 #include "X11/Xlib.h"
 #include "guilib/DirtyRegion.h"
 #include <string>
-
-#define EGL_NO_CONFIG (EGLConfig)0
 
 class CGLContext
 {
@@ -36,12 +32,6 @@ public:
   {
     m_dpy = dpy;
     m_extensions = "";
-    m_glxWindow = 0;
-    m_glxContext = 0;
-    m_eglDisplay = EGL_NO_DISPLAY;
-    m_eglSurface = EGL_NO_SURFACE;
-    m_eglContext = EGL_NO_CONTEXT;
-    m_eglConfig = EGL_NO_CONFIG;
   }
   virtual ~CGLContext() {};
   virtual bool Refresh(bool force, int screen, Window glWindow, bool &newContext) = 0;
@@ -57,12 +47,6 @@ public:
   std::string m_extensions;
 
   Display *m_dpy;
-  GLXWindow m_glxWindow;
-  GLXContext m_glxContext;
-  EGLDisplay m_eglDisplay;
-  EGLSurface m_eglSurface;
-  EGLContext m_eglContext;
-  EGLConfig m_eglConfig;
 };
 
 #endif
