@@ -26,7 +26,7 @@ msgstr "Plex/HT SVN"
 
 msgctxt "#9"
 msgid "xbmc media center"
-msgstr "Plex Home Theater"
+msgstr "OpenPHT"
 
 
 msgctxt "#10"
@@ -1173,13 +1173,13 @@ msgstr "Bitte überprüfen Sie, ob die Datei vorhanden und das notwendige Laufwe
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kann den Inhalt dieses Kanals nicht abspielen."
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kann den Inhalt dieses Kanals nicht abspielen."
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kann den Inhalt dieses Kanals nicht abspielen."
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kann den Inhalt dieses Kanals nicht abspielen."
 
 
 msgctxt "#52100"

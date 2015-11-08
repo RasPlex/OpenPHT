@@ -86,7 +86,7 @@ endforeach()
 set(CONFIG_LIBRARY_OPENGL ${CONFIG_LIBRARY_OPENGL32} ${CONFIG_LIBRARY_GLU32})
 
 set(ARCH "x86-win")
-set(EXECUTABLE_NAME "Plex Home Theater")
+set(EXECUTABLE_NAME "OpenPHT")
 set(FFMPEG_INCLUDE_DIRS ${dependdir}/include)
 set(LIBPATH .)
 set(BINPATH .)

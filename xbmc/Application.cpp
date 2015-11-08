@@ -702,15 +702,15 @@ bool CApplication::Create()
 #endif
 #else
 #if defined(TARGET_DARWIN_OSX)
-  CLog::Log(LOGNOTICE, "Starting Plex Home Theater (%s), Platform: Darwin OSX (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
+  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Darwin OSX (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
 #elif defined(TARGET_DARWIN_IOS)
-  CLog::Log(LOGNOTICE, "Starting Plex Home Theater (%s), Platform: Darwin iOS (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
+  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Darwin iOS (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
 #elif defined(__FreeBSD__)
-  CLog::Log(LOGNOTICE, "Starting Plex Home Theater (%s), Platform: FreeBSD (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
+  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: FreeBSD (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
 #elif defined(_LINUX)
-  CLog::Log(LOGNOTICE, "Starting Plex Home Theater (%s), Platform: Linux (%s, %s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetLinuxDistro().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
+  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Linux (%s, %s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetLinuxDistro().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
 #elif defined(_WIN32)
-  CLog::Log(LOGNOTICE, "Starting Plex Home Theater (%s), Platform: %s. Built on %s (compiler %i)", g_infoManager.GetVersion().c_str(), g_sysinfo.GetKernelVersion().c_str(), __DATE__, _MSC_VER);
+  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: %s. Built on %s (compiler %i)", g_infoManager.GetVersion().c_str(), g_sysinfo.GetKernelVersion().c_str(), __DATE__, _MSC_VER);
 #if defined(__arm__)
   if (g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON)
     CLog::Log(LOGNOTICE, "ARM Features: Neon enabled");
@@ -813,7 +813,7 @@ bool CApplication::Create()
   /* PLEX */
   /* now that we have our directories we can fire up our crashreporter */
 #if defined(HAVE_BREAKPAD) && !defined(_DEBUG)
-  m_breakpad = new BreakpadScope("PLEX HOME THEATER");
+  m_breakpad = new BreakpadScope("OPENPHT");
 #endif
   /* PLEX */
 
@@ -1028,7 +1028,7 @@ bool CApplication::InitWindow()
 #ifndef __PLEX__
   if (!g_Windowing.CreateNewWindow("XBMC", bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
 #else
-  if (!g_Windowing.CreateNewWindow("Plex Home Theater", bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
+  if (!g_Windowing.CreateNewWindow("OpenPHT", bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
 #endif
   {
     CLog::Log(LOGFATAL, "CApplication::Create: Unable to create window");
@@ -1039,7 +1039,7 @@ bool CApplication::InitWindow()
 #ifndef __PLEX__
   if (!g_Windowing.CreateNewWindow("XBMC", bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
 #else
-  if (!g_Windowing.CreateNewWindow("Plex Home Theater", bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
+  if (!g_Windowing.CreateNewWindow("OpenPHT", bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
 #endif
   {
     CLog::Log(LOGFATAL, "CApplication::Create: Unable to create window");

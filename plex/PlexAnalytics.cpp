@@ -43,7 +43,7 @@ CPlexAnalytics::CPlexAnalytics() : m_firstEvent(true), m_numberOfPlays(0)
   m_baseOptions.AddOption("v", "1");
   m_baseOptions.AddOption("tid", ANALYTICS_TID_PHT);
   m_baseOptions.AddOption("ul", g_guiSettings.GetString("locale.language"));
-  m_baseOptions.AddOption("an", "Plex Home Theater");
+  m_baseOptions.AddOption("an", "OpenPHT");
   m_baseOptions.AddOption("av", g_infoManager.GetVersion());
   m_baseOptions.AddOption("cid", g_guiSettings.GetString("system.uuid"));
 
@@ -125,7 +125,7 @@ void CPlexAnalytics::setCustomDimensions(CUrlOptions &options)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlexAnalytics::trackEvent(const std::string &category, const std::string &action, const std::string &label, int64_t value, const CUrlOptions &args)
 {
-  if (!g_guiSettings.GetBool("advanced.collectanalytics"))
+  //if (!g_guiSettings.GetBool("advanced.collectanalytics"))
     return;
 
   CUrlOptions opts(m_baseOptions);
@@ -155,7 +155,7 @@ void CPlexAnalytics::sendPing()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlexAnalytics::sendTrackingRequest(const CUrlOptions &request)
 {
-  if (!g_guiSettings.GetBool("advanced.collectanalytics"))
+  //if (!g_guiSettings.GetBool("advanced.collectanalytics"))
     return;
 
   CURL u("http://www.google-analytics.com/collect");
@@ -190,7 +190,7 @@ void CPlexAnalytics::sendPlaybackStop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlexAnalytics::Announce(ANNOUNCEMENT::AnnouncementFlag flag, const char *sender, const char *message, const CVariant &data)
 {
-  if (!g_guiSettings.GetBool("advanced.collectanalytics"))
+  //if (!g_guiSettings.GetBool("advanced.collectanalytics"))
     return;
 
   if (flag == ANNOUNCEMENT::System && (stricmp(sender, "xbmc") == 0))

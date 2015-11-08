@@ -56,26 +56,26 @@ if [ ! -d plex/Dependencies/$outputdir-xbmc-$DEPEND_HASH -o ! -d plex/Dependenci
     echo "-- Missing plex/Dependencies/built-depends/$outputdir-xbmc-$DEPEND_HASH.tar.xz"
     curl --head --fail -s $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-xbmc-$DEPEND_HASH.tar.xz > /dev/null || fail xbmc $DEPEND_HASH
     echo "-- Fetching $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-xbmc-$DEPEND_HASH.tar.xz"
-    curl -s --fail $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-xbmc-$DEPEND_HASH.tar.xz -o /tmp/$outputdir-xbmc-$DEPEND_HASH.tar.xz || fail xbmc $DEPEND_HASH  
+    curl -s --fail $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-xbmc-$DEPEND_HASH.tar.xz -o $TMPDIR$outputdir-xbmc-$DEPEND_HASH.tar.xz || fail xbmc $DEPEND_HASH
   else
-    cp -v plex/Dependencies/built-depends/$outputdir-xbmc-$DEPEND_HASH.tar.xz /tmp/
+    cp -v plex/Dependencies/built-depends/$outputdir-xbmc-$DEPEND_HASH.tar.xz $TMPDIR
   fi
 
   if [ ! -e plex/Dependencies/built-depends/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz ]; then
     curl --head --fail -s $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz > /dev/null || fail ffmpeg $FFMPEG_HASH
     echo "-- Fetching $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz"
-    curl -s --fail $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz -o /tmp/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz || fail ffmpeg $FFMPEG_HASH
+    curl -s --fail $NIGHTLIES_ROOT/plex-dependencies/plex-home-theater-dependencies/latest/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz -o $TMPDIR$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz || fail ffmpeg $FFMPEG_HASH
   else
-    cp -v plex/Dependencies/built-depends/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz /tmp/
+    cp -v plex/Dependencies/built-depends/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz $TMPDIR
   fi
   
   echo "-- Unpacking $outputdir-xbmc-$DEPEND_HASH.tar.xz"
-  gtar -xaf /tmp/$outputdir-xbmc-$DEPEND_HASH.tar.xz -C plex/Dependencies
+  gtar -xaf $TMPDIR$outputdir-xbmc-$DEPEND_HASH.tar.xz -C plex/Dependencies
   mv plex/Dependencies/$outputdir plex/Dependencies/$outputdir-xbmc-$DEPEND_HASH
   plex/scripts/fix_install_names.py $ROOT/plex/Dependencies/$outputdir-xbmc-$DEPEND_HASH/lib
   
   echo "-- Unpacking $outputdir-ffmpeg-$FFMPEG_HASH.tar.xz"
-  gtar -xaf /tmp/$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz -C plex/Dependencies
+  gtar -xaf $TMPDIR$outputdir-ffmpeg-$FFMPEG_HASH.tar.xz -C plex/Dependencies
   mv plex/Dependencies/ffmpeg-$outputdir plex/Dependencies/$outputdir-ffmpeg-$FFMPEG_HASH
   plex/scripts/fix_install_names.py $ROOT/plex/Dependencies/$outputdir-ffmpeg-$FFMPEG_HASH/lib
 fi

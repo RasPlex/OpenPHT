@@ -1283,7 +1283,7 @@ msgstr "현제 컴퓨터에서 사용중이 오디오 단자 종류를 선택하
 
 
 msgctxt "#32001"
-msgid "Plex Home Theater Setup"
+msgid "OpenPHT Setup"
 msgstr "플렉스 홈시어터 설정"
 
 

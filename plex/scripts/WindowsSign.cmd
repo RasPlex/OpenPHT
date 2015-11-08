@@ -7,23 +7,17 @@ rem
 setlocal
 
 set TargetFile=%~1
-if not exist "%SigningCert%" (
-  set SigningCert=%~dp0PlexTestSPC.pfx
-)
 
-set PasswordArg=
-if "%SigningCertPassword%" NEQ "" (
-  set PasswordArg=/p %SigningCertPassword%
-)
-
-signtool.exe sign /f "%SigningCert%" %PasswordArg% /t http://timestamp.verisign.com/scripts/timstamp.dll "%TargetFile%"
+signtool.exe sign /a /sm /t http://timestamp.verisign.com/scripts/timstamp.dll "%TargetFile%"
 if "%errorlevel%" == 1 (
   echo FATAL ERROR - could sign %TargetFile%
+  exit /b 1
 )
 
 signtool.exe verify /pa "%TargetFile%"
 if "%errorlevel%" == 1 (
   echo FATAL ERROR - could not verify signature for %TargetFile%
+  exit /b 1
 )
 
 endlocal

@@ -3,11 +3,11 @@ find_program(BZIP2 bzip2 HINTS /usr/bin)
 function(GENERATE_DSYMS TGT)
   get_target_property(TARGET_FNAME ${TGT} OUTPUT_NAME)
   add_custom_command(
-    OUTPUT "Plex Home Theater.dSYM/Contents/Resources/DWARF/Plex Home Theater"
+    OUTPUT "${TARGET_FNAME}.dSYM"
     COMMAND dsymutil -o "${TARGET_FNAME}.dSYM" "$<TARGET_FILE:${TGT}>"
     DEPENDS ${TGT}
   )
-  add_custom_target(${TGT}_dsym ALL DEPENDS "Plex Home Theater.dSYM/Contents/Resources/DWARF/Plex Home Theater")
+  add_custom_target(${TGT}_dsym ALL DEPENDS "${TARGET_FNAME}.dSYM")
 endfunction(GENERATE_DSYMS APP)
 
 function(GENERATE_BREAKPAD_SYMBOLS APP)
@@ -42,11 +42,11 @@ function(GENERATE_BREAKPAD_SYMBOLS APP)
 
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/symserv)
     add_custom_command(
-      OUTPUT  ${CMAKE_BINARY_DIR}/PlexHomeTheater-${PLEX_VERSION_STRING}.symsrv.zip
+      OUTPUT  ${CMAKE_BINARY_DIR}/OpenPHT-${PLEX_VERSION_STRING}.symsrv.zip
       COMMAND ${PROJECT_SOURCE_DIR}/plex/scripts/create_symstore.cmd "${PROJECT_SOURCE_DIR}" "${PLEX_VERSION_STRING}"
       DEPENDS ${DEPENDENCY} 
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-	  add_custom_target(${APP}_symbols DEPENDS ${CMAKE_BINARY_DIR}/${APP}-${PLEX_VERSION_STRING}.symbols.7z ${CMAKE_BINARY_DIR}/PlexHomeTheater-${PLEX_VERSION_STRING}.symsrv.zip)
+	  add_custom_target(${APP}_symbols DEPENDS ${CMAKE_BINARY_DIR}/${APP}-${PLEX_VERSION_STRING}.symbols.7z ${CMAKE_BINARY_DIR}/OpenPHT-${PLEX_VERSION_STRING}.symsrv.zip)
   endif(NOT TARGET_WIN32)
 endfunction(GENERATE_BREAKPAD_SYMBOLS APP)

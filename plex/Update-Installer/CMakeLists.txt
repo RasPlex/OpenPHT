@@ -20,7 +20,7 @@ include_directories(external/sha1 external/bsdiff)
 
 ## PLEX
 if(NOT APPNAME)
-	set(APPNAME "Plex Home Theater")
+	set(APPNAME "OpenPHT")
 endif(NOT APPNAME)
 add_definitions(-DAPPNAME="${APPNAME}")
 
@@ -32,7 +32,7 @@ endif(DISABLE_GUI)
 
 ## PLEX
 if(NOT APPNAME)
-	set(APPNAME "Plex Home Theater")
+	set(APPNAME "OpenPHT")
 endif(NOT APPNAME)
 add_definitions(-DAPPNAME="${APPNAME}")
 

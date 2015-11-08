@@ -1173,13 +1173,13 @@ msgstr "Молимо вас да проверите да ли та датоте�
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater не може да репродукује садржај из овог канала"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT не може да репродукује садржај из овог канала"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater не може да репродукује садржај из овог канала"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT не може да репродукује садржај из овог канала"
 
 
 msgctxt "#52100"

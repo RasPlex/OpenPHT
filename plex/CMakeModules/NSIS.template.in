@@ -1016,7 +1016,7 @@ inst:
 FunctionEnd
 
 ; MCE Stuff
-Section "Media Center Launcher for PlexHT" SecMCE
+Section "Media Center Launcher for OpenPHT" SecMCE
 
   SectionIn 1 #section is in installtype Full, not minimal
 
@@ -1037,7 +1037,7 @@ Section "Media Center Launcher for PlexHT" SecMCE
   ${EndIf}
 SectionEnd
 
-Section "Un.Media Center Launcher for PlexHT" UnSecMCE
+Section "Un.Media Center Launcher for OpenPHT" UnSecMCE
   ${If} $SupportedMCEDetected == "1"
     DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers /u $INSTDIR\$MCERegistrationFile"
     StrCpy $0 "?"

@@ -1173,12 +1173,12 @@ msgstr ""
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
+msgid "OpenPHT is not able to play this channel content"
 msgstr ""
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
+msgid "OpenPHT is not able to play this channel content"
 msgstr ""
 
 

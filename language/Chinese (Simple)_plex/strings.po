@@ -1173,13 +1173,13 @@ msgstr "请确认文件存在且必要的驱动器已正确装载"
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater 无法播放该该频道的内容"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT 无法播放该该频道的内容"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater 无法播放该该频道的内容"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT 无法播放该该频道的内容"
 
 
 msgctxt "#52100"

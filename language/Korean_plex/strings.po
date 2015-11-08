@@ -1173,12 +1173,12 @@ msgstr "파일이 존재하거나 필요한 드라이브가 장착되어있는�
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
+msgid "OpenPHT is not able to play this channel content"
 msgstr "플렉스 홈 시어터에서 재생 불가능한 채널 컨텐츠 입니다"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
+msgid "OpenPHT is not able to play this channel content"
 msgstr "플렉스 홈 시어터에서 재생 불가능한 채널 컨텐츠 입니다"
 
 

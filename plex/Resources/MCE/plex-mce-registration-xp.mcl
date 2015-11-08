@@ -1,6 +1,6 @@
-<application name="Plex Home Theater"
-             run="C:\Program Files\Plex Home Theater\Plex Home Theater.exe"
+<application name="OpenPHT"
+             run="C:\Program Files\OpenPHT\OpenPHT.exe"
              nowPlayingDirective="stop"
-             startImage="C:\Program Files\Plex Home Theater\plex-mce-icon-square.png"
-             companyname="Plex Inc."
-             description="Plex Home Theater for Windows" />
+             startImage="C:\Program Files\OpenPHT\plex-mce-icon-square.png"
+             companyname="Team OpenPHT"
+             description="OpenPHT for Windows" />

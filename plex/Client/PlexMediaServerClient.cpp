@@ -139,7 +139,7 @@ void CPlexMediaServerClient::publishDevice()
         CLog::Log(LOGDEBUG, "CPlexMediaServerClient::publishDevice Adding interface: %s for publishing", deviceAddr.Get().c_str());
 
         CStdString opt;
-        opt.Format("%s=%s", CURL::Encode("Connection[][uri]"), CURL::Encode(deviceAddr.Get()));
+        opt.Format("%s=%s", CURL::Encode("Connection[][uri]"), CURL::Encode(deviceAddr.Get().TrimRight("/").c_str()));
 
         interfaceOptions.push_back(opt);
       }

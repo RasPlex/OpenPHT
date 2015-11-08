@@ -33,7 +33,7 @@ class PlexNetworkServiceAdvertiser : public NetworkServiceAdvertiser
     headers["Protocol"] = "plex";
     headers["Protocol-Version"] = "1";
     headers["Protocol-Capabilities"] = PLEX_HOME_THEATER_CAPABILITY_STRING;
-    headers["Device-Class"] = "HTPC";
+    headers["Device-Class"] = "pc";
   }
   
   /// For subclasses to fill in.

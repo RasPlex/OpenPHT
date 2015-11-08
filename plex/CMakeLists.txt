@@ -166,7 +166,7 @@ endif()
 
 # Set the correct binary name
 set_target_properties(${PLEX_TARGET_NAME} PROPERTIES OUTPUT_NAME ${EXECUTABLE_NAME})
-set_target_properties(${PLEX_TARGET_NAME} PROPERTIES PDB_NAME "Plex Home Theater")
+set_target_properties(${PLEX_TARGET_NAME} PROPERTIES PDB_NAME "OpenPHT")
 
 if(TARGET_POSIX)
   # Allow shared libraries to call plexhometheater functions

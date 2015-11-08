@@ -1282,8 +1282,8 @@ msgstr "Vänligen välj den typ av ljudport du använder på denna dator. Om du 
 
 
 msgctxt "#32001"
-msgid "Plex Home Theater Setup"
-msgstr "Plex Home Theater - uppsättning"
+msgid "OpenPHT Setup"
+msgstr "OpenPHT - uppsättning"
 
 
 #empty string with id 32002

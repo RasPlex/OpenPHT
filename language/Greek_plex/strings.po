@@ -1173,13 +1173,13 @@ msgstr "Παρακαλώ ελέγξτε ότι το αρχείο υπάρχει 
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Το Plex Home Theater δεν είναι σε θέση να αναπαράγει το περιεχόμενο αυτού του καναλιού"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "Το OpenPHT δεν είναι σε θέση να αναπαράγει το περιεχόμενο αυτού του καναλιού"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Το Plex Home Theater δεν είναι σε θέση να αναπαράγει το περιεχόμενο αυτού του καναλιού"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "Το OpenPHT δεν είναι σε θέση να αναπαράγει το περιεχόμενο αυτού του καναλιού"
 
 
 msgctxt "#52100"

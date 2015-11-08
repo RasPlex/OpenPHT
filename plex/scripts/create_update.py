@@ -139,14 +139,14 @@ def create_update(product, version, output, platform, input, delta, fversion, ma
 
 if __name__ == "__main__":
 	o = optparse.OptionParser()
-	o.add_option("-r", dest="product", default="PlexHomeTheater", type="string")
+	o.add_option("-r", dest="product", default="OpenPHT", type="string")
 	o.add_option('-v', dest="version", default="NOVERSION", type="string")
 	o.add_option("-o", dest="output", default=".", type="string")
 	o.add_option("-p", dest="platform", default=platform.system().lower(), type="string")
-	o.add_option("-i", dest="input", default="output/Plex Home Theater.app", type="string")
+	o.add_option("-i", dest="input", default="output/OpenPHT.app", type="string")
 	o.add_option("-d", dest="delta", default=False, action="store_true")
 	o.add_option("-f", dest="fromversion", default="", type="string")
-	o.add_option("-m", dest="mainbinary", default="Contents/MacOS/Plex Home Theater", type="string")
+	o.add_option("-m", dest="mainbinary", default="Contents/MacOS/OpenPHT", type="string")
 
 	(options, args) = o.parse_args()
 

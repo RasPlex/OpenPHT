@@ -1,10 +1,10 @@
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
-Name=Plex Home Theater
-Name[en_US]=Plex Home Theater
+Name=OpenPHT
+Name[en_US]=OpenPHT
 Exec=/usr/bin/plexhometheater.sh
 Icon=/usr/share/pixmaps/plexhometheater.png
-Comment[en_US]=Plex Home Theater
+Comment[en_US]=OpenPHT
 StartupNotify=true
 Categories=AudioVideo

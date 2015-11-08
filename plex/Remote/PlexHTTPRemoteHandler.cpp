@@ -17,6 +17,7 @@
 #include "GUIUserMessages.h"
 #include "guilib/GUIWindowManager.h"
 #include "dialogs/GUIDialogKeyboardGeneric.h"
+#include "GUIInfoManager.h"
 
 #include "utils/log.h"
 #include "interfaces/Builtins.h"
@@ -444,14 +445,15 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::resources()
   // title="My Nexus 7" machineIdentifier="x" product="p" platform="p" platformVersion="v" protocolVersion="x" protocolCapabilities="y" deviceClass="z"
   TiXmlElement *player = new TiXmlElement("Player");
   player->SetAttribute("title", g_guiSettings.GetString("services.devicename").c_str());
-  player->SetAttribute("protocol", "plex");
-  player->SetAttribute("protocolVersion", "1");
-  player->SetAttribute("protocolCapabilities", PLEX_HOME_THEATER_CAPABILITY_STRING);
   player->SetAttribute("machineIdentifier", g_guiSettings.GetString("system.uuid").c_str());
-  player->SetAttribute("product", "Plex Home Theater");
+  player->SetAttribute("product", "OpenPHT");
+  player->SetAttribute("version", g_infoManager.GetVersion().c_str());
   player->SetAttribute("platform", PlexUtils::GetMachinePlatform());
   player->SetAttribute("platformVersion", PlexUtils::GetMachinePlatformVersion());
   player->SetAttribute("deviceClass", "pc");
+  player->SetAttribute("protocol", "plex");
+  player->SetAttribute("protocolVersion", "1");
+  player->SetAttribute("protocolCapabilities", PLEX_HOME_THEATER_CAPABILITY_STRING);
 
   mediaContainer->LinkEndChild(player);
 

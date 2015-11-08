@@ -24,7 +24,7 @@ msgstr "Plex/HT Git"
 
 msgctxt "#9"
 msgid "xbmc media center"
-msgstr "Plex Home Theater"
+msgstr "OpenPHT"
 
 msgctxt "#10"
 msgid "Plex"
@@ -455,6 +455,10 @@ msgstr "Ninja"
 msgctxt "#40006"
 msgid "I am Special!"
 msgstr "I am Special!"
+
+msgctxt "#40007"
+msgid "Preview"
+msgstr "Preview"
 
 msgctxt "#40016"
 msgid "Check for update now..."
@@ -965,12 +969,12 @@ msgid "Please check that this file exists and the necessary drive is mounted"
 msgstr "Please check that this file exists and the necessary drive is mounted"
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater is not able to play this channel content"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT is not able to play this channel content"
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater is not able to play ISO files"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT is not able to play ISO files"
 
 msgctxt "#52100"
 msgid "Select Audio Track"

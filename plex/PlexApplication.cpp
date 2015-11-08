@@ -101,8 +101,8 @@ void PlexApplication::Start()
     }
   }
 
-  if (g_guiSettings.GetBool("advanced.collectanalytics"))
-    analytics->startLogging();
+  //if (g_guiSettings.GetBool("advanced.collectanalytics"))
+  //  analytics->startLogging();
 
   myPlexManager->Create();
 }
@@ -185,7 +185,7 @@ void PlexApplication::setNetworkLogging(bool onOff)
     timer->SetTimeout(1200000, this);
     m_networkLoggingOn = true;
 
-    CLog::Log(LOGINFO, "Plex Home Theater v%s (%s %s) @ %s", g_infoManager.GetVersion().c_str(),
+    CLog::Log(LOGINFO, "OpenPHT v%s (%s %s) @ %s", g_infoManager.GetVersion().c_str(),
               PlexUtils::GetMachinePlatform().c_str(),
               PlexUtils::GetMachinePlatformVersion().c_str(),
               myPlexManager->GetCurrentUserInfo().email.c_str());
@@ -245,7 +245,7 @@ void PlexApplication::sendNetworkLog(int level, const std::string& logline)
 
   std::stringstream s;
   s << "<" << priority << ">" + std::string(time) << " x "
-    << "Plex Home Theater: ";
+    << "OpenPHT: ";
   s << "[" << myPlexManager->GetCurrentUserInfo().email << "] ";
 
   int strleft = 1024 - s.str().size();

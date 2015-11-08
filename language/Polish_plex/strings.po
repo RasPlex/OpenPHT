@@ -1173,13 +1173,13 @@ msgstr "Proszę sprawdzić czy ten plik istnieje i czy odpowiedni napęd jest za
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater nie jest w stanie odtworzyć zawartości tego kanału "
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT nie jest w stanie odtworzyć zawartości tego kanału "
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater nie jest w stanie odtworzyć zawartości tego kanału "
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT nie jest w stanie odtworzyć zawartości tego kanału "
 
 
 msgctxt "#52100"

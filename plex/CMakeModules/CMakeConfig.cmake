@@ -4,7 +4,7 @@ if(NOT WIN32)
   include(CheckSystemFunctions)
 endif(NOT WIN32)
 
-set(PLEX_TARGET_NAME PlexHomeTheater)
+set(PLEX_TARGET_NAME OpenPHT)
 
 set(CONFIG_INTERNAL_LIBS
   lib_hts

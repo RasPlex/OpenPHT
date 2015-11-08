@@ -1173,13 +1173,13 @@ msgstr "Veuillez vérifier que ce fichier existe et que le disque est monté"
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater n'est pas en mesure de jouer ce contenu audio"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT n'est pas en mesure de jouer ce contenu audio"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater n'est pas en mesure de jouer ce contenu audio"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT n'est pas en mesure de jouer ce contenu audio"
 
 
 msgctxt "#52100"

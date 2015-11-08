@@ -159,7 +159,7 @@ foreach(lib ${osx_frameworks})
 endforeach()
 
 #### Deal with some generated files
-set(EXECUTABLE_NAME "Plex Home Theater")
+set(EXECUTABLE_NAME "OpenPHT")
 
 set(ARCH "x86-osx")
 

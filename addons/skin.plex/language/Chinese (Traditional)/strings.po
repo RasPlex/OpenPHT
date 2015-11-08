@@ -982,7 +982,7 @@ msgid "Please choose the type of audio connector used on this computer.  If you'
 msgstr ""
 
 msgctxt "#32001"
-msgid "Plex Home Theater Setup"
+msgid "OpenPHT Setup"
 msgstr ""
 
 msgctxt "#32003"

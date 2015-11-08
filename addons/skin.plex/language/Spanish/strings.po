@@ -1282,8 +1282,8 @@ msgstr "Por favor, elija el tipo de conexión de audio usada en este ordenador. 
 
 
 msgctxt "#32001"
-msgid "Plex Home Theater Setup"
-msgstr "Configuración de Plex Home Theater"
+msgid "OpenPHT Setup"
+msgstr "Configuración de OpenPHT"
 
 
 #empty string with id 32002

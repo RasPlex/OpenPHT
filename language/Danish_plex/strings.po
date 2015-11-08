@@ -1173,13 +1173,13 @@ msgstr "Venligst kontroller at filen eksisterer samt at der er adgang til drevet
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kan ikke afspille indholdet af denne kanal"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kan ikke afspille indholdet af denne kanal"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kan ikke afspille indholdet af denne kanal"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kan ikke afspille indholdet af denne kanal"
 
 
 msgctxt "#52100"

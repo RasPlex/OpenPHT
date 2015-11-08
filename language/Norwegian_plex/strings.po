@@ -26,7 +26,7 @@ msgstr "Plex/HT Git"
 
 msgctxt "#9"
 msgid "xbmc media center"
-msgstr "Plex Home Theater"
+msgstr "OpenPHT"
 
 
 msgctxt "#10"
@@ -1173,13 +1173,13 @@ msgstr "Venligst sjekk om filen eksisterer og om nødvendig disk er koblet til"
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater klarer ikke å spille av innholdet på denne kanalen"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT klarer ikke å spille av innholdet på denne kanalen"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater klarer ikke å spille av innholdet på denne kanalen"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT klarer ikke å spille av innholdet på denne kanalen"
 
 
 msgctxt "#52100"

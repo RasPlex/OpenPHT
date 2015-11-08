@@ -17,8 +17,8 @@ cd build-windows-i386
 cmake -GNinja -DCMAKE_INSTALL_PREFIX=output -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
 ninja release_package
 
-move c:\tmp\PlexHomeTheater*exe %WORKSPACE%\upload
-move PlexHomeTheater*7z %WORKSPACE%\upload
-move PlexHomeTheater*symsrv*zip %WORKSPACE%\upload
-move c:\tmp\PlexHomeTheater*zip %WORKSPACE%\upload
-move c:\tmp\PlexHomeTheater*manifest.xml %WORKSPACE%\upload
+move c:\tmp\OpenPHT*exe %WORKSPACE%\upload
+move OpenPHT*7z %WORKSPACE%\upload
+move OpenPHT*symsrv*zip %WORKSPACE%\upload
+move c:\tmp\OpenPHT*zip %WORKSPACE%\upload
+move c:\tmp\OpenPHT*manifest.xml %WORKSPACE%\upload

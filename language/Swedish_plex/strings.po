@@ -1173,13 +1173,13 @@ msgstr "Kontrollera att denna fil existerar på samma sökväg som då den inska
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kan ej spela upp denna kanalens innehåll"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kan ej spela upp denna kanalens innehåll"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater kan ej spela upp denna kanalens innehåll"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT kan ej spela upp denna kanalens innehåll"
 
 
 msgctxt "#52100"

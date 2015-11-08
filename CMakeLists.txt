@@ -1,4 +1,4 @@
-project("Plex Home Theater")
+project("OpenPHT")
 cmake_minimum_required(VERSION 2.8.7 FATAL_ERROR)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -27,8 +27,8 @@ else()
 endif()
 
 set(PLEX_VERSION_MAJOR 1)
-set(PLEX_VERSION_MINOR 4)
-set(PLEX_VERSION_PATCH 2)
+set(PLEX_VERSION_MINOR 5)
+set(PLEX_VERSION_PATCH 0)
 if(DEFINED ENV{BUILD_NUMBER})
   set(PLEX_VERSION_BUILD "$ENV{BUILD_NUMBER}")
   set(PLEX_VERSION_BUILD_NR "$ENV{BUILD_NUMBER}")
@@ -44,7 +44,7 @@ set(XBMC_VERSION "Frodo")
 
 configure_file(${plexdir}/git_revision.h.in git_revision.h)
 
-message(STATUS "Building Plex Home Theater, version: ${PLEX_VERSION_STRING}")
+message(STATUS "Building OpenPHT, version: ${PLEX_VERSION_STRING}")
 
 include(CMakeFunctions)
 

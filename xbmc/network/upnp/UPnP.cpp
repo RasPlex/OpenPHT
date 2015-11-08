@@ -409,12 +409,12 @@ CUPnP::CreateRenderer(int port /* = 0 */)
     device->m_Manufacturer     = "Team XBMC";
     device->m_ManufacturerURL  = "http://www.xbmc.org/";
 #else
-    device->m_ModelName        = "Plex Home Theater";
+    device->m_ModelName        = "OpenPHT";
     device->m_ModelNumber      = g_infoManager.GetVersion().c_str();
-    device->m_ModelDescription = "Plex Home Theater - Media Renderer";
-    device->m_ModelURL         = "http://www.plexapp.com/";
-    device->m_Manufacturer     = "Plex inc";
-    device->m_ManufacturerURL  = "http://www.plexapp.com/";
+    device->m_ModelDescription = "OpenPHT - Media Renderer";
+    device->m_ModelURL         = "http://www.openpht.tv/";
+    device->m_Manufacturer     = "Team OpenPHT";
+    device->m_ManufacturerURL  = "http://www.openpht.tv/";
 #endif
 
     return device;

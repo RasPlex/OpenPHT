@@ -1173,13 +1173,13 @@ msgstr "Controleer of dit bestand bestaat en of de benodigde schijf beschikbaar 
 
 
 msgctxt "#52011"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater is niet in staat de inhoud van dit kanaal af te spelen"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT is niet in staat de inhoud van dit kanaal af te spelen"
 
 
 msgctxt "#52012"
-msgid "Plex Home Theater is not able to play this channel content"
-msgstr "Plex Home Theater is niet in staat de inhoud van dit kanaal af te spelen"
+msgid "OpenPHT is not able to play this channel content"
+msgstr "OpenPHT is niet in staat de inhoud van dit kanaal af te spelen"
 
 
 msgctxt "#52100"

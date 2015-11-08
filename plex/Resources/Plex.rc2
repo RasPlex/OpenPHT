@@ -71,13 +71,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Plex, Inc."
-            VALUE "FileDescription", "Plex Home Theater"
+            VALUE "CompanyName", "Team OpenPHT"
+            VALUE "FileDescription", "OpenPHT"
             VALUE "FileVersion", PLEX_VERSION
-            VALUE "InternalName", "Plex Home Theater.exe"
+            VALUE "InternalName", "OpenPHT.exe"
             VALUE "LegalCopyright", "Copyright (c) Plex, Inc.  All rights reserved."
-            VALUE "OriginalFilename", "Plex Home Theater.exe"
-            VALUE "ProductName", "Plex Home Theater"
+            VALUE "OriginalFilename", "OpenPHT.exe"
+            VALUE "ProductName", "OpenPHT"
             VALUE "ProductVersion", PLEX_VERSION
         END
     END

@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>Plex Home Theater</string>
+	<string>OpenPHT</string>
 	<key>CFBundleGetInfoString</key>
-  <string>Plex Home Theater</string>
+	<string>OpenPHT</string>
 	<key>CFBundleIconFile</key>
 	<string>Plex.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.plexapp.plexhometheater</string>
+	<string>tv.openpht.openpht</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>

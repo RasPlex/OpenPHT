@@ -44,7 +44,7 @@ CPlexAutoUpdate::CPlexAutoUpdate()
   else
     m_url = CURL("https://raw.github.com/RasPlex/RasPlex.github.io/master/autoupdate/stable.xml");
 #else
-  m_url = CURL("https://plex.tv/updater/products/2/check.xml");
+  m_url = CURL("http://services.openpht.tv/updater/check.xml");
 #endif
 
   m_searchFrequency = 21600000; /* 6 hours */
@@ -112,8 +112,8 @@ void CPlexAutoUpdate::OnTimeout()
   if (channel != CMyPlexUserInfo::ROLE_USER)
     m_url.SetOption("channel", boost::lexical_cast<std::string>(channel));
 
-  if (g_plexApplication.myPlexManager->IsSignedIn())
-    m_url.SetOption("X-Plex-Token", g_plexApplication.myPlexManager->GetAuthToken());
+  //if (g_plexApplication.myPlexManager->IsSignedIn())
+  //  m_url.SetOption("X-Plex-Token", g_plexApplication.myPlexManager->GetAuthToken());
 
   std::vector<std::string> alreadyTriedVersion = GetAllInstalledVersions();
   CFileItemList updates;
