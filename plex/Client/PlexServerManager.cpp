@@ -37,7 +37,7 @@ void CPlexServerReachabilityThread::Process()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-CPlexServerManager::CPlexServerManager() : m_stopped(false)
+CPlexServerManager::CPlexServerManager() : m_stopped(false), m_reachabilityTestEvent(true)
 {
   CPlexConnectionPtr conn;
   
@@ -286,11 +286,15 @@ void CPlexServerManager::UpdateReachability(bool force)
       p.second->m_server->CancelReachabilityTests();
     }
 
+    lk.unlock();
+
     if (!m_reachabilityTestEvent.WaitMSec(10 * 1000))
     {
       CLog::Log(LOGWARNING, "CPlexServerManager::UpdateReachability waited 10 seconds for the reachability stuff to finish, will just move on.");
       return;
     }
+
+    lk.lock();
   }
 
   if (m_reachabilityThreads.size() > 0)
