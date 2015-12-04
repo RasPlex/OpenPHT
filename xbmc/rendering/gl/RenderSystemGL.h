@@ -45,6 +45,7 @@ public:
 
   virtual void SetVSync(bool vsync);
   virtual void ResetVSync() { m_bVsyncInit = false; }
+  virtual void FinishPipeline();
 
   virtual void SetViewPort(CRect& viewPort);
   virtual void GetViewPort(CRect& viewPort);
@@ -90,6 +91,8 @@ protected:
   int        m_glslMinor;
   
   GLint      m_viewPort[4];
+
+  uint8_t m_latencyCounter;
 };
 
 #endif // RENDER_SYSTEM_H
