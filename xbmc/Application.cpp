@@ -2348,8 +2348,6 @@ void CApplication::Render()
   // render video layer
   g_windowManager.RenderEx();
 
-  g_renderManager.FrameFinish();
-
   g_Windowing.EndRender();
 
   // reset our info cache - we do this at the end of Render so that it is
@@ -2366,6 +2364,12 @@ void CApplication::Render()
   }
 
   lock.Leave();
+
+  if (g_graphicsContext.IsFullScreenVideo())
+  {
+    g_Windowing.FinishPipeline();
+  }
+  g_renderManager.FrameFinish();
 
   //when nothing has been rendered for m_guiDirtyRegionNoFlipTimeout milliseconds,
   //we don't call g_graphicsContext.Flip() anymore, this saves gpu and cpu usage
