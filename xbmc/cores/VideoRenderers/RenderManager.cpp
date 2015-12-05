@@ -1109,8 +1109,8 @@ void CXBMCRenderManager::UpdateResolution()
         g_graphicsContext.SetVideoResolution(res);
         UpdateDisplayLatency();
       }
+      m_bTriggerUpdateResolution = false;
     }
-    m_bTriggerUpdateResolution = false;
     g_dataCacheCore.SignalVideoInfoChange();
   }
 }
