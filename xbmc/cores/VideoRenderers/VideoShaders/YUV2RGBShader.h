@@ -1,9 +1,6 @@
-#ifndef __YUV2RGB_SHADERS_H__
-#define __YUV2RGB_SHADERS_H__
-
 /*
- *      Copyright (C) 2007-2012 Team XBMC
- *      http://www.xbmc.org
+ *      Copyright (C) 2007-2015 Team XBMC
+ *      http://xbmc.org
  *
  *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,6 +17,7 @@
  *  <http://www.gnu.org/licenses/>.
  *
  */
+#pragma once
 
 #include "guilib/TransformMatrix.h"
 #include "cores/VideoRenderers/RenderFormats.h"
@@ -30,7 +28,8 @@ void CalculateYUVMatrix(TransformMatrix &matrix
                         , unsigned int  flags
                         , ERenderFormat format
                         , float         black
-                        , float         contrast);
+                        , float         contrast
+                        , bool          limited);
 
 #if defined(HAS_GL) || HAS_GLES == 2
 
@@ -201,5 +200,3 @@ namespace Shaders {
 #pragma warning( pop )
 #endif
 #endif
-
-#endif //__YUV2RGB_SHADERS_H__
