@@ -52,6 +52,9 @@
 /* PLEX */
 #include "guilib/LocalizeStrings.h"
 #include "FileSystem/PlexFile.h"
+#include <boost/foreach.hpp>
+
+typedef std::pair<std::string, std::string> stringPair;
 /* END PLEX */
 
 void CDemuxStreamAudioFFmpeg::GetStreamInfo(std::string& strInfo)
@@ -647,12 +650,22 @@ AVDictionary *CDVDDemuxFFmpeg::GetFFMpegOptionsFromURL(const CURL &url)
 
   AVDictionary *options = NULL;
 
-  if (protocol.Equals("http") || protocol.Equals("https"))
+  if (protocol.Equals("http") || protocol.Equals("https") || protocol.Equals("plexserver"))
   {
     std::map<CStdString, CStdString> protocolOptions;
     url.GetProtocolOptions(protocolOptions);
     std::string headers;
     bool hasUserAgent = false;
+
+    /* PLEX */
+    if (protocol.Equals("plexserver"))
+    {
+      std::vector<stringPair> hdrs = XFILE::CPlexFile::GetHeaderList();
+      BOOST_FOREACH(stringPair sp, hdrs)
+        headers.append(sp.first).append(": ").append(sp.second).append("\r\n");
+    }
+    /* END PLEX */
+
     for(std::map<CStdString, CStdString>::const_iterator it = protocolOptions.begin(); it != protocolOptions.end(); ++it)
     {
       const CStdString &name = it->first;
