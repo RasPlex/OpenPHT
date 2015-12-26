@@ -457,8 +457,8 @@ msgid "I am Special!"
 msgstr "I am Special!"
 
 msgctxt "#40007"
-msgid "Preview"
-msgstr "Preview"
+msgid "Pre-release"
+msgstr "Pre-release"
 
 msgctxt "#40016"
 msgid "Check for update now..."
