@@ -66,6 +66,7 @@ namespace CEC
 namespace PERIPHERALS
 {
   class CPeripheralCecAdapterUpdateThread;
+  class CPeripheralCecAdapterReopenJob;
 
   typedef struct
   {
@@ -84,6 +85,7 @@ namespace PERIPHERALS
   class CPeripheralCecAdapter : public CPeripheralHID, public ANNOUNCEMENT::IAnnouncer, private CThread
   {
     friend class CPeripheralCecAdapterUpdateThread;
+    friend class CPeripheralCecAdapterReopenJob;
 
   public:
     CPeripheralCecAdapter(const PeripheralScanResult& scanResult);
@@ -118,7 +120,7 @@ namespace PERIPHERALS
     bool IsRunning(void) const;
 
     bool OpenConnection(void);
-    bool ReopenConnection(void);
+    bool ReopenConnection(bool bAsync = false);
 
     void SetConfigurationFromSettings(void);
     void SetConfigurationFromLibCEC(const CEC::libcec_configuration &config);
