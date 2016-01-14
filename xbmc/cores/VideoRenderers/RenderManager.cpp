@@ -315,6 +315,10 @@ bool CXBMCRenderManager::Configure(DVDVideoPicture& picture, float fps, unsigned
     m_NumberBuffers  = buffers;
     m_renderState = STATE_CONFIGURING;
     m_stateEvent.Reset();
+
+    CSingleLock lock2(m_presentlock);
+    m_presentstep = PRESENT_READY;
+    m_presentevent.notifyAll();
   }
 
   if (!m_stateEvent.WaitMSec(1000))
@@ -443,6 +447,8 @@ void CXBMCRenderManager::FrameMove()
     lock.Leave();
     if (!Configure())
       return;
+
+    FrameWait(50);
 
     if (m_flags & CONF_FLAGS_FULLSCREEN)
     {
