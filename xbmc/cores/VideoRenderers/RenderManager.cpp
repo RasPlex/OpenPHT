@@ -504,6 +504,12 @@ void CXBMCRenderManager::FrameMove()
 
 void CXBMCRenderManager::FrameFinish()
 {
+  {
+    CSharedLock lock(m_sharedSection);
+    if (m_renderState != STATE_CONFIGURED)
+      return;
+  }
+
   /* wait for this present to be valid */
   SPresent& m = m_Queue[m_presentsource];
 
@@ -565,6 +571,7 @@ void CXBMCRenderManager::PreInit()
   m_QueueSize   = 2;
   m_QueueSkip   = 0;
   m_presentstep = PRESENT_IDLE;
+  m_format = RENDER_FMT_NONE;
 }
 
 void CXBMCRenderManager::UnInit()
