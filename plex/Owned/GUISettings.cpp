@@ -303,6 +303,7 @@ void CGUISettings::Initialize()
   AddBool(myPlex, "myplex.sharedsectionsonhome", 52209, false);
   AddBool(myPlex, "myplex.hidecloudsync", 52505, false);
   AddBool(myPlex, "myplex.recentlywatched", 52212, false);
+  AddBool(myPlex, "myplex.hidechannels", 52213, false);
   AddBool(myPlex, "myplex.automaticlogin", 52211, false);
 
 

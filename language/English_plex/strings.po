@@ -1016,6 +1016,10 @@ msgctxt "#52212"
 msgid "Show watched in recently added"
 msgstr "Show watched in recently added"
 
+msgctxt "#52213"
+msgid "Hide channels in menu"
+msgstr "Hide channels in menu"
+
 msgctxt "#52300"
 msgid "Media Server went away"
 msgstr "Media Server went away"

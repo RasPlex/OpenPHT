@@ -799,7 +799,7 @@ void CGUIWindowHome::UpdateSections()
       else if (item->HasProperty("plexchannels"))
       {
         haveChannels = true;
-        if (g_plexApplication.dataLoader->HasChannels())
+        if (!g_guiSettings.GetBool("myplex.hidechannels") && g_plexApplication.dataLoader->HasChannels())
           newList.push_back(item);
         else
           listUpdated = true;
@@ -886,7 +886,7 @@ void CGUIWindowHome::UpdateSections()
     newList.push_back(item);
   }
 
-  if (g_plexApplication.dataLoader->HasChannels() && !haveChannels)
+  if (!g_guiSettings.GetBool("myplex.hidechannels") && g_plexApplication.dataLoader->HasChannels() && !haveChannels)
   {
     /* We need the channel button as well */
     CGUIStaticItemPtr item = CGUIStaticItemPtr(new CGUIStaticItem);
