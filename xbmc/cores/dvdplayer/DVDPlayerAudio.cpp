@@ -517,13 +517,14 @@ void CDVDPlayerAudio::Process()
 
     if( result & DECODE_FLAG_TIMEOUT )
     {
-      m_stalled = true;
-
       // Flush as the audio output may keep looping if we don't
-      if(m_speed == DVD_PLAYSPEED_NORMAL)
+      if(m_speed == DVD_PLAYSPEED_NORMAL && !m_stalled)
       {
         m_dvdAudio.Drain();
         m_dvdAudio.Flush();
+        m_stalled = true;
+        // avoid busy spinning here
+        Sleep(10);
       }
 
       continue;
@@ -543,7 +544,7 @@ void CDVDPlayerAudio::Process()
     if( audioframe.size == 0 )
       continue;
 
-    packetadded = true;
+    packetadded = false;
 
     // we have succesfully decoded an audio frame, setup renderer to match
     if (!m_dvdAudio.IsValidFormat(audioframe))
@@ -589,13 +590,14 @@ void CDVDPlayerAudio::Process()
       // add any packets play
       packetadded = OutputPacket(audioframe);
 
-      // we are not running until something is cached in output device
-      if(m_stalled && m_dvdAudio.GetCacheTime() > 0.0)
+      // we are not running until something is cached in output device and
+      // we still have a minimum level in the message queue
+      if(m_stalled && m_dvdAudio.GetCacheTime() > 0.0 && m_messageQueue.GetLevel() > 5)
         m_stalled = false;
     }
 
     // signal to our parent that we have initialized
-    if(m_started == false)
+    if(m_started == false && !(result & DECODE_FLAG_DROP))
     {
       m_started = true;
       m_messageParent.Put(new CDVDMsgInt(CDVDMsg::PLAYER_STARTED, DVDPLAYER_AUDIO));
