@@ -1167,3 +1167,11 @@ msgstr "Play extra"
 msgctxt "#52634"
 msgid "Play from here"
 msgstr "Play from here"
+
+msgctxt "#52635"
+msgid "Go to Show"
+msgstr "Go to Show"
+
+msgctxt "#52636"
+msgid "Go to Season"
+msgstr "Go to Season"

@@ -317,6 +317,12 @@ bool CGUIWindowHome::OnPopupMenu()
   if (choice == -1)
     return false;
 
+  if (choice == ACTION_PLEX_GOTO_SHOW || choice == ACTION_PLEX_GOTO_SEASON)
+  {
+    // save current focused controls
+    m_focusSaver.SaveFocus(this);
+  }
+
   if (g_plexApplication.defaultActionHandler->OnAction(WINDOW_HOME, choice, GetCurrentFanoutItem(), CFileItemListPtr()))
     return true;
   
