@@ -345,9 +345,7 @@ void CGUISettings::Initialize()
 
   map<int,int> audiomode;
   audiomode.insert(make_pair(338,AUDIO_ANALOG));
-#if !defined(TARGET_RASPBERRY_PI)
   audiomode.insert(make_pair(339,AUDIO_IEC958));
-#endif
   audiomode.insert(make_pair(420,AUDIO_HDMI  ));
 #if defined(TARGET_RASPBERRY_PI)
   AddInt(ao, "audiooutput.mode", 337, AUDIO_HDMI, audiomode, SPIN_CONTROL_TEXT);
@@ -356,25 +354,33 @@ void CGUISettings::Initialize()
 #endif
 
   AddInt(ao, "audiooutput.defaultdelay", 297, 0, (int)(-g_advancedSettings.m_videoAudioDelayRange*1000), 25, (int)(g_advancedSettings.m_videoAudioDelayRange*1000), SPIN_CONTROL_INT_PLUS, MASK_MS, TEXT_OFF);
-  AddBool(NULL, "audiooutput.stereoupmix", 252, false);
 #if defined(TARGET_DARWIN_IOS)
   CSettingsCategory* aocat = g_sysinfo.IsAppleTV2() ? ao : NULL;
 #else
   CSettingsCategory* aocat = ao;
 #endif
   AddBool(aocat, "audiooutput.ac3passthrough"   , 364, true);
+  AddBool(aocat, "audiooutput.eac3passthrough"  , 472, true);
   AddBool(aocat, "audiooutput.dtspassthrough"   , 254, true);
 #if !defined(TARGET_DARWIN) && !defined(TARGET_RASPBERRY_PI)
   AddBool(aocat, "audiooutput.passthroughaac"   , 299, true);
+#else
+  AddBool(NULL, "audiooutput.passthroughaac"   , 299, false);
 #endif
 #if !defined(TARGET_DARWIN_IOS) && !defined(TARGET_RASPBERRY_PI)
   AddBool(aocat, "audiooutput.multichannellpcm" , 348, true );
+#else
+  AddBool(NULL, "audiooutput.multichannellpcm" , 348, false );
 #endif
 #if !defined(TARGET_DARWIN) && !defined(TARGET_RASPBERRY_PI)
   AddBool(aocat, "audiooutput.truehdpassthrough", 349, false );
   AddBool(aocat, "audiooutput.dtshdpassthrough" , 347, false );
+#else
+  AddBool(NULL, "audiooutput.truehdpassthrough", 349, false );
+  AddBool(NULL, "audiooutput.dtshdpassthrough" , 347, false );
 #endif
 
+  AddBool(ao, "audiooutput.stereoupmix", 252, false);
   AddBool(ao, "audiooutput.normalizelevels", 346, true);
 
   map<int,int> channelLayout;
@@ -382,7 +388,6 @@ void CGUISettings::Initialize()
     channelLayout.insert(make_pair(34100 + layout, layout));
   AddInt(ao, "audiooutput.channels", 18110, AE_CH_LAYOUT_2_0, channelLayout, SPIN_CONTROL_TEXT);
 
-#if !defined(TARGET_RASPBERRY_PI)
 #if defined(TARGET_DARWIN)
 #if defined(TARGET_DARWIN_IOS)
   CStdString defaultDeviceName = "Default";
@@ -398,15 +403,12 @@ void CGUISettings::Initialize()
   AddString   (ao, "audiooutput.passthroughdevice", 546, CStdString(CAEFactory::GetDefaultDevice(true )), SPIN_CONTROL_TEXT);
   AddSeparator(ao, "audiooutput.sep2");
 #endif
-#endif
 
-#if !defined(TARGET_RASPBERRY_PI)
   map<int,int> guimode;
   guimode.insert(make_pair(34121, AE_SOUND_IDLE  ));
   guimode.insert(make_pair(34122, AE_SOUND_ALWAYS));
   guimode.insert(make_pair(34123, AE_SOUND_OFF   ));
-  AddInt(NULL, "audiooutput.guisoundmode", 34120, AE_SOUND_ALWAYS, guimode, SPIN_CONTROL_TEXT);
-#endif
+  AddInt(ao, "audiooutput.guisoundmode", 34120, AE_SOUND_IDLE, guimode, SPIN_CONTROL_TEXT);
 
 
 
@@ -1401,6 +1403,7 @@ void CGUISettings::LoadXML(TiXmlElement *pRootElement, bool hideSettings /* = fa
   //SetBool("audiooutput.dtspassthrough", g_audioConfig.GetDTSEnabled());
   CLog::Log(LOGINFO, "Using %s output", GetInt("audiooutput.mode") == AUDIO_ANALOG ? "analog" : "digital");
   CLog::Log(LOGINFO, "AC3 pass through is %s", GetBool("audiooutput.ac3passthrough") ? "enabled" : "disabled");
+  CLog::Log(LOGINFO, "EAC3 pass through is %s", GetBool("audiooutput.eac3passthrough") ? "enabled" : "disabled");
   CLog::Log(LOGINFO, "DTS pass through is %s", GetBool("audiooutput.dtspassthrough") ? "enabled" : "disabled");
   CLog::Log(LOGINFO, "AAC pass through is %s", GetBool("audiooutput.passthroughaac") ? "enabled" : "disabled");
 

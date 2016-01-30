@@ -1808,7 +1808,11 @@ msgctxt "#471"
 msgid "Modchip"
 msgstr ""
 
-#empty strings from id 472 to 473
+msgctxt "#472"
+msgid "- Dolby Digital Plus (E-AC3) capable receiver"
+msgstr ""
+
+#empty string with id 473
 
 msgctxt "#474"
 msgid "Off"
