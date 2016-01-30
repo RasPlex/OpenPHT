@@ -202,6 +202,13 @@
 					<onclick>Skin.ToggleSetting(HideRottenTomatoesRating)</onclick>
 					<selected>Skin.HasSetting(HideRottenTomatoesRating)</selected>
 				</control>
+				<control type="radiobutton" id="221">
+					<description>Show Shut Down/Restart to restricted users</description>
+					<width>625</width>
+					<label>$LOCALIZE[32122]</label>
+					<onclick>Skin.ToggleSetting(ShowRestrictedPowerOptions)</onclick>
+					<selected>Skin.HasSetting(ShowRestrictedPowerOptions)</selected>
+				</control>
 			</control>
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="61">
