@@ -115,7 +115,7 @@ public:
     
   void SetActiveConnection(CPlexConnectionPtr connection) { m_activeConnection = connection; }
 
-  uint64_t GetLastRefreshed() const { return m_lastRefreshed; }
+  uint64_t GetLastRefreshed() const { return m_lastRefreshed > 0 ? XbmcThreads::SystemClockMillis() - m_lastRefreshed : m_lastRefreshed; }
   void DidRefresh() { m_lastRefreshed = XbmcThreads::SystemClockMillis(); }
 
   bool IsSecondary() const
