@@ -163,6 +163,7 @@ class CAdvancedSettings
     bool m_DXVACheckCompatibilityPresent;
     bool m_DXVAForceProcessorRenderer;
     bool m_DXVANoDeintProcForProgressive;
+    bool m_DXVAAllowHqScaling;
     int  m_videoFpsDetect;
 
     CStdString m_videoDefaultPlayer;
