@@ -496,26 +496,12 @@ bool CDVDPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
 #endif
 
     Create();
-    if(!m_ready.WaitMSec(100))
-    {
-      CGUIDialogBusy* dialog = (CGUIDialogBusy*)g_windowManager.GetWindow(WINDOW_DIALOG_BUSY);
-      if(dialog)
-      {
-        dialog->Show();
-        while(!m_ready.WaitMSec(1))
-        {
-          /* PLEX */
-          if (dialog->IsCanceled())
-          {
-            m_bStop = true;
-            Abort();
-          }
-          /* END PLEX */
 
-          g_windowManager.ProcessRenderLoop(false);
-        }
-        dialog->Close();
-      }
+    // wait for the ready event
+    if (!CGUIDialogBusy::WaitOnEvent(m_ready, g_advancedSettings.m_videoBusyDialogDelay_ms))
+    {
+      m_bStop = true;
+      Abort();
     }
 
     // Playback might have been stopped due to some error
