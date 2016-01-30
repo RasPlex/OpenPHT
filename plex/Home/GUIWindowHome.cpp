@@ -799,7 +799,7 @@ void CGUIWindowHome::UpdateSections()
       else if (item->HasProperty("plexchannels"))
       {
         haveChannels = true;
-        if (g_plexApplication.dataLoader->HasChannels() && !g_plexApplication.myPlexManager->GetCurrentUserInfo().restricted)
+        if (g_plexApplication.dataLoader->HasChannels())
           newList.push_back(item);
         else
           listUpdated = true;

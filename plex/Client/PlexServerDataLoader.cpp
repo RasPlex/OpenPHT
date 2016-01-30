@@ -235,7 +235,10 @@ bool CPlexServerDataLoaderJob::DoWork()
       loadPreferences();
       if (m_abort)
         return false;
+    }
 
+    if (m_server->GetServerClass().empty() && m_server->AllowChannelAccess())
+    {
       m_channelList = FetchList("/channels/all");
     }
   }
