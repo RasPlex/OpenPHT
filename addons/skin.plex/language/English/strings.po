@@ -1135,6 +1135,10 @@ msgctxt "#32120"
 msgid "Hide Secure Server Indicators"
 msgstr ""
 
+msgctxt "#32121"
+msgid "Hide Rotten Tomatoes Rating"
+msgstr ""
+
 msgctxt "#41000"
 msgid "System Settings"
 msgstr ""
