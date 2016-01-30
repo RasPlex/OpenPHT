@@ -1,18 +1,15 @@
 include ../Makefile.include
 
 # lib name, version
-LIBNAME=libvorbis
-VERSION=1.3.5
+LIBNAME=nettle
+VERSION=2.7.1
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.gz
-PACKAGE_NAME=libvorbis
 
 # configuration settings
-CONFIGURE=./configure --prefix=$(PREFIX) \
-  PACKAGE_NAME=$(PACKAGE_NAME) \
-  --disable-oggtest --disable-docs --disable-examples
+CONFIGURE=./configure --prefix=$(PREFIX) --disable-shared --disable-openssl
 
-LIBDYLIB=$(SOURCE)/.libs/$(LIBNAME).dylib
+LIBDYLIB=$(SOURCE)/.libs/lib$(LIBNAME).a
 
 all: $(LIBDYLIB) .installed
 
@@ -23,7 +20,7 @@ $(SOURCE): $(TARBALLS_LOCATION)/$(ARCHIVE)
 	rm -rf $(SOURCE)
 	$(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
 	echo $(SOURCE) > .gitignore
-	sed -ie "s|SUBDIRS = m4 include vq lib examples test doc|SUBDIRS = m4 include lib|" "$(SOURCE)/Makefile.in"
+	cd $(SOURCE); patch -p0 < ../01-disable_testsuite.patch
 	cd $(SOURCE); $(CONFIGURE)
 
 $(LIBDYLIB): $(SOURCE)

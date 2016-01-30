@@ -1,18 +1,15 @@
 include ../Makefile.include
 
 # lib name, version
-LIBNAME=libgpg-error
-VERSION=1.10
+LIBNAME=gmp
+VERSION=5.1.3
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.bz2
 
 # configuration settings
-CONFIGURE=./configure --prefix=$(PREFIX) \
- --with-libintl-prefix=$(PREFIX)/lib
+CONFIGURE=./configure --prefix=$(PREFIX) --disable-shared --with-pic
 
-LIBDYLIB=$(SOURCE)/.libs/libgpg-error.dylib
-
-CLEAN_FILES=$(ARCHIVE) $(SOURCE)
+LIBDYLIB=$(SOURCE)/.libs/lib$(LIBNAME).a
 
 all: $(LIBDYLIB) .installed
 
@@ -38,4 +35,3 @@ clean:
 
 distclean::
 	rm -rf $(SOURCE) .installed
-

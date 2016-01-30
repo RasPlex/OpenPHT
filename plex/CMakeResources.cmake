@@ -78,7 +78,7 @@ endfunction(set_bundle_dir)
 
 if(TARGET_COMMON_DARWIN)
   set_source_files_properties(${CONFIG_PLEX_INSTALL_LIBRARIES} PROPERTIES MACOSX_PACKAGE_LOCATION Frameworks)
-  set_bundle_dir(SOURCES ${root}/media DEST Resources/XBMC/media EXCLUDE .*/Splash.png Credits.html)
+  set_bundle_dir(SOURCES ${root}/media DEST Resources/XBMC/media EXCLUDE .*/Splash.png .*/weather.zip Credits.html)
   set_bundle_dir(SOURCES ${root}/sounds DEST Resources/XBMC/sounds)
   set_bundle_dir(SOURCES ${root}/language DEST Resources/XBMC/language)
   set_bundle_dir(SOURCES ${root}/system DEST Resources/XBMC/system EXCLUDE .*/keymaps.* .*/python/.* .*/playercorefactory.xml .*/peripherals.xml)

@@ -99,7 +99,9 @@ if(NOT TARGET_RPI)
 endif()
 
 # add our visualizations
-add_subdirectory(xbmc/visualizations)
+if(NOT TARGET_RPI)
+  add_subdirectory(xbmc/visualizations)
+endif()
 
 # global includes
 include_directories(
