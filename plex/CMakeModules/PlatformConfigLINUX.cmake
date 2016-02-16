@@ -71,13 +71,21 @@ set(INSTALL_LIB
   RTMP
   PLIST
   ShairPort
-  VAAPI
-  VDPAU
 )
 
 foreach(l ${INSTALL_LIB})
   plex_find_package(${l} 1 0)
 endforeach()
+
+option(ENABLE_VAAPI "Enable VAAPI?" ON)
+if(ENABLE_VAAPI)
+  plex_find_package(VAAPI 1 0)
+endif()
+
+option(ENABLE_VDPAU "Enable VDPAU?" ON)
+if(ENABLE_VDPAU)
+  plex_find_package(VDPAU 1 0)
+endif()
 
 if(NOT DISABLE_CEC)
   plex_find_package(CEC 0 0)
