@@ -32,6 +32,9 @@
 #include "guilib/TextureManager.h"
 #include "cores/dvdplayer/DVDFileInfo.h"
 #include "cores/AudioEngine/AEFactory.h"
+#ifdef TARGET_RASPBERRY_PI
+#include "cores/AudioEngine/Utils/AEChannelInfo.h"
+#endif
 #include "cores/AudioEngine/Utils/AEUtil.h"
 #include "PlayListPlayer.h"
 #include "Autorun.h"
@@ -890,6 +893,9 @@ bool CApplication::Create()
   m_lastRenderTime = m_lastFrameTime;
   
   /* PLEX */
+#ifdef TARGET_RASPBERRY_PI
+  if (g_application.getNetwork().IsAvailable(true))
+#endif
   g_plexApplication.Start();
   /* END PLEX */
   
@@ -1595,8 +1601,18 @@ bool CApplication::Initialize()
 #else
       if (g_SkinInfo->HasSkinFile("PlexStartupHelper.xml") && !g_guiSettings.GetBool("system.firstrunwizard"))
       {
+#ifdef TARGET_RASPBERRY_PI
+        g_guiSettings.SetInt("audiooutput.mode", AUDIO_HDMI);
+        g_guiSettings.SetInt("audiooutput.channels", AE_CH_LAYOUT_2_0); // this is why sound is stereo FIXME
+        g_guiSettings.SetBool("audiooutput.ac3passthrough", false);
+        g_guiSettings.SetBool("audiooutput.eac3passthrough", false);
+        g_guiSettings.SetBool("audiooutput.dtspassthrough", false);
+        g_guiSettings.SetBool("system.firstrunwizard", true);
+        g_windowManager.ActivateWindow(g_SkinInfo->GetFirstWindow());
+#else
         g_windowManager.ActivateWindow(WINDOW_PLEX_STARTUP_HELPER);
         g_guiSettings.SetBool("system.firstrunwizard", true);
+#endif
       }
       else
       {
@@ -2513,7 +2529,11 @@ void CApplication::Render()
   bool decrement = false;
   bool hasRendered = false;
   bool limitFrames = false;
+  #if defined(TARGET_RASPBERRY_PI_1)
+  unsigned int singleFrameTime = 66; // default limit 15 fps
+  #else
   unsigned int singleFrameTime = 10; // default limit 100 fps
+  #endif
 
   {
     // Less fps in DPMS
@@ -2605,7 +2625,11 @@ void CApplication::Render()
   if (limitFrames || !flip)
   {
     if (!limitFrames)
+  #if defined(TARGET_RASPBERRY_PI_1)
+      singleFrameTime = 100; //if not flipping, loop at 10 fps
+  #else
       singleFrameTime = 40; //if not flipping, loop at 25 fps
+  #endif
 
     unsigned int frameTime = now - m_lastFrameTime;
     if (frameTime < singleFrameTime)

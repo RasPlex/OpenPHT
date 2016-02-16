@@ -446,7 +446,13 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::resources()
   TiXmlElement *player = new TiXmlElement("Player");
   player->SetAttribute("title", g_guiSettings.GetString("services.devicename").c_str());
   player->SetAttribute("machineIdentifier", g_guiSettings.GetString("system.uuid").c_str());
+#ifdef TARGET_RASPBERRY_PI
+  player->SetAttribute("product", "RasPlex");
+#elif defined(TARGET_OPENELEC)
+  player->SetAttribute("product", "OpenPHT-Embedded");
+#else
   player->SetAttribute("product", "OpenPHT");
+#endif
   player->SetAttribute("version", g_infoManager.GetVersion().c_str());
   player->SetAttribute("platform", PlexUtils::GetMachinePlatform());
   player->SetAttribute("platformVersion", PlexUtils::GetMachinePlatformVersion());

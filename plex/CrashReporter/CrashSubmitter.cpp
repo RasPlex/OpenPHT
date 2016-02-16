@@ -123,6 +123,11 @@ bool CrashSubmitter::UploadFile(const CStdString& p)
   u.SetOption("platform", PlexUtils::GetMachinePlatform());
   u.SetOption("submitter_version", g_infoManager.GetVersion().c_str());
 
+  #ifdef TARGET_RASPBERRY_PI
+    u.SetOption("serial", readProcCPUInfoValue("Serial"));
+    u.SetOption("revision", readProcCPUInfoValue("Revision"));
+  #endif
+
   // Strip off the version number, if present
   CStdString crashUuid = URIUtils::GetFileName(p);
   CStdString ext = URIUtils::GetExtension(crashUuid);
@@ -144,6 +149,15 @@ bool CrashSubmitter::UploadFile(const CStdString& p)
     CLog::Log(LOGERROR, "CrashSubmitter::UploadFile failed to upload to %s", SUBMITTER_URL);
     return false;
   }
+#ifdef TARGET_RASPBERRY_PI
+  else
+  {
+    CStdString message;
+    message.Format("Please reference crash id [B][U]%s[/U][/B]\nif you file a bug report at tiny.cc/rasplex-bugs", data.c_str());
+    CGUIDialogOK::ShowAndGetInput("Crash report submitted", message,  "", "");
+    CLog::Log(LOGNOTICE, "CrashSubmitter::UploadFile got result: %s", data.c_str());
+  }
+#endif
 
   return true;
 }

@@ -38,11 +38,7 @@ CPlexAutoUpdate::CPlexAutoUpdate()
   : m_forced(false), m_isSearching(false), m_isDownloading(false), m_ready(false), m_percentage(0)
 {
 #if defined(TARGET_RASPBERRY_PI)
-  int channel = g_guiSettings.GetInt("updates.channel");
-  if (channel != CMyPlexUserInfo::ROLE_USER)
-    m_url = CURL("https://raw.github.com/RasPlex/RasPlex.github.io/master/autoupdate/experimental.xml");
-  else
-    m_url = CURL("https://raw.github.com/RasPlex/RasPlex.github.io/master/autoupdate/stable.xml");
+  m_url = CURL("http://updater.rasplex.com/update");
 #else
   m_url = CURL("https://services.openpht.tv/updater/check.xml");
 #endif
@@ -72,8 +68,12 @@ void CPlexAutoUpdate::CheckInstalledVersion()
     {
       if (version != currentVersion)
       {
+#ifndef TARGET_RASPBERRY_PI
         CLog::Log(LOGDEBUG, "CPlexAutoUpdate::CheckInstalledVersion Seems like we failed to upgrade from %s to %s, will NOT try this version again.", fromVersion.c_str(), currentVersion.c_str());
         success = false;
+#else
+        success = true;
+#endif
       }
       else
       {
@@ -103,8 +103,15 @@ void CPlexAutoUpdate::OnTimeout()
   m_url.SetOption("distribution", "macosx");
 #elif defined(TARGET_WINDOWS)
   m_url.SetOption("distribution", "windows");
+#elif defined(TARGET_RASPBERRY_PI)
+  m_url.SetOption("distribution", "rasplex");
 #elif defined(TARGET_OPENELEC)
   m_url.SetOption("distribution", "openelec");
+#endif
+
+#ifdef TARGET_RASPBERRY_PI
+  m_url.SetOption("serial", readProcCPUInfoValue("Serial"));
+  m_url.SetOption("revision", readProcCPUInfoValue("Revision"));
 #endif
 
   int channel = g_guiSettings.GetInt("updates.channel");
@@ -373,8 +380,10 @@ void CPlexAutoUpdate::WriteUpdateInfo()
 
   TiXmlElement thisVersion("version");
   thisVersion.SetAttribute("version", m_downloadItem->GetProperty("version").asString());
+#ifndef TARGET_RASPBERRY_PI
   thisVersion.SetAttribute("delta", m_downloadPackage->GetProperty("delta").asBoolean());
   thisVersion.SetAttribute("packageHash", m_downloadPackage->GetProperty("manifestHash").asString());
+#endif
   thisVersion.SetAttribute("fromVersion", std::string(g_infoManager.GetVersion()));
   thisVersion.SetAttribute("installtime", time(NULL));
 
@@ -384,6 +393,26 @@ void CPlexAutoUpdate::WriteUpdateInfo()
     versions->InsertEndChild(thisVersion);
 
   doc.SaveFile("special://profile/plexupdateinfo.xml");
+
+#ifdef TARGET_RASPBERRY_PI
+
+  CURL callback = CURL("http://updater.rasplex.com/updated");
+  callback.SetOption("version", m_downloadItem->GetProperty("version").asString());
+  callback.SetOption("fromVersion", std::string(g_infoManager.GetVersion()));
+  callback.SetOption("serial", readProcCPUInfoValue("Serial"));
+  callback.SetOption("revision", readProcCPUInfoValue("Revision"));
+  int channel = g_guiSettings.GetInt("updates.channel");
+  callback.SetOption("channel", boost::lexical_cast<std::string>(channel));
+
+  CStdString data;
+  XFILE::CCurlFile m_http;
+  bool httpSuccess = m_http.Get(callback.Get(), data);
+
+  if (httpSuccess)
+    CLog::Log(LOGNOTICE, "CPlexAutoUpdate::WriteUpdateInfo updated, got %s seconds", data.c_str());
+  else
+    CLog::Log(LOGERROR, "CPlexAutoUpdate::WriteUpdateInfo failed to update, got %s seconds", data.c_str());
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -662,41 +691,14 @@ void CPlexAutoUpdate::UpdateAndRestart()
 
 #endif
 }
-#else /* OPENELEC */
+
+#else
+
 void CPlexAutoUpdate::UpdateAndRestart()
 {
-  // we need to start the Install script here
-
-  // build script path
-  CStdString updaterPath;
-  CUtil::GetHomePath(updaterPath);
-  updaterPath += "/tools/openelec_install_update.sh";
-
-  // run the script redirecting stderr to stdin so that we can grab script errors and log them
-  CStdString command = "/bin/sh " + updaterPath + " " + CSpecialProtocol::TranslatePath(m_localBinary) + " 2>&1";
-  CLog::Log(LOGDEBUG,"CPlexAutoUpdate::UpdateAndRestart : Executing '%s'", command.c_str());
-  FILE* fp = popen(command.c_str(), "r");
-  if (fp)
-  {
-    // we grab script output in case we would have an error
-    char output[1000];
-    CStdString commandOutput;
-    if (fgets(output, sizeof(output)-1, fp))
-      commandOutput = CStdString(output);
-
-    int retcode = fclose(fp);
-    if (retcode)
-    {
-      CLog::Log(LOGERROR,"CPlexAutoUpdate::UpdateAndRestart: error %d while running install script : %s", retcode, commandOutput.c_str());
-      return;
-    }
-  }
-
-  // now restart
-  CApplicationMessenger::Get().Restart();
+  CJobManager::GetInstance().AddJob(new CPlexUpdaterJob(this, m_localBinary), this, CJob::PRIORITY_HIGH);
 }
 #endif
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void CPlexAutoUpdate::ForceVersionCheckInBackground()

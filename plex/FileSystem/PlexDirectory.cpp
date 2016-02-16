@@ -162,6 +162,27 @@ bool CPlexDirectory::GetDirectory(const CURL& url, CFileItemList& fileItems)
   if (!GetXMLData(m_data))
     return false;
 
+#ifdef TARGET_RASPBERRY_PI
+  // now handle the cache if required
+  unsigned long newHash = 0;
+  std::string cacheURL = m_url.Get();
+
+  if (m_cacheStrategy != CPlexDirectoryCache::CACHE_STARTEGY_NONE)
+  {
+    // first compute the hash on retrieved xml
+     newHash = PlexUtils::GetFastHash(m_data);
+
+   if (g_plexApplication.directoryCache->GetCacheHit(cacheURL,newHash,fileItems))
+    {
+     float elapsed = timer.GetElapsedSeconds();
+     CLog::Log(LOGDEBUG, "CPlexDirectory::GetDirectory::Timing returning a directory after total %f seconds with %d items with content %s", elapsed, fileItems.Size(), fileItems.GetContent().c_str());
+
+      // we found a hit, return it
+      return true;
+    }
+  }
+#endif
+
   {
 
     // now handle the cache if required
@@ -234,6 +255,11 @@ bool CPlexDirectory::GetDirectory(const CURL& url, CFileItemList& fileItems)
     if (g_plexApplication.directoryCache)
       g_plexApplication.directoryCache->AddToCache(cacheURL, newHash, fileItems, m_cacheStrategy);
   }
+
+#ifdef TARGET_RASPBERRY_PI
+  // add evetually to the cache
+  g_plexApplication.directoryCache->AddToCache(cacheURL, newHash, fileItems, m_cacheStrategy);
+#endif
 
   float elapsed = timer.GetElapsedSeconds();
 

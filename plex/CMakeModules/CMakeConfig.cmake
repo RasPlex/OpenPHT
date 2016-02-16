@@ -27,9 +27,7 @@ if(USE_PAGING)
   add_definitions(-DUSE_PAGING)
 endif(USE_PAGING)
 
-if(NOT TARGET_RPI)
-  OPTION(COMPRESS_TEXTURES "If we should compress the textures or not" ON)
-endif()
+OPTION(COMPRESS_TEXTURES "If we should compress the textures or not" ON)
 
 if(NOT DEFINED TARGET_PLATFORM)
   if(APPLE)
