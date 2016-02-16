@@ -103,7 +103,7 @@ void CPlexAutoUpdate::OnTimeout()
   m_url.SetOption("distribution", "macosx");
 #elif defined(TARGET_WINDOWS)
   m_url.SetOption("distribution", "windows");
-#elif defined(TARGET_LINUX) && defined(OPENELEC)
+#elif defined(TARGET_OPENELEC)
   m_url.SetOption("distribution", "openelec");
 #endif
 
@@ -233,7 +233,7 @@ CFileItemPtr CPlexAutoUpdate::GetPackage(CFileItemPtr updateItem)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CPlexAutoUpdate::NeedDownload(const std::string& localFile, const std::string& expectedHash, bool isManifest)
 {
-#ifdef OPENELEC
+#ifdef TARGET_OPENELEC
   // Manifest is not needed in OpenELEC
   if (isManifest)
     return false;
@@ -500,7 +500,7 @@ std::string quoteArgs(const std::list<std::string>& arguments)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef OPENELEC
+#ifndef TARGET_OPENELEC
 void CPlexAutoUpdate::UpdateAndRestart()
 {  
   /* first we need to copy the updater app to our tmp directory, it might change during install.. */

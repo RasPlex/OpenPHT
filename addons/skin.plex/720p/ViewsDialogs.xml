@@ -205,6 +205,18 @@
 						<width>20</width>
 						<height>300</height>
 					</control>
+					<control type="button" id="5">
+						<description>Manual button</description>
+						<posy>280</posy>
+						<posx>410</posx>
+						<width>120</width>
+						<label>186</label>
+						<onleft>3</onleft>
+						<onright>3</onright>
+						<onup>3</onup>
+						<ondown>3</ondown>
+						<include>DialogPressButton</include>
+					</control>
 				</control>
 			</control>
 		</control>

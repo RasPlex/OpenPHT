@@ -227,14 +227,16 @@ string PlexUtils::GetMachinePlatform()
 {
 #ifdef TARGET_WINDOWS
   return "Windows";
-#elif TARGET_LINUX
-  return "Linux";
-#elif TARGET_DARWIN_OSX
+#elif defined(TARGET_DARWIN_OSX)
   return "MacOSX";
-#elif TARGET_DARWIN_IOS_ATV
+#elif defined(TARGET_DARWIN_IOS_ATV)
   return "AppleTV2";
-#elif TARGET_RPI
-  return "RaspberryPI";
+#elif defined(TARGET_RASPBERRY_PI)
+  return "RaspberryPi";
+#elif defined(TARGET_OPENELEC)
+  return "OpenELEC";
+#elif defined(TARGET_LINUX)
+  return "Linux";
 #else
   return "Unknown";
 #endif
@@ -245,7 +247,7 @@ string PlexUtils::GetMachinePlatformVersion()
 {
   string ver;
 
-#if TARGET_WINDOWS
+#if defined(TARGET_WINDOWS)
 
   DWORD dwVersion = GetVersion();
   DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
@@ -256,7 +258,7 @@ string PlexUtils::GetMachinePlatformVersion()
   sprintf(str, "%d.%d (Build %d)", dwMajorVersion, dwMinorVersion, dwBuildNumber);
   ver = str;
 
-#elif TARGET_LINUX
+#elif defined(TARGET_LINUX)
 
   struct utsname buf;
   if (uname(&buf) == 0)
@@ -265,7 +267,7 @@ string PlexUtils::GetMachinePlatformVersion()
     ver = " (" + string(buf.version) + ")";
   }
 
-#elif TARGET_DARWIN_OSX
+#elif defined(TARGET_DARWIN_OSX)
 
   // TODO: Gestalt() is deprecated in 10.8!
 

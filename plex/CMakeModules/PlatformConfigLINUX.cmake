@@ -8,7 +8,7 @@ if(UNIX)
   set(CMAKE_REQUIRED_FLAGS "-D__LINUX_USER__")
 endif()
 
-option(USE_INTERNAL_FFMPEG "" ON)
+option(USE_INTERNAL_FFMPEG "Use internal FFmpeg?" ON)
 
 set(LINK_PKG
   Freetype
@@ -51,7 +51,7 @@ endif(ENABLE_PYTHON)
 foreach(l ${LINK_PKG})
   plex_find_package(${l} 1 1)
 endforeach()
-  
+
 find_package(Boost COMPONENTS thread system REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
@@ -96,8 +96,9 @@ if(ENABLE_VDPAU)
   plex_find_package(VDPAU 1 0)
 endif()
 
-if(NOT DISABLE_CEC)
-  plex_find_package(CEC 0 0)
+option(ENABLE_CEC "Enable CEC?" ON)
+if(ENABLE_CEC)
+  plex_find_package(CEC 1 0)
 endif()
 
 plex_find_package(Threads 1 0)
@@ -198,8 +199,8 @@ set(PLEX_LINK_NOWHOLEARCHIVE -Wl,--no-whole-archive)
 
 option(OPENELEC "Are we building OpenELEC dist?" OFF)
 if(OPENELEC)
-  add_definitions(-DOPENELEC)
+  add_definitions(-DTARGET_OPENELEC)
 endif(OPENELEC)
 
 ############ Add our definitions
-add_definitions(-DTARGET_LINUX -D_LINUX)
+add_definitions(-DTARGET_LINUX)

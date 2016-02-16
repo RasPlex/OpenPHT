@@ -2498,7 +2498,7 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
   }
   else if (condition == SYSTEM_ISOPENELEC)
   {
-#ifdef OPENELEC
+#ifdef TARGET_OPENELEC
     bReturn = true;
 #else
     bReturn = false;

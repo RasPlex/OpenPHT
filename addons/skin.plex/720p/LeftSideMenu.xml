@@ -493,7 +493,7 @@
 						<label> $LOCALIZE[41001] </label>
 						<onclick>Dialog.Close(4998)</onclick>
 						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(rasplex) + !System.UserIsRestricted</visible>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
 					</item>
 					<item id="111">
 						<description>Quit</description>
@@ -623,7 +623,7 @@
 						<label> $LOCALIZE[41001] </label>
 						<onclick>Dialog.Close(4998)</onclick>
 						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(rasplex) + !System.UserIsRestricted</visible>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
 					</item>
 					<item id="112">
 						<description>Sleep</description>

@@ -1087,6 +1087,14 @@ msgctxt "#32108"
 msgid "Section"
 msgstr ""
 
+msgctxt "#41000"
+msgid "System Settings"
+msgstr ""
+
+msgctxt "#41001"
+msgid "Control Precaching"
+msgstr ""
+
 msgctxt "#32109"
 msgid "Unavailable"
 msgstr ""
