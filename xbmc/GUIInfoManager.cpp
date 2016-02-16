@@ -293,6 +293,7 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
                                   { "usedspacepercent", SYSTEM_USED_SPACE_PERCENT },
                                   { "freespacepercent", SYSTEM_FREE_SPACE_PERCENT },
                                   { "buildversion",     SYSTEM_BUILD_VERSION },
+                                  { "buildversionshort",SYSTEM_BUILD_VERSION_SHORT },
                                   { "builddate",        SYSTEM_BUILD_DATE },
                                   { "fps",              SYSTEM_FPS },
                                   { "dvdtraystate",     SYSTEM_DVD_TRAY_STATE },
@@ -306,7 +307,8 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
                                   { "currentcontrol",   SYSTEM_CURRENT_CONTROL },
                                   { "dvdlabel",         SYSTEM_DVD_LABEL },
                                   { "internetstate",    SYSTEM_INTERNET_STATE },
-                                  { "kernelversion",    SYSTEM_KERNEL_VERSION },
+                                  { "osversioninfo",    SYSTEM_OS_VERSION_INFO },
+                                  { "kernelversion",    SYSTEM_OS_VERSION_INFO }, // old, not correct name
                                   { "uptime",           SYSTEM_UPTIME },
                                   { "totaluptime",      SYSTEM_TOTALUPTIME },
                                   { "cpufrequency",     SYSTEM_CPUFREQUENCY },
@@ -1661,7 +1663,7 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
 
   case SYSTEM_VIDEO_ENCODER_INFO:
   case NETWORK_MAC_ADDRESS:
-  case SYSTEM_KERNEL_VERSION:
+  case SYSTEM_OS_VERSION_INFO:
   case SYSTEM_CPUFREQUENCY:
   case SYSTEM_INTERNET_STATE:
   case SYSTEM_UPTIME:
@@ -1765,6 +1767,9 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
           return StringUtils::SecondsToTimeString(duration);
       }
     }
+    break;
+  case SYSTEM_BUILD_VERSION_SHORT:
+    strLabel = GetVersionShort();
     break;
   case SYSTEM_BUILD_VERSION:
     strLabel = GetVersion();
@@ -4547,6 +4552,11 @@ CTemperature CGUIInfoManager::GetGPUTemperature()
 
 // Version string MUST NOT contain spaces.  It is used
 // in the HTTP request user agent.
+CStdString CGUIInfoManager::GetVersionShort(void)
+{
+  return PLEX_VERSION_SHORT;
+}
+
 CStdString CGUIInfoManager::GetVersion()
 {
 #ifndef __PLEX__

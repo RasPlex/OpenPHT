@@ -681,50 +681,56 @@ bool CApplication::Create()
   g_settings.LoadProfiles(PROFILES_FILE);
 
   CLog::Log(LOGNOTICE, "-----------------------------------------------------------------------");
-#ifndef __PLEX__
-#if defined(TARGET_DARWIN_OSX)
-  CLog::Log(LOGNOTICE, "Starting XBMC (%s), Platform: Darwin OSX (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(TARGET_DARWIN_IOS)
-  CLog::Log(LOGNOTICE, "Starting XBMC (%s), Platform: Darwin iOS (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(__FreeBSD__)
-  CLog::Log(LOGNOTICE, "Starting XBMC (%s), Platform: FreeBSD (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(_LINUX)
-  CLog::Log(LOGNOTICE, "Starting XBMC (%s), Platform: Linux (%s, %s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetLinuxDistro().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(_WIN32)
-  CLog::Log(LOGNOTICE, "Starting XBMC (%s), Platform: %s. Built on %s (compiler %i)", g_infoManager.GetVersion().c_str(), g_sysinfo.GetKernelVersion().c_str(), __DATE__, _MSC_VER);
-#if defined(__arm__)
-  if (g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON)
-    CLog::Log(LOGNOTICE, "ARM Features: Neon enabled");
-  else
-    CLog::Log(LOGNOTICE, "ARM Features: Neon disabled");
-#endif
-  CLog::Log(LOGNOTICE, g_cpuInfo.getCPUModel().c_str());
-  CLog::Log(LOGNOTICE, CWIN32Util::GetResInfoString());
-  CLog::Log(LOGNOTICE, "Running with %s rights", (CWIN32Util::IsCurrentUserLocalAdministrator() == TRUE) ? "administrator" : "restricted");
-  CLog::Log(LOGNOTICE, "Aero is %s", (g_sysinfo.IsAeroDisabled() == true) ? "disabled" : "enabled");
-#endif
+  CLog::Log(LOGNOTICE, "Starting %s (%s). Platform: %s %s %d-bit", g_sysinfo.GetAppName().c_str(), g_infoManager.GetVersion().c_str(),
+            g_sysinfo.GetBuildTargetPlatformName().c_str(), g_sysinfo.GetBuildTargetCpuFamily().c_str(), g_sysinfo.GetXbmcBitness());
+
+  CStdString buildType;
+#if defined(_DEBUG)
+  buildType = "Debug";
+#elif defined(NDEBUG)
+  buildType = "Release";
 #else
-#if defined(TARGET_DARWIN_OSX)
-  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Darwin OSX (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(TARGET_DARWIN_IOS)
-  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Darwin iOS (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(__FreeBSD__)
-  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: FreeBSD (%s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(_LINUX)
-  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: Linux (%s, %s). Built on %s", g_infoManager.GetVersion().c_str(), g_sysinfo.GetLinuxDistro().c_str(), g_sysinfo.GetUnameVersion().c_str(), __DATE__);
-#elif defined(_WIN32)
-  CLog::Log(LOGNOTICE, "Starting OpenPHT (%s), Platform: %s. Built on %s (compiler %i)", g_infoManager.GetVersion().c_str(), g_sysinfo.GetKernelVersion().c_str(), __DATE__, _MSC_VER);
+  buildType = "Unknown";
+#endif
+  CStdString specialVersion;
+#if defined(TARGET_DARWIN_IOS_ATV2)
+  specialVersion = " (version for AppleTV2)";
+#elif defined(TARGET_RASPBERRY_PI)
+  specialVersion = " (version for Raspberry Pi)";
+//#elif defined(some_ID) // uncomment for special version/fork
+//  specialVersion = " (version for XXXX)";
+#endif
+  CLog::Log(LOGNOTICE, "Using %s %s x%d build%s", buildType.c_str(), g_sysinfo.GetAppName().c_str(), g_sysinfo.GetXbmcBitness(), specialVersion.c_str());
+  CLog::Log(LOGNOTICE, "%s compiled " __DATE__ " by %s for %s %s %d-bit %s (%s)", g_sysinfo.GetAppName().c_str(), g_sysinfo.GetUsedCompilerNameAndVer().c_str(), g_sysinfo.GetBuildTargetPlatformName().c_str(),
+            g_sysinfo.GetBuildTargetCpuFamily().c_str(), g_sysinfo.GetXbmcBitness(), g_sysinfo.GetBuildTargetPlatformVersionDecoded().c_str(),
+            g_sysinfo.GetBuildTargetPlatformVersion().c_str());
+
+  CStdString deviceModel(g_sysinfo.GetModelName());
+  if (!g_sysinfo.GetManufacturerName().empty())
+    deviceModel = g_sysinfo.GetManufacturerName() + " " + (deviceModel.empty() ? CStdString("device") : deviceModel);
+  if (!deviceModel.empty())
+    CLog::Log(LOGNOTICE, "Running on %s with %s, kernel: %s %s %d-bit version %s", deviceModel.c_str(), g_sysinfo.GetOsPrettyNameWithVersion().c_str(),
+              g_sysinfo.GetKernelName().c_str(), g_sysinfo.GetKernelCpuFamily().c_str(), g_sysinfo.GetKernelBitness(), g_sysinfo.GetKernelVersionFull().c_str());
+  else
+    CLog::Log(LOGNOTICE, "Running on %s, kernel: %s %s %d-bit version %s", g_sysinfo.GetOsPrettyNameWithVersion().c_str(),
+              g_sysinfo.GetKernelName().c_str(), g_sysinfo.GetKernelCpuFamily().c_str(), g_sysinfo.GetKernelBitness(), g_sysinfo.GetKernelVersionFull().c_str());
+  
+  CStdString cpuModel(g_cpuInfo.getCPUModel());
+  if (!cpuModel.empty())
+    CLog::Log(LOGNOTICE, "Host CPU: %s, %d core%s available", cpuModel.c_str(), g_cpuInfo.getCPUCount(), (g_cpuInfo.getCPUCount() == 1) ? "" : "s");
+  else
+    CLog::Log(LOGNOTICE, "%d CPU core%s available", g_cpuInfo.getCPUCount(), (g_cpuInfo.getCPUCount() == 1) ? "" : "s");
+#if defined(TARGET_WINDOWS)
+  CLog::Log(LOGNOTICE, "%s", CWIN32Util::GetResInfoString().c_str());
+  CLog::Log(LOGNOTICE, "Running with %s rights", (CWIN32Util::IsCurrentUserLocalAdministrator() == TRUE) ? "administrator" : "restricted");
+  CLog::Log(LOGNOTICE, "Aero is %s", (g_sysinfo.IsAeroDisabled() == true) ? "disabled" : "enabled");
+#endif
+
 #if defined(__arm__)
   if (g_cpuInfo.GetCPUFeatures() & CPU_FEATURE_NEON)
     CLog::Log(LOGNOTICE, "ARM Features: Neon enabled");
   else
     CLog::Log(LOGNOTICE, "ARM Features: Neon disabled");
-#endif
-  CLog::Log(LOGNOTICE, g_cpuInfo.getCPUModel().c_str());
-  CLog::Log(LOGNOTICE, CWIN32Util::GetResInfoString());
-  CLog::Log(LOGNOTICE, "Running with %s rights", (CWIN32Util::IsCurrentUserLocalAdministrator() == TRUE) ? "administrator" : "restricted");
-  CLog::Log(LOGNOTICE, "Aero is %s", (g_sysinfo.IsAeroDisabled() == true) ? "disabled" : "enabled");
-#endif
 #endif
   CSpecialProtocol::LogPaths();
 
