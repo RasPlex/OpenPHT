@@ -17,6 +17,12 @@ if not exist %DEPENDDIR%\vcredist\2012\vcredist_x86.exe (
   %WORKSPACE%\Project\BuildDependencies\bin\wget -nv --no-check-certificate -O %DEPENDDIR%\vcredist\2012\vcredist_x86.exe http://sources.openpht.tv/plex-dependencies/vcredist/2012/vcredist_x86.exe
 )
 
+if not exist %DEPENDDIR%\vcredist\2013 mkdir %DEPENDDIR%\vcredist\2013
+if not exist %DEPENDDIR%\vcredist\2013\vcredist_x86.exe (
+  echo Downloading vc120 redist...
+  %WORKSPACE%\Project\BuildDependencies\bin\wget -nv --no-check-certificate -O %DEPENDDIR%\vcredist\2013\vcredist_x86.exe http://sources.openpht.tv/plex-dependencies/vcredist/2013/vcredist_x86.exe
+)
+
 if not exist %DEPENDDIR%\dxsetup mkdir %DEPENDDIR%\dxsetup
 for %%f in (DSETUP.dll dsetup32.dll dxdllreg_x86.cab DXSETUP.exe dxupdate.cab Jun2010_D3DCompiler_43_x86.cab Jun2010_d3dx9_43_x86.cab) do (
   if not exist %DEPENDDIR%\dxsetup\%%f (
