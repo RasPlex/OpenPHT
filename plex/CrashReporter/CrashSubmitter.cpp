@@ -16,7 +16,7 @@
 #include "URL.h"
 #include "utils/Base64.h"
 
-#define SUBMITTER_URL "http://services.openpht.tv/crashreport"
+#define SUBMITTER_URL "https://services.openpht.tv/crashreport"
 
 using namespace std;
 
