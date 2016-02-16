@@ -117,6 +117,8 @@ void CPlexAutoUpdate::OnTimeout()
 
   std::vector<std::string> alreadyTriedVersion = GetAllInstalledVersions();
   CFileItemList updates;
+  
+  bool manualUpdateRequired = false;
 
   if (dir.GetDirectory(m_url, list))
   {
@@ -135,7 +137,16 @@ void CPlexAutoUpdate::OnTimeout()
           if (std::find(alreadyTriedVersion.begin(), alreadyTriedVersion.end(), updateItem->GetProperty("version").asString()) == alreadyTriedVersion.end())
             updates.Add(updateItem);
           else
+          {
             CLog::Log(LOGDEBUG, "CPlexAutoUpdate::OnTimeout We have already tried to install %s, skipping it.", updateItem->GetProperty("version").asString().c_str());
+            manualUpdateRequired = true;
+          }
+        }
+        else if (updateItem->HasProperty("version") &&
+            !updateItem->GetProperty("autoupdate").asBoolean() &&
+            updateItem->GetProperty("version").asString() != currentVersion)
+        {
+          manualUpdateRequired = true;
         }
       }
     }
@@ -172,12 +183,25 @@ void CPlexAutoUpdate::OnTimeout()
     return;
   }
 
-  CLog::Log(LOGDEBUG, "CPlexAutoUpdate::OnTimeout no updates available");
-
-  if (m_forced)
+  if (manualUpdateRequired)
   {
-    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "No update available!", "You are up-to-date!", 10000, false);
-    m_forced = false;
+    CLog::Log(LOGDEBUG, "CPlexAutoUpdate::OnTimeout manual update available");
+
+    if (m_forced)
+    {
+      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Update available!", "A new version requires manual update", 10000, false);
+      m_forced = false;
+    }
+  }
+  else
+  {
+    CLog::Log(LOGDEBUG, "CPlexAutoUpdate::OnTimeout no updates available");
+
+    if (m_forced)
+    {
+      CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "No update available!", "You are up-to-date!", 10000, false);
+      m_forced = false;
+    }
   }
 
   if (g_guiSettings.GetBool("updates.auto"))
