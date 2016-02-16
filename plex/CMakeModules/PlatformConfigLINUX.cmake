@@ -140,7 +140,9 @@ if(DEFINED DBUS_FOUND)
 endif()
 
 #### default lircdevice
-set(LIRC_DEVICE "/var/run/lirc/lircd")
+if(NOT DEFINED LIRC_DEVICE)
+  set(LIRC_DEVICE "/var/run/lirc/lircd")
+endif()
 
 #### on linux we want to use a "easy" name
 set(EXECUTABLE_NAME "plexhometheater")
