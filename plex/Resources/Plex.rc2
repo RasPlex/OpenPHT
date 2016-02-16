@@ -71,7 +71,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Team OpenPHT"
+            VALUE "CompanyName", "Team RasPlex"
             VALUE "FileDescription", "OpenPHT"
             VALUE "FileVersion", PLEX_VERSION
             VALUE "InternalName", "OpenPHT.exe"
