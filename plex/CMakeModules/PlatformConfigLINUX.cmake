@@ -70,12 +70,21 @@ set(INSTALL_LIB
   Ass
   RTMP
   PLIST
-  ShairPort
 )
 
 foreach(l ${INSTALL_LIB})
   plex_find_package(${l} 1 0)
 endforeach()
+
+option(ENABLE_SHAIRPLAY "Enable ShairPlay?" ON)
+if(ENABLE_SHAIRPLAY)
+  plex_find_package(ShairPlay 1 0)
+endif()
+
+option(ENABLE_SHAIRPORT "Enable ShairPort?" OFF)
+if(ENABLE_SHAIRPORT AND NOT ENABLE_SHAIRPLAY)
+  plex_find_package(ShairPort 1 0)
+endif()
 
 option(ENABLE_VAAPI "Enable VAAPI?" ON)
 if(ENABLE_VAAPI)
