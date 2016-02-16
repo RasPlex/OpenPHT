@@ -61,7 +61,8 @@ void CPlexAutoUpdate::CheckInstalledVersion()
 {
   if (g_application.GetReturnedFromAutoUpdate())
   {
-    CLog::Log(LOGDEBUG, "CPlexAutoUpdate::CheckInstalledVersion We are returning from a autoupdate with version %s", g_infoManager.GetVersion().c_str());
+    CStdString currentVersion = g_infoManager.GetVersion();
+    CLog::Log(LOGDEBUG, "CPlexAutoUpdate::CheckInstalledVersion We are returning from a autoupdate with version %s", currentVersion.c_str());
 
     std::string version, packageHash, fromVersion;
     bool isDelta;
@@ -69,9 +70,9 @@ void CPlexAutoUpdate::CheckInstalledVersion()
 
     if (GetUpdateInfo(version, isDelta, packageHash, fromVersion))
     {
-      if (version != g_infoManager.GetVersion())
+      if (version != currentVersion)
       {
-        CLog::Log(LOGDEBUG, "CPlexAutoUpdate::CheckInstalledVersion Seems like we failed to upgrade from %s to %s, will NOT try this version again.", fromVersion.c_str(), g_infoManager.GetVersion().c_str());
+        CLog::Log(LOGDEBUG, "CPlexAutoUpdate::CheckInstalledVersion Seems like we failed to upgrade from %s to %s, will NOT try this version again.", fromVersion.c_str(), currentVersion.c_str());
         success = false;
       }
       else
@@ -93,11 +94,9 @@ void CPlexAutoUpdate::OnTimeout()
   m_isSearching = true;
 
   CLog::Log(LOGDEBUG,"CPlexAutoUpdate::OnTimeout Starting");
-#ifdef UPDATE_DEBUG
-  m_url.SetOption("version", "1.0.0.117-a97636ae");
-#else
-  m_url.SetOption("version", g_infoManager.GetVersion());
-#endif
+
+  CStdString currentVersion = g_infoManager.GetVersion();
+  m_url.SetOption("version", currentVersion);
   m_url.SetOption("build", PLEX_BUILD_TAG);
 
 #if defined(TARGET_DARWIN)
@@ -109,11 +108,7 @@ void CPlexAutoUpdate::OnTimeout()
 #endif
 
   int channel = g_guiSettings.GetInt("updates.channel");
-  if (channel != CMyPlexUserInfo::ROLE_USER)
-    m_url.SetOption("channel", boost::lexical_cast<std::string>(channel));
-
-  //if (g_plexApplication.myPlexManager->IsSignedIn())
-  //  m_url.SetOption("X-Plex-Token", g_plexApplication.myPlexManager->GetAuthToken());
+  m_url.SetOption("channel", boost::lexical_cast<std::string>(channel));
 
   std::vector<std::string> alreadyTriedVersion = GetAllInstalledVersions();
   CFileItemList updates;
@@ -131,7 +126,7 @@ void CPlexAutoUpdate::OnTimeout()
         CFileItemPtr updateItem = list.Get(i);
         if (updateItem->HasProperty("version") &&
             updateItem->GetProperty("autoupdate").asBoolean() &&
-            updateItem->GetProperty("version").asString() != g_infoManager.GetVersion())
+            updateItem->GetProperty("version").asString() != currentVersion)
         {
           CLog::Log(LOGDEBUG, "CPlexAutoUpdate::OnTimeout got version %s from update endpoint", updateItem->GetProperty("version").asString().c_str());
           if (std::find(alreadyTriedVersion.begin(), alreadyTriedVersion.end(), updateItem->GetProperty("version").asString()) == alreadyTriedVersion.end())

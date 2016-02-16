@@ -2,6 +2,7 @@
 
 #include <string>
 #include "threads/Thread.h"
+#include "GUIInfoManager.h"
 
 class CrashSubmitter : public CThread
 {

@@ -35,7 +35,7 @@ static inline bool BreakPad_MinidumpCallback(const google_breakpad::MinidumpDesc
   strcpy(finalPath, desc.path());
   finalPath[strlen(finalPath)-4] = '\0';
   strcat(finalPath, "-v-");
-  strcat(finalPath, PLEX_MEDIA_SERVER_VERSION);
+  strcat(finalPath, g_infoManager.GetVersion().c_str());
   strcat(finalPath, ".dmp");
   rename(desc.path(), finalPath);
 

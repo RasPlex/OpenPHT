@@ -423,14 +423,14 @@ void CPlexDirectory::CopyAttributes(XML_ELEMENT* el, CFileItem* item, const CURL
     CStdString key = attr->name();
     CStdString valStr = CStdString(attr->value());
 
-    if (g_attributeMap.find(key) != g_attributeMap.end())
+    AttributeMap::iterator it = g_attributeMap.find(key);
+    if ( it != g_attributeMap.end())
     {
-      CPlexAttributeParserBase* attr = g_attributeMap[key];
-      attr->Process(url, key, valStr, item);
+      it->second->Process(url, key, valStr, item);
     }
     else
     {
-      g_defaultAttr->Process(url, key, valStr, item);
+      item->SetProperty(key,valStr);
     }
 
     attr = attr->next_attribute();

@@ -121,6 +121,7 @@ bool CrashSubmitter::UploadFile(const CStdString& p)
 
   u.SetOption("version", ExtractVersionFromCrashDump(p));
   u.SetOption("platform", PlexUtils::GetMachinePlatform());
+  u.SetOption("submitter_version", g_infoManager.GetVersion().c_str());
 
   // Strip off the version number, if present
   CStdString crashUuid = URIUtils::GetFileName(p);

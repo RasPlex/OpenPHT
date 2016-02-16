@@ -3397,19 +3397,8 @@ void CGUIWindowSettingsCategory::FillInPlexUpdateChannels(CSetting *pSetting)
   pControl->SetType(SPIN_CONTROL_TYPE_TEXT);
   pControl->Clear();
 
-  //CMyPlexUserInfo user = g_plexApplication.myPlexManager->GetCurrentUserInfo();
-
   pControl->AddLabel(g_localizeStrings.Get(40003), CMyPlexUserInfo::ROLE_USER);
   pControl->AddLabel(g_localizeStrings.Get(40007), CMyPlexUserInfo::ROLE_PLEXPASS);
-
-  //if (user.hasRole(CMyPlexUserInfo::ROLE_PLEXPASS) || user.hasRole(CMyPlexUserInfo::ROLE_NINJA) || user.hasRole(CMyPlexUserInfo::ROLE_EMPLOYEE))
-  //  pControl->AddLabel(g_localizeStrings.Get(40004), CMyPlexUserInfo::ROLE_PLEXPASS);
-
-  //if (user.hasRole(CMyPlexUserInfo::ROLE_NINJA) || user.hasRole(CMyPlexUserInfo::ROLE_EMPLOYEE))
-  //  pControl->AddLabel(g_localizeStrings.Get(40005), CMyPlexUserInfo::ROLE_NINJA);
-
-  //if (user.hasRole(CMyPlexUserInfo::ROLE_EMPLOYEE))
-  //  pControl->AddLabel(g_localizeStrings.Get(40006), CMyPlexUserInfo::ROLE_EMPLOYEE);
 
   if (pControl->GetMaximum() < 1)
     /* only one choice */

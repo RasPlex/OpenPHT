@@ -19,7 +19,7 @@ class CPlexExtraInfoLoader : public IJobCallback
 public:
   CPlexExtraInfoLoader();
   ~CPlexExtraInfoLoader();
-  void LoadExtraInfoForItem(const CFileItemListPtr &list, const CFileItemPtr &extraItem = CFileItemPtr(), bool block = false);
+  void LoadExtraInfoForItem(const CFileItemListPtr &list, const CFileItemPtr &extraItem = CFileItemPtr(), bool block = true);
 
 private:
   void CopyProperties(const CFileItemListPtr &item, CFileItemPtr extraItem);
