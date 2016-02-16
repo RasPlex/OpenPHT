@@ -1426,6 +1426,25 @@ bool CWIN32Util::GetCrystalHDLibraryPath(CStdString &strPath)
     return false;
 }
 
+bool CWIN32Util::GetInstallerDependenciesVersion(const CStdString &strGuid, CStdString &strVersion)
+{
+  HKEY hKey;
+  CStdString strRegKey;
+  strRegKey.Format("SOFTWARE\\Classes\\Installer\\Dependencies\\%s", strGuid.c_str());
+  if (CWIN32Util::UtilRegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegKey.c_str(), KEY_READ, &hKey))
+  {
+    DWORD dwType;
+    char *pcVersion = NULL;
+    if (CWIN32Util::UtilRegGetValue(hKey, "Version", &dwType, &pcVersion, NULL, sizeof(pcVersion)) == ERROR_SUCCESS)
+    {
+      strVersion = pcVersion;
+      free(pcVersion);
+      return true;
+    }
+  }
+  return false;
+}
+
 // Retrieve the filename of the process that currently has the focus.
 // Typically this will be some process using the system tray grabbing
 // the focus and causing XBMC to minimise. Logging the offending

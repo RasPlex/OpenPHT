@@ -29,6 +29,10 @@
 #include "PlexAnalytics.h"
 #include "GUIUserMessages.h"
 
+#ifdef TARGET_WINDOWS
+#include "win32/WIN32Util.h"
+#endif
+
 using namespace XFILE;
 
 //#define UPDATE_DEBUG 1
@@ -116,6 +120,19 @@ void CPlexAutoUpdate::OnTimeout()
 
   int channel = g_guiSettings.GetInt("updates.channel");
   m_url.SetOption("channel", boost::lexical_cast<std::string>(channel));
+
+#ifdef TARGET_WINDOWS
+  CStdString vcredistVersion;
+  // Microsoft Visual C++ 2015 Redistributable (x86)
+  if (CWIN32Util::GetInstallerDependenciesVersion("{23daf363-3020-4059-b3ae-dc4ad39fed19}", vcredistVersion))
+    m_url.SetOption("vcredist14", vcredistVersion);
+  // Microsoft Visual C++ 2013 Redistributable (x86)
+  if (CWIN32Util::GetInstallerDependenciesVersion("{f65db027-aff3-4070-886a-0d87064aabb1}", vcredistVersion))
+    m_url.SetOption("vcredist12", vcredistVersion);
+  // Microsoft Visual C++ 2012 Redistributable(x86)
+  if (CWIN32Util::GetInstallerDependenciesVersion("{33d1fd90-4274-48a1-9bc1-97e33d9c2d6f}", vcredistVersion))
+    m_url.SetOption("vcredist11", vcredistVersion);
+#endif
 
   std::vector<std::string> alreadyTriedVersion = GetAllInstalledVersions();
   CFileItemList updates;
