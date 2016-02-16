@@ -273,6 +273,7 @@ void PlexApplication::preShutdown()
   serverManager->Stop();
   dataLoader->Stop();
   timelineManager->Stop();
+  busy.CancelJobs();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
