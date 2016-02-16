@@ -747,14 +747,16 @@ void CGUIWindowFullScreen::createOverlays()
 void CGUIWindowFullScreen::deleteOverlays()
 {
   // remove all the overlays controls
-  if (g_application.CurrentFileItemPtr() && g_application.CurrentFileItemPtr()->m_overlayItems.size())
+  for (int i = 0; i < 100; i++)
   {
-    for (int i=0; i<g_application.CurrentFileItemPtr()->m_overlayItems.size(); i++)
+    CGUIControl *overlayControl = (CGUIControl*)GetControl(CONTROL_OVERLAY_START + i);
+    if (overlayControl)
     {
-      CGUIControl *overlayControl = (CGUIControl*)GetControl(CONTROL_OVERLAY_START + i);
-      if (overlayControl)
-        RemoveControl(overlayControl);
+      RemoveControl(overlayControl);
+      overlayControl->FreeResources();
     }
+    else
+      break;
   }
 }
 
