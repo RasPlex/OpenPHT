@@ -3,6 +3,7 @@
 #include "PlexMediaServerClient.h"
 #include "Network/NetworkInterface.h"
 #include "StringUtils.h"
+#include "Application.h"
 
 #include <vector>
 
@@ -100,6 +101,8 @@ void CPlexNetworkServiceBrowser::handleServiceDeparture(NetworkServicePtr& servi
 /////////////////////////////////////////////////////////////////////////////////////////
 void CPlexNetworkServiceBrowser::handleNetworkChange(const vector<NetworkInterface>& interfaces)
 {
+  if (g_application.m_bStop) return;
+
   NetworkServiceBrowser::handleNetworkChange(interfaces);
 
   // update all our reachability states

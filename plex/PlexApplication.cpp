@@ -260,6 +260,8 @@ void PlexApplication::preShutdown()
 {
   ANNOUNCEMENT::CAnnouncementManager::RemoveAnnouncer(this);
 
+  NetworkInterface::ClearObservers();
+
   timer->StopAllTimers();
   analytics->stopLogging();
   remoteSubscriberManager->Stop();
