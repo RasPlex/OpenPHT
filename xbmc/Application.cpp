@@ -5803,18 +5803,11 @@ void CApplication::ProcessSlow()
   /* PLEX */
   if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO && IsPlayingVideo())
   {
-    CGUIDialogPlexVideoOSD *osd = (CGUIDialogPlexVideoOSD*)g_windowManager.GetWindow(WINDOW_DIALOG_VIDEO_OSD);
-    if (IsPaused() && !IsBuffering())
+    CGUIDialog *osd = dynamic_cast<CGUIDialog*>(g_windowManager.GetWindow(WINDOW_DIALOG_VIDEO_OSD));
+    if (osd && IsPaused() && !IsBuffering() && !osd->IsDialogRunning())
     {
-      if (osd && !osd->IsDialogRunning())
-      {
-        ThreadMessage tmsg = {TMSG_DIALOG_DOMODAL, WINDOW_DIALOG_VIDEO_OSD, WINDOW_FULLSCREEN_VIDEO, "pauseOpen"};
-        CApplicationMessenger::Get().SendMessage(tmsg, false);
-      }
-    }
-    else if (IsPlaying() && osd && osd->IsDialogRunning() && osd->IsOpenedFromPause())
-    {
-      CApplicationMessenger::Get().Close(osd, false, false);
+      ThreadMessage tmsg = {TMSG_DIALOG_DOMODAL, WINDOW_DIALOG_VIDEO_OSD, WINDOW_FULLSCREEN_VIDEO, "pauseOpen"};
+      CApplicationMessenger::Get().SendMessage(tmsg, false);
     }
   }
   /* END PLEX */

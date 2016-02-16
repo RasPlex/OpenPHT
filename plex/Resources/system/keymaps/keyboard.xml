@@ -164,7 +164,7 @@
   </LoginScreen>
   <Home>
     <keyboard>
-      <i>info</i>
+      <o>Info</o>
       <end mod="ctrl">XBMC.ShutDown()</end>
       <space>PlayPause</space>
     </keyboard>
@@ -242,8 +242,8 @@
       <enter>OSD</enter>
       <m>OSD</m>
       <!--
-      <i>Info</i>
-      <o>CodecInfo</o>
+      <o>Info</o>
+      <i>CodecInfo</i>
       -->
       <z>AspectRatio</z>
       <!--
@@ -300,8 +300,8 @@
       <f>FastForward</f>
       <r>Rewind</r>
       <period>StepForward</period>
-      <o>CodecInfo</o>
-      <i>Back</i>
+      <i>CodecInfo</i>
+      <o>Back</o>
       <d mod="ctrl">Back</d>
       <m>OSD</m>
       <escape>Close</escape>
@@ -425,8 +425,8 @@
     <keyboard>
       <m>Back</m>
       <g mod="ctrl">Back</g> <!-- MCE Guide button -->
-      <i>Info</i>
-      <o>CodecInfo</o>
+      <o>Info</o>
+      <i>CodecInfo</i>
     </keyboard>
   </VideoOSD>
   <VideoMenu>
@@ -440,8 +440,8 @@
       <closesquarebracket>BigStepForward</closesquarebracket>
       
       <m>OSD</m>
-      <i>Info</i>
-      <o>CodecInfo</o>
+      <o>Info</o>
+      <i>CodecInfo</i>
       <z>AspectRatio</z>
       <t>ShowSubtitles</t>
       <l>NextSubtitle</l>
@@ -455,14 +455,14 @@
   </VideoMenu>
   <OSDVideoSettings>
     <keyboard>
-      <i>Info</i>
-      <o>CodecInfo</o>
+      <o>Info</o>
+      <i>CodecInfo</i>
     </keyboard>
   </OSDVideoSettings>
   <OSDAudioSettings>
     <keyboard>
-      <i>Info</i>
-      <o>CodecInfo</o>
+      <o>Info</o>
+      <i>CodecInfo</i>
     </keyboard>
   </OSDAudioSettings>
   <VideoBookmarks>
