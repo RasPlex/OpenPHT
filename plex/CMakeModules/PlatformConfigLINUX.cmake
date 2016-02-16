@@ -126,6 +126,11 @@ if(DEFINED OPENGL_FOUND)
   set(HAVE_LIBGL 1)
 endif()
 
+if(DEFINED DBUS_FOUND)
+  include_directories(${DBUS_INCLUDE_DIR} ${DBUS_ARCH_INCLUDE_DIR})
+  set(HAVE_DBUS 1)
+endif()
+
 #### default lircdevice
 set(LIRC_DEVICE "/var/run/lirc/lircd")
 
