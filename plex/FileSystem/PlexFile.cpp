@@ -8,6 +8,7 @@
 #include <string>
 #include "Mime.h"
 #include "URIUtils.h"
+#include "filesystem/File.h"
 
 #include "PlexApplication.h"
 #include "GUIInfoManager.h"
@@ -239,4 +240,45 @@ bool CPlexFile::Service(const CStdString &strURL, CStdString &strHTML)
   }
 
   return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool CPlexFile::DownloadFile(const CStdString& strURL, const CStdString& strFileName)
+{
+  CFile file;
+  if (!file.OpenForWrite(strFileName, true))
+  {
+    CLog::Log(LOGWARNING, "CPlexFile::DownloadFile - Couldn't open file %s for writing", strFileName.c_str());
+    return false;
+  }
+
+  if (Open(strURL))
+  {
+    CLog::Log(LOGDEBUG, "CPlexFile::DownloadFile - Downloading %s to %s", strURL.c_str(), strFileName.c_str());
+
+    bool failed = false;
+    int size_read = 0;
+    int data_size = 0;
+    uint8_t buffer[16385];
+    while ((size_read = Read(buffer, sizeof(buffer) - 1)) > 0)
+    {
+      buffer[size_read] = 0;
+      if (file.Write(buffer, size_read) != size_read)
+      {
+        failed = true;
+        break;
+      }
+      data_size += size_read;
+    }
+    Close();
+    file.Close();
+
+    if (failed || data_size <= 0)
+      CFile::Delete(strFileName);
+
+    return !failed && data_size > 0;
+  }
+
+  CLog::Log(LOGWARNING, "CPlexFile::DownloadFile - Failed to download %s", strURL.c_str());
+  return false;
 }
