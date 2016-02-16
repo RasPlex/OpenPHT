@@ -21,6 +21,7 @@
 #include "PlexApplication.h"
 #include "Client/MyPlex/MyPlexManager.h"
 #include "LocalizeStrings.h"
+#include "utils/SystemInfo.h"
 
 #include "xbmc/Util.h"
 #include "XBDateTime.h"
@@ -139,6 +140,7 @@ void CPlexAutoUpdate::OnTimeout()
   
   bool manualUpdateRequired = false;
 
+  dir.SetUserAgent(g_sysinfo.GetUserAgent());
   if (dir.GetDirectory(m_url, list))
   {
     m_isSearching = false;

@@ -8,6 +8,7 @@
 #include "log.h"
 #include "PlexUtils.h"
 #include "settings/GUISettings.h"
+#include "utils/SystemInfo.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -144,6 +145,7 @@ bool CrashSubmitter::UploadFile(const CStdString& p)
 
   CStdString b64data = GetDumpData(p);
   CStdString data;
+  http.SetUserAgent(g_sysinfo.GetUserAgent());
   if (!http.Post(u.Get(), "dumpfileb64=" + b64data, data))
   {
     CLog::Log(LOGERROR, "CrashSubmitter::UploadFile failed to upload to %s", SUBMITTER_URL);
