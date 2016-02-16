@@ -471,8 +471,9 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput)
   }
   
   // Avoid detecting framerate if advancedsettings.xml says so
-  m_pFormatContext->fps_probe_size = (g_advancedSettings.m_videoFpsDetect == 0) ? 0 : -1;
-
+  if (g_advancedSettings.m_videoFpsDetect == 0) 
+      m_pFormatContext->fps_probe_size = 0;
+  
   // analyse very short to speed up mjpeg playback start
   if (iformat && (strcmp(iformat->name, "mjpeg") == 0) && m_ioContext->seekable == 0)
     m_pFormatContext->max_analyze_duration = 500000;
@@ -710,7 +711,8 @@ double CDVDDemuxFFmpeg::ConvertTimestamp(int64_t pts, int den, int num)
 
   if(timestamp > starttime)
     timestamp -= starttime;
-  else if( timestamp + 0.1f > starttime )
+  // allow for largest possible difference in pts and dts for a single packet
+  else if( timestamp + 0.5f > starttime )
     timestamp = 0;
 
   return timestamp*DVD_TIME_BASE;
