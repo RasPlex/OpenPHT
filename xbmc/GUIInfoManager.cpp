@@ -6314,15 +6314,34 @@ CStdString CGUIInfoManager::GetVideoLabel(int item, const CFileItemPtr& file)
     /* PLEX */
     case VIDEOPLAYER_AUDIOSTREAM:
       {
+        if (g_application.IsPlaying() && g_application.m_pPlayer)
+        {
+          CStdString name;
+          g_application.m_pPlayer->GetAudioStreamName(g_application.m_pPlayer->GetAudioStream(), name);
+          if (!name.empty())
+            return name;
+          return g_localizeStrings.Get(231);
+        }
         if (g_application.CurrentFileItemPtr()->HasProperty("selectedAudioStream"))
           return g_application.CurrentFileItemPtr()->GetProperty("selectedAudioStream").asString();
-        return g_localizeStrings.Get(1446);
+        return g_localizeStrings.Get(231);
       }
     case VIDEOPLAYER_SUBTITLESTREAM:
       {
+        if (g_application.IsPlaying() && g_application.m_pPlayer)
+        {
+          if (g_application.m_pPlayer->GetSubtitleVisible())
+          {
+            CStdString language;
+            g_application.m_pPlayer->GetSubtitleLanguage(g_application.m_pPlayer->GetSubtitle(), language);
+            if (!language.empty())
+              return language;
+          }
+          return g_localizeStrings.Get(231);
+        }
         if (g_application.CurrentFileItemPtr()->HasProperty("selectedSubtitleStream"))
           return g_application.CurrentFileItemPtr()->GetProperty("selectedSubtitleStream").asString();
-        return g_localizeStrings.Get(1446);
+        return g_localizeStrings.Get(231);
       }
     case VIDEOPLAYER_DURATION_STRING:
       {

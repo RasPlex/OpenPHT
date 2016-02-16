@@ -527,18 +527,16 @@ CStdString PlexUtils::GetPrettyStreamNameFromStreamItem(CFileItemPtr stream)
   }
   else if (stream->GetProperty("streamType") == PLEX_STREAM_SUBTITLE)
   {
-    if (!stream->GetProperty("format").empty() || stream->HasProperty("codec"))
+    if (stream->HasProperty("codec"))
     {
-      name += " (";
-      if (!stream->GetProperty("format").empty())
-        name += boost::to_upper_copy(stream->GetProperty("format").asString());
-      else if (stream->HasProperty("codec"))
-        name += boost::to_upper_copy(stream->GetProperty("codec").asString());
+      name += " (" + boost::to_upper_copy(stream->GetProperty("codec").asString());
+
+      if (stream->HasProperty("key"))
+        name += " " + g_localizeStrings.Get(52506); // External
 
       if (stream->GetProperty("forced").asBoolean())
-        name += " " + g_localizeStrings.Get(52503) + ")";
-      else
-        name += ")";
+        name += " " + g_localizeStrings.Get(52503); // Forced
+      name += ")";
     }
   }
 

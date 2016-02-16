@@ -1072,6 +1072,10 @@ msgctxt "#52505"
 msgid "Hide CloudSync sections"
 msgstr "Hide CloudSync sections"
 
+msgctxt "#52506"
+msgid "External"
+msgstr "External"
+
 msgctxt "#52600"
 msgid "Shuffle all"
 msgstr "Shuffle all"
