@@ -33,7 +33,7 @@ int64_t CPlexAttributeParserInt::GetInt(const CStdString &value)
 {
   int64_t intval;
   try { intval = boost::lexical_cast<int64_t>(value); }
-  catch (boost::bad_lexical_cast &e){ return -1; }
+  catch (boost::bad_lexical_cast){ return -1; }
   return intval;
 }
 

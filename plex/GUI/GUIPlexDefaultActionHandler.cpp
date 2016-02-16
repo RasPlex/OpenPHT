@@ -768,7 +768,7 @@ bool CGUIPlexDefaultActionHandler::IsPhotoContainer(CFileItemListPtr container)
   if (dirType == PLEX_DIR_TYPE_CHANNEL && container->Get(0))
     dirType = container->Get(0)->GetPlexDirectoryType();
 
-  return (dirType == PLEX_DIR_TYPE_PHOTOALBUM | dirType == PLEX_DIR_TYPE_PHOTO);
+  return (dirType == PLEX_DIR_TYPE_PHOTOALBUM || dirType == PLEX_DIR_TYPE_PHOTO);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

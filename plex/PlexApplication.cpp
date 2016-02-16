@@ -94,7 +94,7 @@ void PlexApplication::Start()
     if (PlexUtils::IsValidIP(address))
     {
       PlexServerList list;
-      CPlexServerPtr server = CPlexServerPtr(new CPlexServer("", address, 32400));
+      CPlexServerPtr server = CPlexServerPtr(new CPlexServer("", address, true));
       list.push_back(server);
       g_plexApplication.serverManager->UpdateFromConnectionType(list,
                                                                 CPlexConnection::CONNECTION_MANUAL);

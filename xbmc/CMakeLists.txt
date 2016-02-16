@@ -51,7 +51,11 @@ set_target_properties(xbmc PROPERTIES
   XCODE_ATTRIBUTE_WARNING_CFLAGS ""
 )
 
-add_dependencies(xbmc cpluff-${ARCH} cximage)
+if(TARGET_WIN32)
+  add_dependencies(xbmc cpluff cximage)
+else(TARGET_WIN32)
+  add_dependencies(xbmc cpluff-${ARCH} cximage)
+endif(TARGET_WIN32)
 if(USE_INTERNAL_FFMPEG)
   add_dependencies(xbmc ffmpeg)
 endif(USE_INTERNAL_FFMPEG)
