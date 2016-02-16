@@ -40,7 +40,7 @@
 					<posx>-1</posx>
 					<posy>-1</posy>
 					<width>678</width>
-					<height>452</height>
+					<height>502</height>
 					<texture>transparent.png</texture>
 					<bordertexture border="10">border-black.png</bordertexture>
 					<bordersize>1</bordersize>
@@ -118,7 +118,7 @@
 				<posx>105</posx>
 				<posy>65</posy>
 				<width>625</width>
-				<height>400</height>
+				<height>450</height>
 				<onup>5</onup>
 				<ondown>5</ondown>
 				<onleft>302</onleft>
