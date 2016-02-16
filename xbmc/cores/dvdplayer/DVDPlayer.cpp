@@ -3251,22 +3251,23 @@ bool CDVDPlayer::OpenSubtitleStream(int iStream, int source)
     {
       CLog::Log(LOGNOTICE, "Opening Subtitle file: %s", st.filename.c_str());
       auto_ptr<CDVDDemuxVobsub> demux(new CDVDDemuxVobsub());
-      if(!demux->Open(st.filename, st.filename2))
+      if(!demux->Open(st.filename, source, st.filename2))
         return false;
       m_pSubtitleDemuxer = demux.release();
     }
 
-    pStream = m_pSubtitleDemuxer->GetStream(iStream);
-    if(!pStream || pStream->disabled)
-      return false;
-    pStream->SetDiscard(AVDISCARD_NONE);
     double pts = m_dvdPlayerVideo.GetCurrentPts();
     if(pts == DVD_NOPTS_VALUE)
       pts = m_CurrentVideo.dts;
     if(pts == DVD_NOPTS_VALUE)
       pts = 0;
     pts += m_offset_pts;
-    m_pSubtitleDemuxer->SeekTime((int)(1000.0 * pts / (double)DVD_TIME_BASE));
+    if (!m_pSubtitleDemuxer->SeekTime((int)(1000.0 * pts / (double)DVD_TIME_BASE)))
+        CLog::Log(LOGDEBUG, "%s - failed to start subtitle demuxing from: %f", __FUNCTION__, pts);
+    pStream = m_pSubtitleDemuxer->GetStream(iStream);
+    if(!pStream || pStream->disabled)
+      return false;
+    pStream->SetDiscard(AVDISCARD_NONE);
 
     hint.Assign(*pStream, true);
   }
@@ -4073,7 +4074,7 @@ int CDVDPlayer::AddSubtitleFile(const std::string& filename, const std::string& 
       vobsubfile = URIUtils::ReplaceExtension(filename, ".sub");
 
     CDVDDemuxVobsub v;
-    if(!v.Open(filename, vobsubfile))
+    if(!v.Open(filename, STREAM_SOURCE_NONE, vobsubfile))
       return -1;
     m_SelectionStreams.Update(NULL, &v);
     int index = m_SelectionStreams.IndexOf(STREAM_SUBTITLE, m_SelectionStreams.Source(STREAM_SOURCE_DEMUX_SUB, filename), 0);
