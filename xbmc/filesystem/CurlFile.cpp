@@ -542,10 +542,6 @@ void CCurlFile::SetCommonOptions(CReadState* state)
   g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYHOST, 1);
   g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, CSpecialProtocol::TranslatePath("special://xbmc/system/cacert.pem").c_str());
 
-  // If we are talking to plex.tv we use our own CA's certificate instead of the generic one.
-  if (boost::starts_with(m_url, "https://plex.tv") && !boost::starts_with(m_url, "https://plex.tv:443/sync") && !boost::starts_with(m_url, "https://plex.tv/sync"))
-    g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, CSpecialProtocol::TranslatePath("special://xbmc/system/plexca.pem").c_str());
-
   CURL u(m_url);
   if (u.GetProtocol() == "https" && boost::ends_with(u.GetHostName(), ".plex.direct"))
   {
