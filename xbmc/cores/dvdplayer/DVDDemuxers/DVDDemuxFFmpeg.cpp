@@ -516,7 +516,7 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput)
   m_dllAvFormat.av_dump_format(m_pFormatContext, 0, strFile.c_str(), 0);
 
   // check if plex transcoding
-  m_bPlexTranscode = m_dllAvUtil.av_dict_get(m_pFormatContext->metadata, "plex.start_offset", NULL, 0) != NULL;
+  m_bPlexTranscode = m_dllAvUtil.av_dict_get(m_pFormatContext->metadata, "plex.total_duration", NULL, 0) != NULL;
 
   UpdateCurrentPTS();
 

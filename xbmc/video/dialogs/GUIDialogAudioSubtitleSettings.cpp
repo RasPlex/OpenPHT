@@ -111,6 +111,10 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
     AddSpin(AUDIO_SETTINGS_DIGITAL_ANALOG, 337, &m_outputmode, 3, settings);
 #endif
 
+  // Do not display subtitle settings if subtitle is burned in when transcoding
+  if (g_application.m_pPlayer && g_application.m_pPlayer->IsTranscoded() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
+    return;
+
   AddSeparator(7);
   /* PLEX */
   if (!g_application.m_pPlayer)

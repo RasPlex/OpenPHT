@@ -15,6 +15,7 @@
 #include "PlexApplication.h"
 #include "Application.h"
 #include "Settings.h"
+#include "settings/GUISettings.h"
 
 CGUIDialogPlexPicker::CGUIDialogPlexPicker(int id, const CStdString& xml, bool audio)
   : CGUIDialogSelect(id, xml)
@@ -130,7 +131,7 @@ void CGUIDialogPlexPicker::UpdateStreamSelection()
       }
     }
 
-    if (m_fileItem->GetProperty("plexDidTranscode").asBoolean())
+    if (m_fileItem->GetProperty("plexDidTranscode").asBoolean() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
       /* since we are transcoding, we need to stop the current session and restart it on the server */
       CApplicationMessenger::Get().MediaRestart(false);
   }

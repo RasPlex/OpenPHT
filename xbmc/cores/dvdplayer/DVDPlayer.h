@@ -299,6 +299,7 @@ public:
   }
   virtual bool CanOpenAsync() { return false; }
   virtual void Abort() { m_bAbortRequest = true; }
+  virtual bool IsTranscoded() { return m_item.GetProperty("plexDidTranscode").asBoolean(); }
   /* END PLEX */
 protected:
   friend class CSelectionStreams;

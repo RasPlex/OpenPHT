@@ -6338,7 +6338,7 @@ CStdString CGUIInfoManager::GetVideoLabel(int item, const CFileItemPtr& file)
       }
     case VIDEOPLAYER_SUBTITLESTREAM:
       {
-        if (g_application.IsPlaying() && g_application.m_pPlayer)
+        if (g_application.IsPlaying() && g_application.m_pPlayer && !(g_application.m_pPlayer->IsTranscoded() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles")))
         {
           if (g_application.m_pPlayer->GetSubtitleVisible())
           {
