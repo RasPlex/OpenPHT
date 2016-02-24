@@ -539,7 +539,7 @@ void CCurlFile::SetCommonOptions(CReadState* state)
   
   /* With PLEX we actually ship a good CA store */
   g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYPEER, 1);
-  g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYHOST, 1);
+  g_curlInterface.easy_setopt(h, CURLOPT_SSL_VERIFYHOST, 2);
   g_curlInterface.easy_setopt(h, CURLOPT_CAINFO, CSpecialProtocol::TranslatePath("special://xbmc/system/cacert.pem").c_str());
 
   CURL u(m_url);
