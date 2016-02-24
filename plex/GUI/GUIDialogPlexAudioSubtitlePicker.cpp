@@ -110,6 +110,7 @@ void CGUIDialogPlexPicker::UpdateStreamSelection()
   {
     IPlayer *player = g_application.m_pPlayer;
     int64_t streamId = selectedStream->GetProperty("id").asInteger();
+    bool audioStreamChanged = false;
 
     if (m_audio)
     {
@@ -117,6 +118,7 @@ void CGUIDialogPlexPicker::UpdateStreamSelection()
       {
         player->SetAudioStreamPlexID(streamId);
         g_settings.m_currentVideoSettings.m_AudioStream = player->GetAudioStream();
+        audioStreamChanged = true;
       }
     }
     else
@@ -131,7 +133,7 @@ void CGUIDialogPlexPicker::UpdateStreamSelection()
       }
     }
 
-    if (m_fileItem->GetProperty("plexDidTranscode").asBoolean() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
+    if (m_fileItem->GetProperty("plexDidTranscode").asBoolean() && (audioStreamChanged || g_guiSettings.GetBool("plexmediaserver.transcodesubtitles")))
       /* since we are transcoding, we need to stop the current session and restart it on the server */
       CApplicationMessenger::Get().MediaRestart(false);
   }
