@@ -171,12 +171,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-but-set-variable")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-array-bounds")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
 
-plex_find_library(GLESv2 0  0 system/usr/lib 1)
 plex_find_library(EGL 0 0  system/usr/lib 1)
-plex_find_library(vcos 0 0  system/usr/lib 1)
+plex_find_library(GLESv2 0  0 system/usr/lib 1)
 plex_find_library(bcm_host 0 0  system/usr/lib 1)
+plex_find_library(vcos 0 0  system/usr/lib 1)
 plex_find_library(vchiq_arm 0 0  system/usr/lib 1)
-plex_find_library(dbus-1 0 0  system/usr/lib 1)
 
 #needed for the commandline flag CMAKE_INCLUDE_PATH
 foreach(path ${CMAKE_INCLUDE_PATH})

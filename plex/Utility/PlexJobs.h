@@ -24,7 +24,7 @@
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogProgress.h"
-#include "PlexAutoUpdate.h"
+#include "AutoUpdate/PlexAutoUpdate.h"
 #include "filesystem/SpecialProtocol.h"
 #include "xbmc/Util.h"
 #include "guilib/GUIWindowManager.h"
