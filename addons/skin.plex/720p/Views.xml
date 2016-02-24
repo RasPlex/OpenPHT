@@ -260,7 +260,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<include>ListMovieTVUnwatchedOverlay</include>
 						<control type="label">
@@ -338,7 +338,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="image">
 							<posy>16</posy>
@@ -425,7 +425,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="image">
 							<posy>16</posy>
@@ -516,7 +516,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="image">
 							<posx>5</posx>
@@ -592,7 +592,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<include>ListChannelTypeIcon</include>
 						<control type="group">
@@ -660,7 +660,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<include>ListChannelTypeIcon</include>
 						<control type="group">
@@ -728,7 +728,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="image">
 							<posx>28</posx>
@@ -820,7 +820,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<include>ListChannelTypeIcon</include>
 						<control type="group">
@@ -877,7 +877,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="image">
 							<posx>5</posx>
@@ -1011,7 +1011,7 @@
 							<posy>0</posy>
 							<width>1150</width>
 							<height>50</height>
-							<texture border="5">border-bottom-grey.png</texture>
+							<texture>border-bottom-grey.png</texture>
 						</control>
 						<control type="group">
 							<posx>-7</posx>

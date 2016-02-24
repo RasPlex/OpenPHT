@@ -171,7 +171,7 @@
 								<posy>0</posy>
 								<width>560</width>
 								<height>50</height>
-								<texture border="5">border-bottom-grey.png</texture>
+								<texture>border-bottom-grey.png</texture>
 							</control>
 							<control type="label">
 								<width>560</width>
@@ -294,7 +294,7 @@
 								<posy>0</posy>
 								<width>460</width>
 								<height>50</height>
-								<texture border="5">border-bottom-grey.png</texture>
+								<texture>border-bottom-grey.png</texture>
 							</control>
 							<control type="label">
 								<width>460</width>
