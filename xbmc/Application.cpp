@@ -6272,7 +6272,9 @@ bool CApplication::SwitchToFullScreen()
 
 void CApplication::Minimize()
 {
+#ifndef TARGET_OPENELEC
   g_Windowing.Minimize();
+#endif
 }
 
 PLAYERCOREID CApplication::GetCurrentPlayer()
