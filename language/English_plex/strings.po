@@ -1020,6 +1020,10 @@ msgctxt "#52213"
 msgid "Hide channels in menu"
 msgstr "Hide channels in menu"
 
+msgctxt "#52214"
+msgid "Disable preplay screen"
+msgstr "Disable preplay screen"
+
 msgctxt "#52300"
 msgid "Media Server went away"
 msgstr "Media Server went away"

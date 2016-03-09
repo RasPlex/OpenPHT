@@ -29,6 +29,7 @@
 #include "threads/Atomics.h"
 #include "music/tags/MusicInfoTag.h"
 #include "video/VideoInfoTag.h"
+#include "settings/GUISettings.h"
 
 #include "File.h"
 
@@ -452,7 +453,7 @@ int usleep(useconds_t useconds)
 ///////////////////////////////////////////////////////////////////////////////
 bool PlexUtils::CurrentSkinHasPreplay()
 {
-  return g_SkinInfo->HasSkinFile("PlexPreplayVideo.xml");
+  return !g_guiSettings.GetBool("myplex.disablepreplay") && g_SkinInfo->HasSkinFile("PlexPreplayVideo.xml");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
