@@ -1151,6 +1151,10 @@ msgctxt "#32122"
 msgid "Show Shut Down and Restart to restricted users"
 msgstr ""
 
+msgctxt "#32123"
+msgid "Disable window and dialog fade animation"
+msgstr ""
+
 msgctxt "#41000"
 msgid "System Settings"
 msgstr ""

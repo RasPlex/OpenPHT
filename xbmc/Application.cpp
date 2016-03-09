@@ -1614,6 +1614,9 @@ bool CApplication::Initialize()
         g_guiSettings.SetBool("audiooutput.eac3passthrough", false);
         g_guiSettings.SetBool("audiooutput.dtspassthrough", false);
         g_guiSettings.SetBool("system.firstrunwizard", true);
+        int setting = g_settings.TranslateSkinBool("DisableWindowFade");
+        g_settings.SetSkinBool(setting, true);
+        g_settings.Save();
         g_windowManager.ActivateWindow(g_SkinInfo->GetFirstWindow());
 #else
         g_windowManager.ActivateWindow(WINDOW_PLEX_STARTUP_HELPER);

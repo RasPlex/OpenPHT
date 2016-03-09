@@ -211,6 +211,13 @@
 					<onclick>Skin.ToggleSetting(ShowRestrictedPowerOptions)</onclick>
 					<selected>Skin.HasSetting(ShowRestrictedPowerOptions)</selected>
 				</control>
+				<control type="radiobutton" id="222">
+					<description>Disable window and dialog fade animation</description>
+					<width>625</width>
+					<label>$LOCALIZE[32123]</label>
+					<onclick>Skin.ToggleSetting(DisableWindowFade)</onclick>
+					<selected>Skin.HasSetting(DisableWindowFade)</selected>
+				</control>
 			</control>
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="61">
