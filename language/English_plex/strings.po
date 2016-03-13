@@ -1024,6 +1024,14 @@ msgctxt "#52214"
 msgid "Disable preplay screen"
 msgstr "Disable preplay screen"
 
+msgctxt "#52215"
+msgid "Disable server side scaling of fanart"
+msgstr "Disable server side scaling of fanart"
+
+msgctxt "#52216"
+msgid "Disable server side scaling of photos"
+msgstr "Disable server side scaling of photos"
+
 msgctxt "#52300"
 msgid "Media Server went away"
 msgstr "Media Server went away"

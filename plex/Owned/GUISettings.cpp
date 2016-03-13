@@ -305,6 +305,8 @@ void CGUISettings::Initialize()
   AddBool(myPlex, "myplex.recentlywatched", 52212, false);
   AddBool(myPlex, "myplex.hidechannels", 52213, false);
   AddBool(myPlex, "myplex.disablepreplay", 52214, false);
+  AddBool(myPlex, "myplex.disablefanarttranscode", 52215, false);
+  AddBool(myPlex, "myplex.disablepicturetranscode", 52216, false);
   AddBool(myPlex, "myplex.automaticlogin", 52211, false);
 
 

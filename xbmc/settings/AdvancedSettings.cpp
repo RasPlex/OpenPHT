@@ -370,7 +370,6 @@ void CAdvancedSettings::Initialize()
   m_bForceJpegImageFormat = false;
   m_bUseMatroskaTranscodes = true;
   m_bRequireEncryptedConnection = false;
-  m_bDisablePhotoTranscoder = false;
   /* END PLEX */
 }
 
@@ -1190,7 +1189,6 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
   XMLUtils::GetBoolean(pRootElement, "forcejpegimageformat", m_bForceJpegImageFormat);
   XMLUtils::GetBoolean(pRootElement, "usematroskatranscode", m_bUseMatroskaTranscodes);
   XMLUtils::GetBoolean(pRootElement, "requireencryptedconnection", m_bRequireEncryptedConnection);
-  XMLUtils::GetBoolean(pRootElement, "disablephototranscoder", m_bDisablePhotoTranscoder);
   /* END PLEX */
 
   // load in the GUISettings overrides:
