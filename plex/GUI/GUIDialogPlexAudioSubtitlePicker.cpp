@@ -51,6 +51,9 @@ CGUIDialogPlexPicker::OnMessage(CGUIMessage &msg)
 void
 CGUIDialogPlexPicker::SetFileItem(CFileItemPtr& fileItem)
 {
+  if (!fileItem || fileItem->m_mediaItems.empty())
+    return;
+
   m_fileItem = fileItem;
   
   if (!m_audio)
@@ -66,11 +69,16 @@ CGUIDialogPlexPicker::SetFileItem(CFileItemPtr& fileItem)
     Add(noneItem);
   }
   
-  if (!fileItem || fileItem->m_mediaItems.size() < 1 ||
-      fileItem->m_mediaItems[0]->m_mediaParts.size() < 1)
+  CFileItemPtr part;
+  for (int i = 0; !part && i < fileItem->m_mediaItems.size(); i++)
+    for (int j = 0; !part && j < fileItem->m_mediaItems[i]->m_mediaParts.size(); j++)
+      if (fileItem->GetPath() == fileItem->m_mediaItems[i]->m_mediaParts[j]->GetPath())
+        part = fileItem->m_mediaItems[i]->m_mediaParts[j];
+  if (!part && !fileItem->m_mediaItems.empty() && !fileItem->m_mediaItems[0]->m_mediaParts.empty())
+    part = fileItem->m_mediaItems[0]->m_mediaParts[0];
+  if (!part)
     return;
 
-  CFileItemPtr part = fileItem->m_mediaItems[0]->m_mediaParts[0];
   int index = 0;
   bool hasSelection = false;
   for (int y = 0; y < part->m_mediaPartStreams.size(); y ++)
