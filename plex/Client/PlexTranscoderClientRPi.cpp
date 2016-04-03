@@ -141,8 +141,14 @@ bool CPlexTranscoderClientRPi::ShouldTranscode(CPlexServerPtr server, const CFil
   int localQuality = localBitrate();
   int remoteQuality = remoteBitrate();
 
+  // check if video resolution is to large
+  if (videoWidth > 1920 || videoHeight > 1080)
+  {
+    bShouldTranscode = true;
+    ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
+  }
   // check if seetings are to transcoding for local media
-  if ( isLocal && localQuality > 0 && localQuality < videoBitRate )
+  else if ( isLocal && localQuality > 0 && localQuality < videoBitRate )
   {
     bShouldTranscode = true;
     m_maxVideoBitrate = localQuality;
