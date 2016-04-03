@@ -1,10 +1,9 @@
 @echo off
-
-rem
-rem Usage - Sign.cmd <target file>
-rem
-
 setlocal
+
+if "%WORKSPACE%"=="" (
+  exit /b 0
+)
 
 set TargetFile=%~1
 
@@ -27,5 +26,4 @@ if "%errorlevel%" == 1 (
 )
 
 endlocal
-
 exit /b 0
