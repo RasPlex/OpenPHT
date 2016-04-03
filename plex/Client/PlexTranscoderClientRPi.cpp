@@ -27,8 +27,8 @@ CPlexTranscoderClientRPi::CPlexTranscoderClientRPi()
   m_maxAudioBitrate = 0;
 
   // Here is as list of audio / video codecs that we support natively on RPi
-  m_knownVideoCodecs = boost::assign::list_of<std::string>  ("h264") ("mpeg4") ("theora") ("vp6") ("vp8") ("vp6f");
-  m_knownAudioCodecs = boost::assign::list_of<std::string>  ("") ("aac") ("ac3") ("eac3") ("mp3") ("mp2") ("dca") ("dca-ma") ("flac") ("pcm") ("aac_latm") ("vorbis");
+  m_knownVideoCodecs = boost::assign::list_of<std::string>  ("h264") ("mpeg4") ("theora") ("vp6") ("vp8") ("vp6f").convert_to_container<std::set<std::string>>();
+  m_knownAudioCodecs = boost::assign::list_of<std::string>  ("") ("aac") ("ac3") ("eac3") ("mp3") ("mp2") ("dca") ("dca-ma") ("flac") ("pcm") ("aac_latm") ("vorbis").convert_to_container<std::set<std::string>>();
 
   // check if optionnal codecs are here
   if ( g_RBP.GetCodecMpg2() )
