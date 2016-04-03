@@ -1372,8 +1372,14 @@ LONG CWIN32Util::UtilRegGetValue( const HKEY hKey, const char *const pcKey, DWOR
   {
     if (ppcBuffer)
     {
-      char *pcValue=*ppcBuffer;
-      if (!pcValue || !pdwSizeBuff || dwSize +dwSizeAdd > *pdwSizeBuff) pcValue= (char*)realloc(pcValue, dwSize +dwSizeAdd);
+      char *pcValue=*ppcBuffer, *pcValueTmp;
+      if (!pcValue || !pdwSizeBuff || dwSize +dwSizeAdd > *pdwSizeBuff) {
+        pcValueTmp = (char*)realloc(pcValue, dwSize +dwSizeAdd);
+        if(pcValueTmp != NULL)
+        {
+          pcValue = pcValueTmp;
+        }
+      }
       lRet= RegQueryValueEx(hKey,pcKey,NULL,NULL,(LPBYTE)pcValue,&dwSize);
 
       if ( lRet == ERROR_SUCCESS || *ppcBuffer ) *ppcBuffer= pcValue;
@@ -1434,8 +1440,9 @@ bool CWIN32Util::GetInstallerDependenciesVersion(const CStdString &strGuid, CStd
   if (CWIN32Util::UtilRegOpenKeyEx(HKEY_LOCAL_MACHINE, strRegKey.c_str(), KEY_READ, &hKey))
   {
     DWORD dwType;
-    char *pcVersion = NULL;
-    if (CWIN32Util::UtilRegGetValue(hKey, "Version", &dwType, &pcVersion, NULL, sizeof(pcVersion)) == ERROR_SUCCESS)
+    DWORD dwSize = 64;
+    char *pcVersion = (char*)calloc(dwSize, sizeof(char));
+    if (CWIN32Util::UtilRegGetValue(hKey, "Version", &dwType, &pcVersion, &dwSize, sizeof(char)) == ERROR_SUCCESS)
     {
       strVersion = pcVersion;
       free(pcVersion);
