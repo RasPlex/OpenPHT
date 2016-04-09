@@ -136,9 +136,9 @@
 				<textoffsetx>20</textoffsetx>
 			</control>
 			<control type="scrollbar" id="61">
-				<posy>60</posy>
+				<posy>58</posy>
 				<posx>732</posx>
-				<height>410</height>
+				<height>510</height>
 				<onup>61</onup>
 				<ondown>61</ondown>
 			</control>
