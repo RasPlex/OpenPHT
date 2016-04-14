@@ -169,7 +169,7 @@ CLinuxRendererGL::~CLinuxRendererGL()
   }
   else
   {
-    delete [] m_rgbBuffer;
+    av_free(m_rgbBuffer);
     m_rgbBuffer = NULL;
   }
 
@@ -1010,7 +1010,7 @@ void CLinuxRendererGL::UnInit()
   }
   else
   {
-    delete [] m_rgbBuffer;
+    av_free(m_rgbBuffer);
     m_rgbBuffer = NULL;
   }
   m_rgbBufferSize = 0;
@@ -2594,7 +2594,7 @@ void CLinuxRendererGL::SetupRGBBuffer()
   m_rgbBufferSize = m_sourceWidth * m_sourceHeight * 4;
 
   if (!m_rgbPbo)
-    delete [] m_rgbBuffer;
+    av_free(m_rgbBuffer);
 
   if (m_pboSupported)
   {
@@ -2623,7 +2623,7 @@ void CLinuxRendererGL::SetupRGBBuffer()
   }
 
   if (!m_rgbPbo)
-    m_rgbBuffer = new BYTE[m_rgbBufferSize];
+    m_rgbBuffer = (BYTE*) av_malloc(m_rgbBufferSize);
 }
 
 bool CLinuxRendererGL::UploadRGBTexture(int source)
