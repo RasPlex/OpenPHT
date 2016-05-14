@@ -15,7 +15,6 @@
 				<control type="largeimage">
 					<include>FullScreenScaled</include>
 					<texture>$INFO[Player.Art(fanart)]</texture>
-					<include>BackgroundFade</include>
 					<animation effect="fade" end="40" time="0" condition="true">conditional</animation>
 					<fadetime>400</fadetime>
 					<visible>Player.HasAudio</visible>
@@ -23,7 +22,6 @@
 				<control type="largeimage">
 					<include>FullScreenScaled</include>
 					<texture>$INFO[ListItem.Art(fanart)]</texture>
-					<include>BackgroundFade</include>
 					<animation effect="fade" end="40" time="0" condition="true">conditional</animation>
 					<fadetime>400</fadetime>
 					<visible>!Player.HasAudio</visible>

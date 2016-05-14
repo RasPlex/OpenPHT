@@ -846,15 +846,6 @@
 							<texture border="10">-black-bottom-grey.png</texture>
 							<animation effect="fade" start="0" end="80" time="0" condition="true">Conditional</animation>
 						</control>
-						<control type="group">
-							<posx>-27</posx>
-							<posy>-40</posy>
-							<include>ListSelectedSquareItemThumb</include>
-							<animation type="Focus" reversible="false">
-								<effect type="zoom" center="150,0" start="85" end="100" time="200" tween="Linear" easing="out"/>
-								<effect type="fade" start="0" end="100" time="650"/>
-							</animation>
-						</control>
 						<control type="label">
 							<width>850</width>
 							<height>100</height>
