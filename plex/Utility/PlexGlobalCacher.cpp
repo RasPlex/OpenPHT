@@ -188,7 +188,7 @@ void CPlexGlobalCacherWorker::Process()
   CStdStringArray art;
   art.push_back("smallThumb");
   art.push_back("thumb");
-  art.push_back("bigthumb");
+  art.push_back("bigThumb");
   art.push_back("smallPoster");
   art.push_back("poster");
   art.push_back("bigPoster");
