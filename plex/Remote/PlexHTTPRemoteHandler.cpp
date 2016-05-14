@@ -202,6 +202,7 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::showDetails(const ArgMap &arguments)
         CPlexNavigationHelper nav;
         nav.navigateToItem(item, CURL(), WINDOW_HOME, true);
 
+        g_application.ResetScreenSaver();
         g_application.WakeUpScreenSaverAndDPMS();
 
         if (!navTimeout)
