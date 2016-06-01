@@ -695,7 +695,7 @@ bool CDVDVideoCodecVDA::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
 
     switch (hints.codec)
     {
-      case CODEC_ID_H264:
+      case AV_CODEC_ID_H264:
         // source must be H.264 with valid avcC atom data in extradata
         if (extrasize < 7 || extradata == NULL)
         {

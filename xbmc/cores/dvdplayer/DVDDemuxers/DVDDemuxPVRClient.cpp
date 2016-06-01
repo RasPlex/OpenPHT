@@ -26,7 +26,7 @@
 #include "pvr/addons/PVRClients.h"
 #include "../DVDClock.h"
 
-#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - FF_INPUT_BUFFER_PADDING_SIZE)
+#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - AV_INPUT_BUFFER_PADDING_SIZE)
 
 using namespace PVR;
 
@@ -60,10 +60,10 @@ void CDemuxStreamVideoPVRClient::GetStreamInfo(std::string& strInfo)
 {
   switch (codec)
   {
-    case CODEC_ID_MPEG2VIDEO:
+    case AV_CODEC_ID_MPEG2VIDEO:
       strInfo = "mpeg2video";
       break;
-    case CODEC_ID_H264:
+    case AV_CODEC_ID_H264:
       strInfo = "h264";
       break;
     default:
@@ -75,19 +75,19 @@ void CDemuxStreamAudioPVRClient::GetStreamInfo(std::string& strInfo)
 {
   switch (codec)
   {
-    case CODEC_ID_AC3:
+    case AV_CODEC_ID_AC3:
       strInfo = "ac3";
       break;
-    case CODEC_ID_EAC3:
+    case AV_CODEC_ID_EAC3:
       strInfo = "eac3";
       break;
-    case CODEC_ID_MP2:
+    case AV_CODEC_ID_MP2:
       strInfo = "mpeg2audio";
       break;
-    case CODEC_ID_AAC:
+    case AV_CODEC_ID_AAC:
       strInfo = "aac";
       break;
-    case CODEC_ID_DTS:
+    case AV_CODEC_ID_DTS:
       strInfo = "dts";
       break;
     default:
@@ -219,9 +219,9 @@ void CDVDDemuxPVRClient::ParsePacket(DemuxPacket* pkt)
       st->changes++;
       st->disabled = false;
       st->ExtraSize = len;
-      st->ExtraData = new uint8_t[len+FF_INPUT_BUFFER_PADDING_SIZE];
+      st->ExtraData = new uint8_t[len+AV_INPUT_BUFFER_PADDING_SIZE];
       memcpy(st->ExtraData, pkt->pData, len);
-      memset((uint8_t*)st->ExtraData + len, 0 , FF_INPUT_BUFFER_PADDING_SIZE);
+      memset((uint8_t*)st->ExtraData + len, 0 , AV_INPUT_BUFFER_PADDING_SIZE);
       pvr->m_parser_split = false;
     }
   }
@@ -338,7 +338,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       {
         st = dynamic_cast<CDemuxStreamAudioPVRClient*>(stm);
         if (!st
-            || (st->codec != (CodecID)props.stream[i].iCodecId)
+            || (st->codec != (AVCodecID)props.stream[i].iCodecId)
             || (st->iChannels != props.stream[i].iChannels))
           DisposeStream(i);
       }
@@ -364,7 +364,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       {
         st = dynamic_cast<CDemuxStreamVideoPVRClient*>(stm);
         if (!st
-            || (st->codec != (CodecID)props.stream[i].iCodecId)
+            || (st->codec != (AVCodecID)props.stream[i].iCodecId)
             || (st->iWidth != props.stream[i].iWidth)
             || (st->iHeight != props.stream[i].iHeight))
           DisposeStream(i);
@@ -384,11 +384,11 @@ void CDVDDemuxPVRClient::RequestStreams()
       m_streams[i] = st;
       st->m_parser_split = true;
     }
-    else if (props.stream[i].iCodecId == CODEC_ID_DVB_TELETEXT)
+    else if (props.stream[i].iCodecId == AV_CODEC_ID_DVB_TELETEXT)
     {
       if (stm)
       {
-        if (stm->codec != (CodecID)props.stream[i].iCodecId)
+        if (stm->codec != (AVCodecID)props.stream[i].iCodecId)
           DisposeStream(i);
       }
       if (!m_streams[i])
@@ -400,7 +400,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       if (stm)
       {
         st = dynamic_cast<CDemuxStreamSubtitlePVRClient*>(stm);
-        if (!st || (st->codec != (CodecID)props.stream[i].iCodecId))
+        if (!st || (st->codec != (AVCodecID)props.stream[i].iCodecId))
           DisposeStream(i);
       }
       if (!m_streams[i])
@@ -417,7 +417,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       m_streams[i] = new CDemuxStream();
     }
 
-    m_streams[i]->codec       = (CodecID)props.stream[i].iCodecId;
+    m_streams[i]->codec       = (AVCodecID)props.stream[i].iCodecId;
     m_streams[i]->iId         = i;
     m_streams[i]->iPhysicalId = props.stream[i].iPhysicalId;
     m_streams[i]->language[0] = props.stream[i].strLanguage[0];
@@ -464,19 +464,19 @@ void CDVDDemuxPVRClient::GetStreamCodecName(int iStreamId, CStdString &strName)
   CDemuxStream *stream = GetStream(iStreamId);
   if (stream)
   {
-    if (stream->codec == CODEC_ID_AC3)
+    if (stream->codec == AV_CODEC_ID_AC3)
       strName = "ac3";
-    else if (stream->codec == CODEC_ID_MP2)
+    else if (stream->codec == AV_CODEC_ID_MP2)
       strName = "mp2";
-    else if (stream->codec == CODEC_ID_AAC)
+    else if (stream->codec == AV_CODEC_ID_AAC)
       strName = "aac";
-    else if (stream->codec == CODEC_ID_DTS)
+    else if (stream->codec == AV_CODEC_ID_DTS)
       strName = "dca";
-    else if (stream->codec == CODEC_ID_MPEG2VIDEO)
+    else if (stream->codec == AV_CODEC_ID_MPEG2VIDEO)
       strName = "mpeg2video";
-    else if (stream->codec == CODEC_ID_H264)
+    else if (stream->codec == AV_CODEC_ID_H264)
       strName = "h264";
-    else if (stream->codec == CODEC_ID_EAC3)
+    else if (stream->codec == AV_CODEC_ID_EAC3)
       strName = "eac3";
   }
 }

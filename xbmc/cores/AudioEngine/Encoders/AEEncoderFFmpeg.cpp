@@ -104,7 +104,7 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
   if (dts && (!ac3 || g_advancedSettings.m_audioTranscodeTo.Equals("dts")))
   {
     m_CodecName = "DTS";
-    m_CodecID   = CODEC_ID_DTS;
+    m_CodecID   = AV_CODEC_ID_DTS;
     m_PackFunc  = &CAEPackIEC61937::PackDTS_1024;
     m_BitRate   = DTS_ENCODE_BITRATE;
     codec = avcodec_find_encoder(m_CodecID);
@@ -115,7 +115,7 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
   if (!codec && ac3)
   {
     m_CodecName = "AC3";
-    m_CodecID   = CODEC_ID_AC3;
+    m_CodecID   = AV_CODEC_ID_AC3;
     m_PackFunc  = &CAEPackIEC61937::PackAC3;
     m_BitRate   = AC3_ENCODE_BITRATE;
     codec = avcodec_find_encoder(m_CodecID);
@@ -221,7 +221,7 @@ unsigned int CAEEncoderFFmpeg::GetBitRate()
   return m_BitRate;
 }
 
-CodecID CAEEncoderFFmpeg::GetCodecID()
+AVCodecID CAEEncoderFFmpeg::GetCodecID()
 {
   return m_CodecID;
 }
@@ -237,7 +237,7 @@ int CAEEncoderFFmpeg::Encode(float *data, unsigned int frames)
     return 0;
 
   /* encode it */
-  int size = avcodec_encode_audio(m_CodecCtx, m_Buffer + IEC61937_DATA_OFFSET, FF_MIN_BUFFER_SIZE, (short*)data);
+  int size = avcodec_encode_audio(m_CodecCtx, m_Buffer + IEC61937_DATA_OFFSET, AV_INPUT_BUFFER_MIN_SIZE, (short*)data);
 
   /* pack it into an IEC958 frame */
   m_BufferSize = m_PackFunc(NULL, size, m_Buffer);

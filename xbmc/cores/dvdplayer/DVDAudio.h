@@ -69,7 +69,7 @@ public:
   float GetCurrentAttenuation();
   void Pause();
   void Resume();
-  bool Create(const DVDAudioFrame &audioframe, CodecID codec, bool needresampler);
+  bool Create(const DVDAudioFrame &audioframe, AVCodecID codec, bool needresampler);
   bool IsValidFormat(const DVDAudioFrame &audioframe);
   void Destroy();
   DWORD AddPackets(const DVDAudioFrame &audioframe);

@@ -31,7 +31,6 @@ extern "C" {
 #include "libavutil/avutil.h"
 #include "libswscale/swscale.h"
 #include "libpostproc/postprocess.h"
-#include "libavfilter/avfiltergraph.h"
 }
 
 class CVDPAU;
@@ -102,7 +101,7 @@ protected:
   AVFilterGraph*   m_pFilterGraph;
   AVFilterContext* m_pFilterIn;
   AVFilterContext* m_pFilterOut;
-  AVFilterBufferRef* m_pBufferRef;
+  AVFrame*         m_pFilterFrame;
 
   int m_iPictureWidth;
   int m_iPictureHeight;

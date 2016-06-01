@@ -41,7 +41,7 @@ public:
   virtual void Reset();
 
   virtual unsigned int GetBitRate    ();
-  virtual CodecID      GetCodecID    ();
+  virtual AVCodecID    GetCodecID();
   virtual unsigned int GetFrames     ();
 
   virtual int Encode (float *data, unsigned int frames);
@@ -49,14 +49,14 @@ public:
   virtual double GetDelay(unsigned int bufferSize);
 private:
   std::string                m_CodecName;
-  CodecID                   m_CodecID;
+  AVCodecID                 m_CodecID;
   unsigned int              m_BitRate;
   CAEPackIEC61937::PackFunc m_PackFunc;
 
   AEAudioFormat     m_CurrentFormat;
   AVCodecContext   *m_CodecCtx;
   CAEChannelInfo    m_Layout;
-  uint8_t           m_Buffer[IEC61937_DATA_OFFSET + FF_MIN_BUFFER_SIZE];
+  uint8_t           m_Buffer[IEC61937_DATA_OFFSET + AV_INPUT_BUFFER_MIN_SIZE];
   int               m_BufferSize;
   int               m_OutputSize;
   double            m_OutputRatio;

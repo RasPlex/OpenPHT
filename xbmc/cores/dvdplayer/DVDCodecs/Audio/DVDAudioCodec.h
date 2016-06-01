@@ -32,6 +32,8 @@ extern "C" {
 #include "libavcodec/avcodec.h"
 }
 
+#define AVCODEC_MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
+
 struct AVStream;
 
 class CDVDStreamInfo;

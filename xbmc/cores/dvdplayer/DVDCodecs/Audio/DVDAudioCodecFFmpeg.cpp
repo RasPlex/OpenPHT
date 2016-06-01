@@ -31,8 +31,8 @@ CDVDAudioCodecFFmpeg::CDVDAudioCodecFFmpeg() : CDVDAudioCodec()
 {
   m_iBufferSize1 = 0;
   m_iBufferSize2 = 0;
-  m_pBuffer2     = (BYTE*)_aligned_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE, 16);
-  memset(m_pBuffer2, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE + FF_INPUT_BUFFER_PADDING_SIZE);
+  m_pBuffer2     = (BYTE*)_aligned_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE + AV_INPUT_BUFFER_PADDING_SIZE, 16);
+  memset(m_pBuffer2, 0, AVCODEC_MAX_AUDIO_FRAME_SIZE + AV_INPUT_BUFFER_PADDING_SIZE);
 
   m_iBuffered = 0;
   m_pCodecContext = NULL;
@@ -93,7 +93,7 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
 
   if( hints.extradata && hints.extrasize > 0 )
   {
-    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + FF_INPUT_BUFFER_PADDING_SIZE);
+    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + AV_INPUT_BUFFER_PADDING_SIZE);
     if(m_pCodecContext->extradata)
     {
       m_pCodecContext->extradata_size = hints.extrasize;
@@ -108,7 +108,7 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
     return false;
   }
 
-  m_pFrame1 = avcodec_alloc_frame();
+  m_pFrame1 = av_frame_alloc();
   m_bOpenedCodec = true;
   m_iSampleFormat = AV_SAMPLE_FMT_NONE;
   return true;
@@ -116,8 +116,7 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
 
 void CDVDAudioCodecFFmpeg::Dispose()
 {
-  if (m_pFrame1) av_free(m_pFrame1);
-  m_pFrame1 = NULL;
+  av_frame_free(&m_pFrame1);
 
   if (m_pConvert)
     swr_free(&m_pConvert);

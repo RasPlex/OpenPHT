@@ -290,39 +290,39 @@ void CDVDDemuxHTSP::SubscriptionStart (htsmsg_t *m)
 
     if(!strcmp(type, "AC3")) {
       st.a = new CDemuxStreamAudioHTSP(this, type);
-      st.a->codec = CODEC_ID_AC3;
+      st.a->codec = AV_CODEC_ID_AC3;
     } else if(!strcmp(type, "EAC3")) {
       st.a = new CDemuxStreamAudioHTSP(this, type);
-      st.a->codec = CODEC_ID_EAC3;
+      st.a->codec = AV_CODEC_ID_EAC3;
     } else if(!strcmp(type, "MPEG2AUDIO")) {
       st.a = new CDemuxStreamAudioHTSP(this, type);
-      st.a->codec = CODEC_ID_MP2;
+      st.a->codec = AV_CODEC_ID_MP2;
     } else if(!strcmp(type, "AAC")) {
       st.a = new CDemuxStreamAudioHTSP(this, type);
-      st.a->codec = CODEC_ID_AAC;
+      st.a->codec = AV_CODEC_ID_AAC;
     } else if(!strcmp(type, "MPEG2VIDEO")) {
       st.v = new CDemuxStreamVideoHTSP(this, type);
-      st.v->codec = CODEC_ID_MPEG2VIDEO;
+      st.v->codec = AV_CODEC_ID_MPEG2VIDEO;
       st.v->iWidth  = htsmsg_get_u32_or_default(sub, "width" , 0);
       st.v->iHeight = htsmsg_get_u32_or_default(sub, "height", 0);
     } else if(!strcmp(type, "H264")) {
       st.v = new CDemuxStreamVideoHTSP(this, type);
-      st.v->codec = CODEC_ID_H264;
+      st.v->codec = AV_CODEC_ID_H264;
       st.v->iWidth  = htsmsg_get_u32_or_default(sub, "width" , 0);
       st.v->iHeight = htsmsg_get_u32_or_default(sub, "height", 0);
     } else if(!strcmp(type, "DVBSUB")) {
       st.s = new CDemuxStreamSubtitle();
-      st.s->codec = CODEC_ID_DVB_SUBTITLE;
+      st.s->codec = AV_CODEC_ID_DVB_SUBTITLE;
       uint32_t composition_id = 0, ancillary_id = 0;
       htsmsg_get_u32(sub, "composition_id", &composition_id);
       htsmsg_get_u32(sub, "ancillary_id"  , &ancillary_id);
       st.s->identifier = (composition_id & 0xffff) | ((ancillary_id & 0xffff) << 16);
     } else if(!strcmp(type, "TEXTSUB")) {
       st.s = new CDemuxStreamSubtitle();
-      st.s->codec = CODEC_ID_TEXT;
+      st.s->codec = AV_CODEC_ID_TEXT;
     } else if(!strcmp(type, "TELETEXT")) {
       st.t = new CDemuxStreamTeletext();
-      st.t->codec = CODEC_ID_DVB_TELETEXT;
+      st.t->codec = AV_CODEC_ID_DVB_TELETEXT;
     } else {
       continue;
     }

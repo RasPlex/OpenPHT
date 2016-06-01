@@ -48,8 +48,7 @@ FFmpegVideoDecoder::~FFmpegVideoDecoder()
 void FFmpegVideoDecoder::close()
 {
   // Free the YUV frame
-  if ( m_pFrame )
-	av_free( m_pFrame );
+	av_frame_free( &m_pFrame );
 
   // Free the RGB frame
   if ( m_pFrameRGB )
@@ -195,7 +194,7 @@ bool FFmpegVideoDecoder::open( const CStdString& filename )
   }
   
   // Allocate video frames
-  m_pFrame = avcodec_alloc_frame();
+  m_pFrame = av_frame_alloc();
 
   if ( !m_pFrame )
   {

@@ -72,7 +72,7 @@ bool CDVDDemuxVobsub::Open(const string& filename, int source, const string& sub
 
   CDVDStreamInfo hints;
   CDVDCodecOptions options;
-  hints.codec = CODEC_ID_DVD_SUBTITLE;
+  hints.codec = AV_CODEC_ID_DVD_SUBTITLE;
 
   char line[2048];
   DECLARE_UNUSED(bool,res)
@@ -212,7 +212,7 @@ bool CDVDDemuxVobsub::ParseId(SState& state, char* line)
   else
     stream->iPhysicalId = -1;
 
-  stream->codec = CODEC_ID_DVD_SUBTITLE;
+  stream->codec = AV_CODEC_ID_DVD_SUBTITLE;
   stream->iId = m_Streams.size();
   stream->source = m_source;
 

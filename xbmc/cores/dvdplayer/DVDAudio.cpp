@@ -120,7 +120,7 @@ CDVDAudio::~CDVDAudio()
   free(m_pBuffer);
 }
 
-bool CDVDAudio::Create(const DVDAudioFrame &audioframe, CodecID codec, bool needresampler)
+bool CDVDAudio::Create(const DVDAudioFrame &audioframe, AVCodecID codec, bool needresampler)
 {
   CLog::Log(LOGNOTICE,
     "Creating audio stream (codec id: %i, channels: %i, sample rate: %i, %s)",

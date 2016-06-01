@@ -56,7 +56,6 @@ bool CDVDOverlayCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &optio
   m_pCodecContext->debug_mv = 0;
   m_pCodecContext->debug = 0;
   m_pCodecContext->workaround_bugs = FF_BUG_AUTODETECT;
-  m_pCodecContext->sub_id = hints.identifier;
   m_pCodecContext->codec_tag = hints.codec_tag;
   m_pCodecContext->time_base.num = 1;
   m_pCodecContext->time_base.den = DVD_TIME_BASE;
@@ -64,7 +63,7 @@ bool CDVDOverlayCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &optio
   if( hints.extradata && hints.extrasize > 0 )
   {
     m_pCodecContext->extradata_size = hints.extrasize;
-    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + FF_INPUT_BUFFER_PADDING_SIZE);
+    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + AV_INPUT_BUFFER_PADDING_SIZE);
     memcpy(m_pCodecContext->extradata, hints.extradata, hints.extrasize);
 
     // start parsing of extra data - create a copy to be safe and make it zero-terminating to avoid access violations!
@@ -176,7 +175,7 @@ int CDVDOverlayCodecFFmpeg::Decode(DemuxPacket *pPacket)
 
   double pts_offset = 0.0;
  
-  if (m_pCodecContext->codec_id == CODEC_ID_HDMV_PGS_SUBTITLE && m_Subtitle.format == 0) 
+  if (m_pCodecContext->codec_id == AV_CODEC_ID_HDMV_PGS_SUBTITLE && m_Subtitle.format == 0) 
   {
     // for pgs subtitles the packet pts of the end_segments are wrong
     // instead use the subtitle pts to calc the offset here
