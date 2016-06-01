@@ -2,6 +2,7 @@
 ERRORFILE=/xbmc/project/Win32BuildSetup/errormingw
 NOPFILE=/xbmc/project/Win32BuildSetup/noprompt
 MAKECLEANFILE=/xbmc/project/Win32BuildSetup/makeclean
+BGPROCESSFILE=/xbmc/project/Win32BuildSetup/bgprocess
 TOUCH=/bin/touch
 RM=/bin/rm
 NOPROMPT=0
@@ -42,13 +43,11 @@ if [ -f $ERRORFILE ]; then
 fi
 
 # check for noprompt
-if [ -f $NOPFILE ]; then
-  $RM $NOPFILE
+if [ "$PROMPTLEVEL" == "noprompt" ]; then
   NOPROMPT=1
 fi
 
-if [ -f $MAKECLEANFILE ]; then
-  $RM $MAKECLEANFILE
+if [ "$BUILDMODE" == "clean" ]; then
   MAKECLEAN="clean"
 else
   MAKECLEAN="noclean"
@@ -63,6 +62,7 @@ echo "################################"
 echo "## compiling mingw libs"
 echo "## NOPROMPT  = $NOPROMPT"
 echo "## MAKECLEAN = $MAKECLEAN"
+echo "## WORKSPACE = $WORKSPACE"
 echo "################################"
 
 echo "##### building ffmpeg dlls #####"

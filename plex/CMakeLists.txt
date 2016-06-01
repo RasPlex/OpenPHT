@@ -43,7 +43,7 @@ endif(ENABLE_AUTOUPDATE)
 
 if(TARGET_WIN32)
   # disable safe seh
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /DELAYLOAD:dnssd.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:libmicrohttpd-5.dll /DELAYLOAD:sqlite3.dll /DELAYLOAD:libsamplerate-0.dll /MANIFEST:NO")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /DELAYLOAD:dnssd.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:libmicrohttpd-dll.dll /DELAYLOAD:sqlite3.dll /DELAYLOAD:libsamplerate-0.dll /MANIFEST:NO")
 endif(TARGET_WIN32)
 
 OPTION(USE_RAPIDXML "Use RAPIDXML instead of TinyXML - Faster" ON)
@@ -121,7 +121,7 @@ if(ENABLE_TESTING)
     list(APPEND TEST_CASES_OBJS $<TARGET_OBJECTS:${cases}>)
   endforeach(cases ${TEST_CASES})
   add_executable(PlexHomeTheaterTests ${TEST_CASES_OBJS} $<TARGET_OBJECTS:xbmctest> $<TARGET_OBJECTS:PlexMain> Tests/PlexTestUtils.cpp Tests/PlexTestUtils.h)
-  target_link_libraries(PlexHomeTheaterTests xbmc pcre gtest gmock ${CONFIG_INTERNAL_LIBS} ${CONFIG_PLEX_LINK_LIBRARIES})
+  target_link_libraries(PlexHomeTheaterTests xbmc gtest gmock ${CONFIG_INTERNAL_LIBS} ${CONFIG_PLEX_LINK_LIBRARIES})
   add_test(PlexHomeTheaterTests ${EXECUTABLE_OUTPUT_PATH}/PlexHomeTheaterTests --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/PlexHomeTheaterTests.xml --gtest_color=yes)
 
   add_custom_target(all_tests DEPENDS PlexHomeTheaterTests)
@@ -179,7 +179,7 @@ if(ENABLE_DUMP_SYMBOLS)
   add_custom_target(symbols DEPENDS ${PLEX_TARGET_NAME}_symbols)
 endif(ENABLE_DUMP_SYMBOLS)
 
-target_link_libraries(${PLEX_TARGET_NAME} xbmc pcre ${CONFIG_INTERNAL_LIBS} ${CONFIG_PLEX_LINK_LIBRARIES})
+target_link_libraries(${PLEX_TARGET_NAME} xbmc ${CONFIG_INTERNAL_LIBS} ${CONFIG_PLEX_LINK_LIBRARIES})
 
 if(TARGET_WIN32)
   add_custom_command(

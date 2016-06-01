@@ -14,7 +14,7 @@ rd /s /q build-windows-i386
 md build-windows-i386
 cd build-windows-i386
 
-cmake -GNinja -DCMAKE_INSTALL_PREFIX=output -DCMAKE_BUILD_TYPE=RelWithDebInfo .. || exit /b 1
+cmake -GNinja -DCMAKE_INSTALL_PREFIX=output -DCMAKE_BUILD_TYPE=RelWithDebInfo -DTEXTUREPACKERPATH=TexturePacker.exe .. || exit /b 1
 ninja release_package || exit /b 1
 
 move c:\tmp\OpenPHT*exe %WORKSPACE%\upload

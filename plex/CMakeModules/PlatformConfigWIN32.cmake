@@ -42,6 +42,7 @@ include_directories(${DirectX_INCLUDE_DIR})
 
 set(system_libs
   yajl
+  pcre
   dwmapi
   winmm
   Mpr
@@ -56,7 +57,7 @@ set(external_libs
   libfribidi
   libiconv
   turbojpeg-static
-  libmicrohttpd.dll
+  libmicrohttpd-dll
   freetype246MT
   sqlite3
   liblzo2

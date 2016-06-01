@@ -22,7 +22,6 @@
 using namespace std;
 
 #ifdef _WIN32
-#include "config.h"
 #include <process.h>
 #define getpid _getpid
 #endif
