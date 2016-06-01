@@ -949,7 +949,7 @@ bool CMPCOutputThread::GetDecoderOutput(void)
                   uint8_t* src[] =       { procOut.Ybuff, NULL, NULL, NULL };
                   int      srcStride[] = { stride*2, 0, 0, 0 };
                   uint8_t* dst[] =       { pBuffer->m_y_buffer_ptr, pBuffer->m_u_buffer_ptr, pBuffer->m_v_buffer_ptr, NULL };
-                  int      dstStride[] = { pBuffer->m_width, pBuffer->m_width/2, pBuffer->m_width/2, 0 };
+                  int      dstStride[] = { (int)pBuffer->m_width, (int)pBuffer->m_width/2, (int)pBuffer->m_width/2, 0 };
 
                   m_sw_scale_ctx = m_dllSwScale->sws_getCachedContext(m_sw_scale_ctx,
                     pBuffer->m_width, pBuffer->m_height, PIX_FMT_YUYV422,
@@ -971,7 +971,7 @@ bool CMPCOutputThread::GetDecoderOutput(void)
         else
         {
           if (m_PictureNumber != procOut.PicInfo.picture_number)
-            CLog::Log(LOGDEBUG, "%s: No timestamp detected: %"PRIu64, __MODULE_NAME__, procOut.PicInfo.timeStamp);
+            CLog::Log(LOGDEBUG, "%s: No timestamp detected: %" PRIu64, __MODULE_NAME__, procOut.PicInfo.timeStamp);
           m_PictureNumber = procOut.PicInfo.picture_number;
         }
       }
@@ -1986,7 +1986,7 @@ void CCrystalHD::bitstream_alloc_and_copy(
 void PrintFormat(BCM::BC_PIC_INFO_BLOCK &pib)
 {
   CLog::Log(LOGDEBUG, "----------------------------------\n%s","");
-  CLog::Log(LOGDEBUG, "\tTimeStamp: %"PRIu64"\n", pib.timeStamp);
+  CLog::Log(LOGDEBUG, "\tTimeStamp: %" PRIu64"\n", pib.timeStamp);
   CLog::Log(LOGDEBUG, "\tPicture Number: %d\n", pib.picture_number);
   CLog::Log(LOGDEBUG, "\tWidth: %d\n", pib.width);
   CLog::Log(LOGDEBUG, "\tHeight: %d\n", pib.height);

@@ -146,7 +146,7 @@ void CPlayerCoreFactory::GetPlayers( const CFileItem& item, VECPLAYERCORES &vecC
   for(unsigned int i = 0; i < s_vecCoreSelectionRules.size(); i++)
     s_vecCoreSelectionRules[i]->GetPlayers(item, vecCores);
 
-  CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: matched %"PRIuS" rules with players", vecCores.size());
+  CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: matched %" PRIuS" rules with players", vecCores.size());
 
   if( PAPlayer::HandlesType(url.GetFileType()) )
   {
@@ -219,7 +219,7 @@ void CPlayerCoreFactory::GetPlayers( const CFileItem& item, VECPLAYERCORES &vecC
   /* make our list unique, preserving first added players */
   unique(vecCores);
 
-  CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: added %"PRIuS" players", vecCores.size());
+  CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: added %" PRIuS" players", vecCores.size());
 }
 
 PLAYERCOREID CPlayerCoreFactory::GetDefaultPlayer( const CFileItem& item )

@@ -92,7 +92,7 @@ bool FLACCodec::Init(const CStdString &strFile, unsigned int filecache)
   //  These are filled by the metadata callback
   if (m_SampleRate==0 || m_Channels==0 || m_BitsPerSample==0 || m_TotalTime==0 || m_MaxFrameSize==0 || m_DataFormat == AE_FMT_INVALID)
   {
-    CLog::Log(LOGERROR, "FLACCodec: Can't get stream info, SampleRate=%i, Channels=%i, BitsPerSample=%i, TotalTime=%"PRIu64", MaxFrameSize=%i", m_SampleRate, m_Channels, m_BitsPerSample, m_TotalTime, m_MaxFrameSize);
+    CLog::Log(LOGERROR, "FLACCodec: Can't get stream info, SampleRate=%i, Channels=%i, BitsPerSample=%i, TotalTime=%" PRIu64", MaxFrameSize=%i", m_SampleRate, m_Channels, m_BitsPerSample, m_TotalTime, m_MaxFrameSize);
     FreeDecoder();
     return false;
   }

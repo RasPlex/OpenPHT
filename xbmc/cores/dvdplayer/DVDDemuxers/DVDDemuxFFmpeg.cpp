@@ -1478,7 +1478,7 @@ CStdString CDVDDemuxFFmpeg::GetErrorString(int code)
 {
   switch (code)
   {
-    case AVERROR_INVALIDDATA:
+    case (int)AVERROR_INVALIDDATA:
       return g_localizeStrings.Get(42002); // Could not read file header.
       break;
 

@@ -234,7 +234,7 @@ CStdString CTextureCacheJob::GetImageHash(const CStdString &url)
     if (time || st.st_size)
     {
       CStdString hash;
-      hash.Format("d%"PRId64"s%"PRId64, time, st.st_size);
+      hash.Format("d%" PRId64"s%" PRId64, time, st.st_size);
       return hash;
     }
 
