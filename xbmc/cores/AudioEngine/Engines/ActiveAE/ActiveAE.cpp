@@ -28,6 +28,7 @@ using namespace ActiveAE;
 #include "cores/AudioEngine/Encoders/AEEncoderFFmpeg.h"
 
 #include "settings/GUISettings.h"
+#include "settings/AdvancedSettings.h"
 #include "windowing/WindowingFactory.h"
 #include "utils/log.h"
 
@@ -1517,6 +1518,15 @@ void CActiveAE::ApplySettingsToFormat(AEAudioFormat &format, AudioSettings &sett
       }
       format.m_channelLayout = AE_CH_LAYOUT_2_0;
     }
+
+#ifdef TARGET_OPENELEC
+    // OpenELEC workaround to define a minimum sample Rate for broken AVRs
+    if (format.m_sampleRate < g_advancedSettings.m_minimumSampleRate)
+    {
+      format.m_sampleRate = g_advancedSettings.m_minimumSampleRate;
+      CLog::Log(LOGDEBUG, "CActiveAE::MinimumSampleRate - Forced by use to samplerate %d", format.m_sampleRate);
+    }
+#endif
 
     if (m_settings.config == AE_CONFIG_FIXED)
     {

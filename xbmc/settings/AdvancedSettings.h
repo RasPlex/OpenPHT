@@ -103,6 +103,10 @@ class CAdvancedSettings
     bool CanLogComponent(int component) const;
 
     int m_audioHeadRoom;
+#ifdef TARGET_OPENELEC
+    // OpenELEC workaround for minimum sample Rate
+    int m_minimumSampleRate;
+#endif
     float m_ac3Gain;
     int m_maxPllAdjust;
     CStdString m_audioDefaultPlayer;

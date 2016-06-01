@@ -51,6 +51,10 @@ CAdvancedSettings::CAdvancedSettings()
 void CAdvancedSettings::Initialize()
 {
   m_audioHeadRoom = 0;
+#ifdef TARGET_OPENELEC  
+  // OpenELEC workaround for broken AVRs
+  m_minimumSampleRate = 8000;
+#endif
   m_ac3Gain = 12.0f;
   m_audioApplyDrc = -1.0f;
   m_maxPllAdjust = 1000;
@@ -449,6 +453,9 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
     XMLUtils::GetFloat(pElement, "ac3downmixgain", m_ac3Gain, -96.0f, 96.0f);
     XMLUtils::GetInt(pElement, "maxplladjust", m_maxPllAdjust, 0, 1000000);
     XMLUtils::GetInt(pElement, "headroom", m_audioHeadRoom, 0, 12);
+#ifdef TARGET_OPENELEC
+    XMLUtils::GetInt(pElement, "minimumsamplerate", m_minimumSampleRate, 8000, 192000);
+#endif
     XMLUtils::GetString(pElement, "defaultplayer", m_audioDefaultPlayer);
     // 101 on purpose - can be used to never automark as watched
     XMLUtils::GetFloat(pElement, "playcountminimumpercent", m_audioPlayCountMinimumPercent, 0.0f, 101.0f);
