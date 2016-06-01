@@ -42,7 +42,7 @@ CAEEncoderFFmpeg::CAEEncoderFFmpeg():
 CAEEncoderFFmpeg::~CAEEncoderFFmpeg()
 {
   Reset();
-  m_dllAvUtil.av_freep(&m_CodecCtx);
+  av_freep(&m_CodecCtx);
 }
 
 bool CAEEncoderFFmpeg::IsCompatible(AEAudioFormat format)
@@ -95,11 +95,6 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
 {
   Reset();
 
-  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load())
-    return false;
-
-  m_dllAvCodec.avcodec_register_all();
-
   bool ac3 = g_guiSettings.GetBool("audiooutput.ac3passthrough");
 
   AVCodec *codec = NULL;
@@ -112,7 +107,7 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
     m_CodecID   = CODEC_ID_DTS;
     m_PackFunc  = &CAEPackIEC61937::PackDTS_1024;
     m_BitRate   = DTS_ENCODE_BITRATE;
-    codec = m_dllAvCodec.avcodec_find_encoder(m_CodecID);
+    codec = avcodec_find_encoder(m_CodecID);
   }
 #endif
 
@@ -123,14 +118,14 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
     m_CodecID   = CODEC_ID_AC3;
     m_PackFunc  = &CAEPackIEC61937::PackAC3;
     m_BitRate   = AC3_ENCODE_BITRATE;
-    codec = m_dllAvCodec.avcodec_find_encoder(m_CodecID);
+    codec = avcodec_find_encoder(m_CodecID);
   }
 
   /* check we got the codec */
   if (!codec)
     return false;
 
-  m_CodecCtx                 = m_dllAvCodec.avcodec_alloc_context3(codec);
+  m_CodecCtx                 = avcodec_alloc_context3(codec);
   m_CodecCtx->bit_rate       = m_BitRate;
   m_CodecCtx->sample_rate    = format.m_sampleRate;
   m_CodecCtx->channel_layout = AV_CH_LAYOUT_5POINT1_BACK;
@@ -194,9 +189,9 @@ bool CAEEncoderFFmpeg::Initialize(AEAudioFormat &format)
   m_CodecCtx->channels = BuildChannelLayout(m_CodecCtx->channel_layout, m_Layout);
 
   /* open the codec */
-  if (m_dllAvCodec.avcodec_open2(m_CodecCtx, codec, NULL))
+  if (avcodec_open2(m_CodecCtx, codec, NULL))
   {
-    m_dllAvUtil.av_freep(&m_CodecCtx);
+    av_freep(&m_CodecCtx);
     return false;
   }
 
@@ -242,7 +237,7 @@ int CAEEncoderFFmpeg::Encode(float *data, unsigned int frames)
     return 0;
 
   /* encode it */
-  int size = m_dllAvCodec.avcodec_encode_audio(m_CodecCtx, m_Buffer + IEC61937_DATA_OFFSET, FF_MIN_BUFFER_SIZE, (short*)data);
+  int size = avcodec_encode_audio(m_CodecCtx, m_Buffer + IEC61937_DATA_OFFSET, FF_MIN_BUFFER_SIZE, (short*)data);
 
   /* pack it into an IEC958 frame */
   m_BufferSize = m_PackFunc(NULL, size, m_Buffer);

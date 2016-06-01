@@ -21,12 +21,12 @@
  */
 
 #include "DVDDemux.h"
-#include "DllAvFormat.h"
-#include "DllAvCodec.h"
-#include "DllAvUtil.h"
-
 #include "threads/CriticalSection.h"
 #include "threads/SystemClock.h"
+
+extern "C" {
+#include "libavformat/avformat.h"
+}
 
 class CDVDDemuxFFmpeg;
 class CURL;
@@ -136,10 +136,6 @@ protected:
   CDemuxStream* m_streams[MAX_STREAMS]; // maximum number of streams that ffmpeg can handle
 
   AVIOContext* m_ioContext;
-
-  DllAvFormat m_dllAvFormat;
-  DllAvCodec  m_dllAvCodec;
-  DllAvUtil   m_dllAvUtil;
 
   double   m_iCurrentPts; // used for stream length estimation
   bool     m_bMatroska;

@@ -35,7 +35,9 @@ class CDVDInputStream;
   #include "config.h"
 #endif
 
-#include "DllAvCodec.h"
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 #ifndef __GNUC__
 #pragma warning(pop)

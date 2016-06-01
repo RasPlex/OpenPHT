@@ -64,7 +64,14 @@ cp .libs/avutil-*.dll /xbmc/system/players/dvdplayer/ &&
 cp .libs/avfilter-*.dll /xbmc/system/players/dvdplayer/ &&
 cp .libs/postproc-*.dll /xbmc/system/players/dvdplayer/ &&
 cp .libs/swresample-*.dll /xbmc/system/players/dvdplayer/ &&
-cp .libs/swscale-*.dll /xbmc/system/players/dvdplayer/
+cp .libs/swscale-*.dll /xbmc/system/players/dvdplayer/ &&
+cp .libs/avcodec.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/avformat.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/avutil.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/avfilter.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/postproc.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/swresample.lib /xbmc/project/BuildDependencies/lib/ &&
+cp .libs/swscale.lib /xbmc/project/BuildDependencies/lib/
 
 #remove the bgprocessfile for signaling the process end
 echo deleting $BGPROCESSFILE

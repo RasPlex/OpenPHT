@@ -22,8 +22,11 @@
   #include "config.h"
 #elif defined(_WIN32)
 #include "system.h"
-#include "DllAvCodec.h"
 #endif
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 #if defined(HAVE_LIBCRYSTALHD)
 #include "settings/GUISettings.h"

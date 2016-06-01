@@ -22,12 +22,17 @@
 
 #include "DVDVideoCodec.h"
 #include "DVDResource.h"
-#include "DllAvCodec.h"
-#include "DllAvFormat.h"
-#include "DllAvUtil.h"
-#include "DllSwScale.h"
-#include "DllAvFilter.h"
-#include "DllPostProc.h"
+#include "utils/StdString.h"
+
+extern "C" {
+#include "libavfilter/avfilter.h"
+#include "libavcodec/avcodec.h"
+#include "libavformat/avformat.h"
+#include "libavutil/avutil.h"
+#include "libswscale/swscale.h"
+#include "libpostproc/postprocess.h"
+#include "libavfilter/avfiltergraph.h"
+}
 
 class CVDPAU;
 class CCriticalSection;
@@ -107,12 +112,6 @@ protected:
   int m_iOrientation;// orientation of the video in degress counter clockwise
 
   unsigned int m_uSurfacesCount;
-
-  DllAvCodec m_dllAvCodec;
-  DllAvUtil  m_dllAvUtil;
-  DllSwScale m_dllSwScale;
-  DllAvFilter m_dllAvFilter;
-  DllPostProc m_dllPostProc;
 
   std::string m_name;
   bool              m_bSoftware;

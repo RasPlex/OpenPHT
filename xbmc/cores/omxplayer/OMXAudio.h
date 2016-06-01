@@ -36,10 +36,13 @@
 
 #include "OMXClock.h"
 #include "OMXCore.h"
-#include "DllAvCodec.h"
-#include "DllAvUtil.h"
 
 #include "threads/CriticalSection.h"
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libavutil/avutil.h"
+}
 
 #define AUDIO_BUFFER_SECONDS 3
 #define VIS_PACKET_SIZE 512
@@ -155,7 +158,6 @@ protected:
   COMXCoreTunel     m_omx_tunnel_decoder;
   COMXCoreTunel     m_omx_tunnel_splitter_analog;
   COMXCoreTunel     m_omx_tunnel_splitter_hdmi;
-  DllAvUtil         m_dllAvUtil;
 
   CCriticalSection m_critSection;
 };

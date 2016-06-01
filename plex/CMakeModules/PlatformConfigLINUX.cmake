@@ -136,8 +136,6 @@ endif()
 
 plex_get_soname(CURL_SONAME ${CURL_LIBRARY})
 
-list(APPEND CONFIG_INTERNAL_LIBS lib_dllsymbols)
-
 ####
 if(DEFINED X11_FOUND)
   set(HAVE_X11 1)

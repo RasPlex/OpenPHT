@@ -23,6 +23,8 @@
 #include "settings/Settings.h"
 #include "VAAPI.h"
 #include "DVDVideoCodec.h"
+#include "utils/log.h"
+#include "threads/SingleLock.h"
 #include <boost/scoped_array.hpp>
 #include <boost/weak_ptr.hpp>
 

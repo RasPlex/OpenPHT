@@ -19,7 +19,6 @@
  */
 #pragma once
 
-#include "DllAvCodec.h"
 #include "DVDCodecs/Video/DVDVideoCodecFFmpeg.h"
 #include "guilib/D3DResource.h"
 #include "threads/Event.h"
@@ -29,6 +28,10 @@
 #include <vector>
 #include "settings/VideoSettings.h"
 #include "guilib/Geometry.h"
+
+extern "C" {
+#include "libavcodec/avcodec.h"
+}
 
 namespace DXVA {
 

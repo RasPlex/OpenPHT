@@ -117,8 +117,6 @@ endif()
 
 plex_get_soname(CURL_SONAME ${CURL_LIBRARY})
 
-list(APPEND CONFIG_INTERNAL_LIBS lib_dllsymbols)
-
 ####
 if(DEFINED DBUS_FOUND)
   include_directories(${DBUS_INCLUDE_DIR} ${DBUS_ARCH_INCLUDE_DIR})

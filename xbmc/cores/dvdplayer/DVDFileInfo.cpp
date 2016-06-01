@@ -45,14 +45,14 @@
 #include "DVDCodecs/Video/DVDVideoCodec.h"
 #include "DVDCodecs/Video/DVDVideoCodecFFmpeg.h"
 
-#include "DllAvCodec.h"
-#include "DllSwScale.h"
-#include "filesystem/File.h"
-#include "TextureCache.h"
+extern "C" {
+#include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
+}
 
-/* PLEX */
-static DllAvFormat _dllAvFormat;
-/* END PLEX */
+#include "filesystem/File.h"
+#include "cores/FFmpeg.h"
+#include "TextureCache.h"
 
 bool CDVDFileInfo::GetFileDuration(const CStdString &path, int& duration)
 {
@@ -239,11 +239,8 @@ bool CDVDFileInfo::ExtractThumb(const CStdString &strPath, CTextureDetails &deta
               aspect = hint.aspect;
             unsigned int nHeight = (unsigned int)((double)g_advancedSettings.GetThumbSize() / aspect);
 
-            DllSwScale dllSwScale;
-            dllSwScale.Load();
-
             BYTE *pOutBuf = new BYTE[nWidth * nHeight * 4];
-            struct SwsContext *context = dllSwScale.sws_getContext(picture.iWidth, picture.iHeight,
+            struct SwsContext *context = sws_getContext(picture.iWidth, picture.iHeight,
                   PIX_FMT_YUV420P, nWidth, nHeight, PIX_FMT_BGRA, SWS_FAST_BILINEAR | SwScaleCPUFlags(), NULL, NULL, NULL);
             uint8_t *src[] = { picture.data[0], picture.data[1], picture.data[2], 0 };
             int     srcStride[] = { picture.iLineSize[0], picture.iLineSize[1], picture.iLineSize[2], 0 };
@@ -253,8 +250,8 @@ bool CDVDFileInfo::ExtractThumb(const CStdString &strPath, CTextureDetails &deta
             if (context)
             {
               int orientation = DegreeToOrientation(hint.orientation);
-              dllSwScale.sws_scale(context, src, srcStride, 0, picture.iHeight, dst, dstStride);
-              dllSwScale.sws_freeContext(context);
+              sws_scale(context, src, srcStride, 0, picture.iHeight, dst, dstStride);
+              sws_freeContext(context);
 
               details.width = nWidth;
               details.height = nHeight;
@@ -262,7 +259,6 @@ bool CDVDFileInfo::ExtractThumb(const CStdString &strPath, CTextureDetails &deta
               bOk = true;
             }
 
-            dllSwScale.Unload();
             delete [] pOutBuf;
           }
         }

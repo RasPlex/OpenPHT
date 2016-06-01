@@ -29,9 +29,13 @@
 #include "DVDClock.h"
 #include "DVDStreamInfo.h"
 #include "cores/dvdplayer/DVDCodecs/DVDCodecUtils.h"
+#include "cores/FFmpeg.h"
 #include "DVDVideoCodecVDA.h"
-#include "DllAvFormat.h"
-#include "DllSwScale.h"
+
+extern "C" {
+#include "libswscale/swscale.h"
+}
+
 #include "utils/log.h"
 #include "utils/TimeUtils.h"
 #include "windowing/WindowingFactory.h"
@@ -508,8 +512,7 @@ const uint8_t *avc_find_startcode(const uint8_t *p, const uint8_t *end)
   return out;
 }
 
-const int avc_parse_nal_units(DllAvFormat *av_format_ctx,
-  AVIOContext *pb, const uint8_t *buf_in, int size)
+const int avc_parse_nal_units(AVIOContext *pb, const uint8_t *buf_in, int size)
 {
   const uint8_t *p = buf_in;
   const uint8_t *end = p + size;
@@ -521,31 +524,29 @@ const int avc_parse_nal_units(DllAvFormat *av_format_ctx,
   {
     while (!*(nal_start++));
     nal_end = avc_find_startcode(nal_start, end);
-    av_format_ctx->avio_wb32(pb, nal_end - nal_start);
-    av_format_ctx->avio_write(pb, nal_start, nal_end - nal_start);
+    avio_wb32(pb, nal_end - nal_start);
+    avio_write(pb, nal_start, nal_end - nal_start);
     size += 4 + nal_end - nal_start;
     nal_start = nal_end;
   }
   return size;
 }
 
-const int avc_parse_nal_units_buf(DllAvUtil *av_util_ctx, DllAvFormat *av_format_ctx,
-  const uint8_t *buf_in, uint8_t **buf, int *size)
+const int avc_parse_nal_units_buf(const uint8_t *buf_in, uint8_t **buf, int *size)
 {
   AVIOContext *pb;
-  int ret = av_format_ctx->avio_open_dyn_buf(&pb);
+  int ret = avio_open_dyn_buf(&pb);
   if (ret < 0)
     return ret;
 
-  avc_parse_nal_units(av_format_ctx, pb, buf_in, *size);
+  avc_parse_nal_units(pb, buf_in, *size);
 
-  av_util_ctx->av_freep(buf);
-  *size = av_format_ctx->avio_close_dyn_buf(pb, buf);
+  av_freep(buf);
+  *size = avio_close_dyn_buf(pb, buf);
   return 0;
 }
 
-const int isom_write_avcc(DllAvUtil *av_util_ctx, DllAvFormat *av_format_ctx,
-  AVIOContext *pb, const uint8_t *data, int len)
+const int isom_write_avcc(AVIOContext *pb, const uint8_t *data, int len)
 {
   // extradata from bytestream h264, convert to avcC atom data for bitstream
   if (len > 6)
@@ -557,7 +558,7 @@ const int isom_write_avcc(DllAvUtil *av_util_ctx, DllAvFormat *av_format_ctx,
       uint32_t sps_size=0, pps_size=0;
       uint8_t *sps=0, *pps=0;
 
-      int ret = avc_parse_nal_units_buf(av_util_ctx, av_format_ctx, data, &buf, &len);
+      int ret = avc_parse_nal_units_buf(data, &buf, &len);
       if (ret < 0)
         return ret;
       start = buf;
@@ -586,26 +587,26 @@ const int isom_write_avcc(DllAvUtil *av_util_ctx, DllAvFormat *av_format_ctx,
       }
       assert(sps);
 
-      av_format_ctx->avio_w8(pb, 1); /* version */
-      av_format_ctx->avio_w8(pb, sps[1]); /* profile */
-      av_format_ctx->avio_w8(pb, sps[2]); /* profile compat */
-      av_format_ctx->avio_w8(pb, sps[3]); /* level */
-      av_format_ctx->avio_w8(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
-      av_format_ctx->avio_w8(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
+      avio_w8(pb, 1); /* version */
+      avio_w8(pb, sps[1]); /* profile */
+      avio_w8(pb, sps[2]); /* profile compat */
+      avio_w8(pb, sps[3]); /* level */
+      avio_w8(pb, 0xff); /* 6 bits reserved (111111) + 2 bits nal size length - 1 (11) */
+      avio_w8(pb, 0xe1); /* 3 bits reserved (111) + 5 bits number of sps (00001) */
 
-      av_format_ctx->avio_wb16(pb, sps_size);
-      av_format_ctx->avio_write(pb, sps, sps_size);
+      avio_wb16(pb, sps_size);
+      avio_write(pb, sps, sps_size);
       if (pps)
       {
-        av_format_ctx->avio_w8(pb, 1); /* number of pps */
-        av_format_ctx->avio_wb16(pb, pps_size);
-        av_format_ctx->avio_write(pb, pps, pps_size);
+        avio_w8(pb, 1); /* number of pps */
+        avio_wb16(pb, pps_size);
+        avio_write(pb, pps, pps_size);
       }
-      av_util_ctx->av_free(start);
+      av_free(start);
     }
     else
     {
-      av_format_ctx->avio_write(pb, data, len);
+      avio_write(pb, data, len);
     }
   }
   return 0;
@@ -626,9 +627,6 @@ CDVDVideoCodecVDA::CDVDVideoCodecVDA() : CDVDVideoCodec()
 
   m_convert_bytestream = false;
   m_convert_3byteTo4byteNALSize = false;
-  m_dllAvUtil = NULL;
-  m_dllAvFormat = NULL;
-  m_dllSwScale = NULL;
   memset(&m_videobuffer, 0, sizeof(DVDVideoPicture));
 }
 
@@ -712,30 +710,23 @@ bool CDVDVideoCodecVDA::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
           {
             // video content is from x264 or from bytestream h264 (AnnexB format)
             // NAL reformating to bitstream format needed
-            m_dllAvUtil = new DllAvUtil;
-            m_dllAvFormat = new DllAvFormat;
-            if (!m_dllAvUtil->Load() || !m_dllAvFormat->Load())
-            {
-              return false;
-            }
-
             AVIOContext *pb;
-            if (m_dllAvFormat->avio_open_dyn_buf(&pb) < 0)
+            if (avio_open_dyn_buf(&pb) < 0)
             {
               return false;
             }
 
             m_convert_bytestream = true;
             // create a valid avcC atom data from ffmpeg's extradata
-            isom_write_avcc(m_dllAvUtil, m_dllAvFormat, pb, extradata, extrasize);
+            isom_write_avcc(pb, extradata, extrasize);
             // unhook from ffmpeg's extradata
             extradata = NULL;
             // extract the avcC atom data into extradata then write it into avcCData for VDADecoder
-            extrasize = m_dllAvFormat->avio_close_dyn_buf(pb, &extradata);
+            extrasize = avio_close_dyn_buf(pb, &extradata);
             // CFDataCreate makes a copy of extradata contents
             avcCData = CFDataCreate(kCFAllocatorDefault, (const uint8_t*)extradata, extrasize);
             // done with the converted extradata, we MUST free using av_free
-            m_dllAvUtil->av_free(extradata);
+            av_free(extradata);
           }
           else
           {
@@ -749,11 +740,6 @@ bool CDVDVideoCodecVDA::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
           {
             // video content is from so silly encoder that think 3 byte NAL sizes
             // are valid, setup to convert 3 byte NAL sizes to 4 byte.
-            m_dllAvUtil = new DllAvUtil;
-            m_dllAvFormat = new DllAvFormat;
-            if (!m_dllAvUtil->Load() || !m_dllAvFormat->Load())
-              return false;
-
             extradata[4] = 0xFF;
             m_convert_3byteTo4byteNALSize = true;
           }
@@ -826,13 +812,6 @@ bool CDVDVideoCodecVDA::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
 
     if (!m_use_cvBufferRef)
     {
-      m_dllSwScale = new DllSwScale;
-      if (!m_dllSwScale->Load())
-      {
-        CFRelease(avcCData);
-        return false;
-      }
-
       // allocate a YV12 DVDVideoPicture buffer.
       // first make sure all properties are reset.
       memset(&m_videobuffer, 0, sizeof(DVDVideoPicture));
@@ -951,15 +930,6 @@ void CDVDVideoCodecVDA::Dispose()
     free(m_videobuffer.data[2]), m_videobuffer.data[2] = NULL;
     m_videobuffer.iFlags = 0;
   }
-
-  if (m_dllAvUtil)
-    delete m_dllAvUtil, m_dllAvUtil = NULL;
-
-  if (m_dllSwScale)
-    delete m_dllSwScale, m_dllSwScale = NULL;
-
-  if (m_dllAvFormat)
-    delete m_dllAvFormat, m_dllAvFormat = NULL;
 }
 
 void CDVDVideoCodecVDA::SetDropState(bool bDrop)
@@ -986,20 +956,20 @@ int CDVDVideoCodecVDA::Decode(BYTE* pData, int iSize, double dts, double pts)
       int demuxer_bytes;
       uint8_t *demuxer_content;
 
-      if(m_dllAvFormat->avio_open_dyn_buf(&pb) < 0)
+      if(avio_open_dyn_buf(&pb) < 0)
       {
         return VC_ERROR;
       }
-      demuxer_bytes = avc_parse_nal_units(m_dllAvFormat, pb, pData, iSize);
-      demuxer_bytes = m_dllAvFormat->avio_close_dyn_buf(pb, &demuxer_content);
+      demuxer_bytes = avc_parse_nal_units(pb, pData, iSize);
+      demuxer_bytes = avio_close_dyn_buf(pb, &demuxer_content);
       avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
-      m_dllAvUtil->av_free(demuxer_content);
+      av_free(demuxer_content);
     }
     else if (m_convert_3byteTo4byteNALSize)
     {
       // convert demuxer packet from 3 byte NAL sizes to 4 byte
       AVIOContext *pb;
-      if (m_dllAvFormat->avio_open_dyn_buf(&pb) < 0)
+      if (avio_open_dyn_buf(&pb) < 0)
         return VC_ERROR;
 
       uint32_t nal_size;
@@ -1008,16 +978,16 @@ int CDVDVideoCodecVDA::Decode(BYTE* pData, int iSize, double dts, double pts)
       while (nal_start < end)
       {
         nal_size = VDA_RB24(nal_start);
-        m_dllAvFormat->avio_wb32(pb, nal_size);
+        avio_wb32(pb, nal_size);
         nal_start += 3;
-        m_dllAvFormat->avio_write(pb, nal_start, nal_size);
+        avio_write(pb, nal_start, nal_size);
         nal_start += nal_size;
       }
 
       uint8_t *demuxer_content;
-      int demuxer_bytes = m_dllAvFormat->avio_close_dyn_buf(pb, &demuxer_content);
+      int demuxer_bytes = avio_close_dyn_buf(pb, &demuxer_content);
       avc_demux = CFDataCreate(kCFAllocatorDefault, demuxer_content, demuxer_bytes);
-      m_dllAvUtil->av_free(demuxer_content);
+      av_free(demuxer_content);
     }
     else
     {
@@ -1162,7 +1132,7 @@ void CDVDVideoCodecVDA::DisplayQueuePop(void)
 void CDVDVideoCodecVDA::UYVY422_to_YUV420P(uint8_t *yuv422_ptr, int yuv422_stride, DVDVideoPicture *picture)
 {
   // convert PIX_FMT_UYVY422 to PIX_FMT_YUV420P.
-  struct SwsContext *swcontext = m_dllSwScale->sws_getContext(
+  struct SwsContext *swcontext = sws_getContext(
     m_videobuffer.iWidth, m_videobuffer.iHeight, PIX_FMT_UYVY422, 
     m_videobuffer.iWidth, m_videobuffer.iHeight, PIX_FMT_YUV420P, 
     SWS_FAST_BILINEAR | SwScaleCPUFlags(), NULL, NULL, NULL);
@@ -1174,15 +1144,15 @@ void CDVDVideoCodecVDA::UYVY422_to_YUV420P(uint8_t *yuv422_ptr, int yuv422_strid
     uint8_t  *dst[] = { picture->data[0], picture->data[1], picture->data[2], 0 };
     int dstStride[] = { picture->iLineSize[0], picture->iLineSize[1], picture->iLineSize[2], 0 };
 
-    m_dllSwScale->sws_scale(swcontext, src, srcStride, 0, picture->iHeight, dst, dstStride);
-    m_dllSwScale->sws_freeContext(swcontext);
+    sws_scale(swcontext, src, srcStride, 0, picture->iHeight, dst, dstStride);
+    sws_freeContext(swcontext);
   }
 }
 
 void CDVDVideoCodecVDA::BGRA_to_YUV420P(uint8_t *bgra_ptr, int bgra_stride, DVDVideoPicture *picture)
 {
   // convert PIX_FMT_BGRA to PIX_FMT_YUV420P.
-  struct SwsContext *swcontext = m_dllSwScale->sws_getContext(
+  struct SwsContext *swcontext = sws_getContext(
     m_videobuffer.iWidth, m_videobuffer.iHeight, PIX_FMT_BGRA, 
     m_videobuffer.iWidth, m_videobuffer.iHeight, PIX_FMT_YUV420P, 
     SWS_FAST_BILINEAR | SwScaleCPUFlags(), NULL, NULL, NULL);
@@ -1194,8 +1164,8 @@ void CDVDVideoCodecVDA::BGRA_to_YUV420P(uint8_t *bgra_ptr, int bgra_stride, DVDV
     uint8_t  *dst[] = { picture->data[0], picture->data[1], picture->data[2], 0 };
     int dstStride[] = { picture->iLineSize[0], picture->iLineSize[1], picture->iLineSize[2], 0 };
 
-    m_dllSwScale->sws_scale(swcontext, src, srcStride, 0, picture->iHeight, dst, dstStride);
-    m_dllSwScale->sws_freeContext(swcontext);
+    sws_scale(swcontext, src, srcStride, 0, picture->iHeight, dst, dstStride);
+    sws_freeContext(swcontext);
   }
 }
 

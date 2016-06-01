@@ -54,7 +54,7 @@ COMXAudioCodecOMX::COMXAudioCodecOMX()
 
 COMXAudioCodecOMX::~COMXAudioCodecOMX()
 {
-  m_dllAvUtil.av_free(m_pBufferOutput);
+  av_free(m_pBufferOutput);
   m_pBufferOutput = NULL;
   m_iBufferOutputAlloced = 0;
   m_iBufferOutputUsed = 0;
@@ -66,16 +66,11 @@ bool COMXAudioCodecOMX::Open(CDVDStreamInfo &hints)
   AVCodec* pCodec = NULL;
   m_bOpenedCodec = false;
 
-  if (!m_dllAvUtil.Load() || !m_dllAvCodec.Load() || !m_dllSwResample.Load())
-    return false;
-
-  m_dllAvCodec.avcodec_register_all();
-
   if (hints.codec == AV_CODEC_ID_DTS && g_guiSettings.GetBool("audiooutput.supportdtshdcpudecoding"))
-    pCodec = m_dllAvCodec.avcodec_find_decoder_by_name("libdcadec");
+    pCodec = avcodec_find_decoder_by_name("libdcadec");
 
   if (!pCodec)
-    pCodec = m_dllAvCodec.avcodec_find_decoder(hints.codec);
+    pCodec = avcodec_find_decoder(hints.codec);
 
   if (!pCodec)
   {
@@ -84,7 +79,7 @@ bool COMXAudioCodecOMX::Open(CDVDStreamInfo &hints)
   }
 
   m_bFirstFrame = true;
-  m_pCodecContext = m_dllAvCodec.avcodec_alloc_context3(pCodec);
+  m_pCodecContext = avcodec_alloc_context3(pCodec);
   m_pCodecContext->debug_mv = 0;
   m_pCodecContext->debug = 0;
   m_pCodecContext->workaround_bugs = 1;
@@ -104,13 +99,13 @@ bool COMXAudioCodecOMX::Open(CDVDStreamInfo &hints)
     {
       m_pCodecContext->request_channel_layout = AV_CH_LAYOUT_STEREO;
       m_pCodecContext->channels = 2;
-      m_pCodecContext->channel_layout = m_dllAvUtil.av_get_default_channel_layout(m_pCodecContext->channels);
+      m_pCodecContext->channel_layout = av_get_default_channel_layout(m_pCodecContext->channels);
     }
     else if (g_guiSettings.GetInt("audiooutput.channels") <= AE_CH_LAYOUT_5_1)
     {
       m_pCodecContext->request_channel_layout = AV_CH_LAYOUT_5POINT1;
       m_pCodecContext->channels = 6;
-      m_pCodecContext->channel_layout = m_dllAvUtil.av_get_default_channel_layout(m_pCodecContext->channels);
+      m_pCodecContext->channel_layout = av_get_default_channel_layout(m_pCodecContext->channels);
     }
   }
   if (m_pCodecContext->request_channel_layout)
@@ -126,18 +121,18 @@ bool COMXAudioCodecOMX::Open(CDVDStreamInfo &hints)
   if( hints.extradata && hints.extrasize > 0 )
   {
     m_pCodecContext->extradata_size = hints.extrasize;
-    m_pCodecContext->extradata = (uint8_t*)m_dllAvUtil.av_mallocz(hints.extrasize + FF_INPUT_BUFFER_PADDING_SIZE);
+    m_pCodecContext->extradata = (uint8_t*)av_mallocz(hints.extrasize + FF_INPUT_BUFFER_PADDING_SIZE);
     memcpy(m_pCodecContext->extradata, hints.extradata, hints.extrasize);
   }
 
-  if (m_dllAvCodec.avcodec_open2(m_pCodecContext, pCodec, NULL) < 0)
+  if (avcodec_open2(m_pCodecContext, pCodec, NULL) < 0)
   {
     CLog::Log(LOGDEBUG,"COMXAudioCodecOMX::Open() Unable to open codec");
     Dispose();
     return false;
   }
 
-  m_pFrame1 = m_dllAvUtil.av_frame_alloc();
+  m_pFrame1 = av_frame_alloc();
   m_bOpenedCodec = true;
   m_iSampleFormat = AV_SAMPLE_FMT_NONE;
   m_desiredSampleFormat = m_pCodecContext->sample_fmt == AV_SAMPLE_FMT_S16 ? AV_SAMPLE_FMT_S16 : AV_SAMPLE_FMT_FLTP;
@@ -146,25 +141,21 @@ bool COMXAudioCodecOMX::Open(CDVDStreamInfo &hints)
 
 void COMXAudioCodecOMX::Dispose()
 {
-  if (m_pFrame1) m_dllAvUtil.av_free(m_pFrame1);
+  if (m_pFrame1) av_free(m_pFrame1);
   m_pFrame1 = NULL;
 
   if (m_pConvert)
-    m_dllSwResample.swr_free(&m_pConvert);
+    swr_free(&m_pConvert);
 
   if (m_pCodecContext)
   {
-    if (m_pCodecContext->extradata) m_dllAvUtil.av_free(m_pCodecContext->extradata);
+    if (m_pCodecContext->extradata) av_free(m_pCodecContext->extradata);
     m_pCodecContext->extradata = NULL;
-    if (m_bOpenedCodec) m_dllAvCodec.avcodec_close(m_pCodecContext);
+    if (m_bOpenedCodec) avcodec_close(m_pCodecContext);
     m_bOpenedCodec = false;
-    m_dllAvUtil.av_free(m_pCodecContext);
+    av_free(m_pCodecContext);
     m_pCodecContext = NULL;
   }
-
-  m_dllAvCodec.Unload();
-  m_dllAvUtil.Unload();
-  m_dllSwResample.Unload();
 
   m_bGotFrame = false;
 }
@@ -176,10 +167,10 @@ int COMXAudioCodecOMX::Decode(BYTE* pData, int iSize, double dts, double pts)
 
   AVPacket avpkt;
   m_bGotFrame = false;
-  m_dllAvCodec.av_init_packet(&avpkt);
+  av_init_packet(&avpkt);
   avpkt.data = pData;
   avpkt.size = iSize;
-  iBytesUsed = m_dllAvCodec.avcodec_decode_audio4( m_pCodecContext
+  iBytesUsed = avcodec_decode_audio4( m_pCodecContext
                                                  , m_pFrame1
                                                  , &got_frame
                                                  , &avpkt);
@@ -218,13 +209,13 @@ int COMXAudioCodecOMX::GetData(BYTE** dst, double &dts, double &pts)
     return 0;
   int inLineSize, outLineSize;
   /* input audio is aligned */
-  int inputSize = m_dllAvUtil.av_samples_get_buffer_size(&inLineSize, m_pCodecContext->channels, m_pFrame1->nb_samples, m_pCodecContext->sample_fmt, 0);
+  int inputSize = av_samples_get_buffer_size(&inLineSize, m_pCodecContext->channels, m_pFrame1->nb_samples, m_pCodecContext->sample_fmt, 0);
   /* output audio will be packed */
-  int outputSize = m_dllAvUtil.av_samples_get_buffer_size(&outLineSize, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1);
+  int outputSize = av_samples_get_buffer_size(&outLineSize, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1);
 
   if (m_iBufferOutputAlloced < m_iBufferOutputUsed + outputSize)
   {
-     m_pBufferOutput = (BYTE*)m_dllAvUtil.av_realloc(m_pBufferOutput, m_iBufferOutputUsed + outputSize + FF_INPUT_BUFFER_PADDING_SIZE);
+     m_pBufferOutput = (BYTE*)av_realloc(m_pBufferOutput, m_iBufferOutputUsed + outputSize + FF_INPUT_BUFFER_PADDING_SIZE);
      m_iBufferOutputAlloced = m_iBufferOutputUsed + outputSize;
   }
   *dst = m_pBufferOutput;
@@ -234,21 +225,21 @@ int COMXAudioCodecOMX::GetData(BYTE** dst, double &dts, double &pts)
   {
     if(m_pConvert && (m_pCodecContext->sample_fmt != m_iSampleFormat || m_channels != m_pCodecContext->channels))
     {
-      m_dllSwResample.swr_free(&m_pConvert);
+      swr_free(&m_pConvert);
       m_channels = m_pCodecContext->channels;
     }
 
     if(!m_pConvert)
     {
       m_iSampleFormat = m_pCodecContext->sample_fmt;
-      m_pConvert = m_dllSwResample.swr_alloc_set_opts(NULL,
-                      m_dllAvUtil.av_get_default_channel_layout(m_pCodecContext->channels), 
+      m_pConvert = swr_alloc_set_opts(NULL,
+                      av_get_default_channel_layout(m_pCodecContext->channels), 
                       m_desiredSampleFormat, m_pCodecContext->sample_rate,
-                      m_dllAvUtil.av_get_default_channel_layout(m_pCodecContext->channels), 
+                      av_get_default_channel_layout(m_pCodecContext->channels), 
                       m_pCodecContext->sample_fmt, m_pCodecContext->sample_rate,
                       0, NULL);
 
-      if(!m_pConvert || m_dllSwResample.swr_init(m_pConvert) < 0)
+      if(!m_pConvert || swr_init(m_pConvert) < 0)
       {
         CLog::Log(LOGERROR, "COMXAudioCodecOMX::Decode - Unable to initialise convert format %d to %d", m_pCodecContext->sample_fmt, m_desiredSampleFormat);
         return 0;
@@ -257,8 +248,8 @@ int COMXAudioCodecOMX::GetData(BYTE** dst, double &dts, double &pts)
 
     /* use unaligned flag to keep output packed */
     uint8_t *out_planes[m_pCodecContext->channels];
-    if(m_dllAvUtil.av_samples_fill_arrays(out_planes, NULL, m_pBufferOutput + m_iBufferOutputUsed, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1) < 0 ||
-       m_dllSwResample.swr_convert(m_pConvert, out_planes, m_pFrame1->nb_samples, (const uint8_t **)m_pFrame1->data, m_pFrame1->nb_samples) < 0)
+    if(av_samples_fill_arrays(out_planes, NULL, m_pBufferOutput + m_iBufferOutputUsed, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1) < 0 ||
+       swr_convert(m_pConvert, out_planes, m_pFrame1->nb_samples, (const uint8_t **)m_pFrame1->data, m_pFrame1->nb_samples) < 0)
     {
       CLog::Log(LOGERROR, "COMXAudioCodecOMX::Decode - Unable to convert format %d to %d", (int)m_pCodecContext->sample_fmt, m_desiredSampleFormat);
       outputSize = 0;
@@ -268,8 +259,8 @@ int COMXAudioCodecOMX::GetData(BYTE** dst, double &dts, double &pts)
   {
     /* copy to a contiguous buffer */
     uint8_t *out_planes[m_pCodecContext->channels];
-    if (m_dllAvUtil.av_samples_fill_arrays(out_planes, NULL, m_pBufferOutput + m_iBufferOutputUsed, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1) < 0 ||
-      m_dllAvUtil.av_samples_copy(out_planes, m_pFrame1->data, 0, 0, m_pFrame1->nb_samples, m_pCodecContext->channels, m_desiredSampleFormat) < 0 )
+    if (av_samples_fill_arrays(out_planes, NULL, m_pBufferOutput + m_iBufferOutputUsed, m_pCodecContext->channels, m_pFrame1->nb_samples, m_desiredSampleFormat, 1) < 0 ||
+      av_samples_copy(out_planes, m_pFrame1->data, 0, 0, m_pFrame1->nb_samples, m_pCodecContext->channels, m_desiredSampleFormat) < 0 )
     {
       outputSize = 0;
     }
@@ -302,7 +293,7 @@ int COMXAudioCodecOMX::GetData(BYTE** dst, double &dts, double &pts)
 
 void COMXAudioCodecOMX::Reset()
 {
-  if (m_pCodecContext) m_dllAvCodec.avcodec_flush_buffers(m_pCodecContext);
+  if (m_pCodecContext) avcodec_flush_buffers(m_pCodecContext);
   m_bGotFrame = false;
   m_iBufferOutputUsed = 0;
 }
@@ -352,7 +343,7 @@ void COMXAudioCodecOMX::BuildChannelMap()
   else
   {
     CLog::Log(LOGINFO, "COMXAudioCodecOMX::GetChannelMap - FFmpeg reported %d channels, but the layout contains %d ignoring", m_pCodecContext->channels, bits);
-    layout = m_dllAvUtil.av_get_default_channel_layout(m_pCodecContext->channels);
+    layout = av_get_default_channel_layout(m_pCodecContext->channels);
   }
 
   m_channelLayout.Reset();

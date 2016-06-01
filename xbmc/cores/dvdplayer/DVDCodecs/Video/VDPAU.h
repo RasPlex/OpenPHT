@@ -28,7 +28,6 @@
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 
-#include "DllAvUtil.h"
 #include "DVDVideoCodec.h"
 #include "DVDVideoCodecFFmpeg.h"
 #include "libavcodec/vdpau.h"
@@ -37,6 +36,12 @@
 #include "settings/VideoSettings.h"
 #include "guilib/DispResource.h"
 #include "threads/Event.h"
+
+extern "C" {
+#include "libavutil/avutil.h"
+#include "libavcodec/vdpau.h"
+}
+
 namespace Surface { class CSurface; }
 
 #define NUM_OUTPUT_SURFACES                4
@@ -227,7 +232,6 @@ public:
                           , VdpChromaType     &chroma_type);
 
   std::vector<vdpau_render_state*> m_videoSurfaces;
-  DllAvUtil   m_dllAvUtil;
 
   enum VDPAUOutputMethod
   {

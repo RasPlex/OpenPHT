@@ -40,7 +40,12 @@
 #include "cores/AudioEngine/AEFactory.h"
 #include "Util.h"
 
-#include "DllSwResample.h"
+extern "C" {
+#include "libavutil/crc.h"
+#include "libavutil/channel_layout.h"
+#include "libavutil/opt.h"
+#include "libswresample/swresample.h"
+}
 
 using namespace std;
 
@@ -534,9 +539,6 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
 
   Deinitialize();
 
-  if (!m_dllAvUtil.Load())
-    return false;
-
   m_HWDecode    = bUseHWDecode;
   m_Passthrough = bUsePassthrough;
 
@@ -624,11 +626,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
 
     // this code is just uses ffmpeg to produce the 8x8 mixing matrix
     // dummy sample rate and format, as we only care about channel mapping
-    DllSwResample m_dllSwResample;
-    if (!m_dllSwResample.Load())
-      return false;
-
-    SwrContext *m_pContext = m_dllSwResample.swr_alloc_set_opts(NULL, m_dst_chan_layout, AV_SAMPLE_FMT_FLT, 48000,
+    SwrContext *m_pContext = swr_alloc_set_opts(NULL, m_dst_chan_layout, AV_SAMPLE_FMT_FLT, 48000,
                                                           m_src_chan_layout, AV_SAMPLE_FMT_FLT, 48000, 0, NULL);
     if(!m_pContext)
     {
@@ -655,7 +653,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
       memset(m_rematrix, 0, sizeof(m_rematrix));
       for (int out=0; out<m_dst_channels; out++)
       {
-        uint64_t out_chan = m_dllAvUtil.av_channel_layout_extract_channel(m_dst_chan_layout, out);
+        uint64_t out_chan = av_channel_layout_extract_channel(m_dst_chan_layout, out);
         switch(out_chan)
         {
           case AV_CH_FRONT_LEFT:
@@ -681,14 +679,14 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
         }
       }
 
-      if (m_dllSwResample.swr_set_matrix(m_pContext, (const double*)m_rematrix, AE_CH_MAX) < 0)
+      if (swr_set_matrix(m_pContext, (const double*)m_rematrix, AE_CH_MAX) < 0)
       {
         CLog::Log(LOGERROR, "COMXAudio::Init - setting channel matrix failed");
         return false;
       }
     }
 
-    if (m_dllSwResample.swr_init(m_pContext) < 0)
+    if (swr_init(m_pContext) < 0)
     {
       CLog::Log(LOGERROR, "COMXAudio::Init - init resampler failed");
       return false;
@@ -705,7 +703,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
       for (int i=0; i < m_src_channels; i++)
         *f++ = i == j ? 1.0f : 0.0f;
 
-    int ret = m_dllSwResample.swr_convert(m_pContext, &output, samples, (const uint8_t **)&input, samples);
+    int ret = swr_convert(m_pContext, &output, samples, (const uint8_t **)&input, samples);
     if (ret < 0)
       CLog::Log(LOGERROR, "COMXAudio::Resample - resample failed");
 
@@ -727,8 +725,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
     }
     av_freep(&input);
     av_freep(&output);
-    m_dllSwResample.swr_free(&m_pContext);
-    m_dllSwResample.Unload();
+    swr_free(&m_pContext);
 
     m_wave_header.dwChannelMask = m_src_chan_layout;
   }
@@ -989,8 +986,6 @@ bool COMXAudio::Deinitialize()
     free(m_extradata);
   m_extradata = NULL;
   m_extrasize = 0;
-
-  m_dllAvUtil.Unload();
 
   while(!m_ampqueue.empty())
     m_ampqueue.pop_front();

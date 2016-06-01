@@ -329,6 +329,8 @@
 #include "XHandle.h"
 #endif
 
+#include "cores/FFmpeg.h"
+
 #ifdef HAS_LIRC
 #include "input/linux/LIRC.h"
 #endif
@@ -775,6 +777,19 @@ bool CApplication::Create()
 #elif defined(_WIN32)
   SetEnvironmentVariable("OS","win32");
 #endif
+
+  // register ffmpeg lockmanager callback
+  av_lockmgr_register(&ffmpeg_lockmgr_cb);
+  // register avcodec
+  avcodec_register_all();
+  // register avformat
+  av_register_all();
+  // register avfilter
+  avfilter_register_all();
+  // set avutil callback
+  av_log_set_callback(ff_avutil_log);
+  // do global initialization of network components
+  avformat_network_init();
 
   g_powerManager.Initialize();
 
@@ -4004,6 +4019,12 @@ void CApplication::Stop(int exitCode)
     // shutdown the AudioEngine
     CAEFactory::Shutdown();
     CAEFactory::UnLoadEngine();
+
+    // unregister ffmpeg lock manager call back
+    avformat_network_deinit();
+
+    // unregister ffmpeg lock manager call back
+    av_lockmgr_register(NULL);
 
     CLog::Log(LOGNOTICE, "stopped");
   }

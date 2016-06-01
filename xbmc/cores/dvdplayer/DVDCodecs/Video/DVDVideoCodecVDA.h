@@ -34,9 +34,6 @@ typedef struct frame_queue {
   struct frame_queue  *nextframe;
 } frame_queue;
 
-class DllAvUtil;
-class DllSwScale;
-class DllAvFormat;
 class DllLibVDADecoder;
 class CDVDVideoCodecVDA : public CDVDVideoCodec
 {
@@ -79,10 +76,6 @@ protected:
   
   bool              m_convert_bytestream;
   bool              m_convert_3byteTo4byteNALSize;
-  DllAvUtil         *m_dllAvUtil;
-  DllAvFormat       *m_dllAvFormat;
-
-  DllSwScale        *m_dllSwScale;
   DVDVideoPicture   m_videobuffer;
 };
 

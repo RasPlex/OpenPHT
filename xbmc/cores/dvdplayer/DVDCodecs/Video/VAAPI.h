@@ -21,7 +21,6 @@
 
 #include "system_gl.h"
 
-#include "DllAvCodec.h"
 #include "DVDVideoCodecFFmpeg.h"
 #include <libavcodec/vaapi.h>
 #include <va/va.h>
@@ -29,6 +28,11 @@
 #include <va/va_glx.h>
 #include <list>
 #include <boost/shared_ptr.hpp>
+
+extern "C" {
+#include "libavutil/avutil.h"
+#include "libavcodec/vaapi.h"
+}
 
 
 namespace VAAPI {

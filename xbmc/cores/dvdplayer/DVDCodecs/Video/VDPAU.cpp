@@ -33,6 +33,7 @@
 #include "Application.h"
 #include "utils/MathUtils.h"
 #include "DVDCodecs/DVDCodecUtils.h"
+#include "utils/log.h"
 
 #define ARSIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -178,9 +179,6 @@ bool CVDPAU::Open(AVCodecContext* avctx, const enum PixelFormat, unsigned int su
     }
   }
 
-  if (!m_dllAvUtil.Load())
-    return false;
-
   InitVDPAUProcs();
 
   if (vdp_device != VDP_INVALID_HANDLE)
@@ -245,13 +243,12 @@ void CVDPAU::Close()
     vdpau_render_state *render = m_videoSurfaces.back();
     m_videoSurfaces.pop_back();
     if (render->bitstream_buffers_allocated)
-      m_dllAvUtil.av_freep(&render->bitstream_buffers);
+      av_freep(&render->bitstream_buffers);
     render->bitstream_buffers_allocated = 0;
     free(render);
   }
 
   g_Windowing.Unregister(this);
-  m_dllAvUtil.Unload();
 }
 
 bool CVDPAU::MakePixmapGL()
