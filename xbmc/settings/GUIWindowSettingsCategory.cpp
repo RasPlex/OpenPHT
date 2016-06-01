@@ -112,10 +112,6 @@
 #include "pvr/PVRManager.h"
 #include "pvr/addons/PVRClients.h"
 
-#if defined(HAVE_LIBCRYSTALHD)
-#include "cores/dvdplayer/DVDCodecs/Video/CrystalHD.h"
-#endif
-
 #if defined(HAS_AIRPLAY)
 #include "network/AirPlayServer.h"
 #endif

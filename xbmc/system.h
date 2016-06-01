@@ -114,9 +114,6 @@
 #define HAS_WIN32_NETWORK
 #define HAS_IRSERVERSUITE
 #define HAS_AUDIO
-#ifndef __PLEX__
-#define HAVE_LIBCRYSTALHD 2
-#endif
 #define HAS_WEB_SERVER
 #define HAS_WEB_INTERFACE
 #ifndef __PLEX__

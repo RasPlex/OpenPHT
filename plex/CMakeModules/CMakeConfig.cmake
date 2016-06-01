@@ -97,9 +97,6 @@ set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS $<$<CONFIG:Debug>:_DE
 add_definitions(-D__PLEX__ -D__PLEX__XBMC__ -DPLEX_BUILD_TAG="${BUILD_TAG}" -DPLEX_TARGET_NAME="${EXECUTABLE_NAME}" -DENABLE_DVDINPUTSTREAM_STACK)
 
 include(CheckFFmpegIncludes)
-if(NOT TARGET_RPI)
-  include(CheckCrystalHDInclude)
-endif()
 include(CheckLibshairportConfig)
 include(CheckLibshairplayConfig)
 

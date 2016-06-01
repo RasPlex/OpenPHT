@@ -12,14 +12,14 @@ SUBDIRS := \
 	openssl gmp nettle gnutls librtmp curl \
 	libjpeg-turbo tiff libpng libogg \
 	libvorbis libflac fribidi libmpeg2 \
-	libass libcdio libcrystalhd \
+	libass libcdio \
 	libGLEW libsdl libsdl_image \
 	libmicrohttpd libmodplug yajl libffi \
 	libplist libshairplay libcec tinyxml \
 	boost breakpad libdcadec
 
 ifeq ($(DARWIN), ios)
-  EXCLUDED = libcec libcrystalhd libGLEW libsdl libsdl_image
+  EXCLUDED = libcec libGLEW libsdl libsdl_image
 else
   EXCLUDED = Backrow
 endif

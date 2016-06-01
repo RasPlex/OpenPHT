@@ -37,7 +37,6 @@
 #include "utils/XBMCTinyXML.h"
 #include "windowing/WindowingFactory.h"
 #include "powermanagement/PowerManager.h"
-#include "cores/dvdplayer/DVDCodecs/Video/CrystalHD.h"
 #include "cores/AudioEngine/AEFactory.h"
 #include "cores/AudioEngine/Utils/AEAudioFormat.h"
 #include "guilib/GUIFont.h" // for FONT_STYLE_* definitions
@@ -691,9 +690,6 @@ void CGUISettings::Initialize()
 #endif
 #ifdef HAS_DX
   AddBool(g_sysinfo.IsVistaOrHigher() ? vp: NULL, "videoplayer.usedxva2", 13427, g_sysinfo.IsVistaOrHigher() ? true : false);
-#endif
-#ifdef HAVE_LIBCRYSTALHD
-  AddBool(CCrystalHD::GetInstance()->DevicePresent() ? vp: NULL, "videoplayer.usechd", 13428, true);
 #endif
 #ifdef HAVE_LIBVDADECODER
   AddBool(g_sysinfo.HasVDADecoder() ? vp: NULL, "videoplayer.usevda", 13429, true);
