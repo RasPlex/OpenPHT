@@ -421,6 +421,16 @@
 				<info>Player.Seekbar</info>
 				<visible>Player.Seeking</visible>
 			</control>
+			<control type="image">
+				<posx>20</posx>
+				<posy>-222</posy>
+				<height>180</height>
+				<width>320</width>
+				<fadetime>1</fadetime>
+				<aspectratio align="left" aligny="bottom">keep</aspectratio>
+				<texture>$INFO[VideoPlayer.SeekImage]</texture>
+				<visible>Player.Seeking + !IsEmpty(VideoPlayer.SeekImage)</visible>
+			</control>
 		</control>
 	</include>
 	<!-- VideoOSD.xml -->
@@ -526,6 +536,16 @@
 					<label>$VAR[SeekingLabels]</label>
 					<textcolor>white</textcolor>
 				</control>
+			</control>
+			<control type="image">
+				<posx>20</posx>
+				<posy>-222</posy>
+				<height>180</height>
+				<width>320</width>
+				<fadetime>1</fadetime>
+				<aspectratio align="left" aligny="bottom">keep</aspectratio>
+				<texture>$INFO[VideoPlayer.SeekImage]</texture>
+				<visible>Player.Seeking + !IsEmpty(VideoPlayer.SeekImage)</visible>
 			</control>
 			<!-- buttons -->
 			<control type="group" id="200">

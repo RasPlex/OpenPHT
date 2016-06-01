@@ -474,6 +474,7 @@ const infomap videoplayer[] =    {{ "title",            VIDEOPLAYER_TITLE },
                                   { "isstereoscopic",   VIDEOPLAYER_IS_STEREOSCOPIC },
                                   { "stereoscopicmode", VIDEOPLAYER_STEREOSCOPIC_MODE },
                                   /* PLEX */
+                                  { "seekimage",        VIDEOPLAYER_SEEKIMAGE },
                                   { "audiostream",      VIDEOPLAYER_AUDIOSTREAM },
                                   { "subtitlestream",   VIDEOPLAYER_SUBTITLESTREAM },
                                   { "durationstr",      VIDEOPLAYER_DURATION_STRING },
@@ -1602,6 +1603,7 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
   case VIDEOPLAYER_PARENTAL_RATING:
   case VIDEOPLAYER_PLAYCOUNT:
   /* PLEX */
+  case VIDEOPLAYER_SEEKIMAGE:
   case VIDEOPLAYER_AUDIOSTREAM:
   case VIDEOPLAYER_SUBTITLESTREAM:
   case VIDEOPLAYER_DURATION_STRING:
@@ -6417,6 +6419,16 @@ CStdString CGUIInfoManager::GetVideoLabel(int item, const CFileItemPtr& file)
         break;
       }
     /* PLEX */
+    case VIDEOPLAYER_SEEKIMAGE:
+      {
+        if (g_application.m_pPlayer->IsPlayingVideo())
+        {
+          CFileItemPtr mediaPart = g_application.CurrentFileItem().m_selectedMediaPart;
+          if (mediaPart && mediaPart->HasProperty("indexesUrl"))
+            return mediaPart->GetProperty("indexesUrl").asString() + std::to_string((static_cast<int64_t>(std::round(g_application.GetTime())) + CSeekHandler::GetInstance().GetSeekSize() + 5) * 1000);
+        }
+        return "";
+      }
     case VIDEOPLAYER_AUDIOSTREAM:
       {
         if (g_application.m_pPlayer->IsPlaying())
