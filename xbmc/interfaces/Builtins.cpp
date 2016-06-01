@@ -768,13 +768,21 @@ int CBuiltins::Execute(const CStdString& execString)
     }
     else if (parameter.Equals("smallskipbackward"))
     {
+#ifndef __PLEX__
       if (g_application.m_pPlayer->IsPlaying())
         g_application.m_pPlayer->Seek(false, false);
+#else
+      g_application.OnAction(CAction(ACTION_STEP_BACK));
+#endif
     }
     else if (parameter.Equals("smallskipforward"))
     {
+#ifndef __PLEX__
       if (g_application.m_pPlayer->IsPlaying())
         g_application.m_pPlayer->Seek(true, false);
+#else
+      g_application.OnAction(CAction(ACTION_STEP_FORWARD));
+#endif
     }
     else if (parameter.Left(14).Equals("seekpercentage"))
     {

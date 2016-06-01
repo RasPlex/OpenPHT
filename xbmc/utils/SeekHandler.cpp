@@ -92,6 +92,7 @@ void CSeekHandler::Reset()
   m_analogSeek = false;
   m_seekStep = 0;
   m_seekSize = 0;
+  m_timer.Stop();
 }
 
 int CSeekHandler::GetSeekStepSize(SeekType type, int step)
@@ -136,6 +137,9 @@ void CSeekHandler::Seek(bool forward, float amount, float duration /* = 0 */, bo
     m_requireSeek = true;
     m_analogSeek = analogSeek;
     m_seekDelay = analogSeek ? analogSeekDelay : m_seekDelays.at(type);
+
+    if (g_application.m_pPlayer->IsPlayingVideo() && !g_application.m_pPlayer->IsPaused())
+      g_application.m_pPlayer->SetPlaySpeed(0, g_settings.m_bMute);
   }
 
   // calculate our seek amount
@@ -168,8 +172,12 @@ void CSeekHandler::Seek(bool forward, float amount, float duration /* = 0 */, bo
     }
     else
     {
+      if (g_application.m_pPlayer->IsPlayingVideo())
+        g_application.m_pPlayer->SetPlaySpeed(1, g_settings.m_bMute);
+
       // nothing to do, abort seeking
       Reset();
+      return;
     }
   }
 
@@ -209,6 +217,9 @@ void CSeekHandler::Process()
 
     // perform relative seek
     g_application.m_pPlayer->SeekTimeRelative(static_cast<int64_t>(m_seekSize * 1000));
+
+    if (g_application.m_pPlayer->IsPlayingVideo())
+      g_application.m_pPlayer->SetPlaySpeed(1, g_settings.m_bMute);
 
     Reset();
   }
