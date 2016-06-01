@@ -535,6 +535,10 @@ int CBuiltins::Execute(const CStdString& execString)
   {
     if (params.size())
     {
+#ifdef TARGET_OPENELEC
+      if (params[0].Equals("service.openelec.settings"))
+        params[0] = "service.libreelec.settings";
+#endif
       AddonPtr addon;
       if (CAddonMgr::Get().GetAddon(params[0],addon) && addon)
       {

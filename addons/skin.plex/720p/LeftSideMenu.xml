@@ -485,7 +485,7 @@
 						<description>OE Settings Button</description>
 						<label> $LOCALIZE[41000] </label>
 						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.openelec.settings)</onclick>
+						<onclick>RunAddon(service.libreelec.settings)</onclick>
 						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
 					</item>
 					<item id="102">
@@ -615,7 +615,7 @@
 						<description>OE Settings Button</description>
 						<label> $LOCALIZE[41000] </label>
 						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.openelec.settings)</onclick>
+						<onclick>RunAddon(service.libreelec.settings)</onclick>
 						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
 					</item>
 					<item id="102">
