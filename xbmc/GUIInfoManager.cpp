@@ -452,11 +452,13 @@ const infomap videoplayer[] =    {{ "title",            VIDEOPLAYER_TITLE },
                                   { "videoaspect",      VIDEOPLAYER_VIDEO_ASPECT },
                                   { "audiocodec",       VIDEOPLAYER_AUDIO_CODEC },
                                   { "audiochannels",    VIDEOPLAYER_AUDIO_CHANNELS },
+                                  { "audiolanguage",    VIDEOPLAYER_AUDIO_LANG },
                                   { "hasteletext",      VIDEOPLAYER_HASTELETEXT },
                                   { "lastplayed",       VIDEOPLAYER_LASTPLAYED },
                                   { "playcount",        VIDEOPLAYER_PLAYCOUNT },
                                   { "hassubtitles",     VIDEOPLAYER_HASSUBTITLES },
                                   { "subtitlesenabled", VIDEOPLAYER_SUBTITLESENABLED },
+                                  { "subtitlelanguage", VIDEOPLAYER_SUBTITLE_LANG },
                                   { "endtime",          VIDEOPLAYER_ENDTIME },
                                   { "nexttitle",        VIDEOPLAYER_NEXT_TITLE },
                                   { "nextgenre",        VIDEOPLAYER_NEXT_GENRE },
@@ -1639,10 +1641,26 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
         strLabel.Format("%i", m_audioInfo.channels);
     }
     break;
+  case VIDEOPLAYER_AUDIO_LANG:
+    if(g_application.m_pPlayer->IsPlaying())
+    {
+      SPlayerAudioStreamInfo info;
+      g_application.m_pPlayer->GetAudioStreamInfo(CURRENT_STREAM, info);
+      strLabel = (!info.language.empty()) ? CStdString(info.language) : g_localizeStrings.Get(231);
+    }
+    break;
   case VIDEOPLAYER_STEREOSCOPIC_MODE:
     if(g_application.m_pPlayer->IsPlaying())
     {
       strLabel = m_videoInfo.stereoMode;
+    }
+    break;
+  case VIDEOPLAYER_SUBTITLE_LANG:
+    if(g_application.m_pPlayer->IsPlaying())
+    {
+      SPlayerSubtitleStreamInfo info;
+      g_application.m_pPlayer->GetSubtitleStreamInfo(CURRENT_STREAM, info);
+      strLabel = (!info.language.empty()) ? CStdString(info.language) : g_localizeStrings.Get(231);
     }
     break;
   case PLAYLIST_LENGTH:
