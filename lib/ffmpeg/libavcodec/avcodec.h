@@ -532,6 +532,10 @@ enum AVCodecID {
     AV_CODEC_ID_ASS        = MKBETAG('A','S','S',' '),  ///< ASS as defined in Matroska
     AV_CODEC_ID_HDMV_TEXT_SUBTITLE = MKBETAG('B','D','T','X'),
 
+    /* data codecs */
+    AV_CODEC_ID_VBI_DATA= 0x17500,
+    AV_CODEC_ID_VBI_TELETEXT,
+
     /* other specific kind of codecs (generally used for attachments) */
     AV_CODEC_ID_FIRST_UNKNOWN = 0x18000,           ///< A dummy ID pointing at the start of various fake codecs.
     AV_CODEC_ID_TTF = 0x18000,
@@ -2804,6 +2808,7 @@ typedef struct AVCodecContext {
 #define FF_BUG_DC_CLIP          4096
 #define FF_BUG_MS               8192 ///< Work around various bugs in Microsoft's broken decoders.
 #define FF_BUG_TRUNCATED       16384
+#define FF_BUG_GMC_UNSUPPORTED 32768
 
     /**
      * strictly follow the standard (MPEG4, ...).

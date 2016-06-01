@@ -69,6 +69,8 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     int ret;
     char hostname[1024],proto[1024],path[1024];
     char portstr[10];
+    size_t len;
+    char *c;
     s->open_timeout = 5000000;
 
     av_url_split(proto, sizeof(proto), NULL, 0, hostname, sizeof(hostname),
@@ -104,6 +106,17 @@ static int tcp_open(URLContext *h, const char *uri, int flags)
     snprintf(portstr, sizeof(portstr), "%d", port);
     if (s->listen)
         hints.ai_flags |= AI_PASSIVE;
+    len = strlen(hostname);
+    if (len > 12 && !strcmp(hostname + len - 12, ".plex.direct")) {
+        for (c = hostname; *c; c++) {
+            if (*c == '-') {
+                *c = '.';
+            } else if (*c == '.') {
+                *c = '\0';
+                break;
+            }
+        }
+    }
     if (!hostname[0])
         ret = getaddrinfo(NULL, portstr, &hints, &ai);
     else

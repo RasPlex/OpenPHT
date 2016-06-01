@@ -497,6 +497,14 @@ static int dxva2_h264_end_frame(AVCodecContext *avctx)
 
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
         return -1;
+
+    // Wait for an I-frame before start decoding. Workaround for ATI UVD and UVD+ GPUs
+    if (!h->got_first_iframe) {
+        if (!(ctx_pic->pp.wBitFields & (1 << 15)))
+            return -1;
+        h->got_first_iframe = 1;
+    }
+
     ret = ff_dxva2_common_end_frame(avctx, h->cur_pic_ptr->f,
                                     &ctx_pic->pp, sizeof(ctx_pic->pp),
                                     &ctx_pic->qm, sizeof(ctx_pic->qm),

@@ -24,6 +24,8 @@ fi
 # the resulting debug dll's are twice to fourth time the size of the release binaries
 
 OPTIONS="
+--disable-muxers \
+--disable-encoders \
 --enable-shared \
 --enable-memalign-hack \
 --enable-gpl \
@@ -74,5 +76,6 @@ cp .libs/swresample.lib /xbmc/project/BuildDependencies/lib/ &&
 cp .libs/swscale.lib /xbmc/project/BuildDependencies/lib/
 
 #remove the bgprocessfile for signaling the process end
-echo deleting $BGPROCESSFILE
-rm $BGPROCESSFILE
+if [ -f "$BGPROCESSFILE" ]; then
+  rm $BGPROCESSFILE
+fi

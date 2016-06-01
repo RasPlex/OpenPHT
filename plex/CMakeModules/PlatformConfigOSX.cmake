@@ -99,6 +99,7 @@ set(external_libs
   nettle
   hogweed
   gnutls
+  dcadec
 )
 
 set(ffmpeg_libs

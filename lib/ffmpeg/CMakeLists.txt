@@ -32,18 +32,18 @@ ExternalProject_Add(
   INSTALL_COMMAND make install
 )
 
-#define DLL_PATH_LIBAVCODEC    "special://xbmcbin/system/players/dvdplayer/avcodec-53-${ARCH}.so"
-#define DLL_PATH_LIBAVFORMAT   "special://xbmcbin/system/players/dvdplayer/avformat-53-${ARCH}.so"
-#define DLL_PATH_LIBAVUTIL     "special://xbmcbin/system/players/dvdplayer/avutil-51-${ARCH}.so"
-#define DLL_PATH_LIBPOSTPROC   "special://xbmcbin/system/players/dvdplayer/postproc-52-${ARCH}.so"
-#define DLL_PATH_LIBSWSCALE    "special://xbmcbin/system/players/dvdplayer/swscale-2-${ARCH}.so"
-#define DLL_PATH_LIBAVFILTER   "special://xbmcbin/system/players/dvdplayer/avfilter-2-${ARCH}.so"
-#define DLL_PATH_LIBSWRESAMPLE "special://xbmcbin/system/players/dvdplayer/swresample-0-${ARCH}.so"
+#define DLL_PATH_LIBAVCODEC    "special://xbmcbin/system/players/dvdplayer/avcodec-56-${ARCH}.so"
+#define DLL_PATH_LIBAVFORMAT   "special://xbmcbin/system/players/dvdplayer/avformat-56-${ARCH}.so"
+#define DLL_PATH_LIBAVUTIL     "special://xbmcbin/system/players/dvdplayer/avutil-54-${ARCH}.so"
+#define DLL_PATH_LIBPOSTPROC   "special://xbmcbin/system/players/dvdplayer/postproc-53-${ARCH}.so"
+#define DLL_PATH_LIBSWSCALE    "special://xbmcbin/system/players/dvdplayer/swscale-3-${ARCH}.so"
+#define DLL_PATH_LIBAVFILTER   "special://xbmcbin/system/players/dvdplayer/avfilter-5-${ARCH}.so"
+#define DLL_PATH_LIBSWRESAMPLE "special://xbmcbin/system/players/dvdplayer/swresample-1-${ARCH}.so"
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavcodec.so.53.61.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avcodec-53-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavformat.so.53.32.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avformat-53-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavutil.so.51.35.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avutil-51-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libpostproc.so.52.0.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME postproc-52-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libswscale.so.2.1.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME swscale-2-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavfilter.so.2.61.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avfilter-2-${ARCH}.so)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libswresample.so.0.6.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME swresample-0-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavcodec.so.56.1.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avcodec-56-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavformat.so.56.4.101 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avformat-56-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavutil.so.54.7.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avutil-54-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libpostproc.so.53.0.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME postproc-53-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libswscale.so.3.0.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME swscale-3-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libavfilter.so.5.1.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME avfilter-5-${ARCH}.so)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ffmpeg/lib/libswresample.so.1.1.100 DESTINATION ${LIBPATH}/system/players/dvdplayer RENAME swresample-1-${ARCH}.so)
