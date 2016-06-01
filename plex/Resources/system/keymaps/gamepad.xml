@@ -43,7 +43,7 @@
       <Y>Queue</Y>
       <white>ContextMenu</white>
       <black/>
-      <start>XBMC.ActivateWindow(PlayerControls)</start>
+      <!--<start>XBMC.ActivateWindow(PlayerControls)</start>-->
       <back>PreviousMenu</back>
       <dpadleft>Left</dpadleft>
       <dpadright>Right</dpadright>

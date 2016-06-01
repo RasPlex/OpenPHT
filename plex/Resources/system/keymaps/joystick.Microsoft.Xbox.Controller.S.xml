@@ -48,7 +48,7 @@
       <button id="6">ContextMenu</button>
       <button id="7"/>
       <button id="8"/>
-      <button id="9">XBMC.ActivateWindow(PlayerControls)</button>
+      <!--<button id="9">XBMC.ActivateWindow(PlayerControls)</button>-->
       <button id="10"/>
       <button id="11">Screenshot</button>
       <button id="12">XBMC.ActivateWindow(ShutdownMenu)</button>
