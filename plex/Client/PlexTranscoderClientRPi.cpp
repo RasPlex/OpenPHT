@@ -47,6 +47,7 @@ CPlexTranscoderClientRPi::CPlexTranscoderClientRPi()
   }
 
 #ifdef TARGET_RASPBERRY_PI_2
+    m_knownVideoCodecs.insert("hevc");
     m_knownAudioCodecs.insert("truehd");
 #endif
 
@@ -147,6 +148,14 @@ bool CPlexTranscoderClientRPi::ShouldTranscode(CPlexServerPtr server, const CFil
     bShouldTranscode = true;
     ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
   }
+#ifdef TARGET_RASPBERRY_PI_2
+  // check if video resolution is to large for hevc
+  else if (videoCodec == "hvec" && (videoWidth > 1280 || videoHeight > 720))
+  {
+    bShouldTranscode = true;
+    ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
+  }
+#endif
   // check if seetings are to transcoding for local media
   else if ( isLocal && localQuality > 0 && localQuality < videoBitRate )
   {
