@@ -24,7 +24,6 @@
 #include "XBApplicationEx.h"
 
 #include "guilib/IMsgTargetCallback.h"
-#include "guilib/Key.h"
 #include "threads/Condition.h"
 #include "utils/GlobalsHandling.h"
 
@@ -32,8 +31,12 @@
 #include <memory>
 #include <string>
 
+class CAction;
 class CFileItem;
 class CFileItemList;
+class CKey;
+
+
 namespace ADDON
 {
   class CSkinInfo;
@@ -64,6 +67,7 @@ namespace MEDIA_DETECT
 #include "threads/Thread.h"
 
 #include "ApplicationPlayer.h"
+#include "interfaces/IActionListener.h"
 
 /* PLEX */
 #include "plex/Windows/LaunchHost.h"
@@ -388,6 +392,17 @@ public:
   void SetRenderGUI(bool renderGUI);
   bool GetRenderGUI() const { return m_renderGUI; };
 
+  /*!
+   \brief Register an action listener.
+   \param listener The listener to register
+   */
+  void RegisterActionListener(IActionListener *listener);
+  /*!
+   \brief Unregister an action listener.
+   \param listener The listener to unregister
+   */
+  void UnregisterActionListener(IActionListener *listener);
+
   /* PLEX */
   bool m_bPlaybackInFullScreen;
 
@@ -416,6 +431,13 @@ public:
 protected:
   bool LoadSkin(const CStdString& skinID);
   void LoadSkin(const boost::shared_ptr<ADDON::CSkinInfo>& skin);
+  
+  /*!
+   \brief Delegates the action to all registered action handlers.
+   \param action The action
+   \return true, if the action was taken by one of the action listener.
+   */
+  bool NotifyActionListeners(const CAction &action) const;
 
   bool m_skinReloading; // if true we disallow LoadSkin until ReloadSkin is called
 
@@ -515,6 +537,7 @@ protected:
   std::map<std::string, std::map<int, float> > m_lastAxisMap;
 #endif
 
+  std::vector<IActionListener *> m_actionListeners;
 
   /* PLEX */
 #ifdef HAVE_BREAKPAD
@@ -525,6 +548,9 @@ protected:
   LaunchHost *m_pLaunchHost;
   bool m_returnFromAutoUpdate;
   /* END PLEX */
+
+private:
+  CCriticalSection                m_critSection;                 /*!< critical section for all changes to this class, except for changes to triggers */
 };
 
 XBMC_GLOBAL_REF(CApplication,g_application);
