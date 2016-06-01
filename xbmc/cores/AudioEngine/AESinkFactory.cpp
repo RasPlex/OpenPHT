@@ -28,6 +28,9 @@
 #elif defined(TARGET_RASPBERRY_PI)
   #include "Sinks/AESinkPi.h"
   #include "Sinks/AESinkALSA.h"
+  #if defined(HAS_PULSEAUDIO) && defined(TARGET_OPENELEC)
+    #include "Sinks/AESinkPULSE.h"
+  #endif
 #elif defined(TARGET_DARWIN_IOS)
   #include "Sinks/AESinkDARWINIOS.h"
 #elif defined(TARGET_DARWIN_OSX)
@@ -67,6 +70,9 @@ void CAESinkFactory::ParseDevice(std::string &device, std::string &driver)
 #elif defined(TARGET_RASPBERRY_PI)
         driver == "PI"          ||
         driver == "ALSA"        ||
+  #if defined(HAS_PULSEAUDIO) && defined(TARGET_OPENELEC)
+        driver == "PULSE"	||
+  #endif
 #elif defined(TARGET_DARWIN_IOS)
         driver == "DARWINIOS"  ||
 #elif defined(TARGET_DARWIN_OSX)
@@ -108,6 +114,10 @@ IAESink *CAESinkFactory::TrySink(std::string &driver, std::string &device, AEAud
 #elif defined(TARGET_RASPBERRY_PI)
   if (driver == "PI")
     sink = new CAESinkPi();
+  #if defined(HAS_PULSEAUDIO) && defined(TARGET_OPENELEC)
+    if (driver == "PULSE")
+      sink = new CAESinkPULSE();
+  #endif
   #if defined(HAS_ALSA)
   if (driver == "ALSA")
     sink = new CAESinkALSA();
@@ -209,6 +219,16 @@ void CAESinkFactory::EnumerateEx(AESinkInfoList &list, bool force)
   if(!info.m_deviceInfoList.empty())
     list.push_back(info);
   #endif
+  #if defined(HAS_PULSEAUDIO) && defined(TARGET_OPENELEC)
+  info.m_deviceInfoList.clear();
+  info.m_sinkName = "PULSE";
+  CAESinkPULSE::EnumerateDevicesEx(info.m_deviceInfoList, force);
+  if(!info.m_deviceInfoList.empty())
+  {
+    list.push_back(info);
+    return;
+  }
+  #endif
 #elif defined(TARGET_DARWIN_IOS)
 
   info.m_deviceInfoList.clear();
@@ -253,6 +273,28 @@ void CAESinkFactory::EnumerateEx(AESinkInfoList &list, bool force)
       CLog::Log(LOGNOTICE, "User specified Sink %s could not be enumerated", envSink.c_str());
   }
 
+#if defined(TARGET_OPENELEC)
+  #if defined(HAS_ALSA)
+  info.m_deviceInfoList.clear();
+  info.m_sinkName = "ALSA";
+  CAESinkALSA::EnumerateDevicesEx(info.m_deviceInfoList, force);
+  if(!info.m_deviceInfoList.empty())
+  {
+    list.push_back(info);
+  }
+  #endif
+
+  #if defined(HAS_PULSEAUDIO)
+  info.m_deviceInfoList.clear();
+  info.m_sinkName = "PULSE";
+  CAESinkPULSE::EnumerateDevicesEx(info.m_deviceInfoList, force);
+  if(!info.m_deviceInfoList.empty())
+  {
+    list.push_back(info);
+    return;
+  }
+  #endif
+#else
   #if defined(HAS_PULSEAUDIO)
   info.m_deviceInfoList.clear();
   info.m_sinkName = "PULSE";
@@ -274,6 +316,7 @@ void CAESinkFactory::EnumerateEx(AESinkInfoList &list, bool force)
     return;
   }
   #endif
+#endif
 
   info.m_deviceInfoList.clear();
   info.m_sinkName = "OSS";
