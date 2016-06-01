@@ -774,8 +774,6 @@ bool CApplication::Create()
     return false;
   }
 
-  g_peripherals.Initialise();
-
   // Create the Mouse, Keyboard, Remote, and Joystick devices
   // Initialize after loading settings to get joystick deadzone setting
   g_Mouse.Initialize();
@@ -800,14 +798,6 @@ bool CApplication::Create()
 
   m_lastFrameTime = XbmcThreads::SystemClockMillis();
   m_lastRenderTime = m_lastFrameTime;
-  
-  /* PLEX */
-#ifdef TARGET_RASPBERRY_PI
-  if (g_application.getNetwork().IsAvailable(true))
-#endif
-  g_plexApplication.Start();
-  /* END PLEX */
-  
   return true;
 }
 
@@ -1267,6 +1257,8 @@ bool CApplication::Initialize()
     CDirectory::Create("special://xbmc/sounds");
   }
 
+  g_peripherals.Initialise();
+
   // Load curl so curl_global_init gets called before any service threads
   // are started. Unloading will have no effect as curl is never fully unloaded.
   // To quote man curl_global_init:
@@ -1281,6 +1273,13 @@ bool CApplication::Initialize()
 
   // initialize (and update as needed) our databases
   CDatabaseManager::Get().Initialize();
+
+  /* PLEX */
+#ifdef TARGET_RASPBERRY_PI
+  if (g_application.getNetwork().IsAvailable(true))
+#endif
+  g_plexApplication.Start();
+  /* END PLEX */
 
 #ifdef HAS_WEB_SERVER
   CWebServer::RegisterRequestHandler(&m_httpImageHandler);
@@ -1391,6 +1390,7 @@ bool CApplication::Initialize()
 #endif
     ADDON::CAddonMgr::Get().StartServices(false);
   }
+
   g_sysinfo.Refresh();
 
   CLog::Log(LOGINFO, "removing tempfiles");
@@ -1398,7 +1398,9 @@ bool CApplication::Initialize()
 
   if (!g_settings.UsingLoginScreen())
   {
+#ifndef __PLEX__
     UpdateLibraries();
+#endif
 #ifdef HAS_PYTHON
     g_pythonParser.m_bLogin = true;
 #endif
@@ -2968,8 +2970,8 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
         }
       }
       g_graphicsContext.Unlock();
-      CWinEvents::MessagePump();
     }
+    CWinEvents::MessagePump();
 
     UpdateLCD();
 
@@ -3581,10 +3583,10 @@ void CApplication::Stop(int exitCode)
 #endif
 #endif
 
-  g_mediaManager.Stop();
+    g_mediaManager.Stop();
 
-  // Stop services before unloading Python
-  CAddonMgr::Get().StopServices(false);
+    // Stop services before unloading Python
+    CAddonMgr::Get().StopServices(false);
 
     // unregister action listeners
     UnregisterActionListener(&CSeekHandler::GetInstance());
@@ -4014,10 +4016,6 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
     return false;
   }
 
-  /* PLEX */
-  CPlexServerPtr bestServer = g_plexApplication.serverManager->GetBestServer();
-  /* END PLEX */
-
   CPlayerOptions options;
 
   if( item.HasProperty("StartPercent") )
@@ -4134,8 +4132,6 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
 
   // reset m_bStartVideoWindowed as it's a temp setting
   g_settings.m_bStartVideoWindowed = false;
-  // reset any forced player
-  m_eForcedNextPlayer = EPC_NONE;
 
 #ifdef HAS_KARAOKE
   //We have to stop parsing a cdg before mplayer is deallocated
@@ -5059,6 +5055,14 @@ bool CApplication::OnMessage(CGUIMessage& message)
       if (url.GetProtocol() == "plugin")
         XFILE::CPluginDirectory::GetPluginResult(url.Get(), file);
 
+      // Don't queue if next media type is different from current one
+      if ((!file.IsVideo() && m_pPlayer->IsPlayingVideo())
+          || ((!file.IsAudio() || file.IsVideo()) && m_pPlayer->IsPlayingAudio()))
+      {
+        m_pPlayer->OnNothingToQueueNotify();
+        return true;
+      }
+
 #ifdef HAS_UPNP
       if (URIUtils::IsUPnP(file.GetPath()))
       {
@@ -5250,7 +5254,12 @@ bool CApplication::ExecuteXBMCAction(std::string actionStr)
       PlayFile(item);
     }
     else
+    {
+      //At this point we have given up to translate, so even though
+      //there may be insecure information, we log it.
+      CLog::Log(LOGDEBUG, "%s : Tried translating, but failed to understand %s", __FUNCTION__, actionStr.c_str());
       return false;
+    }
   }
   return true;
 }
@@ -5378,7 +5387,7 @@ void CApplication::ProcessSlow()
     UPNP::CUPnP::GetInstance()->UpdateState();
 #endif
 
-#if defined(_LINUX) && defined(HAS_FILESYSTEM_SMB)
+#if defined(TARGET_POSIX) && defined(HAS_FILESYSTEM_SMB)
   smb.CheckIfIdle();
 #endif
 
@@ -5443,20 +5452,14 @@ void CApplication::ProcessSlow()
 int CApplication::GlobalIdleTime()
 {
   if(!m_idleTimer.IsRunning())
-  {
-    m_idleTimer.Stop();
     m_idleTimer.StartZero();
-  }
   return (int)m_idleTimer.GetElapsedSeconds();
 }
 
 float CApplication::NavigationIdleTime()
 {
   if (!m_navigationTimer.IsRunning())
-  {
-    m_navigationTimer.Stop();
     m_navigationTimer.StartZero();
-  }
   return m_navigationTimer.GetElapsedSeconds();
 }
 
@@ -5657,8 +5660,7 @@ double CApplication::GetTotalTime() const
 
 void CApplication::StopShutdownTimer()
 {
-  if (m_shutdownTimer.IsRunning())
-    m_shutdownTimer.Stop();
+  m_shutdownTimer.Stop();
 }
 
 void CApplication::ResetShutdownTimers()

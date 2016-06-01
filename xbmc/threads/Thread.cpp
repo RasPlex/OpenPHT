@@ -23,6 +23,7 @@
 #include "threads/ThreadLocal.h"
 #include "threads/SingleLock.h"
 #include "commons/Exception.h"
+#include <stdlib.h>
 
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
@@ -120,7 +121,7 @@ THREADFUNC CThread::staticThread(void* data)
 
   pThread->SetThreadInfo();
 
-  LOG(LOGNOTICE,"Thread %s start, auto delete: %s", name.c_str(), (autodelete ? "true" : "false"));
+  LOG(LOGDEBUG,"Thread %s start, auto delete: %s", name.c_str(), (autodelete ? "true" : "false"));
 
   currentThread.set(pThread);
   pThread->m_StartEvent.Set();
