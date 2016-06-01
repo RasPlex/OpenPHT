@@ -5079,27 +5079,27 @@ msgid "Use pixel buffer objects"
 msgstr ""
 
 msgctxt "#13425"
-msgid "Allow hardware acceleration (VDPAU)"
+msgid "Allow hardware acceleration - VDPAU"
 msgstr ""
 
 msgctxt "#13426"
-msgid "Allow hardware acceleration (VAAPI)"
+msgid "Allow hardware acceleration - VAAPI"
 msgstr ""
 
 msgctxt "#13427"
-msgid "Allow hardware acceleration (DXVA2)"
+msgid "Allow hardware acceleration - DXVA2"
 msgstr ""
 
 msgctxt "#13428"
-msgid "Allow hardware acceleration (CrystalHD)"
+msgid "Allow hardware acceleration - CrystalHD"
 msgstr ""
 
 msgctxt "#13429"
-msgid "Allow hardware acceleration (VDADecoder)"
+msgid "Allow hardware acceleration - VDADecoder"
 msgstr ""
 
 msgctxt "#13430"
-msgid "Allow hardware acceleration (OpenMax)"
+msgid "Allow hardware acceleration - OpenMax"
 msgstr ""
 
 msgctxt "#13431"
@@ -5107,7 +5107,7 @@ msgid "Pixel Shaders"
 msgstr ""
 
 msgctxt "#13432"
-msgid "Allow hardware acceleration (VideoToolbox)"
+msgid "Allow hardware acceleration - VideoToolbox"
 msgstr ""
 
 #: xbmc/settings/GUISettings.cpp
@@ -5123,10 +5123,50 @@ msgstr ""
 
 #: system/settings/settings.xml
 msgctxt "#13435"
-msgid "Enable HQ Scalers for scalings above"
+msgid "Enable HQ scalers for scaling above"
 msgstr ""
 
-#empty strings from id 13436 to 13499
+msgctxt "#13437"
+msgid "Prefer VDPAU video mixer"
+msgstr ""
+
+msgctxt "#13441"
+msgid "Use MPEG-2 VDPAU"
+msgstr ""
+
+msgctxt "#13443"
+msgid "Use MPEG-4 VDPAU"
+msgstr ""
+
+msgctxt "#13445"
+msgid "Use VC-1 VDPAU"
+msgstr ""
+
+msgctxt "#13447"
+msgid "Use MPEG-2 VAAPI"
+msgstr ""
+
+msgctxt "#13449"
+msgid "Use MPEG-4 VAAPI"
+msgstr ""
+
+msgctxt "#13451"
+msgid "Use VC-1 VAAPI"
+msgstr ""
+
+msgctxt "#13457"
+msgid "Prefer VAAPI render method"
+msgstr ""
+
+msgctxt "#13458"
+msgid "Allow hardware acceleration - OMXPlayer"
+msgstr ""
+
+msgctxt "#13459"
+msgid "Use OMXPlayer for decoding of video files."
+msgstr ""
+
+#empty strings from id 13460 to 13499
 
 msgctxt "#13500"
 msgid "A/V sync method"
@@ -6293,15 +6333,15 @@ msgid "Temporal"
 msgstr ""
 
 msgctxt "#16311"
-msgid "Temporal/Spatial"
+msgid "Temporal / Spatial"
 msgstr ""
 
 msgctxt "#16312"
-msgid "(VDPAU)Noise Reduction"
+msgid "VDPAU - Noise reduction"
 msgstr ""
 
 msgctxt "#16313"
-msgid "(VDPAU)Sharpness"
+msgid "Sharpness"
 msgstr ""
 
 msgctxt "#16314"
@@ -6309,7 +6349,7 @@ msgid "Inverse Telecine"
 msgstr ""
 
 msgctxt "#16315"
-msgid "Lanczos3 optimized"
+msgid "Lanczos3 - Optimised"
 msgstr ""
 
 msgctxt "#16316"
@@ -6317,11 +6357,11 @@ msgid "Auto"
 msgstr ""
 
 msgctxt "#16317"
-msgid "Temporal (Half)"
+msgid "Temporal (half)"
 msgstr ""
 
 msgctxt "#16318"
-msgid "Temporal/Spatial (Half)"
+msgid "Temporal / Spatial (half)"
 msgstr ""
 
 msgctxt "#16319"
@@ -6329,11 +6369,11 @@ msgid "DXVA"
 msgstr ""
 
 msgctxt "#16320"
-msgid "DXVA Bob"
+msgid "DXVA - Bob"
 msgstr ""
 
 msgctxt "#16321"
-msgid "DXVA Best"
+msgid "DXVA - Best"
 msgstr ""
 
 msgctxt "#16322"
@@ -6341,18 +6381,58 @@ msgid "Spline36"
 msgstr ""
 
 msgctxt "#16323"
-msgid "Spline36 optimized"
+msgid "Spline36 - Optimised"
 msgstr ""
 
 msgctxt "#16324"
-msgid "Software Blend"
+msgid "Software - Blend"
 msgstr ""
 
 msgctxt "#16325"
-msgid "Auto - ION Optimized"
+msgid "VDPAU - Bob"
 msgstr ""
 
-#empty strings from id 16326 to 16399
+msgctxt "#16326"
+msgid "DXVA-HD"
+msgstr ""
+
+msgctxt "#16327"
+msgid "VAAPI - Bob"
+msgstr ""
+
+msgctxt "#16328"
+msgid "VAAPI - Motion adaptive"
+msgstr ""
+
+msgctxt "#16329"
+msgid "VAAPI - Motion compensated"
+msgstr ""
+
+msgctxt "#16330"
+msgid "MMAL - Advanced"
+msgstr ""
+
+msgctxt "#16331"
+msgid "MMAL - Advanced (half)"
+msgstr ""
+
+msgctxt "#16332"
+msgid "MMAL - Bob"
+msgstr ""
+
+msgctxt "#16333"
+msgid "MMAL - Bob (half)"
+msgstr ""
+
+msgctxt "#16334"
+msgid "IMX - Fast motion"
+msgstr ""
+
+msgctxt "#16335"
+msgid "IMX - Fast motion (double)"
+msgstr ""
+
+#empty strings from id 16336 to 16399
 
 msgctxt "#16400"
 msgid "Post-processing"
@@ -11469,6 +11549,105 @@ msgstr ""
 msgctxt "#36043"
 msgid "Boost center channel when downmixing"
 msgstr ""
+msgctxt "#36434"
+msgid "Allow hardware acceleration - MMAL"
+msgstr ""
+
+msgctxt "#36500"
+msgid "Stereoscopic 3D mode / Current"
+msgstr ""
+
+msgctxt "#36501"
+msgid "Stereoscopic 3D mode"
+msgstr ""
+
+msgctxt "#36502"
+msgid "Disabled"
+msgstr ""
+
+msgctxt "#36503"
+msgid "Over / Under"
+msgstr ""
+
+msgctxt "#36504"
+msgid "Side by side"
+msgstr ""
+
+msgctxt "#36505"
+msgid "Anaglyph red / cyan"
+msgstr ""
+
+msgctxt "#36506"
+msgid "Anaglyph green / magenta"
+msgstr ""
+
+msgctxt "#36507"
+msgid "Interlaced"
+msgstr ""
+
+msgctxt "#36508"
+msgid "Hardware based"
+msgstr ""
+
+msgctxt "#36509"
+msgid "Monoscopic / 2D"
+msgstr ""
+
+msgctxt "#36510"
+msgid "Anaglyph yellow / blue"
+msgstr ""
+
+msgctxt "#36520"
+msgid "Playback mode of stereoscopic 3D videos"
+msgstr ""
+
+msgctxt "#36521"
+msgid "Ask me"
+msgstr ""
+
+msgctxt "#36524"
+msgid "Preferred mode"
+msgstr ""
+
+msgctxt "#36525"
+msgid "Same as movie (autodetect)"
+msgstr ""
+
+msgctxt "#36526"
+msgid "Disable stereoscopic 3D mode when playback ended"
+msgstr ""
+
+msgctxt "#36527"
+msgid "Select playback mode"
+msgstr ""
+
+msgctxt "#36528"
+msgid "Select stereoscopic 3D mode"
+msgstr ""
+
+msgctxt "#36531"
+msgid "Select alternate mode..."
+msgstr ""
+
+msgctxt "#36532"
+msgid "Same as movie"
+msgstr ""
+
+msgctxt "#36535"
+msgid "Stereoscopic 3D mode of video"
+msgstr ""
+
+msgctxt "#36536"
+msgid "Invert stereoscopic 3D mode (flip eyes)"
+msgstr ""
+
+msgctxt "#36545"
+msgid "Stereoscopic 3D depth of subtitles"
+msgstr ""
+
+msgctxt "#36550"
+msgid "Stereoscopic 3D effect strength"
+msgstr ""
 
 #: system/settings/rbp.xml
 msgctxt "#37020"
@@ -11507,6 +11686,18 @@ msgstr ""
 
 msgctxt "#38010"
 msgid "GPU accelerated"
+msgstr ""
+
+msgctxt "#38013"
+msgid "Limit GUI updates during playback"
+msgstr ""
+
+msgctxt "#38015"
+msgid "Unlimited"
+msgstr ""
+
+msgctxt "#38016"
+msgid "%d fps"
 msgstr ""
 
 msgctxt "#38019"

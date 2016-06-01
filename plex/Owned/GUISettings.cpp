@@ -72,6 +72,7 @@
 #include "PlexUtils.h"
 #include "Client/MyPlex/MyPlexManager.h"
 #include "Client/PlexServerManager.h"
+#include "guilib/StereoscopicsManager.h"
 
 
 using namespace std;
@@ -541,6 +542,9 @@ void CGUISettings::Initialize()
   // System/Advanced
   CSettingsCategory* advs = AddCategory(SETTINGS_SYSTEM, "advanced", 18105);
   AddString(advs, "advanced.labelvideo", 291, "", BUTTON_CONTROL_STANDARD);
+
+  //TODO: videoscreen.monitor
+
   // this setting would ideally not be saved, as its value is systematically derived from videoscreen.screenmode.
   // contains a DISPLAYMODE
 #if !defined(TARGET_DARWIN_IOS_ATV2) && !defined(TARGET_RASPBERRY_PI)
@@ -569,24 +573,24 @@ void CGUISettings::Initialize()
   fakeFullScreen = true;
   showSetting = false;
 #endif
-#if defined(TARGET_DARWIN)
+#if defined(TARGET_DARWIN) || defined(TARGET_RASPBERRY_PI)
   showSetting = false;
 #endif
   AddBool(showSetting ? advs : NULL, "videoscreen.fakefullscreen", 14083, fakeFullScreen);
-#ifdef TARGET_DARWIN_IOS
+#if defined(TARGET_DARWIN_IOS) || defined(TARGET_RASPBERRY_PI)
   AddBool(NULL, "videoscreen.blankdisplays", 13130, false);
 #else
   AddBool(advs, "videoscreen.blankdisplays", 13130, false);
 #endif
   AddSeparator(advs, "videoscreen.sep1");
 #endif
-#ifdef TARGET_RASPBERRY_PI_1
-  AddBool(advs, "videoscreen.textures32", 37020, false);
-#endif
+
+#ifdef TARGET_RASPBERRY_PI
 #ifdef TARGET_RASPBERRY_PI_2
   AddBool(advs, "videoscreen.textures32", 37020, true);
+#else
+  AddBool(advs, "videoscreen.textures32", 37020, false);
 #endif
-#ifdef TARGET_RASPBERRY_PI
   map<int,int> limitgui;
   limitgui.insert(make_pair(37026,0));
   limitgui.insert(make_pair(37027,540));
@@ -596,8 +600,35 @@ void CGUISettings::Initialize()
   AddInt(advs, "videoscreen.limitgui", 37021, 0, limitgui, SPIN_CONTROL_TEXT);
 #endif
 
+  map<int, int> stereoscopicmodes;
+  for (int i = RENDER_STEREO_MODE_OFF; i < RENDER_STEREO_MODE_COUNT; i++)
+  {
+    RENDER_STEREO_MODE mode = (RENDER_STEREO_MODE)i;
+    if (g_Windowing.SupportsStereo(mode))
+      stereoscopicmodes.insert(make_pair(CStereoscopicsManager::Get().GetLabelIdForStereoMode(mode), mode));
+  }
+  AddInt(advs, "videoscreen.stereoscopicmode", 36500, 0, stereoscopicmodes, SPIN_CONTROL_TEXT);
+
+  map<int, int> preferedstereoscopicmodes;
+  preferedstereoscopicmodes.insert(make_pair(CStereoscopicsManager::Get().GetLabelIdForStereoMode(RENDER_STEREO_MODE_AUTO), RENDER_STEREO_MODE_AUTO)); // option for autodetect
+  // don't add "off" to the list of preferred modes as this doesn't make sense
+  for (int i = RENDER_STEREO_MODE_OFF +1; i < RENDER_STEREO_MODE_COUNT; i++)
+  {
+    RENDER_STEREO_MODE mode = (RENDER_STEREO_MODE)i;
+    // also skip "mono" mode which is no real stereoscopic mode
+    if (mode != RENDER_STEREO_MODE_MONO && g_Windowing.SupportsStereo(mode))
+      preferedstereoscopicmodes.insert(std::make_pair(CStereoscopicsManager::Get().GetLabelIdForStereoMode(mode), mode));
+  }
+  AddInt(advs, "videoscreen.preferedstereoscopicmode", 36524, 100, preferedstereoscopicmodes, SPIN_CONTROL_TEXT);
+
+#ifdef TARGET_RASPBERRY_PI
+  // videoscreen.framepacking
+  AddBool(advs, "videoscreen.framepacking", 38029, false);
+#endif
+
   map<int,int> vsync;
-#if defined(_LINUX) && !defined(TARGET_DARWIN)
+  // This ifdef is intended to catch everything except Linux and FreeBSD
+#if defined(TARGET_LINUX) && !defined(TARGET_DARWIN) && !defined(TARGET_ANDROID) && !defined(TARGET_RASPBERRY_PI)
   vsync.insert(make_pair(13101,VSYNC_DRIVER));
 #endif
   vsync.insert(make_pair(13106,VSYNC_DISABLED));
@@ -712,6 +743,8 @@ void CGUISettings::Initialize()
   subtitleAlignments.insert(make_pair(21464, SUBTITLE_ALIGN_TOP_INSIDE));
   subtitleAlignments.insert(make_pair(21465, SUBTITLE_ALIGN_TOP_OUTSIDE));
   AddInt(sub, "subtitles.align", 21460, SUBTITLE_ALIGN_MANUAL, subtitleAlignments, SPIN_CONTROL_TEXT);
+
+  AddInt(sub, "subtitles.videoplayer.preferdefaultflag", 36545, 0, 0, 1, 10, SPIN_CONTROL_INT);
 
   //CSettingsCategory* dvd = AddCategory(SETTINGS_VIDEOS, "dvds", 14087);
   AddBool(NULL, "dvds.autorun", 14088, false);
@@ -839,52 +872,44 @@ void CGUISettings::Initialize()
   adjustTypes.insert(make_pair(351, ADJUST_REFRESHRATE_OFF));
   adjustTypes.insert(make_pair(36035, ADJUST_REFRESHRATE_ALWAYS));
   adjustTypes.insert(make_pair(36036, ADJUST_REFRESHRATE_ON_STARTSTOP));
-#if !defined(TARGET_DARWIN_IOS)
   AddInt(adv, "videoplayer.adjustrefreshrate", 170, ADJUST_REFRESHRATE_OFF, adjustTypes, SPIN_CONTROL_TEXT);
-  //  AddBool(vp, "videoplayer.adjustrefreshrate", 170, false);
   AddInt(adv, "videoplayer.pauseafterrefreshchange", 13550, 0, 0, 1, MAXREFRESHCHANGEDELAY, SPIN_CONTROL_TEXT);
-#else
-  AddInt(NULL, "videoplayer.adjustrefreshrate", 170, ADJUST_REFRESHRATE_OFF, adjustTypes, SPIN_CONTROL_TEXT);
-  //AddBool(NULL, "videoplayer.adjustrefreshrate", 170, false);
-  AddInt(NULL, "videoplayer.pauseafterrefreshchange", 13550, 0, 0, 1, MAXREFRESHCHANGEDELAY, SPIN_CONTROL_TEXT);
-#endif
 
-  //sync settings not available on windows gl build
-#if defined(_WIN32) && defined(HAS_GL)
-#define SYNCSETTINGS 0
+#ifdef TARGET_RASPBERRY_PI
+  AddBool(adv, "videoplayer.usedisplayasclock", 13510, true);
 #else
-#define SYNCSETTINGS 1
+  AddBool(adv, "videoplayer.usedisplayasclock", 13510, false);
 #endif
-  AddBool(SYNCSETTINGS ? adv : NULL, "videoplayer.usedisplayasclock", 13510, false);
 
   map<int, int> syncTypes;
-  syncTypes.insert(make_pair(13501, SYNC_DISCON));
-  syncTypes.insert(make_pair(13502, SYNC_SKIPDUP));
   syncTypes.insert(make_pair(13503, SYNC_RESAMPLE));
-  AddInt(SYNCSETTINGS ? adv : NULL, "videoplayer.synctype", 13500, SYNC_RESAMPLE, syncTypes, SPIN_CONTROL_TEXT);
+#ifdef TARGET_RASPBERRY_PI
+  syncTypes.insert(make_pair(13504, SYNC_PLLADJUST));
+  AddInt(adv, "videoplayer.synctype", 13500, SYNC_RESAMPLE, syncTypes, SPIN_CONTROL_TEXT);
+#else
+  AddInt(NULL, "videoplayer.synctype", 13500, SYNC_RESAMPLE, syncTypes, SPIN_CONTROL_TEXT);
+#endif
 
-  AddFloat(NULL, "videoplayer.maxspeedadjust", 13504, 5.0f, 0.0f, 0.1f, 10.0f);
+  AddInt(adv, "videoplayer.errorinaspect", 22021, 0, 0, 1, 20, SPIN_CONTROL_INT_PLUS, MASK_PERCENT, TEXT_NONE);
 
   map<int,int> stretch;
   stretch.insert(make_pair(630,VIEW_MODE_NORMAL));
   stretch.insert(make_pair(633,VIEW_MODE_WIDE_ZOOM));
   stretch.insert(make_pair(634,VIEW_MODE_STRETCH_16x9));
   stretch.insert(make_pair(631,VIEW_MODE_ZOOM));
-
   AddInt(adv, "videoplayer.stretch43", 173, VIEW_MODE_NORMAL, stretch, SPIN_CONTROL_TEXT);
-#ifdef HAVE_LIBVDPAU
-  AddBool(NULL, "videoplayer.vdpau_allow_xrandr", 13122, false);
-#endif
-#if defined(HAS_GL) || HAS_GLES == 2  // May need changing for GLES
-  AddSeparator(adv, "videoplayer.sep1.5");
-#ifdef HAVE_LIBVDPAU
-  AddBool(NULL, "videoplayer.vdpauUpscalingLevel", 13121, false);
-  AddBool(NULL, "videoplayer.vdpaustudiolevel", 0, false); //depreciated
-#endif
-#endif
-  AddSeparator(NULL, "videoplayer.sep5");
+  
   AddBool(NULL, "videoplayer.teletextenabled", 23050, true);
-  AddBool(NULL, "Videoplayer.teletextscale", 23055, true);
+  AddBool(NULL, "videoplayer.teletextscale", 23055, true);
+
+  map<int, int> stereoscopicplaybackmode;
+  stereoscopicplaybackmode.insert(make_pair(36521, 0));
+  stereoscopicplaybackmode.insert(make_pair(36524, 1));
+  stereoscopicplaybackmode.insert(make_pair(36509, 2));
+  stereoscopicplaybackmode.insert(make_pair(36028, 100));
+  AddInt(adv, "videoplayer.stereoscopicplaybackmode", 36520, 0, stereoscopicplaybackmode, SPIN_CONTROL_TEXT);
+
+  AddBool(adv, "videoplayer.quitstereomodeonstop", 36526, true);
 
   map<int, int> myVideosSelectActions;
   myVideosSelectActions.insert(make_pair(22080, SELECT_ACTION_CHOOSE));
@@ -897,25 +922,13 @@ void CGUISettings::Initialize()
   AddBool(NULL, "myvideos.replacelabels", 20419, true);
   AddBool(NULL, "myvideos.extractthumb",20433, true);
 
-  map<int, int> resampleQualities;
-  resampleQualities.insert(make_pair(13506, RESAMPLE_LOW));
-  resampleQualities.insert(make_pair(13507, RESAMPLE_MID));
-  resampleQualities.insert(make_pair(13508, RESAMPLE_HIGH));
-  resampleQualities.insert(make_pair(13509, RESAMPLE_REALLYHIGH));
-  AddInt(NULL, "videoplayer.resamplequality", 13505, RESAMPLE_MID, resampleQualities, SPIN_CONTROL_TEXT);
-
-  AddInt(adv, "videoplayer.errorinaspect", 22021, 0, 0, 1, 20, SPIN_CONTROL_INT_PLUS, MASK_PERCENT, TEXT_NONE);
-
   map<int, int> renderers;
   renderers.insert(make_pair(13416, RENDER_METHOD_AUTO));
-
 #ifdef HAS_DX
-  if (g_sysinfo.IsVistaOrHigher())
-    renderers.insert(make_pair(16319, RENDER_METHOD_DXVA));
+  renderers.insert(make_pair(16319, RENDER_METHOD_DXVA));
   renderers.insert(make_pair(13431, RENDER_METHOD_D3D_PS));
   renderers.insert(make_pair(13419, RENDER_METHOD_SOFTWARE));
 #endif
-
 #ifdef HAS_GL
   renderers.insert(make_pair(13417, RENDER_METHOD_ARB));
   renderers.insert(make_pair(13418, RENDER_METHOD_GLSL));
@@ -924,20 +937,29 @@ void CGUISettings::Initialize()
   AddInt(adv, "videoplayer.rendermethod", 18109, RENDER_METHOD_AUTO, renderers, SPIN_CONTROL_TEXT);
 
 #if defined(HAS_GL) || defined(HAS_DX)
-  AddInt(adv, "videoplayer.hqscalers", 13435, 0, 0, 10, 100, SPIN_CONTROL_INT);
+  AddInt(adv, "videoplayer.hqscalers", 13435, 0, 0, 10, 100, SPIN_CONTROL_INT, 14047);
 #endif
 
 #ifdef HAVE_LIBVDPAU
   AddBool(adv, "videoplayer.usevdpau", 13425, true);
+  AddBool(adv, "videoplayer.usevdpaumixer", 13437, true);
+  AddBool(adv, "videoplayer.usevdpaumpeg2", 13441, true);
+  AddBool(adv, "videoplayer.usevdpaumpeg4", 13443, false);
+  AddBool(adv, "videoplayer.usevdpauvc1", 13445, true);
 #endif
 #ifdef HAVE_LIBVA
   AddBool(adv, "videoplayer.usevaapi", 13426, true);
+  AddBool(adv, "videoplayer.usevaapimpeg2", 13447, true);
+  AddBool(adv, "videoplayer.usevaapimpeg4", 13449, true);
+  AddBool(adv, "videoplayer.usevaapivc1", 13451, true);
+  AddBool(adv, "videoplayer.prefervaapirender", 13457, true);
 #endif
 #ifdef HAS_DX
-  AddBool(g_sysinfo.IsVistaOrHigher() ? adv: NULL, "videoplayer.usedxva2", 13427, g_sysinfo.IsVistaOrHigher() ? true : false);
+  AddBool(adv, "videoplayer.usedxva2", 13427, true);
 #endif
-#ifdef HAVE_LIBVDADECODER
-  AddBool(g_sysinfo.HasVDADecoder() ? adv: NULL, "videoplayer.usevda", 13429, true);
+#ifdef TARGET_RASPBERRY_PI
+  AddBool(adv, "videoplayer.useomxplayer", 13458, true);
+  AddBool(adv, "videoplayer.usemmal", 36434, true);
 #endif
 #ifdef HAVE_LIBOPENMAX
   AddBool(adv, "videoplayer.useomx", 13430, true);
@@ -945,9 +967,13 @@ void CGUISettings::Initialize()
 #ifdef HAVE_VIDEOTOOLBOXDECODER
   AddBool(g_sysinfo.HasVideoToolBoxDecoder() ? adv: NULL, "videoplayer.usevideotoolbox", 13432, true);
 #endif
+#ifdef HAVE_LIBVDADECODER
+  AddBool(g_sysinfo.HasVDADecoder() ? adv: NULL, "videoplayer.usevda", 13429, true);
+#endif
 
-#ifdef HAS_GL
-  AddBool(NULL, "videoplayer.usepbo", 13424, true);
+  AddInt(adv, "videoplayer.limitguiupdate", 38013, 10, 0, 5, 25, SPIN_CONTROL_INT, 38016, 38015);
+#ifdef TARGET_RASPBERRY_PI
+  AddBool(adv, "videoplayer.supportmvc", 38027, true);
 #endif
 
 #ifdef TARGET_RASPBERRY_PI
@@ -1023,7 +1049,9 @@ void CGUISettings::Initialize()
 #endif
   //AddSeparator(loc, "locale.sep3");
   AddString(NULL, "locale.audiolanguage", 285, "original", SPIN_CONTROL_TEXT);
+  AddBool(NULL, "videoplayer.preferdefaultflag", 37040, true);
   AddString(NULL, "locale.subtitlelanguage", 286, "original", SPIN_CONTROL_TEXT);
+  AddBool(NULL, "subtitles.parsecaptions", 24130, false);
 
   //CSettingsCategory* fl = AddCategory(SETTINGS_APPEARANCE, "filelists", 14081);
   AddBool(NULL, "filelists.showparentdiritems", 13306, false);

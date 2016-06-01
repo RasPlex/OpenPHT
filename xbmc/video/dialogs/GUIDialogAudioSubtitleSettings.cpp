@@ -50,6 +50,7 @@ CGUIDialogAudioSubtitleSettings::CGUIDialogAudioSubtitleSettings(void)
     : CGUIDialogSettings(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "VideoOSDSettings.xml"),
     m_passthrough(false)
 {
+  m_loadType = LOAD_ON_GUI_INIT;
 }
 
 CGUIDialogAudioSubtitleSettings::~CGUIDialogAudioSubtitleSettings(void)
@@ -83,7 +84,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
   // clear out any old settings
   m_settings.clear();
   // create our settings
-  m_volume = g_settings.m_fVolumeLevel;
+  m_volume = g_application.GetVolume(false);
   AddSlider(AUDIO_SETTINGS_VOLUME, 13376, &m_volume, VOLUME_MINIMUM, VOLUME_MAXIMUM / 100.0f, VOLUME_MAXIMUM, PercentAsDecibel, false);
   if (SupportsAudioFeature(IPC_AUD_AMP))
     AddSlider(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, 660, &g_settings.m_currentVideoSettings.m_VolumeAmplification, VOLUME_DRC_MINIMUM * 0.01f, (VOLUME_DRC_MAXIMUM - VOLUME_DRC_MINIMUM) / 6000.0f, VOLUME_DRC_MAXIMUM * 0.01f, FormatDecibel, false);
@@ -93,7 +94,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
     EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION,false);
   }
   if (SupportsAudioFeature(IPC_AUD_OFFSET))
-    AddSlider(AUDIO_SETTINGS_DELAY, 297, &g_settings.m_currentVideoSettings.m_AudioDelay, -g_advancedSettings.m_videoAudioDelayRange, .025f, g_advancedSettings.m_videoAudioDelayRange, FormatDelay);
+    AddSlider(AUDIO_SETTINGS_DELAY, 297, &g_settings.m_currentVideoSettings.m_AudioDelay, -g_advancedSettings.m_videoAudioDelayRange, 0.025f, g_advancedSettings.m_videoAudioDelayRange, FormatDelay);
   if (SupportsAudioFeature(IPC_AUD_SELECT_STREAM))
     AddAudioStreams(AUDIO_SETTINGS_STREAM);
 
@@ -103,9 +104,11 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
     AddBool(AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS, 252, &g_settings.m_currentVideoSettings.m_OutputToAllSpeakers, true);
 #endif
 
-  m_passthrough = g_guiSettings.GetBool("audiooutput.passthrough");
   if (SupportsAudioFeature(IPC_AUD_SELECT_OUTPUT))
+  {
+    m_passthrough = g_guiSettings.GetBool("audiooutput.passthrough");
     AddBool(AUDIO_SETTINGS_DIGITAL_ANALOG, 348, &m_passthrough);
+  }
 
   if (!g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
   {
@@ -122,9 +125,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
       AddButton(SUBTITLE_SETTINGS_BROWSER, 13250);
   }
 
-#ifndef __PLEX__ /* Not possible in Plex */
   AddButton(AUDIO_SETTINGS_MAKE_DEFAULT, 12376);
-#endif
 }
 
 void CGUIDialogAudioSubtitleSettings::AddAudioStreams(unsigned int id)
@@ -211,7 +212,7 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
   if (setting.id == AUDIO_SETTINGS_VOLUME)
   {
     g_settings.m_fVolumeLevel = m_volume;
-    g_application.SetVolume(m_volume, false);//false - value is not in percent
+    g_application.SetVolume(m_volume, false); // false - value is not in percent
   }
   else if (setting.id == AUDIO_SETTINGS_VOLUME_AMPLIFICATION)
   {
@@ -239,7 +240,6 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
   else if (setting.id == AUDIO_SETTINGS_DIGITAL_ANALOG)
   {
     g_guiSettings.SetBool("audiooutput.passthrough", m_passthrough);
-
     EnableSettings(AUDIO_SETTINGS_VOLUME, !g_application.m_pPlayer->IsPassthrough());
     EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, !g_application.m_pPlayer->IsPassthrough());
   }
@@ -337,7 +337,7 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
 void CGUIDialogAudioSubtitleSettings::FrameMove()
 {
   // update the volume setting if necessary
-  float newVolume = g_settings.m_fVolumeLevel;
+  float newVolume = g_application.GetVolume(false);
   if (newVolume != m_volume)
   {
     m_volume = newVolume;
@@ -402,20 +402,22 @@ CStdString CGUIDialogAudioSubtitleSettings::FormatDelay(float value, float inter
 
 bool CGUIDialogAudioSubtitleSettings::SupportsAudioFeature(int feature)
 {
-  for (Features::iterator itr = m_audioCaps.begin(); itr != m_audioCaps.end(); itr++)
+  for (Features::iterator itr = m_audioCaps.begin(); itr != m_audioCaps.end(); ++itr)
   {
-    if(*itr == feature || *itr == IPC_AUD_ALL)
+    if (*itr == feature || *itr == IPC_AUD_ALL)
       return true;
   }
+
   return false;
 }
 
 bool CGUIDialogAudioSubtitleSettings::SupportsSubtitleFeature(int feature)
 {
-  for (Features::iterator itr = m_subCaps.begin(); itr != m_subCaps.end(); itr++)
+  for (Features::iterator itr = m_subCaps.begin(); itr != m_subCaps.end(); ++itr)
   {
-    if(*itr == feature || *itr == IPC_SUBS_ALL)
+    if (*itr == feature || *itr == IPC_SUBS_ALL)
       return true;
   }
+
   return false;
 }
