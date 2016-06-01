@@ -21,6 +21,8 @@
 
 #include "utils/StdString.h"
 #include <vector>
+
+#include "pictures/PictureScalingAlgorithm.h"
 #include "utils/GlobalsHandling.h"
 
 class TiXmlElement;
@@ -218,6 +220,7 @@ class CAdvancedSettings
      */
     unsigned int GetThumbSize() const { return m_imageRes / 2; };
     bool m_useDDSFanart;
+    CPictureScalingAlgorithm::Algorithm m_imageScalingAlgorithm;
 
     int m_sambaclienttimeout;
     CStdString m_sambadoscodepage;

@@ -441,7 +441,8 @@ bool CPlexTextureCacheJob::CacheTexture(CBaseTexture **texture)
   // unwrap the URL as required
   std::string additional_info;
   unsigned int width, height;
-  CStdString image = DecodeImageURL(m_url, width, height, additional_info);
+  CPictureScalingAlgorithm::Algorithm scalingAlgorithm;
+  CStdString image = DecodeImageURL(m_url, width, height, scalingAlgorithm, additional_info);
 
   m_details.updateable = additional_info != "music" && UpdateableURL(image);
 
@@ -514,7 +515,7 @@ bool CPlexTextureCacheJob::CacheTexture(CBaseTexture **texture)
     m_outputFile.Close();
 	
     if (texture)
-      *texture = CTextureCacheJob::LoadImage(CTextureCache::GetCachedPath(m_details.file), width, height, additional_info);
+      *texture = CTextureCacheJob::LoadImage(CTextureCache::GetCachedPath(m_details.file), width, height, additional_info, true);
 	
     return true;
   }
