@@ -36,11 +36,7 @@ else()
 endif()
 
 if(NOT DEFINED PLEX_SPLASH)
-  if(TARGET_RPI)
-    set(PLEX_SPLASH Splash-RPI.png)
-  else(TARGET_RPI)
-    set(PLEX_SPLASH Splash.png)
-  endif(TARGET_RPI)
+  set(PLEX_SPLASH Splash.png)
 endif(NOT DEFINED PLEX_SPLASH)
 
 
