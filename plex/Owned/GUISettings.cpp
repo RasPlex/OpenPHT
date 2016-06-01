@@ -1651,28 +1651,18 @@ void CGUISettings::SetResolution(RESOLUTION res)
 bool CGUISettings::SetLanguage(const CStdString &strLanguage)
 {
   CStdString strPreviousLanguage = GetString("locale.language");
-  CStdString strNewLanguage = strLanguage;
-  if (strNewLanguage != strPreviousLanguage)
+  if (strLanguage != strPreviousLanguage)
   {
     CStdString strLangInfoPath;
-    strLangInfoPath.Format("special://xbmc/language/%s/langinfo.xml", strNewLanguage.c_str());
+    strLangInfoPath.Format("special://xbmc/language/%s/langinfo.xml", strLanguage.c_str());
     if (!g_langInfo.Load(strLangInfoPath))
       return false;
 
-    if (g_langInfo.ForceUnicodeFont() && !g_fontManager.IsFontSetUnicode())
-    {
-      CLog::Log(LOGINFO, "Language needs a ttf font, loading first ttf font available");
-      CStdString strFontSet;
-      if (g_fontManager.GetFirstFontSetUnicode(strFontSet))
-        strNewLanguage = strFontSet;
-      else
-        CLog::Log(LOGERROR, "No ttf font found but needed: %s", strFontSet.c_str());
-    }
-    SetString("locale.language", strNewLanguage);
+    SetString("locale.language", strLanguage);
 
     g_charsetConverter.reset();
 
-    if (!g_localizeStrings.Load("special://xbmc/language/", strNewLanguage))
+    if (!g_localizeStrings.Load("special://xbmc/language/", strLanguage))
       return false;
 
     // also tell our weather and skin to reload as these are localized
