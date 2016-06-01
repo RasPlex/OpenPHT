@@ -105,7 +105,7 @@ public:
   int m_BitsPerCodedSample;
   enum AEDataFormat m_DataFormat;
   int m_Bitrate;
-  CStdString m_CodecName;
+  std::string m_CodecName;
   MUSIC_INFO::CMusicInfoTag m_tag;
   XFILE::CFile m_file;
 

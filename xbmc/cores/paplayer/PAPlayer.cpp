@@ -31,6 +31,7 @@
 #include "cores/AudioEngine/AEFactory.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
 #include "cores/AudioEngine/Interfaces/AEStream.h"
+#include "cores/DataCacheCore.h"
 
 #define TIME_TO_CACHE_NEXT_FILE 5000 /* 5 seconds before end of song, start caching the next song */
 #define FAST_XFADE_TIME           80 /* 80 milliseconds */
@@ -549,8 +550,11 @@ inline bool PAPlayer::PrepareStream(StreamInfo *si)
   return true;
 }
 
-bool PAPlayer::CloseFile()
+bool PAPlayer::CloseFile(bool reopen)
 {
+  if (reopen)
+    CAEFactory::KeepConfiguration(3000);
+
   if (!m_isPaused)
     SoftStop(true, true);
   CloseAllStreams(false);
@@ -1036,29 +1040,13 @@ int PAPlayer::GetCacheLevel() const
   return m_playerGUIData.m_cacheLevel;
 }
 
-int PAPlayer::GetChannels()
+void PAPlayer::GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info)
 {
-  return m_playerGUIData.m_channelCount;
-}
-
-int PAPlayer::GetBitsPerSample()
-{
-  return m_playerGUIData.m_bitsPerSample;
-}
-
-int PAPlayer::GetSampleRate()
-{
-  return m_playerGUIData.m_sampleRate;
-}
-
-CStdString PAPlayer::GetAudioCodecName()
-{
-  return m_playerGUIData.m_codec;
-}
-
-int PAPlayer::GetAudioBitrate()
-{
-  return m_playerGUIData.m_audioBitrate;
+  info.bitrate = m_playerGUIData.m_audioBitrate;
+  info.channels = m_playerGUIData.m_channelCount;
+  info.audioCodecName = m_playerGUIData.m_codec;
+  info.samplerate = m_playerGUIData.m_sampleRate;
+  info.bitspersample = m_playerGUIData.m_bitsPerSample;
 }
 
 bool PAPlayer::CanSeek()
@@ -1066,7 +1054,7 @@ bool PAPlayer::CanSeek()
   return m_playerGUIData.m_canSeek;
 }
 
-void PAPlayer::Seek(bool bPlus, bool bLargeStep)
+void PAPlayer::Seek(bool bPlus, bool bLargeStep, bool bChapterOverride)
 {
   if (!CanSeek()) return;
 
@@ -1154,6 +1142,8 @@ void PAPlayer::UpdateGUIData(StreamInfo *si)
     total = m_currentStream->m_endOffset;
   total -= m_currentStream->m_startOffset;
   m_playerGUIData.m_totalTime = total;
+
+  g_dataCacheCore.SignalAudioInfoChange();
 }
 
 void PAPlayer::OnJobComplete(unsigned int jobID, bool success, CJob *job)

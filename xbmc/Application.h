@@ -316,8 +316,6 @@ public:
   CStdString m_strPlayListFile;
 
   int GlobalIdleTime();
-  void NewFrame();
-  bool WaitFrame(unsigned int timeout);
 
   void EnablePlatformDirectories(bool enable=true)
   {
@@ -356,8 +354,6 @@ public:
     return m_bTestMode;
   }
 
-  bool IsPresentFrame();
-
   void Minimize();
   bool ToggleDPMS(bool manual);
 
@@ -373,6 +369,7 @@ public:
 
   CSplash* GetSplash() { return m_splash; }
   void SetRenderGUI(bool renderGUI);
+  bool GetRenderGUI() const { return m_renderGUI; };
 
   /* PLEX */
   bool m_bPlaybackInFullScreen;
@@ -454,15 +451,12 @@ protected:
   bool m_bPresentFrame;
   unsigned int m_lastFrameTime;
   unsigned int m_lastRenderTime;
+  bool m_skipGuiRender;
 
   bool m_bStandalone;
   bool m_bEnableLegacyRes;
   bool m_bTestMode;
   bool m_bSystemScreenSaverEnable;
-
-  int        m_frameCount;
-  CCriticalSection m_frameMutex;
-  XbmcThreads::ConditionVariable  m_frameCond;
 
   VIDEO::CVideoInfoScanner *m_videoInfoScanner;
   MUSIC_INFO::CMusicInfoScanner *m_musicInfoScanner;

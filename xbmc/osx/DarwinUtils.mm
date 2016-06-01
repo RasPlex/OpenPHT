@@ -36,12 +36,26 @@
 #else
   #import <Cocoa/Cocoa.h>
   #import <CoreFoundation/CoreFoundation.h>
+  #import <IOKit/IOKitLib.h>
   #import <IOKit/ps/IOPowerSources.h>
   #import <IOKit/ps/IOPSKeys.h>
 #endif
 
 #import "AutoPool.h"
 #import "DarwinUtils.h"
+
+#ifndef NSAppKitVersionNumber10_5
+#define NSAppKitVersionNumber10_5 949
+#endif
+
+#ifndef NSAppKitVersionNumber10_6
+#define NSAppKitVersionNumber10_6 1038
+#endif
+
+#ifndef NSAppKitVersionNumber10_9
+#define NSAppKitVersionNumber10_9 1265
+#endif
+
 
 enum iosPlatform
 {
@@ -163,6 +177,16 @@ bool DarwinHasRetina(void)
   }
 #endif
   return (platform >= iPhone4);
+}
+
+bool DarwinDeviceHasLeakyVDA(void)
+{
+  static int hasLeakyVDA = -1;
+#if defined(TARGET_DARWIN_OSX)
+  if (hasLeakyVDA == -1)
+    hasLeakyVDA = NSAppKitVersionNumber <= NSAppKitVersionNumber10_9 ? 1 : 0;
+#endif
+  return hasLeakyVDA == 1;
 }
 
 const char *GetDarwinOSReleaseString(void)

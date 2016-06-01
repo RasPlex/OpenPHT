@@ -22,9 +22,8 @@
 #include "GUIVideoControl.h"
 #include "GUIWindowManager.h"
 #include "Application.h"
-#ifdef HAS_VIDEO_PLAYBACK
 #include "cores/VideoRenderers/RenderManager.h"
-#else
+#ifndef HAS_VIDEO_PLAYBACK
 #include "cores/DummyVideoPlayer.h"
 #endif
 
@@ -39,8 +38,11 @@ CGUIVideoControl::~CGUIVideoControl(void)
 
 void CGUIVideoControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
+  g_renderManager.FrameMove();
+
   // TODO Proper processing which marks when its actually changed. Just mark always for now.
-  MarkDirtyRegion();
+  if (g_renderManager.IsGuiLayer())
+    MarkDirtyRegion();
 
   CGUIControl::Process(currentTime, dirtyregions);
 }
@@ -61,15 +63,47 @@ void CGUIVideoControl::Render()
       g_application.ResetScreenSaver();
 
     g_graphicsContext.SetViewWindow(m_posX, m_posY, m_posX + m_width, m_posY + m_height);
+    TransformMatrix mat;
+    g_graphicsContext.SetTransform(mat, 1.0, 1.0);
 
 #ifdef HAS_VIDEO_PLAYBACK
     color_t alpha = g_graphicsContext.MergeAlpha(0xFF000000) >> 24;
-    g_renderManager.RenderUpdate(false, 0, alpha);
+    if (g_renderManager.IsVideoLayer())
+    {
+      CRect old = g_graphicsContext.GetScissors();
+      CRect region = GetRenderRegion();
+      region.Intersect(old);
+      g_graphicsContext.BeginPaint();
+      g_graphicsContext.SetScissors(region);
+#ifdef HAS_IMXVPU
+      g_graphicsContext.Clear((16 << 16)|(8 << 8)|16);
+#else
+      g_graphicsContext.Clear(0);
+#endif
+      g_graphicsContext.SetScissors(old);
+      g_graphicsContext.EndPaint();
+    }
+    else
+      g_renderManager.Render(false, 0, alpha);
 #else
     ((CDummyVideoPlayer *)g_application.m_pPlayer)->Render();
 #endif
+
+    g_graphicsContext.RemoveTransform();
   }
+  // TODO: remove this crap: HAS_VIDEO_PLAYBACK
+  // instantiating a video control having no playback is complete nonsense
   CGUIControl::Render();
+}
+
+void CGUIVideoControl::RenderEx()
+{
+#ifdef HAS_VIDEO_PLAYBACK
+  if (g_application.IsPlayingVideo() && g_renderManager.IsStarted())
+    g_renderManager.Render(false, 0, 255, false);
+  g_renderManager.FrameFinish();
+#endif
+  CGUIControl::RenderEx();
 }
 
 EVENT_RESULT CGUIVideoControl::OnMouseEvent(const CPoint &point, const CMouseEvent &event)

@@ -19,8 +19,6 @@
  */
 
 #include "DVDDemux.h"
-#include "DVDCodecs/DVDCodecs.h"
-#include "utils/LangCodeExpander.h"
 
 void CDemuxStreamTeletext::GetStreamInfo(std::string& strInfo)
 {
@@ -170,14 +168,7 @@ CDemuxStreamTeletext* CDVDDemux::GetStreamFromTeletextId(int iTeletextIndex)
 
 void CDemuxStream::GetStreamName( std::string& strInfo )
 {
-  if( language[0] == 0 )
-    strInfo = "";
-  else
-  {
-    CStdString name;
-    g_LangCodeExpander.Lookup( name, language );
-    strInfo = name;
-  }
+  strInfo = "";
 }
 
 AVDiscard CDemuxStream::GetDiscard()

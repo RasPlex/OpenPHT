@@ -538,6 +538,14 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
         g_application.SwitchToFullScreen();
       break;
 
+    case TMSG_SETVIDEORESOLUTION:
+      {
+        RESOLUTION res = (RESOLUTION)pMsg->dwParam1;
+        bool forceUpdate = pMsg->dwParam2 == 1 ? true : false;
+        g_graphicsContext.SetVideoResolution(res, forceUpdate);
+      }
+      break;
+
     case TMSG_TOGGLEFULLSCREEN:
       g_graphicsContext.Lock();
       g_graphicsContext.ToggleFullScreenRoot();
@@ -969,6 +977,12 @@ void CApplicationMessenger::MediaStop(bool bWait /* = true */, int playlistid /*
 void CApplicationMessenger::MediaPause()
 {
   ThreadMessage tMsg = {TMSG_MEDIA_PAUSE};
+  SendMessage(tMsg, true);
+}
+
+void CApplicationMessenger::MediaUnPause()
+{
+  ThreadMessage tMsg = {TMSG_MEDIA_UNPAUSE};
   SendMessage(tMsg, true);
 }
 

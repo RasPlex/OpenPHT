@@ -24,8 +24,6 @@
 #include "threads/CriticalSection.h"
 #include "dialogs/GUIDialogSlider.h"
 
-class CGUITextLayout; // forward
-
 class CGUIWindowFullScreen :
       public CGUIWindow, public ISliderCallback
 {
@@ -34,9 +32,11 @@ public:
   virtual ~CGUIWindowFullScreen(void);
   virtual bool OnMessage(CGUIMessage& message);
   virtual bool OnAction(const CAction &action);
+  virtual void ClearBackground();
   virtual void FrameMove();
   virtual void Process(unsigned int currentTime, CDirtyRegionList &dirtyregion);
   virtual void Render();
+  virtual void RenderEx();
   virtual void OnWindowLoaded();
   void ChangetheTimeCode(int remote);
   void ChangetheTVGroup(bool next);
@@ -46,10 +46,10 @@ protected:
   virtual EVENT_RESULT OnMouseEvent(const CPoint &point, const CMouseEvent &event);
 
 private:
-  void RenderTTFSubtitles();
   void SeekChapter(int iChapter);
   void FillInTVGroups();
   void ToggleOSD();
+  void TriggerOSD();
 
   /* PLEX */
   void createOverlays();
@@ -93,7 +93,4 @@ private:
   int m_timeCodePosition;
   
   int m_sliderAction; ///< \brief set to the action id for a slider being displayed \sa ShowSlider
-
-  CCriticalSection m_fontLock;
-  CGUITextLayout* m_subsLayout;
 };

@@ -27,13 +27,20 @@
 #include "Overlay/DVDOverlayCodec.h"
 #include "cores/dvdplayer/DVDCodecs/DVDCodecs.h"
 
+#if defined(TARGET_DARWIN_OSX)
 #include "Video/DVDVideoCodecVDA.h"
+#endif
 #if defined(HAVE_VIDEOTOOLBOXDECODER)
 #include "Video/DVDVideoCodecVideoToolBox.h"
+#include "utils/SystemInfo.h"
 #endif
 #include "Video/DVDVideoCodecFFmpeg.h"
 #include "Video/DVDVideoCodecOpenMax.h"
 #include "Video/DVDVideoCodecLibMpeg2.h"
+#include "Video/MMALCodec.h"
+#if defined(HAS_MMAL)
+#include "linux/RBP.h"
+#endif
 #include "Audio/DVDAudioCodecFFmpeg.h"
 #include "Audio/DVDAudioCodecPassthrough.h"
 #include "Overlay/DVDOverlayCodecSSA.h"
@@ -43,8 +50,10 @@
 
 
 #include "DVDStreamInfo.h"
+#include "settings/AdvancedSettings.h"
 #include "settings/GUISettings.h"
-#include "utils/SystemInfo.h"
+#include "settings/VideoSettings.h"
+#include "utils/StringUtils.h"
 
 CDVDVideoCodec* CDVDFactoryCodec::OpenCodec(CDVDVideoCodec* pCodec, CDVDStreamInfo &hints, CDVDCodecOptions &options )
 {
@@ -113,66 +122,72 @@ CDVDOverlayCodec* CDVDFactoryCodec::OpenCodec(CDVDOverlayCodec* pCodec, CDVDStre
 }
 
 
-CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigned int surfaces, const std::vector<ERenderFormat>& formats)
+CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const CRenderInfo &info)
 {
   CDVDVideoCodec* pCodec = NULL;
   CDVDCodecOptions options;
 
-  if(formats.size() == 0)
+  if(info.formats.empty())
     options.m_formats.push_back(RENDER_FMT_YUV420P);
   else
-    options.m_formats = formats;
+    options.m_formats = info.formats;
+
+  options.m_opaque_pointer = info.opaque_pointer;
 
   //when support for a hardware decoder is not compiled in
   //only print it if it's actually available on the platform
-  CStdString hwSupport;
-#if defined(HAVE_LIBVDADECODER) && defined(TARGET_DARWIN)
+  std::string hwSupport;
+#if defined(TARGET_DARWIN_OSX)
   hwSupport += "VDADecoder:yes ";
-#elif defined(TARGET_DARWIN)
-  hwSupport += "VDADecoder:no ";
 #endif
 #if defined(HAVE_VIDEOTOOLBOXDECODER) && defined(TARGET_DARWIN)
   hwSupport += "VideoToolBoxDecoder:yes ";
 #elif defined(TARGET_DARWIN)
   hwSupport += "VideoToolBoxDecoder:no ";
 #endif
-#if defined(HAVE_LIBOPENMAX) && defined(_LINUX)
+#if defined(HAVE_LIBOPENMAX)
   hwSupport += "OpenMax:yes ";
-#elif defined(_LINUX)
+#elif defined(TARGET_POSIX)
   hwSupport += "OpenMax:no ";
 #endif
-#if defined(HAVE_LIBVDPAU) && defined(_LINUX)
+#if defined(HAVE_LIBVDPAU) && defined(TARGET_POSIX)
   hwSupport += "VDPAU:yes ";
-#elif defined(_LINUX) && !defined(TARGET_DARWIN)
+#elif defined(TARGET_POSIX) && !defined(TARGET_DARWIN)
   hwSupport += "VDPAU:no ";
 #endif
-#if defined(_WIN32) && defined(HAS_DX)
+#if defined(TARGET_WINDOWS) && defined(HAS_DX)
   hwSupport += "DXVA:yes ";
-#elif defined(_WIN32)
+#elif defined(TARGET_WINDOWS)
   hwSupport += "DXVA:no ";
 #endif
-#if defined(HAVE_LIBVA) && defined(_LINUX)
+#if defined(HAVE_LIBVA) && defined(TARGET_POSIX)
   hwSupport += "VAAPI:yes ";
-#elif defined(_LINUX) && !defined(TARGET_DARWIN)
+#elif defined(TARGET_POSIX) && !defined(TARGET_DARWIN)
   hwSupport += "VAAPI:no ";
 #endif
-
+#if defined(HAS_MMAL)
+  hwSupport += "MMAL:yes ";
+#else
+  hwSupport += "MMAL:no ";
+#endif
   CLog::Log(LOGDEBUG, "CDVDFactoryCodec: compiled in hardware support: %s", hwSupport.c_str());
 
-  // dvd's have weird still-frames in it, which is not fully supported in ffmpeg
-  if(hint.stills && (hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_MPEG1VIDEO))
+#if defined(HAS_MMAL)
+  // mmal can handle dvd playback including stills
+  if (!g_guiSettings.GetBool("videoplayer.usemmal") || !g_RBP.GetCodecMpg2())
+#endif
+  if (hint.stills && (hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_MPEG1VIDEO))
   {
-    if( (pCodec = OpenCodec(new CDVDVideoCodecLibMpeg2(), hint, options)) ) return pCodec;
+     // If dvd is an mpeg2 and hint.stills
+     if ( (pCodec = OpenCodec(new CDVDVideoCodecLibMpeg2(), hint, options)) ) return pCodec;
   }
-#if defined(HAVE_LIBVDADECODER)
-  if (!hint.software && g_guiSettings.GetBool("videoplayer.usevda"))
+
+#if defined(TARGET_DARWIN_OSX)
+  if (!hint.software && g_guiSettings.GetBool("videoplayer.usevda") && !g_advancedSettings.m_useFfmpegVda)
   {
-    if (g_sysinfo.HasVDADecoder())
+    if (hint.codec == AV_CODEC_ID_H264 && !hint.ptsinvalid)
     {
-      if (hint.codec == AV_CODEC_ID_H264 && !hint.ptsinvalid)
-      {
-        if ( (pCodec = OpenCodec(new CDVDVideoCodecVDA(), hint, options)) ) return pCodec;
-      }
+      if ( (pCodec = OpenCodec(new CDVDVideoCodecVDA(), hint, options)) ) return pCodec;
     }
   }
 #endif
@@ -188,26 +203,39 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
           if (hint.codec == AV_CODEC_ID_H264 && hint.ptsinvalid)
             break;
           if ( (pCodec = OpenCodec(new CDVDVideoCodecVideoToolBox(), hint, options)) ) return pCodec;
-        break;
+          break;
         default:
-        break;
+          break;
       }
     }
   }
 #endif
 
 #if defined(HAVE_LIBOPENMAX)
-  if (g_guiSettings.GetBool("videoplayer.useomx") && !hint.software )
-  {
-      if (hint.codec == AV_CODEC_ID_H264 || hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_VC1)
+    if (g_guiSettings.GetBool("videoplayer.useomx") && !hint.software )
     {
-      if ( (pCodec = OpenCodec(new CDVDVideoCodecOpenMax(), hint, options)) ) return pCodec;
+      if (hint.codec == AV_CODEC_ID_H264 || hint.codec == AV_CODEC_ID_MPEG2VIDEO || hint.codec == AV_CODEC_ID_VC1)
+      {
+        if ( (pCodec = OpenCodec(new CDVDVideoCodecOpenMax(), hint, options)) ) return pCodec;
+      }
     }
-  }
+#endif
+
+#if defined(HAS_MMAL)
+    if (g_guiSettings.GetBool("videoplayer.usemmal") && !hint.software )
+    {
+      if (hint.codec == AV_CODEC_ID_H264 || hint.codec == AV_CODEC_ID_H263 || hint.codec == AV_CODEC_ID_MPEG4 ||
+          hint.codec == AV_CODEC_ID_MPEG1VIDEO || hint.codec == AV_CODEC_ID_MPEG2VIDEO ||
+          hint.codec == AV_CODEC_ID_VP6 || hint.codec == AV_CODEC_ID_VP6F || hint.codec == AV_CODEC_ID_VP6A || hint.codec == AV_CODEC_ID_VP8 ||
+          hint.codec == AV_CODEC_ID_THEORA || hint.codec == AV_CODEC_ID_MJPEG || hint.codec == AV_CODEC_ID_MJPEGB || hint.codec == AV_CODEC_ID_VC1 || hint.codec == AV_CODEC_ID_WMV3)
+      {
+        if ( (pCodec = OpenCodec(new CMMALVideo(), hint, options)) ) return pCodec;
+      }
+    }
 #endif
 
   // try to decide if we want to try halfres decoding
-#if !defined(_LINUX) && !defined(_WIN32)
+#if !defined(TARGET_POSIX) && !defined(TARGET_WINDOWS)
   float pixelrate = (float)hint.width*hint.height*hint.fpsrate/hint.fpsscale;
   if( pixelrate > 1400.0f*720.0f*30.0f )
   {
@@ -216,8 +244,7 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
   }
 #endif
 
-  CStdString value;
-  value.Format("%d", surfaces);
+  std::string value = StringUtils::Format("%d", info.max_buffer_size);
   options.m_keys.push_back(CDVDCodecOption("surfaces", value));
   if( (pCodec = OpenCodec(new CDVDVideoCodecFFmpeg(), hint, options)) ) return pCodec;
 

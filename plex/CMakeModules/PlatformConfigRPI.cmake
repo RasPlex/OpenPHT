@@ -171,6 +171,10 @@ plex_find_library(GLESv2 0  0 system/usr/lib 1)
 plex_find_library(bcm_host 0 0  system/usr/lib 1)
 plex_find_library(vcos 0 0  system/usr/lib 1)
 plex_find_library(vchiq_arm 0 0  system/usr/lib 1)
+plex_find_library(mmal 0 0  system/usr/lib 1)
+plex_find_library(mmal_core 0 0  system/usr/lib 1)
+plex_find_library(mmal_util 0 0  system/usr/lib 1)
+plex_find_library(vcsm 0 0  system/usr/lib 1)
 
 #needed for the commandline flag CMAKE_INCLUDE_PATH
 foreach(path ${CMAKE_INCLUDE_PATH})
@@ -199,6 +203,7 @@ add_definitions(
   -D_ARMEL
   -DTARGET_RPI
   -DHAS_GLES=2
+  -DHAS_MMAL
   -DHAVE_OMXLIB
   -DOMX_SKIP64BIT
   -DHAS_BUILTIN_SYNC_ADD_AND_FETCH

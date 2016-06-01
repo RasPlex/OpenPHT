@@ -36,17 +36,14 @@
 #include "PlayerSelectionRule.h"
 #include "guilib/LocalizeStrings.h"
 
-/* PLEX */
-#include "PlexTypes.h"
-/* END PLEX */
-
 using namespace AUTOPTR;
 
 std::vector<CPlayerCoreConfig *> CPlayerCoreFactory::s_vecCoreConfigs;
 std::vector<CPlayerSelectionRule *> CPlayerCoreFactory::s_vecCoreSelectionRules;
 
 CPlayerCoreFactory::CPlayerCoreFactory()
-{}
+{ }
+
 CPlayerCoreFactory::~CPlayerCoreFactory()
 {
   for(std::vector<CPlayerCoreConfig *>::iterator it = s_vecCoreConfigs.begin(); it != s_vecCoreConfigs.end(); it++)
@@ -71,7 +68,7 @@ template<typename T> void unique (T &con)
 
 IPlayer* CPlayerCoreFactory::CreatePlayer(const CStdString& strCore, IPlayerCallback& callback) const
 {
-  return CreatePlayer( GetPlayerCore(strCore), callback );
+  return CreatePlayer(GetPlayerCore(strCore), callback );
 }
 
 IPlayer* CPlayerCoreFactory::CreatePlayer(const PLAYERCOREID eCore, IPlayerCallback& callback)
@@ -222,12 +219,12 @@ PLAYERCOREID CPlayerCoreFactory::GetDefaultPlayer( const CFileItem& item )
   GetPlayers(item, vecCores);
 
   //If we have any players return the first one
-  if( vecCores.size() > 0 ) return vecCores.at(0);
+  if( !vecCores.empty() ) return vecCores.at(0);
 
   return EPC_NONE;
 }
 
-PLAYERCOREID CPlayerCoreFactory::SelectPlayerDialog(VECPLAYERCORES &vecCores, float posX, float posY)
+PLAYERCOREID CPlayerCoreFactory::SelectPlayerDialog(const VECPLAYERCORES &vecCores, float posX, float posY)
 {
   CContextButtons choices;
   if (vecCores.size())
@@ -277,26 +274,6 @@ bool CPlayerCoreFactory::LoadConfiguration(TiXmlElement* pConfig, bool clear)
     paplayer->m_bPlaysAudio = true;
     s_vecCoreConfigs.push_back(paplayer);
 
-    /* PLEX */
-    CPlayerCoreConfig* pmsplayer = new CPlayerCoreConfig("PMSPlayer", EPC_PMSPLAYER, NULL);
-    pmsplayer->m_bPlaysAudio = pmsplayer->m_bPlaysVideo = true;
-    s_vecCoreConfigs.push_back(pmsplayer);
-    /* END PLEX */
-
-#if defined(HAS_AMLPLAYER)
-    CPlayerCoreConfig* amlplayer = new CPlayerCoreConfig("AMLPlayer", EPC_AMLPLAYER, NULL);
-    amlplayer->m_bPlaysAudio = true;
-    amlplayer->m_bPlaysVideo = true;
-    s_vecCoreConfigs.push_back(amlplayer);
-#endif
-
-#if defined(HAS_OMXPLAYER)
-    CPlayerCoreConfig* omxplayer = new CPlayerCoreConfig("OMXPlayer", EPC_OMXPLAYER, NULL);
-    omxplayer->m_bPlaysAudio = true;
-    omxplayer->m_bPlaysVideo = true;
-    s_vecCoreConfigs.push_back(omxplayer);
-#endif
-
     for(std::vector<CPlayerSelectionRule *>::iterator it = s_vecCoreSelectionRules.begin(); it != s_vecCoreSelectionRules.end(); it++)
       delete *it;
     s_vecCoreSelectionRules.clear();
@@ -323,9 +300,6 @@ bool CPlayerCoreFactory::LoadConfiguration(TiXmlElement* pConfig, bool clear)
       if (type == "dvdplayer" || type == "mplayer") eCore = EPC_DVDPLAYER;
       if (type == "paplayer" ) eCore = EPC_PAPLAYER;
       if (type == "externalplayer" ) eCore = EPC_EXTPLAYER;
-      /* PLEX */
-      if (type == "pmsplayer") eCore = EPC_PMSPLAYER;
-      /* END PLEX */
 
       if (eCore != EPC_NONE)
       {

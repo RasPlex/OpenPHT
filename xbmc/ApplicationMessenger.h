@@ -88,6 +88,7 @@ namespace MUSIC_INFO
 #define TMSG_RENDERER_FLUSH       312
 #define TMSG_INHIBITIDLESHUTDOWN  313
 #define TMSG_LOADPROFILE          314
+#define TMSG_SETVIDEORESOLUTION   319
 
 #define TMSG_NETWORKMESSAGE         500
 
@@ -172,6 +173,7 @@ public:
   void MediaPlay(int playlistid, int song = -1);
   void MediaStop(bool bWait = true, int playlistid = -1);
   void MediaPause();
+  void MediaUnPause();
   void MediaRestart(bool bWait);
 
   void PlayListPlayerPlay();

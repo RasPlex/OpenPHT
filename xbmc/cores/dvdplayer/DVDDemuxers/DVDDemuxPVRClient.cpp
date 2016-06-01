@@ -26,7 +26,7 @@
 #include "pvr/addons/PVRClients.h"
 #include "../DVDClock.h"
 
-#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - AV_INPUT_BUFFER_PADDING_SIZE)
+#define FF_MAX_EXTRADATA_SIZE ((1 << 28) - FF_INPUT_BUFFER_PADDING_SIZE)
 
 using namespace PVR;
 
@@ -34,6 +34,7 @@ CDemuxStreamPVRInternal::CDemuxStreamPVRInternal(CDVDDemuxPVRClient *parent)
  : m_parent(parent)
  , m_parser(NULL)
  , m_context(NULL)
+ , m_parser_split(false)
 {
 }
 
@@ -118,7 +119,6 @@ bool CDVDDemuxPVRClient::Open(CDVDInputStream* pInput)
   if (!g_PVRClients->GetPlayingClient(m_pvrClient))
     return false;
 
-  RequestStreams();
   return true;
 }
 
@@ -126,12 +126,7 @@ void CDVDDemuxPVRClient::Dispose()
 {
   for (int i = 0; i < MAX_STREAMS; i++)
   {
-    if (m_streams[i])
-    {
-      if (m_streams[i]->ExtraData)
-        delete[] (BYTE*)(m_streams[i]->ExtraData);
-      delete m_streams[i];
-    }
+    delete m_streams[i];
     m_streams[i] = NULL;
   }
 
@@ -142,11 +137,6 @@ void CDVDDemuxPVRClient::DisposeStream(int iStreamId)
 {
   if (iStreamId < 0 || iStreamId >= MAX_STREAMS)
     return;
-  if (m_streams[iStreamId]->ExtraData)
-  {
-    delete[] (uint8_t*)m_streams[iStreamId]->ExtraData;
-    m_streams[iStreamId]->ExtraData = NULL;
-  }
   delete m_streams[iStreamId];
   m_streams[iStreamId] = NULL;
 }
@@ -219,9 +209,9 @@ void CDVDDemuxPVRClient::ParsePacket(DemuxPacket* pkt)
       st->changes++;
       st->disabled = false;
       st->ExtraSize = len;
-      st->ExtraData = new uint8_t[len+AV_INPUT_BUFFER_PADDING_SIZE];
+      st->ExtraData = new uint8_t[len+FF_INPUT_BUFFER_PADDING_SIZE];
       memcpy(st->ExtraData, pkt->pData, len);
-      memset((uint8_t*)st->ExtraData + len, 0 , AV_INPUT_BUFFER_PADDING_SIZE);
+      memset((uint8_t*)st->ExtraData + len, 0 , FF_INPUT_BUFFER_PADDING_SIZE);
       pvr->m_parser_split = false;
     }
   }
@@ -323,7 +313,7 @@ void CDVDDemuxPVRClient::RequestStreams()
   if (!g_PVRManager.IsStarted())
     return;
 
-  PVR_STREAM_PROPERTIES props;
+  PVR_STREAM_PROPERTIES props = {};
   m_pvrClient->GetStreamProperties(&props);
   unsigned int i;
 
@@ -337,9 +327,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       if (stm)
       {
         st = dynamic_cast<CDemuxStreamAudioPVRClient*>(stm);
-        if (!st
-            || (st->codec != (AVCodecID)props.stream[i].iCodecId)
-            || (st->iChannels != props.stream[i].iChannels))
+        if (!st || (st->codec != (AVCodecID)props.stream[i].iCodecId))
           DisposeStream(i);
       }
       if (!m_streams[i])
@@ -356,6 +344,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       st->iBitsPerSample  = props.stream[i].iBitsPerSample;
       m_streams[i] = st;
       st->m_parser_split = true;
+      st->changes++;
     }
     else if (props.stream[i].iCodecType == AVMEDIA_TYPE_VIDEO)
     {
@@ -381,6 +370,7 @@ void CDVDDemuxPVRClient::RequestStreams()
       st->iHeight         = props.stream[i].iHeight;
       st->iWidth          = props.stream[i].iWidth;
       st->fAspect         = props.stream[i].fAspect;
+      st->stereo_mode     = "mono";
       m_streams[i] = st;
       st->m_parser_split = true;
     }
@@ -407,7 +397,15 @@ void CDVDDemuxPVRClient::RequestStreams()
       {
         st = new CDemuxStreamSubtitlePVRClient(this);
       }
-      st->identifier = props.stream[i].iIdentifier;
+      if(props.stream[i].iIdentifier)
+      {
+        st->ExtraData = new uint8_t[4];
+        st->ExtraSize = 4;
+        st->ExtraData[0] = (props.stream[i].iIdentifier >> 8) & 0xff;
+        st->ExtraData[1] = (props.stream[i].iIdentifier >> 0) & 0xff;
+        st->ExtraData[2] = (props.stream[i].iIdentifier >> 24) & 0xff;
+        st->ExtraData[3] = (props.stream[i].iIdentifier >> 16) & 0xff;
+      }
       m_streams[i] = st;
     }
     else
@@ -459,7 +457,7 @@ std::string CDVDDemuxPVRClient::GetFileName()
     return "";
 }
 
-void CDVDDemuxPVRClient::GetStreamCodecName(int iStreamId, CStdString &strName)
+void CDVDDemuxPVRClient::GetStreamCodecName(int iStreamId, std::string &strName)
 {
   CDemuxStream *stream = GetStream(iStreamId);
   if (stream)

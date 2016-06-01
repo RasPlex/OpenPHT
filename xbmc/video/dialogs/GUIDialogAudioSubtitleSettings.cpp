@@ -46,10 +46,6 @@ using namespace std;
 using namespace XFILE;
 using namespace PVR;
 
-#ifdef HAS_VIDEO_PLAYBACK
-extern void xbox_audio_switch_channel(int iAudioStream, bool bAudioOnAllSpeakers); //lowlevel audio
-#endif
-
 CGUIDialogAudioSubtitleSettings::CGUIDialogAudioSubtitleSettings(void)
     : CGUIDialogSettings(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "VideoOSDSettings.xml"),
     m_passthrough(false)
@@ -149,9 +145,10 @@ void CGUIDialogAudioSubtitleSettings::AddAudioStreams(unsigned int id)
   // cycle through each audio stream and add it to our list control
   for (int i = 0; i <= setting.max; ++i)
   {
+    SPlayerAudioStreamInfo info;
+    g_application.m_pPlayer->GetAudioStreamInfo(i, info);
     CStdString strItem;
-    CStdString strName;
-    g_application.m_pPlayer->GetAudioStreamName(i, strName);
+    CStdString strName = info.name;
     if (strName.empty())
       strName = g_localizeStrings.Get(13205); // Unknown
 
@@ -188,9 +185,10 @@ void CGUIDialogAudioSubtitleSettings::AddSubtitleStreams(unsigned int id)
   // cycle through each subtitle and add it to our entry list
   for (int i = 0; i <= setting.max; ++i)
   {
+    SPlayerSubtitleStreamInfo info;
+    g_application.m_pPlayer->GetSubtitleStreamInfo(i, info);
     CStdString strItem;
-    CStdString strName;
-    g_application.m_pPlayer->GetSubtitleName(i, strName);
+    CStdString strName = info.name;
     if (strName.empty())
       strName = g_localizeStrings.Get(13205); // Unknown
 
@@ -309,14 +307,7 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
         if (CFile::Exists(URIUtils::ReplaceExtension(strPath, ".idx")))
           strPath = URIUtils::ReplaceExtension(strPath, ".idx");
       
-      int id = g_application.m_pPlayer->AddSubtitle(strPath);
-      if(id >= 0)
-      {
-        m_subtitleStream = id;
-        g_application.m_pPlayer->SetSubtitle(m_subtitleStream);
-        g_application.m_pPlayer->SetSubtitleVisible(true);
-      }
-      g_settings.m_currentVideoSettings.m_SubtitleCached = true;
+      g_application.m_pPlayer->AddSubtitle(strPath);
       Close();
     }
   }

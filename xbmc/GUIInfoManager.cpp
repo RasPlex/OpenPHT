@@ -56,6 +56,7 @@
 #include "utils/SeekHandler.h"
 #include "URL.h"
 #include "addons/Skin.h"
+#include "cores/DataCacheCore.h"
 
 // stuff for current song
 #include "music/MusicInfoLoader.h"
@@ -79,6 +80,7 @@
 #include "video/VideoThumbLoader.h"
 #include "music/MusicThumbLoader.h"
 #include "video/VideoDatabase.h"
+#include "cores/IPlayer.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
 
 /* PLEX */
@@ -113,7 +115,6 @@ CGUIInfoManager::CGUIInfoManager(void) :
     Observable()
 {
   m_lastSysHeatInfoTime = -SYSHEATUPDATEINTERVAL;  // make sure we grab CPU temp on the first pass
-  m_lastMusicBitrateTime = 0;
   m_fanSpeed = 0;
   m_AfterSeekTimeout = 0;
   m_seekOffset = 0;
@@ -127,7 +128,6 @@ CGUIInfoManager::CGUIInfoManager(void) :
   m_frameCounter = 0;
   m_lastFPSTime = 0;
   m_updateTime = 1;
-  m_MusicBitrate = 0;
   m_playerShowTime = false;
   m_playerShowCodec = false;
   m_playerShowInfo = false;
@@ -1606,27 +1606,33 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
   break;
   case VIDEOPLAYER_VIDEO_CODEC:
     if(g_application.IsPlaying() && g_application.m_pPlayer)
-      strLabel = g_application.m_pPlayer->GetVideoCodecName();
+    {
+      strLabel = m_videoInfo.videoCodecName;
+    }
     break;
   case VIDEOPLAYER_VIDEO_RESOLUTION:
     if(g_application.IsPlaying() && g_application.m_pPlayer)
-      return CStreamDetails::VideoDimsToResolutionDescription(g_application.m_pPlayer->GetPictureWidth(), g_application.m_pPlayer->GetPictureHeight());
+    {
+      return CStreamDetails::VideoDimsToResolutionDescription(m_videoInfo.width, m_videoInfo.height);
+    }
     break;
   case VIDEOPLAYER_AUDIO_CODEC:
     if(g_application.IsPlaying() && g_application.m_pPlayer)
-      strLabel = g_application.m_pPlayer->GetAudioCodecName();
+    {
+      strLabel = m_audioInfo.audioCodecName;
+    }
     break;
   case VIDEOPLAYER_VIDEO_ASPECT:
     if (g_application.IsPlaying() && g_application.m_pPlayer)
     {
-      float aspect;
-      g_application.m_pPlayer->GetVideoAspectRatio(aspect);
-      strLabel = CStreamDetails::VideoAspectToAspectDescription(aspect);
+      strLabel = CStreamDetails::VideoAspectToAspectDescription(m_videoInfo.videoAspectRatio);
     }
     break;
   case VIDEOPLAYER_AUDIO_CHANNELS:
     if(g_application.IsPlaying() && g_application.m_pPlayer)
-      strLabel.Format("%i", g_application.m_pPlayer->GetChannels());
+    {
+      strLabel.Format("%i", m_audioInfo.channels);
+    }
     break;
   case PLAYLIST_LENGTH:
   case PLAYLIST_POSITION:
@@ -3382,7 +3388,7 @@ CStdString CGUIInfoManager::GetMultiInfoLabel(const GUIInfo &info, int contextWi
   }
   else if (info.m_info == PLAYER_SEEKOFFSET)
   {
-    CStdString seekOffset = StringUtils::SecondsToTimeString(abs(m_seekOffset), (TIME_FORMAT)info.GetData1());
+    CStdString seekOffset = StringUtils::SecondsToTimeString(abs(m_seekOffset / 1000), (TIME_FORMAT)info.GetData1());
     if (m_seekOffset < 0)
       return "-" + seekOffset;
     if (m_seekOffset > 0)
@@ -3904,24 +3910,18 @@ CStdString CGUIInfoManager::GetMusicLabel(int item)
     break;
   case MUSICPLAYER_BITRATE:
     {
-      float fTimeSpan = (float)(CTimeUtils::GetFrameTime() - m_lastMusicBitrateTime);
-      if (fTimeSpan >= 500.0f)
-      {
-        m_MusicBitrate = g_application.m_pPlayer->GetAudioBitrate();
-        m_lastMusicBitrateTime = CTimeUtils::GetFrameTime();
-      }
       CStdString strBitrate = "";
-      if (m_MusicBitrate > 0)
-        strBitrate.Format("%i", MathUtils::round_int((double)m_MusicBitrate / 1000.0));
+      if (m_audioInfo.bitrate > 0)
+        strBitrate.Format("%i", MathUtils::round_int((double)m_audioInfo.bitrate / 1000.0));
       return strBitrate;
     }
     break;
   case MUSICPLAYER_CHANNELS:
     {
       CStdString strChannels = "";
-      if (g_application.m_pPlayer->GetChannels() > 0)
+      if (m_audioInfo.channels > 0)
       {
-        strChannels.Format("%i", g_application.m_pPlayer->GetChannels());
+        strChannels.Format("%i", m_audioInfo.channels);
       }
       return strChannels;
     }
@@ -3929,27 +3929,23 @@ CStdString CGUIInfoManager::GetMusicLabel(int item)
   case MUSICPLAYER_BITSPERSAMPLE:
     {
       CStdString strBitsPerSample = "";
-      if (g_application.m_pPlayer->GetBitsPerSample() > 0)
-      {
-        strBitsPerSample.Format("%i", g_application.m_pPlayer->GetBitsPerSample());
-      }
+      if (m_audioInfo.bitspersample > 0)
+        strBitsPerSample.Format("%i", m_audioInfo.bitspersample);
       return strBitsPerSample;
     }
     break;
   case MUSICPLAYER_SAMPLERATE:
     {
       CStdString strSampleRate = "";
-      if (g_application.m_pPlayer->GetSampleRate() > 0)
-      {
-        strSampleRate.Format("%.5g", ((double)g_application.m_pPlayer->GetSampleRate() / 1000.0));
-      }
+      if (m_audioInfo.samplerate > 0)
+        strSampleRate.Format("%.5g", ((double)m_audioInfo.samplerate / 1000.0));
       return strSampleRate;
     }
     break;
   case MUSICPLAYER_CODEC:
     {
       CStdString strCodec;
-      strCodec.Format("%s", g_application.m_pPlayer->GetAudioCodecName().c_str());
+      strCodec.Format("%s", m_audioInfo.audioCodecName.c_str());
       return strCodec;
     }
     break;
@@ -4643,6 +4639,24 @@ void CGUIInfoManager::UpdateFPS()
     m_fps = m_frameCounter / fTimeSpan;
     m_lastFPSTime = curTime;
     m_frameCounter = 0;
+  }
+}
+
+void CGUIInfoManager::UpdateAVInfo()
+{
+  if(g_application.IsPlaying())
+  {
+    if (g_dataCacheCore.HasAVInfoChanges())
+    {
+      SPlayerVideoStreamInfo video;
+      SPlayerAudioStreamInfo audio;
+
+      g_application.m_pPlayer->GetVideoStreamInfo(video);
+      g_application.m_pPlayer->GetAudioStreamInfo(CURRENT_STREAM, audio);
+
+      m_videoInfo = video;
+      m_audioInfo = audio;
+    }
   }
 }
 
@@ -6326,32 +6340,28 @@ CStdString CGUIInfoManager::GetVideoLabel(int item, const CFileItemPtr& file)
       {
         if (g_application.IsPlaying() && g_application.m_pPlayer)
         {
-          CStdString name;
-          g_application.m_pPlayer->GetAudioStreamName(g_application.m_pPlayer->GetAudioStream(), name);
-          if (!name.empty())
-            return name;
+          SPlayerAudioStreamInfo info;
+          g_application.m_pPlayer->GetAudioStreamInfo(CURRENT_STREAM, info);
+          if (!info.name.empty())
+            return info.name;
           return g_localizeStrings.Get(231);
         }
-        if (g_application.CurrentFileItemPtr()->HasProperty("selectedAudioStream"))
-          return g_application.CurrentFileItemPtr()->GetProperty("selectedAudioStream").asString();
-        return g_localizeStrings.Get(231);
+        return g_localizeStrings.Get(1446);
       }
     case VIDEOPLAYER_SUBTITLESTREAM:
       {
-        if (g_application.IsPlaying() && g_application.m_pPlayer && !(g_application.m_pPlayer->IsTranscoded() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles")))
+        if (g_application.m_pPlayer->IsPlaying() && g_application.m_pPlayer)
         {
           if (g_application.m_pPlayer->GetSubtitleVisible())
           {
-            CStdString language;
-            g_application.m_pPlayer->GetSubtitleLanguage(g_application.m_pPlayer->GetSubtitle(), language);
-            if (!language.empty())
-              return language;
+            SPlayerSubtitleStreamInfo info;
+            g_application.m_pPlayer->GetSubtitleStreamInfo(CURRENT_STREAM, info);
+            if (!info.language.empty())
+              return info.language;
           }
           return g_localizeStrings.Get(231);
         }
-        if (g_application.CurrentFileItemPtr()->HasProperty("selectedSubtitleStream"))
-          return g_application.CurrentFileItemPtr()->GetProperty("selectedSubtitleStream").asString();
-        return g_localizeStrings.Get(231);
+        return g_localizeStrings.Get(1446);
       }
     case VIDEOPLAYER_DURATION_STRING:
       {

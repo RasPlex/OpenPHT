@@ -22,9 +22,9 @@
 #include "utils/log.h"
 #include "cores/FFmpeg.h"
 
-CDVDVideoPPFFmpeg::CDVDVideoPPFFmpeg(const CStdString& mType)
+CDVDVideoPPFFmpeg::CDVDVideoPPFFmpeg(const CStdString& mType):
+  m_sType(mType)
 {
-  m_sType = mType;
   m_pMode = m_pContext = NULL;
   m_pSource = m_pTarget = NULL;
   m_iInitWidth = m_iInitHeight = 0;
@@ -134,7 +134,7 @@ bool CDVDVideoPPFFmpeg::Process(DVDVideoPicture* pPicture)
   pp_postprocess((const uint8_t**)m_pSource->data, m_pSource->iLineSize,
                 m_pTarget->data, m_pTarget->iLineSize,
                 m_pSource->iWidth, m_pSource->iHeight,
-                m_pSource->qscale_table, m_pSource->qscale_stride,
+                m_pSource->qp_table, m_pSource->qstride,
                 m_pMode, m_pContext,
                 pict_type); //m_pSource->iFrameType);
 
@@ -143,15 +143,14 @@ bool CDVDVideoPPFFmpeg::Process(DVDVideoPicture* pPicture)
   if (m_deinterlace)
     m_pTarget->iFlags &= ~DVP_FLAG_INTERLACED;
   m_pTarget->iFrameType = m_pSource->iFrameType;
-  m_pTarget->iRepeatPicture = m_pSource->iRepeatPicture;;
+  m_pTarget->iRepeatPicture = m_pSource->iRepeatPicture;
   m_pTarget->iDuration = m_pSource->iDuration;
-  m_pTarget->qscale_table = m_pSource->qscale_table;
-  m_pTarget->qscale_stride = m_pSource->qscale_stride;
+  m_pTarget->qp_table = m_pSource->qp_table;
+  m_pTarget->qstride = m_pSource->qstride;
   m_pTarget->qscale_type = m_pSource->qscale_type;
   m_pTarget->iDisplayHeight = m_pSource->iDisplayHeight;
   m_pTarget->iDisplayWidth = m_pSource->iDisplayWidth;
   m_pTarget->pts = m_pSource->pts;
-  m_pTarget->iGroupId = m_pSource->iGroupId;
   m_pTarget->format = RENDER_FMT_YUV420P;
   return true;
 }
@@ -183,9 +182,9 @@ bool CDVDVideoPPFFmpeg::CheckFrameBuffer(const DVDVideoPicture* pSource)
     m_FrameBuffer.iWidth = pSource->iWidth;
     m_FrameBuffer.iHeight = pSource->iHeight;
 
-    m_FrameBuffer.data[0] = (BYTE*)_aligned_malloc(m_FrameBuffer.iLineSize[0] * m_FrameBuffer.iHeight  , 16);
-    m_FrameBuffer.data[1] = (BYTE*)_aligned_malloc(m_FrameBuffer.iLineSize[1] * m_FrameBuffer.iHeight/2, 16);
-    m_FrameBuffer.data[2] = (BYTE*)_aligned_malloc(m_FrameBuffer.iLineSize[2] * m_FrameBuffer.iHeight/2, 16);
+    m_FrameBuffer.data[0] = (uint8_t*)_aligned_malloc(m_FrameBuffer.iLineSize[0] * m_FrameBuffer.iHeight  , 16);
+    m_FrameBuffer.data[1] = (uint8_t*)_aligned_malloc(m_FrameBuffer.iLineSize[1] * m_FrameBuffer.iHeight/2, 16);
+    m_FrameBuffer.data[2] = (uint8_t*)_aligned_malloc(m_FrameBuffer.iLineSize[2] * m_FrameBuffer.iHeight/2, 16);
 
     if( !m_FrameBuffer.data[0] || !m_FrameBuffer.data[1] || !m_FrameBuffer.data[2])
     {

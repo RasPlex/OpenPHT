@@ -18,7 +18,6 @@
  *
  */
 
-#include "DVDCodecs/DVDCodecs.h"
 #include "DVDInputStreams/DVDInputStreamHttp.h"
 #include "DVDDemuxShoutcast.h"
 #include "DVDDemuxUtils.h"
@@ -118,8 +117,6 @@ void CDVDDemuxShoutcast::Flush()
 
 DemuxPacket* CDVDDemuxShoutcast::Read()
 {
-  int iRead = 0;
-
   // XXX
   // if meta interval is greater than FileCurl's max read size (currently 64k)
   // it will simply fail becuse the meta-interval will get incorrect
@@ -151,8 +148,8 @@ DemuxPacket* CDVDDemuxShoutcast::Read()
   {
     // we already have read m_iMetaStreamInterval bytes of streaming data
     // metadata follows
-    BYTE l;
-    iRead = m_pInput->Read(&l, 1);
+    uint8_t l;
+    int iRead = m_pInput->Read(&l, 1);
     if (iRead > 0)
     {
       int iMetaLength = l * 16;
@@ -160,7 +157,7 @@ DemuxPacket* CDVDDemuxShoutcast::Read()
       if (iMetaLength > 0)
       {
         // iMetaLength cannot be larger then 16 * 255
-        BYTE buffer[16 * 255];
+        uint8_t buffer[16 * 255];
 
         // skip meta data for now
         m_pInput->Read(buffer, iMetaLength);

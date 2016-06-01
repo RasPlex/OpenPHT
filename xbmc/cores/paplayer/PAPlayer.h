@@ -46,14 +46,14 @@ public:
   virtual bool OpenFile(const CFileItem& file, const CPlayerOptions &options);
   virtual bool QueueNextFile(const CFileItem &file);
   virtual void OnNothingToQueueNotify();
-  virtual bool CloseFile();
+  virtual bool CloseFile(bool reopen = false);
   virtual bool IsPlaying() const;
   virtual void Pause();
   virtual bool IsPaused() const;
   virtual bool HasVideo() const { return false; }
   virtual bool HasAudio() const { return true; }
   virtual bool CanSeek();
-  virtual void Seek(bool bPlus = true, bool bLargeStep = false);
+  virtual void Seek(bool bPlus = true, bool bLargeStep = false, bool bChapterOverride = false);
   virtual void SeekPercentage(float fPercent = 0.0f);
   virtual float GetPercentage();
   virtual void SetVolume(float volume);
@@ -61,16 +61,11 @@ public:
   virtual void GetAudioInfo( CStdString& strAudioInfo) {}
   virtual void GetVideoInfo( CStdString& strVideoInfo) {}
   virtual void GetGeneralInfo( CStdString& strVideoInfo) {}
-  virtual void Update(bool bPauseDrawing = false) {}
   virtual void ToFFRW(int iSpeed = 0);
   virtual int GetCacheLevel() const;
   virtual int64_t GetTotalTime();
   virtual void SetTotalTime(int64_t time);
-  virtual int GetAudioBitrate();
-  virtual int GetChannels();
-  virtual int GetBitsPerSample();
-  virtual int GetSampleRate();
-  virtual CStdString GetAudioCodecName();
+  virtual void GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info);
   virtual int64_t GetTime();
   virtual void SetTime(int64_t time);
   virtual void SeekTime(int64_t iTime = 0);

@@ -33,6 +33,7 @@
 #include "XBDateTime.h"
 #include "utils/Observer.h"
 #include "interfaces/info/SkinVariable.h"
+#include "cores/IPlayer.h"
 
 #include <list>
 #include <map>
@@ -822,6 +823,7 @@ public:
   CTemperature GetGPUTemperature();
 
   void UpdateFPS();
+  void UpdateAVInfo();
   inline float GetFPS() const { return m_fps; };
 
   void SetNextWindow(int windowID) { m_nextWindowID = windowID; };
@@ -940,8 +942,6 @@ protected:
   // Current playing stuff
   CFileItemPtr m_currentFile;
   CStdString m_currentMovieThumb;
-  unsigned int m_lastMusicBitrateTime;
-  unsigned int m_MusicBitrate;
   CFileItem* m_currentSlide;
 
   // fan stuff
@@ -976,6 +976,9 @@ protected:
   int m_libraryHasTVShows;
   int m_libraryHasMusicVideos;
   int m_libraryHasMovieSets;
+
+  SPlayerVideoStreamInfo m_videoInfo;
+  SPlayerAudioStreamInfo m_audioInfo;
 
   CCriticalSection m_critInfo;
 

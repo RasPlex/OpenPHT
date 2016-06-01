@@ -157,8 +157,8 @@ void CGUIDialogVideoSettings::CreateSettings()
 
     AddSpin(VIDEO_SETTINGS_SCALINGMETHOD, 16300, (int*)&g_settings.m_currentVideoSettings.m_ScalingMethod, entries);
   }
-  if (g_renderManager.Supports(RENDERFEATURE_CROP))
-    AddBool(VIDEO_SETTINGS_CROP, 644, &g_settings.m_currentVideoSettings.m_Crop);
+  //if (g_renderManager.Supports(RENDERFEATURE_CROP))
+  //  AddBool(VIDEO_SETTINGS_CROP, 644, &g_settings.m_currentVideoSettings.m_Crop);
   if (g_renderManager.Supports(RENDERFEATURE_STRETCH) || g_renderManager.Supports(RENDERFEATURE_PIXEL_RATIO))
   {
     const int entries[] = {630, 631, 632, 633, 634, 635, 636 };

@@ -19,8 +19,8 @@
  *
  */
 
-#include <vector>
 #include "utils/StdString.h"
+#include <vector>
 #include "utils/GlobalsHandling.h"
 
 class TiXmlElement;
@@ -102,17 +102,10 @@ class CAdvancedSettings
 
     int m_audioHeadRoom;
     float m_ac3Gain;
+    int m_maxPllAdjust;
     CStdString m_audioDefaultPlayer;
     float m_audioPlayCountMinimumPercent;
     bool m_dvdplayerIgnoreDTSinWAV;
-    int m_audioResample;
-    bool m_allowTranscode44100;
-    bool m_audioForceDirectSound;
-    bool m_audioAudiophile;
-    bool m_allChannelStereo;
-    bool m_streamSilence;
-    int m_audioSinkBufferDurationMsec;
-    CStdString m_audioTranscodeTo;
     float m_limiterHold;
     float m_limiterRelease;
 
@@ -135,6 +128,8 @@ class CAdvancedSettings
     int m_videoPercentSeekBackwardBig;
     CStdString m_videoPPFFmpegDeint;
     CStdString m_videoPPFFmpegPostProc;
+    bool m_videoVDPAUtelecine;
+    bool m_videoVDPAUdeintSkipChromaHD;
     bool m_musicUseTimeSeeking;
     int m_musicTimeSeekForward;
     int m_musicTimeSeekBackward;
@@ -147,15 +142,14 @@ class CAdvancedSettings
     int m_videoBlackBarColour;
     int m_videoIgnoreSecondsAtStart;
     float m_videoIgnorePercentAtEnd;
-    CStdString m_audioHost;
-    bool m_audioApplyDrc;
+    float m_audioApplyDrc;
+    bool m_useFfmpegVda;
 
-    bool  m_videoVDPAUScaling;
+    int   m_videoVDPAUScaling;
+    bool  m_videoVAAPIforced;
     float m_videoNonLinStretchRatio;
     bool  m_videoEnableHighQualityHwScalers;
     float m_videoAutoScaleMaxFps;
-    bool  m_videoAllowMpeg4VDPAU;
-    bool  m_videoAllowMpeg4VAAPI;
     std::vector<RefreshOverride> m_videoAdjustRefreshOverrides;
     std::vector<RefreshVideoLatency> m_videoRefreshLatency;
     float m_videoDefaultLatency;
@@ -293,7 +287,6 @@ class CAdvancedSettings
     int m_iEdlCommBreakAutowait;    // seconds
     int m_iEdlCommBreakAutowind;    // seconds
 
-    bool m_bFirstLoop;
     int m_curlconnecttimeout;
     int m_curllowspeedtime;
     int m_curlretries;
@@ -343,9 +336,6 @@ class CAdvancedSettings
     bool m_bPVRAutoScanIconsUserSet; /*!< @brief mark channel icons populated by auto scan as "user set" */
     int m_iPVRNumericChannelSwitchTimeout; /*!< @brief time in ms before the numeric dialog auto closes when confirmchannelswitch is disabled */
 
-    bool m_measureRefreshrate; //when true the videoreferenceclock will measure the refreshrate when direct3d is used
-                               //otherwise it will use the windows refreshrate
-
     DatabaseSettings m_databaseMusic; // advanced music database setup
     DatabaseSettings m_databaseVideo; // advanced video database setup
     DatabaseSettings m_databaseTV;    // advanced tv database setup
@@ -357,6 +347,7 @@ class CAdvancedSettings
     unsigned int m_addonPackageFolderSize;
 
     unsigned int m_cacheMemBufferSize;
+    float m_readBufferFactor;
 
     bool m_jsonOutputCompact;
     unsigned int m_jsonTcpPort;
@@ -369,6 +360,16 @@ class CAdvancedSettings
     bool m_initialized;
 
     void SetDebugMode(bool debug);
+
+    CStdString m_stereoscopicregex_3d;
+    CStdString m_stereoscopicregex_sbs;
+    CStdString m_stereoscopicregex_tab;
+    CStdString m_stereoscopicregex_mvc;
+
+    /*!< @brief position behavior of ass subtitiles when setting "subtitle position on screen" set to "fixed"
+    True to show at the fixed position set in video calibration
+    False to show at the bottom of video (default) */
+    bool m_videoAssFixedWorks;
 
     /* PLEX */
     CStdString m_language;

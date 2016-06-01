@@ -591,6 +591,24 @@ void CGUIWindowManager::RenderPass()
   }
 }
 
+void CGUIWindowManager::RenderEx() const
+{
+  CGUIWindow* pWindow = GetWindow(GetActiveWindow());
+  if (pWindow)
+    pWindow->RenderEx();
+
+  // We don't call RenderEx for now on dialogs since it is used
+  // to trigger non gui video rendering. We can activate it later at any time.
+  /*
+  vector<CGUIWindow *> &activeDialogs = m_activeDialogs;
+  for (iDialog it = activeDialogs.begin(); it != activeDialogs.end(); ++it)
+  {
+    if ((*it)->IsDialogRunning())
+      (*it)->RenderEx();
+  }
+  */
+}
+
 bool CGUIWindowManager::Render()
 {
   assert(g_application.IsCurrentThread());
@@ -637,16 +655,13 @@ bool CGUIWindowManager::Render()
       CGUITexture::DrawQuad(*i, 0x4c00ff00);
   }
 
-  m_tracker.CleanMarkedRegions();
-
-  // execute post rendering actions (finalize window closing)
-  AfterRender();
-
   return hasRendered;
 }
 
 void CGUIWindowManager::AfterRender()
 {
+  m_tracker.CleanMarkedRegions();
+
   CGUIWindow* pWindow = GetWindow(GetActiveWindow());
   if (pWindow)
     pWindow->AfterRender();
@@ -685,6 +700,8 @@ void CGUIWindowManager::FrameMove()
   vector<CGUIWindow *> dialogs = m_activeDialogs;
   for (iDialog it = dialogs.begin(); it != dialogs.end(); ++it)
     (*it)->FrameMove();
+
+  g_infoManager.UpdateAVInfo();
 }
 
 CGUIWindow* CGUIWindowManager::GetWindow(int id) const

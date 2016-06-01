@@ -30,6 +30,7 @@
 #include "utils/MathUtils.h"
 #include "cores/AudioEngine/AEFactory.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
+#include "cores/DataCacheCore.h"
 
 #include <sstream>
 #include <iomanip>
@@ -198,6 +199,8 @@ void CDVDPlayerAudio::OpenStream( CDVDStreamInfo &hints, CDVDAudioCodec* codec )
   m_silence = false;
 
   m_maxspeedadjust = 5.0;
+
+  g_dataCacheCore.SignalAudioInfoChange();
 }
 
 void CDVDPlayerAudio::CloseStream(bool bWaitForBuffers)
@@ -397,6 +400,17 @@ int CDVDPlayerAudio::DecodeFrame(DVDAudioFrame &audioframe)
       if(m_started)
         m_messageParent.Put(new CDVDMsgInt(CDVDMsg::PLAYER_STARTED, DVDPLAYER_AUDIO));
     }
+    else if (pMsg->IsType(CDVDMsg::PLAYER_DISPLAYTIME))
+    {
+      CDVDPlayer::SPlayerState& state = ((CDVDMsgType<CDVDPlayer::SPlayerState>*)pMsg)->m_value;
+
+      if(state.time_src == CDVDPlayer::ETIMESOURCE_CLOCK)
+        state.time      = DVD_TIME_TO_MSEC(m_pClock->GetClock(state.timestamp) + state.time_offset);
+      else
+        state.timestamp = CDVDClock::GetAbsoluteClock();
+      state.player    = DVDPLAYER_AUDIO;
+      m_messageParent.Put(pMsg->Acquire());
+    }
     else if (pMsg->IsType(CDVDMsg::GENERAL_EOF))
     {
       CLog::Log(LOGDEBUG, "CDVDPlayerAudio - CDVDMsg::GENERAL_EOF");
@@ -564,6 +578,8 @@ void CDVDPlayerAudio::Process()
         CLog::Log(LOGERROR, "%s - failed to create audio renderer", __FUNCTION__);
 
       m_streaminfo.channels = audioframe.passthrough ? audioframe.encoded_channel_count : audioframe.channel_count;
+
+      g_dataCacheCore.SignalAudioInfoChange();
     }
 
     // Zero out the frame data if we are supposed to silence the audio

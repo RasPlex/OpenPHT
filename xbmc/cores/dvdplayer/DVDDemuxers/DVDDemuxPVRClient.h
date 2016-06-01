@@ -100,11 +100,7 @@ public:
   CDemuxStream* GetStream(int iStreamId);
   int GetNrOfStreams();
   std::string GetFileName();
-  virtual void GetStreamCodecName(int iStreamId, CStdString &strName);
-
-  /* PLEX */
-  virtual int GetStreamBitrate() { return 0; }
-  /* END PLEX */
+  virtual void GetStreamCodecName(int iStreamId, std::string &strName);
 
 protected:
   CDVDInputStream* m_pInput;

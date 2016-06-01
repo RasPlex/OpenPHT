@@ -79,15 +79,23 @@ bool FFmpegVideoDecoder::isOpened() const
 
 double FFmpegVideoDecoder::getDuration() const
 {
-  if ( m_pFormatCtx && m_pFormatCtx->duration / AV_TIME_BASE > 0.0 )
-	return m_pFormatCtx->duration / AV_TIME_BASE;
+  if (m_pFormatCtx)
+  {
+    double duration = static_cast<double>(m_pFormatCtx->duration) / AV_TIME_BASE;
+    if (duration > 0.0)
+      return duration;
+  }
 
   return 0.0;
 }
   
 double FFmpegVideoDecoder::getFramesPerSecond() const
 {
+#if defined(AVFORMAT_HAS_STREAM_GET_R_FRAME_RATE)
+  return m_pFormatCtx ? av_q2d( av_stream_get_r_frame_rate( m_pFormatCtx->streams[ m_videoStream ] ) ) : 0.0;
+#else
   return m_pFormatCtx ? av_q2d( m_pFormatCtx->streams[ m_videoStream ]->r_frame_rate ) : 0.0;
+#endif
 }
   
 unsigned int FFmpegVideoDecoder::getWidth() const
@@ -265,7 +273,7 @@ bool FFmpegVideoDecoder::nextFrame( CBaseTexture * texture )
       // Did we get a video frame?
       if ( frameFinished )
       {
-        if ( packet.dts != AV_NOPTS_VALUE )
+        if ( packet.dts != (int64_t)AV_NOPTS_VALUE )
 	  m_lastFrameTime = packet.dts * av_q2d( m_pFormatCtx->streams[ m_videoStream ]->time_base );
         else
 	   m_lastFrameTime = 0.0;

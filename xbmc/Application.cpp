@@ -60,6 +60,7 @@
 #include "playlists/PlayListFactory.h"
 #include "guilib/GUIFontManager.h"
 #include "guilib/GUIColorManager.h"
+#include "guilib/StereoscopicsManager.h"
 #include "guilib/GUITextLayout.h"
 #include "addons/Skin.h"
 #ifdef HAS_PYTHON
@@ -467,8 +468,6 @@ CApplication::CApplication(void)
 #endif
   m_currentStack = new CFileItemList;
 
-  m_frameCount = 0;
-
   m_bPresentFrame = false;
   m_bPlatformDirectories = true;
 
@@ -487,8 +486,8 @@ CApplication::CApplication(void)
   m_currentStackPosition = 0;
   m_lastFrameTime = 0;
   m_lastRenderTime = 0;
+  m_skipGuiRender = false;
   m_bTestMode = false;
-
 }
 
 CApplication::~CApplication(void)
@@ -2215,13 +2214,10 @@ void CApplication::LoadSkin(const SkinPtr& skin)
     if (bPreviousPlayingState)
       g_application.m_pPlayer->Pause();
 #ifdef HAS_VIDEO_PLAYBACK
-    if (!g_renderManager.Paused())
+    if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO)
     {
-      if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO)
-     {
-        g_windowManager.ActivateWindow(WINDOW_HOME);
-        bPreviousRenderingState = true;
-      }
+      g_windowManager.ActivateWindow(WINDOW_HOME);
+      bPreviousRenderingState = true;
     }
 #endif
   }
@@ -2455,20 +2451,11 @@ bool CApplication::RenderNoPresent()
   // dont show GUI when playing full screen video
   if (g_graphicsContext.IsFullScreenVideo())
   {
-    if (m_bPresentFrame && IsPlaying() && !IsPaused())
-    {
-      ResetScreenSaver();
-      g_renderManager.Present();
-    }
-    else
-      g_renderManager.RenderUpdate(true);
-
     // close window overlays
     CGUIDialog *overlay = (CGUIDialog *)g_windowManager.GetWindow(WINDOW_DIALOG_VIDEO_OVERLAY);
     if (overlay) overlay->Close(true);
     overlay = (CGUIDialog *)g_windowManager.GetWindow(WINDOW_DIALOG_MUSIC_OVERLAY);
     if (overlay) overlay->Close(true);
-
   }
 
   bool hasRendered = g_windowManager.Render();
@@ -2495,67 +2482,27 @@ float CApplication::GetDimScreenSaverLevel() const
   return 100.0f;
 }
 
-bool CApplication::WaitFrame(unsigned int timeout)
-{
-  bool done = false;
-
-  // Wait for all other frames to be presented
-  CSingleLock lock(m_frameMutex);
-  //wait until event is set, but modify remaining time
-
-  TightConditionVariable<InversePredicate<int&> > cv(m_frameCond, InversePredicate<int&>(m_frameCount));
-  cv.wait(lock,timeout);
-  done = m_frameCount == 0;
-
-  return done;
-}
-
-void CApplication::NewFrame()
-{
-  /* PLEX */
-  HideBusyIndicator();
-  /* END PLEX */
-
-  // We just posted another frame. Keep track and notify.
-  {
-    CSingleLock lock(m_frameMutex);
-    m_frameCount++;
-  }
-
-  m_frameCond.notifyAll();
-}
-
 void CApplication::Render()
 {
-  // do not render if we are stopped
+  // do not render if we are stopped or in background
   if (m_bStop)
     return;
-
-  if (!m_AppActive && !m_bStop && (!IsPlayingVideo() || IsPaused()))
-  {
-    Sleep(1);
-    ResetScreenSaver();
-    return;
-  }
 
   MEASURE_FUNCTION;
 
   int vsync_mode = g_guiSettings.GetInt("videoscreen.vsync");
 
-  bool decrement = false;
   bool hasRendered = false;
   bool limitFrames = false;
-  #if defined(TARGET_RASPBERRY_PI_1)
-  unsigned int singleFrameTime = 66; // default limit 15 fps
-  #else
-  unsigned int singleFrameTime = 10; // default limit 100 fps
-  #endif
+  unsigned int singleFrameTime = 40; // default limit 25 fps
+  bool vsync = true;
+
+  // Whether externalplayer is playing and we're unfocused
+  bool extPlayerActive = m_eCurrentPlayer == EPC_EXTPLAYER && IsPlaying() && !m_AppFocused;
 
   {
     // Less fps in DPMS
-    bool lowfps = m_dpmsIsActive || g_Windowing.EnableFrameLimiter();
-    // Whether externalplayer is playing and we're unfocused
-    bool extPlayerActive = m_eCurrentPlayer == EPC_EXTPLAYER && IsPlaying() && !m_AppFocused;
+    bool lowfps = g_Windowing.EnableFrameLimiter();
 
     m_bPresentFrame = false;
     /* PLEX */
@@ -2565,25 +2512,24 @@ void CApplication::Render()
     /* END PLEX */
     //if (!extPlayerActive && g_graphicsContext.IsFullScreenVideo() && !IsPaused())
     {
-      CSingleLock lock(m_frameMutex);
-
-      TightConditionVariable<int&> cv(m_frameCond,m_frameCount);
-      cv.wait(lock,100);
-
-      m_bPresentFrame = m_frameCount > 0;
-      decrement = m_bPresentFrame;
-      hasRendered = true;
+      m_bPresentFrame = g_renderManager.HasFrame();
     }
     else
     {
       // engage the frame limiter as needed
       limitFrames = lowfps || extPlayerActive;
-      // DXMERGE - we checked for g_videoConfig.GetVSyncMode() before this
-      //           perhaps allowing it to be set differently than the UI option??
+
+      // TODO:
+      // remove those useless modes, they don't do any good
       if (vsync_mode == VSYNC_DISABLED || vsync_mode == VSYNC_VIDEO)
+      {
         limitFrames = true; // not using vsync.
-      else if ((g_infoManager.GetFPS() > g_graphicsContext.GetFPS() + 10) && g_infoManager.GetFPS() > 1000 / singleFrameTime)
+        singleFrameTime = 10;
+      }
+      else if ((g_infoManager.GetFPS() > g_graphicsContext.GetFPS() + 10) && g_infoManager.GetFPS() > 100.0f)
+      {
         limitFrames = true; // using vsync, but it isn't working.
+      }
 
       if (limitFrames)
       {
@@ -2596,26 +2542,58 @@ void CApplication::Render()
           singleFrameTime = 200;  // 5 fps, <=200 ms latency to wake up
       }
 
-      decrement = true;
     }
   }
 
   CSingleLock lock(g_graphicsContext);
-  g_infoManager.UpdateFPS();
 
   if (g_graphicsContext.IsFullScreenVideo() && IsPlaying() && vsync_mode == VSYNC_VIDEO)
     g_Windowing.SetVSync(true);
   else if (vsync_mode == VSYNC_ALWAYS)
     g_Windowing.SetVSync(true);
   else if (vsync_mode != VSYNC_DRIVER)
+  {
     g_Windowing.SetVSync(false);
+    vsync = false;
+  }
+
+  if (m_bPresentFrame && IsPlaying() && !IsPaused())
+    ResetScreenSaver();
 
   if(!g_Windowing.BeginRender())
     return;
 
-  CDirtyRegionList dirtyRegions = g_windowManager.GetDirty();
-  if (RenderNoPresent())
-    hasRendered = true;
+  CDirtyRegionList dirtyRegions;
+
+  // render gui layer
+  if (!m_skipGuiRender)
+  {
+    dirtyRegions = g_windowManager.GetDirty();
+    if (g_graphicsContext.GetStereoMode())
+    {
+      g_graphicsContext.SetStereoView(RENDER_STEREO_VIEW_LEFT);
+      if (RenderNoPresent())
+        hasRendered = true;
+
+      if (g_graphicsContext.GetStereoMode() != RENDER_STEREO_MODE_MONO)
+      {
+        g_graphicsContext.SetStereoView(RENDER_STEREO_VIEW_RIGHT);
+        if (RenderNoPresent())
+          hasRendered = true;
+      }
+      g_graphicsContext.SetStereoView(RENDER_STEREO_VIEW_OFF);
+    }
+    else
+    {
+      if (RenderNoPresent())
+        hasRendered = true;
+    }
+    // execute post rendering actions (finalize window closing)
+    g_windowManager.AfterRender();
+  }
+
+  // render video layer
+  g_windowManager.RenderEx();
 
   g_Windowing.EndRender();
 
@@ -2623,11 +2601,16 @@ void CApplication::Render()
   // fresh for the next process(), or after a windowclose animation (where process()
   // isn't called)
   g_infoManager.ResetCache();
-  lock.Leave();
+
 
   unsigned int now = XbmcThreads::SystemClockMillis();
   if (hasRendered)
+  {
+    g_infoManager.UpdateFPS();
     m_lastRenderTime = now;
+  }
+
+  lock.Leave();
 
   //when nothing has been rendered for m_guiDirtyRegionNoFlipTimeout milliseconds,
   //we don't call g_graphicsContext.Flip() anymore, this saves gpu and cpu usage
@@ -2638,34 +2621,26 @@ void CApplication::Render()
     flip = true;
 
   //fps limiter, make sure each frame lasts at least singleFrameTime milliseconds
-  if (limitFrames || !flip)
+  if (limitFrames || !(flip || m_bPresentFrame))
   {
-    if (!limitFrames)
-  #if defined(TARGET_RASPBERRY_PI_1)
-      singleFrameTime = 100; //if not flipping, loop at 10 fps
-  #else
-      singleFrameTime = 40; //if not flipping, loop at 25 fps
-  #endif
-
     unsigned int frameTime = now - m_lastFrameTime;
     if (frameTime < singleFrameTime)
       Sleep(singleFrameTime - frameTime);
   }
-  m_lastFrameTime = XbmcThreads::SystemClockMillis();
 
   if (flip)
     g_graphicsContext.Flip(dirtyRegions);
-  CTimeUtils::UpdateFrameTime(flip);
+
+  if (!extPlayerActive && g_graphicsContext.IsFullScreenVideo() && !IsPaused())
+  {
+    g_renderManager.FrameWait(100);
+  }
+
+  m_lastFrameTime = XbmcThreads::SystemClockMillis();
+  CTimeUtils::UpdateFrameTime(flip, vsync);
 
   g_renderManager.UpdateResolution();
   g_renderManager.ManageCaptures();
-
-  {
-    CSingleLock lock(m_frameMutex);
-    if(m_frameCount > 0 && decrement)
-      m_frameCount--;
-  }
-  m_frameCond.notifyAll();
 }
 
 void CApplication::SetStandAlone(bool value)
@@ -3278,8 +3253,30 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
   }
   if (processGUI && m_renderGUI)
   {
+    m_skipGuiRender = false;
+    int fps = 0;
+
+#if defined(TARGET_RASPBERRY_PI) || defined(HAS_IMXVPU)
+    // This code reduces rendering fps of the GUI layer when playing videos in fullscreen mode
+    // it makes only sense on architectures with multiple layers
+    if (IsPlayingVideo() && !IsPausedPlayback() && g_renderManager.IsVideoLayer())
+      fps = g_guiSettings.GetInt("videoplayer.limitguiupdate");
+#endif
+
+    unsigned int now = XbmcThreads::SystemClockMillis();
+    unsigned int frameTime = now - m_lastRenderTime;
+    if (fps > 0 && frameTime * fps < 1000)
+      m_skipGuiRender = true;
+
     if (!m_bStop)
-      g_windowManager.Process(CTimeUtils::GetFrameTime());
+    {
+      if (!m_skipGuiRender)
+        g_windowManager.Process(CTimeUtils::GetFrameTime());
+#if defined(TARGET_RASPBERRY_PI) || defined(HAS_IMXVPU)
+      else if (!g_graphicsContext.IsFullScreenVideo())
+        g_renderManager.FrameMove();
+#endif
+    }
     g_windowManager.FrameMove();
   }
 }
@@ -4569,11 +4566,7 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
   // one of the players that allows gapless playback (paplayer, dvdplayer)
   if (m_pPlayer)
   {
-    if ( !(m_eCurrentPlayer == eNewCore && (m_eCurrentPlayer == EPC_DVDPLAYER || m_eCurrentPlayer  == EPC_PAPLAYER
-#if defined(HAS_OMXPLAYER)
-            || m_eCurrentPlayer == EPC_OMXPLAYER
-#endif            
-            )) )
+    if ( !(m_eCurrentPlayer == eNewCore && (m_eCurrentPlayer == EPC_DVDPLAYER || m_eCurrentPlayer  == EPC_PAPLAYER)) )
     {
       delete m_pPlayer;
       m_pPlayer = NULL;
@@ -6248,12 +6241,6 @@ bool CApplication::SwitchToFullScreen()
   // See if we're playing a video, and are in GUI mode
   if ( IsPlayingVideo() && g_windowManager.GetActiveWindow() != WINDOW_FULLSCREEN_VIDEO)
   {
-    // Reset frame count so that timing is FPS will be correct.
-    {
-      CSingleLock lock(m_frameMutex);
-      m_frameCount = 0;
-    }
-
     // then switch to fullscreen mode
     g_windowManager.ActivateWindow(WINDOW_FULLSCREEN_VIDEO);
     return true;
@@ -6488,14 +6475,6 @@ bool CApplication::AlwaysProcess(const CAction& action)
 bool CApplication::IsCurrentThread() const
 {
   return CThread::IsCurrentThread(m_threadID);
-}
-
-bool CApplication::IsPresentFrame()
-{
-  CSingleLock lock(m_frameMutex);
-  bool ret = m_bPresentFrame;
-
-  return ret;
 }
 
 void CApplication::SetRenderGUI(bool renderGUI)

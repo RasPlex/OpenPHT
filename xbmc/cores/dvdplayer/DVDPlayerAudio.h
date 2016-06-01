@@ -97,7 +97,7 @@ public:
   XbmcThreads::EndTime m_timer;
 };
 
-class CDVDPlayerAudio : public CThread
+class CDVDPlayerAudio : public CThread, public IDVDStreamPlayerAudio
 {
 public:
   CDVDPlayerAudio(CDVDClock* pClock, CDVDMessageQueue& parent);

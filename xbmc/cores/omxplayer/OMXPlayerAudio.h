@@ -24,20 +24,19 @@
 #include <deque>
 #include <sys/types.h>
 
-#include "utils/StdString.h"
-
 #include "OMXClock.h"
 #include "DVDStreamInfo.h"
 #include "OMXAudio.h"
 #include "OMXAudioCodecOMX.h"
 #include "threads/Thread.h"
+#include "IDVDPlayer.h"
 
 #include "DVDDemuxers/DVDDemux.h"
 #include "DVDMessageQueue.h"
 #include "utils/BitstreamStats.h"
 #include "xbmc/linux/DllBCM.h"
 
-class OMXPlayerAudio : public CThread
+class OMXPlayerAudio : public CThread, public IDVDStreamPlayerAudio
 {
 protected:
   CDVDMessageQueue      m_messageQueue;
@@ -86,7 +85,7 @@ public:
   bool IsStalled() const                            { return m_stalled;  }
   bool IsEOS();
   void WaitForBuffers();
-  bool CloseStream(bool bWaitForBuffers);
+  void CloseStream(bool bWaitForBuffers);
   bool CodecChange();
   bool Decode(DemuxPacket *pkt, bool bDropPacket);
   void Flush();

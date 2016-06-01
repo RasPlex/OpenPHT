@@ -18,7 +18,7 @@
  *
  */
 
-#if (defined HAVE_CONFIG_H) && (!defined WIN32)
+#if (defined HAVE_CONFIG_H) && (!defined TARGET_WINDOWS)
   #include "config.h"
 #endif
 #include "DVDDemuxUtils.h"
@@ -34,7 +34,12 @@ void CDVDDemuxUtils::FreeDemuxPacket(DemuxPacket* pPacket)
   if (pPacket)
   {
     try {
-      if (pPacket->pData) _aligned_free(pPacket->pData);
+      if (pPacket->pkt)
+      {
+        av_free_packet(pPacket->pkt);
+        delete pPacket->pkt;
+      }
+      else if (pPacket->pData) _aligned_free(pPacket->pData);
       delete pPacket;
     }
     catch(...) {
@@ -63,7 +68,7 @@ DemuxPacket* CDVDDemuxUtils::AllocateDemuxPacket(int iDataSize)
         * Note, if the first 23 bits of the additional bytes are not 0 then damaged
         * MPEG bitstreams could cause overread and segfault
         */
-      pPacket->pData =(BYTE*)_aligned_malloc(iDataSize + AV_INPUT_BUFFER_PADDING_SIZE, 16);
+      pPacket->pData =(uint8_t*)_aligned_malloc(iDataSize + FF_INPUT_BUFFER_PADDING_SIZE, 16);
       if (!pPacket->pData)
       {
         FreeDemuxPacket(pPacket);
@@ -71,7 +76,7 @@ DemuxPacket* CDVDDemuxUtils::AllocateDemuxPacket(int iDataSize)
       }
 
       // reset the last 8 bytes to 0;
-      memset(pPacket->pData + iDataSize, 0, AV_INPUT_BUFFER_PADDING_SIZE);
+      memset(pPacket->pData + iDataSize, 0, FF_INPUT_BUFFER_PADDING_SIZE);
     }
 
     // setup defaults

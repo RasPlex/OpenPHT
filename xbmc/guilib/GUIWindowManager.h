@@ -96,6 +96,8 @@ public:
    */
   bool Render();
 
+  void RenderEx() const;
+
   /*! \brief Do any post render activities.
    */
   void AfterRender();

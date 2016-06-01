@@ -101,11 +101,7 @@ bool DVDPlayerCodec::Init(const CStdString &strFile, unsigned int filecache)
 
   try
   {
-    /* PLEX */
-    CStdString error;
-    m_pDemuxer = CDVDFactoryDemuxer::CreateDemuxer(m_pInputStream, error);
-    /* END PLEX */
-
+    m_pDemuxer = CDVDFactoryDemuxer::CreateDemuxer(m_pInputStream);
     if (!m_pDemuxer)
     {
       delete m_pInputStream;
