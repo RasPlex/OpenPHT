@@ -29,6 +29,8 @@
 #include "utils/GlobalsHandling.h"
 
 #include <map>
+#include <memory>
+#include <string>
 
 class CFileItem;
 class CFileItemList;
@@ -60,6 +62,8 @@ namespace MEDIA_DETECT
 #endif
 #include "windowing/XBMC_events.h"
 #include "threads/Thread.h"
+
+#include "ApplicationPlayer.h"
 
 /* PLEX */
 #include "plex/Windows/LaunchHost.h"
@@ -102,6 +106,12 @@ namespace MUSIC_INFO
   class CMusicInfoScanner;
 }
 
+#define VOLUME_MINIMUM 0.0f        // -60dB
+#define VOLUME_MAXIMUM 1.0f        // 0dB
+#define VOLUME_DYNAMIC_RANGE 90.0f // 60dB
+#define VOLUME_CONTROL_STEPS 90    // 90 steps
+
+
 class CBackgroundPlayer : public CThread
 {
 public:
@@ -115,6 +125,7 @@ protected:
 
 class CApplication : public CXBApplicationEx, public IPlayerCallback, public IMsgTargetCallback
 {
+  friend class CApplicationPlayer;
 public:
 
   enum ESERVERS
@@ -197,10 +208,6 @@ public:
   void Restart(bool bSamePosition = true);
   void DelayedPlayerRestart();
   void CheckDelayedPlayerRestart();
-  bool IsPlaying() const;
-  bool IsPaused() const;
-  bool IsPlayingAudio() const;
-  bool IsPlayingVideo() const;
   bool IsPlayingFullScreenVideo() const;
   bool IsStartingPlayback() const { return m_bPlaybackStarting; }
   bool IsFullScreen();
@@ -219,15 +226,14 @@ public:
   virtual void Process();
   void ProcessSlow();
   void ResetScreenSaver();
-  int GetVolume() const;
+  float GetVolume(bool percentage = true) const;
   void SetVolume(float iValue, bool isPercentage = true);
   bool IsMuted() const;
   void ToggleMute(void);
+  void SetMute(bool mute);
   void ShowVolumeBar(const CAction *action = NULL);
-  int GetPlaySpeed() const;
   int GetSubtitleDelay() const;
   int GetAudioDelay() const;
-  void SetPlaySpeed(int iSpeed);
   void ResetSystemIdleTimer();
   void ResetScreenSaverTimer();
   void StopScreenSaverTimer();
@@ -289,7 +295,7 @@ public:
   MEDIA_DETECT::CDetectDVDMedia m_DetectDVDType;
 #endif
 
-  IPlayer* m_pPlayer;
+  CApplicationPlayer* m_pPlayer;
 
 #ifdef HAS_WEB_SERVER
   CWebServer& m_WebServer;
@@ -309,6 +315,16 @@ public:
 
   bool m_bIsPaused;
   bool m_bPlaybackStarting;
+  typedef enum
+  {
+    PLAY_STATE_NONE = 0,
+    PLAY_STATE_STARTING,
+    PLAY_STATE_PLAYING,
+    PLAY_STATE_STOPPED,
+    PLAY_STATE_ENDED,
+  } PlayState;
+  PlayState m_ePlayState;
+  CCriticalSection m_playStateMutex;
 
   CKaraokeLyricsManager* m_pKaraokeMgr;
 
@@ -436,7 +452,6 @@ protected:
   CStdString m_prevMedia;
   CSplash* m_splash;
   ThreadIdentifier m_threadID;       // application thread ID.  Used in applicationMessanger to know where we are firing a thread with delay from.
-  PLAYERCOREID m_eCurrentPlayer;
   bool m_bInitializing;
   bool m_bPlatformDirectories;
 
@@ -444,7 +459,6 @@ protected:
   CFileItemPtr m_progressTrackingItem;
   bool m_progressTrackingPlayCountUpdate;
 
-  int m_iPlaySpeed;
   int m_currentStackPosition;
   int m_nextPlaylistItem;
 

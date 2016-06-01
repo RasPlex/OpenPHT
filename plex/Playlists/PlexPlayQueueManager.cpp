@@ -431,8 +431,8 @@ void CPlexPlayQueueManager::QueueItem(const CFileItemPtr& item, bool next)
     options.startPlaying = false;
     success = create(*item, "", options);
 
-    if ((g_application.IsPlayingAudio() && isItemVideo) ||
-        (g_application.IsPlayingVideo() && isItemAudio))
+    if ((g_application.m_pPlayer->IsPlayingAudio() && isItemVideo) ||
+        (g_application.m_pPlayer->IsPlayingVideo() && isItemAudio))
       CApplicationMessenger::Get().MediaStop();
   }
   else

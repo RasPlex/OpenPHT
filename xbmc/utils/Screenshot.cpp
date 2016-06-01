@@ -66,7 +66,7 @@ bool CScreenshotSurface::capture()
 #elif defined(HAS_DX)
   LPDIRECT3DSURFACE9 lpSurface = NULL, lpBackbuffer = NULL;
   g_graphicsContext.Lock();
-  if (g_application.IsPlayingVideo())
+  if (g_application.m_pPlayer->IsPlayingVideo())
   {
 #ifdef HAS_VIDEO_PLAYBACK
     g_renderManager.SetupScreenshot();
@@ -112,7 +112,7 @@ bool CScreenshotSurface::capture()
 #elif defined(HAS_GL) || defined(HAS_GLES)
 
   g_graphicsContext.BeginPaint();
-  if (g_application.IsPlayingVideo())
+  if (g_application.m_pPlayer->IsPlayingVideo())
   {
 #ifdef HAS_VIDEO_PLAYBACK
     g_renderManager.SetupScreenshot();

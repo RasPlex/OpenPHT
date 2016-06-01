@@ -1257,7 +1257,7 @@ void CLinuxRendererGL::RenderSinglePass(int index, int field)
 
   //disable non-linear stretch when a dvd menu is shown, parts of the menu are rendered through the overlay renderer
   //having non-linear stretch on breaks the alignment
-  if (g_application.m_pPlayer && g_application.m_pPlayer->IsInMenu())
+  if (g_application.m_pPlayer->IsInMenu())
     m_pYUVShader->SetNonLinStretch(1.0);
   else
     m_pYUVShader->SetNonLinStretch(pow(g_settings.m_fPixelRatio, g_advancedSettings.m_videoNonLinStretchRatio));
@@ -1481,7 +1481,7 @@ void CLinuxRendererGL::RenderFromFBO()
 
     //disable non-linear stretch when a dvd menu is shown, parts of the menu are rendered through the overlay renderer
     //having non-linear stretch on breaks the alignment
-    if (g_application.m_pPlayer && g_application.m_pPlayer->IsInMenu())
+    if (g_application.m_pPlayer->IsInMenu())
       m_pVideoFilterShader->SetNonLinStretch(1.0);
     else
       m_pVideoFilterShader->SetNonLinStretch(pow(g_settings.m_fPixelRatio, g_advancedSettings.m_videoNonLinStretchRatio));
@@ -1585,7 +1585,7 @@ void CLinuxRendererGL::RenderRGB(int index, int field)
 
     //disable non-linear stretch when a dvd menu is shown, parts of the menu are rendered through the overlay renderer
     //having non-linear stretch on breaks the alignment
-    if (g_application.m_pPlayer && g_application.m_pPlayer->IsInMenu())
+    if (g_application.m_pPlayer->IsInMenu())
       m_pVideoFilterShader->SetNonLinStretch(1.0);
     else
       m_pVideoFilterShader->SetNonLinStretch(pow(g_settings.m_fPixelRatio, g_advancedSettings.m_videoNonLinStretchRatio));

@@ -321,7 +321,7 @@ void CGraphicContext::SetFullScreenVideo(bool bOnOff)
   if(m_bFullScreenRoot)
   {
     bool allowDesktopRes = g_guiSettings.GetInt("videoplayer.adjustrefreshrate") == ADJUST_REFRESHRATE_ALWAYS;
-    if(m_bFullScreenVideo || (!allowDesktopRes && g_application.IsPlayingVideo()))
+    if(m_bFullScreenVideo || (!allowDesktopRes && g_application.m_pPlayer->IsPlayingVideo()))
       SetVideoResolution(g_renderManager.GetResolution());
     else if(g_guiSettings.m_LookAndFeelResolution > RES_DESKTOP)
       SetVideoResolution(g_guiSettings.m_LookAndFeelResolution);
@@ -398,7 +398,7 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
   {
     //pause the player during the refreshrate change
     int delay = g_guiSettings.GetInt("videoplayer.pauseafterrefreshchange");
-    if (delay > 0 && g_guiSettings.GetInt("videoplayer.adjustrefreshrate") != ADJUST_REFRESHRATE_OFF && g_application.IsPlayingVideo() && !g_application.IsPaused())
+    if (delay > 0 && g_guiSettings.GetInt("videoplayer.adjustrefreshrate") != ADJUST_REFRESHRATE_OFF && g_application.m_pPlayer->IsPlayingVideo() && !g_application.m_pPlayer->IsPausedPlayback())
     {
       g_application.m_pPlayer->Pause();
       ThreadMessage msg = {TMSG_MEDIA_UNPAUSE};

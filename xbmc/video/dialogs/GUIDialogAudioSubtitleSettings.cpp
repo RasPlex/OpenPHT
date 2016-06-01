@@ -74,7 +74,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
 {
   m_usePopupSliders = g_SkinInfo->HasSkinFile("DialogSlider.xml");
 
-  if (g_application.m_pPlayer)
+  if (g_application.m_pPlayer->HasPlayer())
   {
     g_application.m_pPlayer->GetAudioCapabilities(m_audioCaps);
     g_application.m_pPlayer->GetSubtitleCapabilities(m_subCaps);
@@ -87,7 +87,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
   AddSlider(AUDIO_SETTINGS_VOLUME, 13376, &m_volume, VOLUME_MINIMUM, VOLUME_MAXIMUM / 100.0f, VOLUME_MAXIMUM, PercentAsDecibel, false);
   if (SupportsAudioFeature(IPC_AUD_AMP))
     AddSlider(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, 660, &g_settings.m_currentVideoSettings.m_VolumeAmplification, VOLUME_DRC_MINIMUM * 0.01f, (VOLUME_DRC_MAXIMUM - VOLUME_DRC_MINIMUM) / 6000.0f, VOLUME_DRC_MAXIMUM * 0.01f, FormatDecibel, false);
-  if (g_guiSettings.GetBool("audiooutput.passthrough") || (g_application.m_pPlayer && g_application.m_pPlayer->IsPassthrough()))
+  if (g_guiSettings.GetBool("audiooutput.passthrough") || g_application.m_pPlayer->IsPassthrough())
   {
     EnableSettings(AUDIO_SETTINGS_VOLUME,false);
     EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION,false);
@@ -112,7 +112,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
     // TODO: also check m_item.GetProperty("plexDidTranscode").asBoolean()
     AddSeparator(7);
 
-    m_subtitleVisible = g_application.m_pPlayer && g_application.m_pPlayer->GetSubtitleVisible();
+    m_subtitleVisible = g_application.m_pPlayer->GetSubtitleVisible();
     AddBool(SUBTITLE_SETTINGS_ENABLE, 13397, &m_subtitleVisible);
     if (SupportsSubtitleFeature(IPC_SUBS_OFFSET))
       AddSlider(SUBTITLE_SETTINGS_DELAY, 22006, &g_settings.m_currentVideoSettings.m_SubtitleDelay, -g_advancedSettings.m_videoSubsDelayRange, 0.1f, g_advancedSettings.m_videoSubsDelayRange, FormatDelay);
@@ -215,18 +215,16 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
   }
   else if (setting.id == AUDIO_SETTINGS_VOLUME_AMPLIFICATION)
   {
-    if (g_application.m_pPlayer)
-      g_application.m_pPlayer->SetDynamicRangeCompression((long)(g_settings.m_currentVideoSettings.m_VolumeAmplification * 100));
+    g_application.m_pPlayer->SetDynamicRangeCompression((long)(g_settings.m_currentVideoSettings.m_VolumeAmplification * 100));
   }
   else if (setting.id == AUDIO_SETTINGS_DELAY)
   {
-    if (g_application.m_pPlayer)
-      g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
+    g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
   }
   else if (setting.id == AUDIO_SETTINGS_STREAM)
   {
     // only change the audio stream if a different one has been asked for
-    if (g_application.m_pPlayer && g_application.m_pPlayer->GetAudioStream() != m_audioStream)
+    if (g_application.m_pPlayer->GetAudioStream() != m_audioStream)
     {
       g_settings.m_currentVideoSettings.m_AudioStream = m_audioStream;
       g_application.m_pPlayer->SetAudioStream(m_audioStream);    // Set the audio stream to the one selected
@@ -345,7 +343,7 @@ void CGUIDialogAudioSubtitleSettings::FrameMove()
     m_volume = newVolume;
     UpdateSetting(AUDIO_SETTINGS_VOLUME);
   }
-  if (g_application.m_pPlayer)
+  if (g_application.m_pPlayer->HasPlayer())
   {
     // these settings can change on the fly
     UpdateSetting(AUDIO_SETTINGS_DELAY);

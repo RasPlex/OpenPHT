@@ -131,9 +131,6 @@ CGUIWindowFullScreen::~CGUIWindowFullScreen(void)
 
 bool CGUIWindowFullScreen::OnAction(const CAction &action)
 {
-  if (g_application.m_pPlayer != NULL && g_application.m_pPlayer->OnAction(action))
-    return true;
-
   if (m_timeCodePosition > 0 && action.GetButtonCode())
   { // check whether we have a mapping in our virtual videotimeseek "window" and have a select action
     CKey key(action.GetButtonCode());
@@ -225,7 +222,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
 
   case ACTION_SHOW_SUBTITLES:
     {
-      if (!g_application.m_pPlayer || g_application.m_pPlayer->GetSubtitleCount() == 0)
+      if (g_application.m_pPlayer->GetSubtitleCount() == 0)
         return true;
 
       bool subsOn = !g_application.m_pPlayer->GetSubtitleVisible();
@@ -302,8 +299,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
       g_settings.m_currentVideoSettings.m_SubtitleDelay -= 0.1f;
       if (g_settings.m_currentVideoSettings.m_SubtitleDelay < -g_advancedSettings.m_videoSubsDelayRange)
         g_settings.m_currentVideoSettings.m_SubtitleDelay = -g_advancedSettings.m_videoSubsDelayRange;
-      if (g_application.m_pPlayer)
-        g_application.m_pPlayer->SetSubTitleDelay(g_settings.m_currentVideoSettings.m_SubtitleDelay);
+      g_application.m_pPlayer->SetSubTitleDelay(g_settings.m_currentVideoSettings.m_SubtitleDelay);
 
       ShowSlider(action.GetID(), 22006, g_settings.m_currentVideoSettings.m_SubtitleDelay,
                  -g_advancedSettings.m_videoSubsDelayRange, 0.1f,
@@ -323,8 +319,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
       g_settings.m_currentVideoSettings.m_SubtitleDelay += 0.1f;
       if (g_settings.m_currentVideoSettings.m_SubtitleDelay > g_advancedSettings.m_videoSubsDelayRange)
         g_settings.m_currentVideoSettings.m_SubtitleDelay = g_advancedSettings.m_videoSubsDelayRange;
-      if (g_application.m_pPlayer)
-        g_application.m_pPlayer->SetSubTitleDelay(g_settings.m_currentVideoSettings.m_SubtitleDelay);
+      g_application.m_pPlayer->SetSubTitleDelay(g_settings.m_currentVideoSettings.m_SubtitleDelay);
 
       ShowSlider(action.GetID(), 22006, g_settings.m_currentVideoSettings.m_SubtitleDelay,
                  -g_advancedSettings.m_videoSubsDelayRange, 0.1f,
@@ -355,8 +350,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
     g_settings.m_currentVideoSettings.m_AudioDelay -= 0.025f;
     if (g_settings.m_currentVideoSettings.m_AudioDelay < -g_advancedSettings.m_videoAudioDelayRange)
       g_settings.m_currentVideoSettings.m_AudioDelay = -g_advancedSettings.m_videoAudioDelayRange;
-    if (g_application.m_pPlayer)
-      g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
+    g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
 
     ShowSlider(action.GetID(), 297, g_settings.m_currentVideoSettings.m_AudioDelay,
                                     -g_advancedSettings.m_videoAudioDelayRange, 0.025f,
@@ -367,8 +361,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
     g_settings.m_currentVideoSettings.m_AudioDelay += 0.025f;
     if (g_settings.m_currentVideoSettings.m_AudioDelay > g_advancedSettings.m_videoAudioDelayRange)
       g_settings.m_currentVideoSettings.m_AudioDelay = g_advancedSettings.m_videoAudioDelayRange;
-    if (g_application.m_pPlayer)
-      g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
+    g_application.m_pPlayer->SetAVDelay(g_settings.m_currentVideoSettings.m_AudioDelay);
 
     ShowSlider(action.GetID(), 297, g_settings.m_currentVideoSettings.m_AudioDelay,
                                     -g_advancedSettings.m_videoAudioDelayRange, 0.025f,
@@ -377,7 +370,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
     break;
   case ACTION_AUDIO_NEXT_LANGUAGE:
     {
-      if (!g_application.m_pPlayer || g_application.m_pPlayer->GetAudioStreamCount() == 1)
+      if (g_application.m_pPlayer->GetAudioStreamCount() == 1)
         return true;
 
       int currentAudio = g_application.m_pPlayer->GetAudioStream();
@@ -642,8 +635,7 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
       g_settings.m_currentVideoSettings.m_VolumeAmplification =
         std::max(std::min(g_settings.m_currentVideoSettings.m_VolumeAmplification, sliderMax), sliderMin);
 
-      if (g_application.m_pPlayer)
-        g_application.m_pPlayer->SetDynamicRangeCompression((long)(g_settings.m_currentVideoSettings.m_VolumeAmplification * 100));
+      g_application.m_pPlayer->SetDynamicRangeCompression((long)(g_settings.m_currentVideoSettings.m_VolumeAmplification * 100));
 
       ShowSlider(action.GetID(), 660, g_settings.m_currentVideoSettings.m_VolumeAmplification, sliderMin, 1.0f, sliderMax);
 
@@ -797,7 +789,7 @@ bool CGUIWindowFullScreen::OnMessage(CGUIMessage& message)
 
       // check whether we've come back here from a window during which time we've actually
       // stopped playing videos
-      if (message.GetParam1() == WINDOW_INVALID && !g_application.IsPlayingVideo())
+      if (message.GetParam1() == WINDOW_INVALID && !g_application.m_pPlayer->IsPlayingVideo())
       { // why are we here if nothing is playing???
         g_windowManager.PreviousWindow();
         return true;
@@ -970,12 +962,12 @@ EVENT_RESULT CGUIWindowFullScreen::OnMouseEvent(const CPoint &point, const CMous
 
 void CGUIWindowFullScreen::FrameMove()
 {
-  if (g_application.GetPlaySpeed() != 1)
+  if (g_application.m_pPlayer->GetPlaySpeed() != 1)
     g_infoManager.SetDisplayAfterSeek();
   if (m_bShowCurrentTime)
     g_infoManager.SetDisplayAfterSeek();
 
-  if (!g_application.m_pPlayer) return;
+  if (!g_application.m_pPlayer->HasPlayer()) return;
 
 #ifndef __PLEX__
   if( g_application.m_pPlayer->IsCaching() )
@@ -1290,7 +1282,7 @@ void CGUIWindowFullScreen::OnSliderChange(void *data, CGUISliderControl *slider)
   else
     slider->SetTextValue(CGUIDialogAudioSubtitleSettings::FormatDelay(slider->GetFloatValue(), 0.025f));
 
-  if (g_application.m_pPlayer)
+  if (g_application.m_pPlayer->HasPlayer())
   {
     if (m_sliderAction == ACTION_AUDIO_DELAY)
     {

@@ -507,7 +507,7 @@ void CGUIPlexDefaultActionHandler::GetContextButtonsForAction(int actionID, CFil
       break;
       
     case ACTION_PLEX_NOW_PLAYING:
-      if (g_application.IsPlaying())
+      if (g_application.m_pPlayer->IsPlaying())
         buttons.Add(actionID, 13350);
       break;
       

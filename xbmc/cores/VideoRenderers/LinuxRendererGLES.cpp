@@ -203,10 +203,10 @@ bool CLinuxRendererGLES::Configure(unsigned int width, unsigned int height, unsi
       m_RenderFeaturesCallBackFn = NULL;
       m_RenderFeaturesCallBackCtx = NULL;
     }
-    g_application.m_pPlayer->OMXGetRenderFeatures(m_renderFeatures);
-    g_application.m_pPlayer->OMXGetDeinterlaceMethods(m_deinterlaceMethods);
-    g_application.m_pPlayer->OMXGetDeinterlaceModes(m_deinterlaceModes);
-    g_application.m_pPlayer->OMXGetScalingMethods(m_scalingMethods);
+    g_application.m_pPlayer->GetRenderFeatures(m_renderFeatures);
+    g_application.m_pPlayer->GetDeinterlaceMethods(m_deinterlaceMethods);
+    g_application.m_pPlayer->GetDeinterlaceModes(m_deinterlaceModes);
+    g_application.m_pPlayer->GetScalingMethods(m_scalingMethods);
   }
 
   return true;

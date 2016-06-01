@@ -361,7 +361,7 @@ void CPlexServerDataLoader::OnTimeout()
   CSingleLock lk(m_serverLock);
 
   // don't run any checks during video playback
-  if (g_application.IsPlayingVideo())
+  if (g_application.m_pPlayer->IsPlayingVideo())
   {
     g_plexApplication.timer->SetTimeout(SECTION_REFRESH_INTERVAL, this);
     return;
