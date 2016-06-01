@@ -428,8 +428,7 @@ int CGUIWindowAddonBrowser::SelectAddonID(const vector<ADDON::TYPE> &types, CStd
     {
       CFileItemPtr nowPlaying(new CFileItem());
       nowPlaying->SetLabel("Now Playing");
-      nowPlaying->SetPath("Now Playing");
-
+      nowPlaying->SetPath("visualization.nowplaying");
       items.Add(nowPlaying);
     }
     /* END PLEX */

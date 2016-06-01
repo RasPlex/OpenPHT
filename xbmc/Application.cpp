@@ -4213,7 +4213,11 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
     if(m_pPlayer->IsPlayingAudio())
     {
       if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO)
+#ifndef __PLEX__
+        g_windowManager.ActivateWindow(WINDOW_VISUALISATION);
+#else
         ActivateVisualizer();
+#endif
 
       /* PLEX */
       if (!g_playlistPlayer.HasPlayedFirstFile())
@@ -4233,6 +4237,9 @@ bool CApplication::PlayFile(const CFileItem& item_, bool bRestart)
     else
     {
       if (g_windowManager.GetActiveWindow() == WINDOW_VISUALISATION ||
+          /* PLEX */
+          g_windowManager.GetActiveWindow() == WINDOW_NOW_PLAYING ||
+          /* END PLEX */
           g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO)
         g_windowManager.PreviousWindow();
     }
@@ -4485,6 +4492,9 @@ bool CApplication::IsFullScreen()
 {
   return IsPlayingFullScreenVideo() ||
         (g_windowManager.GetActiveWindow() == WINDOW_VISUALISATION) ||
+         /* PLEX */
+         g_windowManager.GetActiveWindow() == WINDOW_NOW_PLAYING ||
+         /* END PLEX */
          g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW;
 }
 
@@ -4609,6 +4619,9 @@ void CApplication::StopPlaying()
 
     // turn off visualisation window when stopping
     if ((iWin == WINDOW_VISUALISATION
+    /* PLEX */
+    ||  iWin == WINDOW_NOW_PLAYING
+    /* END PLEX */
     ||  iWin == WINDOW_FULLSCREEN_VIDEO)
     && !m_bStop)
       g_windowManager.PreviousWindow();
@@ -4794,21 +4807,20 @@ void CApplication::CheckScreenSaverAndDPMS()
 
   // See if we need to reset timer.
   // * Are we playing a video and it is not paused?
-#ifndef __PLEX__
   if ((m_pPlayer->IsPlayingVideo() && !m_pPlayer->IsPaused())
       // * Are we playing some music in fullscreen vis?
+#ifndef __PLEX__
       || (m_pPlayer->IsPlayingAudio() && g_windowManager.GetActiveWindow() == WINDOW_VISUALISATION
-          && !g_guiSettings.GetString("musicplayer.visualisation").IsEmpty()))
 #else
-  if ((m_pPlayer->IsPlayingVideo() && !m_pPlayer->IsPaused())
-      || (m_pPlayer->IsPlayingAudio() && IsVisualizerActive()))
+      || (m_pPlayer->IsPlayingAudio() && IsVisualizerActive()
 #endif
+          && !g_guiSettings.GetString("musicplayer.visualisation").IsEmpty()))
   {
     ResetScreenSaverTimer();
     return;
   }
 
-  float elapsed = m_screenSaverTimer.GetElapsedSeconds();
+  float elapsed = m_screenSaverTimer.IsRunning() ? m_screenSaverTimer.GetElapsedSeconds() : 0.f;
 
   // DPMS has priority (it makes the screensaver not needed)
   if (maybeDPMS
@@ -4829,6 +4841,16 @@ void CApplication::CheckScreenSaverAndDPMS()
 // the type of screensaver displayed
 void CApplication::ActivateScreenSaver(bool forceType /*= false */)
 {
+    if (m_pPlayer->IsPlayingAudio() && g_guiSettings.GetBool("screensaver.usemusicvisinstead") && !g_guiSettings.GetString("musicplayer.visualisation").IsEmpty())
+  { // just activate the visualisation if user toggled the usemusicvisinstead option
+#ifndef __PLEX__
+    g_windowManager.ActivateWindow(WINDOW_VISUALISATION);
+#else
+    ActivateVisualizer();
+#endif
+    return;
+  }
+
   m_bScreenSave = true;
 
   // Get Screensaver Mode
@@ -4847,7 +4869,7 @@ void CApplication::ActivateScreenSaver(bool forceType /*= false */)
 #endif
 
   if (!CAddonMgr::Get().GetAddon(mode, m_screenSaver))
-      m_screenSaver.reset(new CScreenSaver(""));
+    m_screenSaver.reset(new CScreenSaver(""));
 
   /* END PLEX */
 
@@ -4867,34 +4889,20 @@ void CApplication::ActivateScreenSaver(bool forceType /*= false */)
     if (g_windowManager.HasModalDialog() || (m_pPlayer->IsPlayingVideo() && g_guiSettings.GetBool("screensaver.usedimonpause")) || g_PVRManager.IsRunningChannelScan())
     {
       if (!CAddonMgr::Get().GetAddon("screensaver.xbmc.builtin.dim", m_screenSaver))
-        m_screenSaver.reset(new CScreenSaver("screensaver.xbmc.builtin.dim"));
+        m_screenSaver.reset(new CScreenSaver(""));
     }
-    // Check if we are Playing Audio and Vis instead Screensaver!
-#ifndef __PLEX__
-    else if (m_pPlayer->IsPlayingAudio() && g_guiSettings.GetBool("screensaver.usemusicvisinstead") && !g_guiSettings.GetString("musicplayer.visualisation").IsEmpty())
-    { // activate the visualisation
-      m_screenSaver.reset(new CScreenSaver("visualization"));
-      g_windowManager.ActivateWindow(WINDOW_VISUALISATION);
-      return;
-    }
-#else
-    else if (m_pPlayer->IsPlayingAudio() && g_guiSettings.GetBool("screensaver.usemusicvisinstead"))
-    {
-      m_screenSaver.reset(new CScreenSaver("visualization"));
-      ActivateVisualizer();
-      return;
-    }
-#endif
   }
-  if (m_screenSaver->ID() == "screensaver.xbmc.builtin.dim" || m_screenSaver->ID().empty())
+  if (m_screenSaver->ID() == "screensaver.xbmc.builtin.dim"
+      /* PLEX */
+      || m_screenSaver->ID() == "screensaver.xbmc.builtin.plexphotos"
+      /* END PLEX */
+      || m_screenSaver->ID() == "screensaver.xbmc.builtin.black")
+  {
     return;
-  else if (m_screenSaver->ID() == "screensaver.xbmc.builtin.black")
+  }
+  else if (m_screenSaver->ID().IsEmpty())
     return;
-  /* PLEX */
-  else if (m_screenSaver->ID() == "screensaver.xbmc.builtin.plexphotos")
-    return;
-  /* END PLEX */
-  else if (!m_screenSaver->ID().IsEmpty())
+  else
     g_windowManager.ActivateWindow(WINDOW_SCREENSAVER);
 }
 
