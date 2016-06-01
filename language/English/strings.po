@@ -10731,7 +10731,7 @@ msgid "To use this feature you must download an Add-on:"
 msgstr ""
 
 msgctxt "#24101"
-msgid "Would you like to download this Add-on?"
+msgid "Would you like to download this add-on?"
 msgstr ""
 
 #: xbmc/Application.cpp
