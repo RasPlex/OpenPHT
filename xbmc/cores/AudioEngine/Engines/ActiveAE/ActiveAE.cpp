@@ -2600,9 +2600,8 @@ IAESound *CActiveAE::MakeSound(const std::string& file)
       len = avcodec_decode_audio4(dec_ctx, decoded_frame, &got_frame, &avpkt);
       if (len < 0)
       {
-        avcodec_close(dec_ctx);
-        av_free(dec_ctx);
         av_frame_free(&decoded_frame);
+        avcodec_free_context(&dec_ctx);
         avformat_close_input(&fmt_ctx);
         if (io_ctx)
         {
@@ -2625,13 +2624,19 @@ IAESound *CActiveAE::MakeSound(const std::string& file)
         sound->StoreSound(true, decoded_frame->extended_data,
                           decoded_frame->nb_samples, decoded_frame->linesize[0]);
       }
+      av_free_packet(&avpkt);
     }
-    avcodec_close(dec_ctx);
   }
 
-  av_free(dec_ctx);
   av_frame_free(&decoded_frame);
-  avformat_close_input(&fmt_ctx);
+  avcodec_free_context(&dec_ctx);
+  if (fmt_ctx)
+  {
+    for (unsigned int i = 0; i < fmt_ctx->nb_streams; i++) {
+      avcodec_close(fmt_ctx->streams[i]->codec);
+    }
+    avformat_close_input(&fmt_ctx);
+  }
   if (io_ctx)
   {
     av_freep(&io_ctx->buffer);

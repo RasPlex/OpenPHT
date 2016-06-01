@@ -37,7 +37,6 @@ extern "C" {
 CDVDAudioCodecFFmpeg::CDVDAudioCodecFFmpeg() : CDVDAudioCodec()
 {
   m_pCodecContext = NULL;
-  m_bOpenedCodec = false;
 
   m_channels = 0;
   m_layout = 0;
@@ -55,7 +54,6 @@ CDVDAudioCodecFFmpeg::~CDVDAudioCodecFFmpeg()
 bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
 {
   AVCodec* pCodec = NULL;
-  m_bOpenedCodec = false;
 
   if (hints.codec == AV_CODEC_ID_DTS && g_guiSettings.GetBool("audiooutput.supportdtshdcpudecoding"))
     pCodec = avcodec_find_decoder_by_name("libdcadec");
@@ -70,6 +68,9 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
   }
 
   m_pCodecContext = avcodec_alloc_context3(pCodec);
+  if (!m_pCodecContext)
+    return false;
+
   m_pCodecContext->debug_mv = 0;
   m_pCodecContext->debug = 0;
   m_pCodecContext->workaround_bugs = 1;
@@ -109,7 +110,12 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
   }
 
   m_pFrame1 = av_frame_alloc();
-  m_bOpenedCodec = true;
+  if (!m_pFrame1)
+  {
+    Dispose();
+    return false;
+  }
+
   m_iSampleFormat = AV_SAMPLE_FMT_NONE;
   m_matrixEncoding = AV_MATRIX_ENCODING_NONE;
 
@@ -119,14 +125,7 @@ bool CDVDAudioCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options
 void CDVDAudioCodecFFmpeg::Dispose()
 {
   av_frame_free(&m_pFrame1);
-
-  if (m_pCodecContext)
-  {
-    if (m_bOpenedCodec) avcodec_close(m_pCodecContext);
-    m_bOpenedCodec = false;
-    av_free(m_pCodecContext);
-    m_pCodecContext = NULL;
-  }
+  avcodec_free_context(&m_pCodecContext);
 }
 
 int CDVDAudioCodecFFmpeg::Decode(uint8_t* pData, int iSize)

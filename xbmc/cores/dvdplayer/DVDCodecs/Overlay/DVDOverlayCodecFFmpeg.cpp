@@ -52,6 +52,9 @@ bool CDVDOverlayCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &optio
   }
 
   m_pCodecContext = avcodec_alloc_context3(pCodec);
+  if (!m_pCodecContext)
+    return false;
+
   m_pCodecContext->debug_mv = 0;
   m_pCodecContext->debug = 0;
   m_pCodecContext->workaround_bugs = FF_BUG_AUTODETECT;
@@ -107,6 +110,7 @@ bool CDVDOverlayCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &optio
 
   if (avcodec_open2(m_pCodecContext, pCodec, NULL) < 0)
   {
+    avcodec_free_context(&m_pCodecContext);
     CLog::Log(LOGDEBUG,"CDVDVideoCodecFFmpeg::Open() Unable to open codec");
     return false;
   }
@@ -116,31 +120,8 @@ bool CDVDOverlayCodecFFmpeg::Open(CDVDStreamInfo &hints, CDVDCodecOptions &optio
 
 void CDVDOverlayCodecFFmpeg::Dispose()
 {
-  if (m_pCodecContext)
-  {
-    if (m_pCodecContext->codec) avcodec_close(m_pCodecContext);
-    av_free(m_pCodecContext);
-    m_pCodecContext = NULL;
-  }
-  FreeSubtitle(m_Subtitle);
-}
-
-void CDVDOverlayCodecFFmpeg::FreeSubtitle(AVSubtitle& sub)
-{
-  for(unsigned i=0;i<sub.num_rects;i++)
-  {
-    if(sub.rects[i])
-    {
-      av_free(sub.rects[i]->pict.data[0]);
-      av_free(sub.rects[i]->pict.data[1]);
-      av_freep(&sub.rects[i]);
-    }
-  }
-  if(sub.rects)
-    av_freep(&sub.rects);
-  sub.num_rects = 0;
-  sub.start_display_time = 0;
-  sub.end_display_time = 0;
+  avsubtitle_free(&m_Subtitle);
+  avcodec_free_context(&m_pCodecContext);
 }
 
 int CDVDOverlayCodecFFmpeg::Decode(DemuxPacket *pPacket)
@@ -150,7 +131,7 @@ int CDVDOverlayCodecFFmpeg::Decode(DemuxPacket *pPacket)
 
   int gotsub = 0, len = 0;
 
-  FreeSubtitle(m_Subtitle);
+  avsubtitle_free(&m_Subtitle);
 
   AVPacket avpkt;
   av_init_packet(&avpkt);
@@ -206,7 +187,7 @@ void CDVDOverlayCodecFFmpeg::Reset()
 
 void CDVDOverlayCodecFFmpeg::Flush()
 {
-  FreeSubtitle(m_Subtitle);
+  avsubtitle_free(&m_Subtitle);
   m_SubtitleIndex = -1;
 
   avcodec_flush_buffers(m_pCodecContext);
@@ -296,9 +277,6 @@ CDVDOverlay* CDVDOverlayCodecFFmpeg::GetOverlay()
     for(int i=0;i<rect.nb_colors;i++)
       overlay->palette[i] = Endian_SwapLE32(((uint32_t *)rect.pict.data[1])[i]);
 
-    av_free(rect.pict.data[0]);
-    av_free(rect.pict.data[1]);
-    av_freep(&m_Subtitle.rects[m_SubtitleIndex]);
     m_SubtitleIndex++;
 
     return overlay;
