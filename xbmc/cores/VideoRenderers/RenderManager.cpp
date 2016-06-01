@@ -157,13 +157,14 @@ void CXBMCRenderManager::WaitPresentTime(double presenttime)
     return;
   }
 
-  bool ismaster = CDVDClock::IsMasterClock();
-
-  //the videoreferenceclock updates its clock on every vertical blank
-  //we want every frame's presenttime to end up in the middle of two vblanks
-  //if CDVDPlayerAudio is the master clock, we add a correction to the presenttime
-  if (ismaster)
-    presenttime += m_presentcorr * frametime;
+  CDVDClock *dvdclock = CDVDClock::GetMasterClock();
+  if(dvdclock != NULL && dvdclock->GetSpeedAdjust() != 0.0)
+  {
+    CDVDClock::WaitAbsoluteClock(presenttime * DVD_TIME_BASE);
+    m_presenterr = 0;
+    m_presentcorr = 0;
+    return;
+  }
 
   double clock     = CDVDClock::WaitAbsoluteClock(presenttime * DVD_TIME_BASE) / DVD_TIME_BASE;
   double target    = 0.5;
@@ -194,20 +195,11 @@ void CXBMCRenderManager::WaitPresentTime(double presenttime)
   avgerror /= ERRORBUFFSIZE;
 
 
-  //if CDVDPlayerAudio is not the master clock, we change the clock speed slightly
+  //we change the clock speed slightly
   //to make every frame's presenttime end up in the middle of two vblanks
-  if (!ismaster)
-  {
-    //integral correction, clamp to -0.5:0.5 range
-    m_presentcorr = std::max(std::min(m_presentcorr + avgerror * 0.01, 0.1), -0.1);
-    g_VideoReferenceClock.SetFineAdjust(1.0 - avgerror * 0.01 - m_presentcorr * 0.01);
-  }
-  else
-  {
-    //integral correction, wrap to -0.5:0.5 range
-    m_presentcorr = wrap(m_presentcorr + avgerror * 0.01, target - 1.0, target);
-    g_VideoReferenceClock.SetFineAdjust(1.0);
-  }
+  //integral correction, clamp to -0.5:0.5 range
+  m_presentcorr = std::max(std::min(m_presentcorr + avgerror * 0.01, 0.1), -0.1);
+  g_VideoReferenceClock.SetFineAdjust(1.0 - avgerror * 0.01 - m_presentcorr * 0.01);
 
   //printf("%f %f % 2.0f%% % f % f\n", presenttime, clock, m_presentcorr * 100, error, error_org);
 }

@@ -21,9 +21,8 @@
 #include "DVDAudioCodecPassthrough.h"
 #include "DVDCodecs/DVDCodecs.h"
 #include "DVDStreamInfo.h"
-#include "settings/GUISettings.h"
-#include "settings/Settings.h"
-#include "utils/log.h"
+
+#include <algorithm>
 
 #include "cores/AudioEngine/AEFactory.h"
 
@@ -127,7 +126,7 @@ void CDVDAudioCodecPassthrough::Dispose()
   m_bufferSize = 0;
 }
 
-int CDVDAudioCodecPassthrough::Decode(BYTE* pData, int iSize)
+int CDVDAudioCodecPassthrough::Decode(uint8_t* pData, int iSize)
 {
   if (iSize <= 0) return 0;
 
@@ -142,7 +141,7 @@ int CDVDAudioCodecPassthrough::Decode(BYTE* pData, int iSize)
   return used;
 }
 
-int CDVDAudioCodecPassthrough::GetData(BYTE** dst)
+int CDVDAudioCodecPassthrough::GetData(uint8_t** dst)
 {
   int size = m_packer.GetSize();
   *dst     = m_packer.GetBuffer();

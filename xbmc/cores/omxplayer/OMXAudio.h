@@ -29,8 +29,6 @@
 
 #include "cores/AudioEngine/Utils/AEAudioFormat.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
-#include "cores/AudioEngine/Utils/AERemap.h"
-#include "cores/IAudioCallback.h"
 #include "linux/PlatformDefs.h"
 #include "DVDStreamInfo.h"
 
@@ -57,8 +55,6 @@ extern "C" {
 class COMXAudio
 {
 public:
-  void UnRegisterAudioCallback();
-  void RegisterAudioCallback(IAudioCallback* pCallback);
   unsigned int GetChunkLen();
   float GetDelay();
   float GetCacheTime();
@@ -99,7 +95,6 @@ public:
   float GetMaxLevel(double &pts);
 
 private:
-  IAudioCallback* m_pCallback;
   bool          m_Initialized;
   float         m_CurrentVolume;
   bool          m_Mute;

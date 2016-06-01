@@ -18,9 +18,9 @@
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if (defined HAVE_CONFIG_H) && (!defined WIN32)
+#if (defined HAVE_CONFIG_H) && (!defined TARGET_WINDOWS)
   #include "config.h"
-#elif defined(_WIN32)
+#elif defined(TARGET_WINDOWS)
 #include "system.h"
 #endif
 
@@ -39,6 +39,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "cores/AudioEngine/AEFactory.h"
 #include "Util.h"
+#include <cassert>
 
 extern "C" {
 #include "libavutil/crc.h"
@@ -58,7 +59,6 @@ static const char rounded_up_channels_shift[] = {0,0,1,2,2,3,3,3,3};
 //////////////////////////////////////////////////////////////////////
 //***********************************************************************************************
 COMXAudio::COMXAudio() :
-  m_pCallback       (NULL   ),
   m_Initialized     (false  ),
   m_CurrentVolume   (0      ),
   m_Mute            (false  ),
@@ -153,7 +153,7 @@ bool COMXAudio::PortSettingsChanged()
     // round up to power of 2
     m_pcm_output.nChannels = m_OutputChannels > 4 ? 8 : m_OutputChannels > 2 ? 4 : m_OutputChannels;
     /* limit samplerate (through resampling) if requested */
-    m_pcm_output.nSamplingRate = std::min(std::max((int)m_pcm_output.nSamplingRate, 8000), 192000);
+    m_pcm_output.nSamplingRate = std::min(std::max((int)m_pcm_output.nSamplingRate, 8000), g_guiSettings.GetInt("audiooutput.samplerate"));
 
     m_pcm_output.nPortIndex = m_omx_mixer.GetOutputPort();
     omx_err = m_omx_mixer.SetParameter(OMX_IndexParamAudioPcm, &m_pcm_output);
@@ -568,11 +568,11 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
   }
   SetCodingType(format.m_dataFormat);
 
-  if (m_Passthrough || g_guiSettings.GetString("audiooutput.audiodevice") == "Pi:HDMI")
+  if (m_Passthrough || g_guiSettings.GetString("audiooutput.audiodevice") == "PI:HDMI")
     m_output = AESINKPI_HDMI;
-  else if (g_guiSettings.GetString("audiooutput.audiodevice") == "Pi:Analogue")
+  else if (g_guiSettings.GetString("audiooutput.audiodevice") == "PI:Analogue")
     m_output = AESINKPI_ANALOGUE;
-  else if (g_guiSettings.GetString("audiooutput.audiodevice") == "Pi:Both")
+  else if (g_guiSettings.GetString("audiooutput.audiodevice") == "PI:Both")
     m_output = AESINKPI_BOTH;
   else assert(0);
 
@@ -597,7 +597,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
   if (!m_Passthrough)
   {
     bool upmix = g_guiSettings.GetBool("audiooutput.stereoupmix");
-    bool normalize = !g_guiSettings.GetBool("audiooutput.normalizelevels");
+    bool normalize = !g_guiSettings.GetBool("audiooutput.maintainoriginalvolume");
     void *remapLayout = NULL;
 
     CAEChannelInfo stdLayout = (enum AEStdChLayout)g_guiSettings.GetInt("audiooutput.channels");
@@ -609,7 +609,7 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
     CAEChannelInfo resolvedMap = channelMap;
     resolvedMap.ResolveChannels(stdLayout);
 
-    if (upmix && channelMap.Count() <= 2)
+    if (g_guiSettings.GetInt("audiooutput.config") == AE_CONFIG_FIXED || (upmix && channelMap.Count() <= 2))
       resolvedMap = stdLayout;
 
     uint64_t m_dst_chan_layout = GetAVChannelLayout(resolvedMap);
@@ -755,6 +755,16 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
   m_wave_header.Samples.wValidBitsPerSample = m_BitsPerSample;
   m_wave_header.Format.cbSize               = 0;
   m_wave_header.SubFormat                   = KSDATAFORMAT_SUBTYPE_PCM;
+
+  OMX_INIT_STRUCTURE(m_pcm_input);
+  memcpy(m_pcm_input.eChannelMapping, m_input_channels, sizeof(m_input_channels));
+  m_pcm_input.eNumData              = OMX_NumericalDataSigned;
+  m_pcm_input.eEndian               = OMX_EndianLittle;
+  m_pcm_input.bInterleaved          = OMX_TRUE;
+  m_pcm_input.nBitPerSample         = m_BitsPerSample;
+  m_pcm_input.ePCMMode              = OMX_AUDIO_PCMModeLinear;
+  m_pcm_input.nChannels             = m_InputChannels;
+  m_pcm_input.nSamplingRate         = m_format.m_sampleRate;
 
   if(!m_omx_decoder.Initialize("OMX.broadcom.audio_decode", OMX_IndexParamAudioInit))
     return false;
@@ -902,17 +912,6 @@ bool COMXAudio::Initialize(AEAudioFormat format, OMXClock *clock, CDVDStreamInfo
   /* return on decoder error so m_Initialized stays false */
   if(m_omx_decoder.BadState())
     return false;
-
-  OMX_INIT_STRUCTURE(m_pcm_input);
-  m_pcm_input.nPortIndex            = m_omx_decoder.GetInputPort();
-  memcpy(m_pcm_input.eChannelMapping, m_input_channels, sizeof(m_input_channels));
-  m_pcm_input.eNumData              = OMX_NumericalDataSigned;
-  m_pcm_input.eEndian               = OMX_EndianLittle;
-  m_pcm_input.bInterleaved          = OMX_TRUE;
-  m_pcm_input.nBitPerSample         = m_BitsPerSample;
-  m_pcm_input.ePCMMode              = OMX_AUDIO_PCMModeLinear;
-  m_pcm_input.nChannels             = m_InputChannels;
-  m_pcm_input.nSamplingRate         = m_format.m_sampleRate;
 
   m_Initialized   = true;
   m_settings_changed = false;
@@ -1209,7 +1208,7 @@ unsigned int COMXAudio::AddPackets(const void* data, unsigned int len, double dt
         if(pts > m_last_pts)
           m_last_pts = pts;
         else
-          omx_buffer->nFlags = OMX_BUFFERFLAG_TIME_UNKNOWN;;
+          omx_buffer->nFlags = OMX_BUFFERFLAG_TIME_UNKNOWN;
       }
       else if (m_last_pts == pts)
       {
@@ -1334,7 +1333,7 @@ float COMXAudio::GetDelay()
   if (m_last_pts != DVD_NOPTS_VALUE && m_av_clock)
     stamp = m_av_clock->OMXMediaTime();
   // if possible the delay is current media time - time of last submitted packet
-  if (stamp != DVD_NOPTS_VALUE)
+  if (stamp != DVD_NOPTS_VALUE && stamp != 0.0)
   {
     ret = (m_last_pts - stamp) * (1.0 / DVD_TIME_BASE);
   }
@@ -1367,25 +1366,6 @@ unsigned int COMXAudio::GetChunkLen()
 int COMXAudio::SetPlaySpeed(int iSpeed)
 {
   return 0;
-}
-
-void COMXAudio::RegisterAudioCallback(IAudioCallback *pCallback)
-{
-  CSingleLock lock (m_critSection);
-  if(!m_Passthrough && !m_HWDecode)
-  {
-    m_pCallback = pCallback;
-    if (m_pCallback)
-      m_pCallback->OnInitialize(2, m_SampleRate, 32);
-  }
-  else
-    m_pCallback = NULL;
-}
-
-void COMXAudio::UnRegisterAudioCallback()
-{
-  CSingleLock lock (m_critSection);
-  m_pCallback = NULL;
 }
 
 unsigned int COMXAudio::GetAudioRenderingLatency() const

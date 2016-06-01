@@ -21,7 +21,6 @@
  */
 
 #include "system.h" // until we get sane int types used here
-#include "IAudioCallback.h"
 #include "utils/StdString.h"
 
 struct TextCacheStruct_t;
@@ -95,8 +94,6 @@ public:
   IPlayer(IPlayerCallback& callback): m_callback(callback){};
   virtual ~IPlayer(){};
   virtual bool Initialize(TiXmlElement* pConfig) { return true; };
-  virtual void RegisterAudioCallback(IAudioCallback* pCallback) {};
-  virtual void UnRegisterAudioCallback() {};
   virtual bool OpenFile(const CFileItem& file, const CPlayerOptions& options){ return false;}
   virtual bool QueueNextFile(const CFileItem &file) { return false; }
   virtual void OnNothingToQueueNotify() {}

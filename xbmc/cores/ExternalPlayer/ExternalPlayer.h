@@ -33,8 +33,6 @@ public:
   CExternalPlayer(IPlayerCallback& callback);
   virtual ~CExternalPlayer();
   virtual bool Initialize(TiXmlElement* pConfig);
-  virtual void RegisterAudioCallback(IAudioCallback* pCallback) {}
-  virtual void UnRegisterAudioCallback()                        {}
   virtual bool OpenFile(const CFileItem& file, const CPlayerOptions &options);
   virtual bool CloseFile();
   virtual bool IsPlaying() const;

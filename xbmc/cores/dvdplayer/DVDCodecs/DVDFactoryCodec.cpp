@@ -25,6 +25,7 @@
 #include "Video/DVDVideoCodec.h"
 #include "Audio/DVDAudioCodec.h"
 #include "Overlay/DVDOverlayCodec.h"
+#include "cores/dvdplayer/DVDCodecs/DVDCodecs.h"
 
 #include "Video/DVDVideoCodecVDA.h"
 #if defined(HAVE_VIDEOTOOLBOXDECODER)
@@ -37,12 +38,6 @@
 #include "Video/DVDVideoCodecCrystalHD.h"
 #endif
 #include "Audio/DVDAudioCodecFFmpeg.h"
-#include "Audio/DVDAudioCodecLibMad.h"
-#include "Audio/DVDAudioCodecPcm.h"
-#include "Audio/DVDAudioCodecLPcm.h"
-#if defined(TARGET_DARWIN_OSX) || defined(TARGET_DARWIN_IOS)
-#include "Audio/DVDAudioCodecPassthroughFFmpeg.h"
-#endif
 #include "Audio/DVDAudioCodecPassthrough.h"
 #include "Overlay/DVDOverlayCodecSSA.h"
 #include "Overlay/DVDOverlayCodecText.h"
@@ -261,76 +256,14 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, unsigne
   return NULL;
 }
 
-CDVDAudioCodec* CDVDFactoryCodec::CreateAudioCodec( CDVDStreamInfo &hint, bool passthrough /* = true */)
+CDVDAudioCodec* CDVDFactoryCodec::CreateAudioCodec( CDVDStreamInfo &hint)
 {
   CDVDAudioCodec* pCodec = NULL;
   CDVDCodecOptions options;
 
-  if (passthrough)
-  {
-#if defined(TARGET_DARWIN_OSX) || defined(TARGET_DARWIN_IOS)
-    switch(hint.codec)
-    {
-      case AV_CODEC_ID_AC3:
-      case AV_CODEC_ID_DTS:
-        pCodec = OpenCodec( new CDVDAudioCodecPassthroughFFmpeg(), hint, options );
-        if( pCodec ) return pCodec;
-        break;
-      default:
-        break;      
-    }
-#endif
-    pCodec = OpenCodec( new CDVDAudioCodecPassthrough(), hint, options );
-    if( pCodec ) return pCodec;
-  }
-
-  switch (hint.codec)
-  {
-  case AV_CODEC_ID_MP2:
-  case AV_CODEC_ID_MP3:
-    {
-      pCodec = OpenCodec( new CDVDAudioCodecLibMad(), hint, options );
-      if( pCodec ) return pCodec;
-      break;
-    }
-  case AV_CODEC_ID_PCM_S32LE:
-  case AV_CODEC_ID_PCM_S32BE:
-  case AV_CODEC_ID_PCM_U32LE:
-  case AV_CODEC_ID_PCM_U32BE:
-  case AV_CODEC_ID_PCM_S24LE:
-  case AV_CODEC_ID_PCM_S24BE:
-  case AV_CODEC_ID_PCM_U24LE:
-  case AV_CODEC_ID_PCM_U24BE:
-  case AV_CODEC_ID_PCM_S24DAUD:
-  case AV_CODEC_ID_PCM_S16LE:
-  case AV_CODEC_ID_PCM_S16BE:
-  case AV_CODEC_ID_PCM_U16LE:
-  case AV_CODEC_ID_PCM_U16BE:
-  case AV_CODEC_ID_PCM_S8:
-  case AV_CODEC_ID_PCM_U8:
-  case AV_CODEC_ID_PCM_ALAW:
-  case AV_CODEC_ID_PCM_MULAW:
-    {
-      pCodec = OpenCodec( new CDVDAudioCodecPcm(), hint, options );
-      if( pCodec ) return pCodec;
-      break;
-    }
-#if 0
-  //case AV_CODEC_ID_LPCM_S16BE:
-  //case AV_CODEC_ID_LPCM_S20BE:
-  case AV_CODEC_ID_LPCM_S24BE:
-    {
-      pCodec = OpenCodec( new CDVDAudioCodecLPcm(), hint, options );
-      if( pCodec ) return pCodec;
-      break;
-    }
-#endif
-  default:
-    {
-      pCodec = NULL;
-      break;
-    }
-  }
+  // try passthrough first
+  pCodec = OpenCodec( new CDVDAudioCodecPassthrough(), hint, options );
+  if( pCodec ) return pCodec;
 
   pCodec = OpenCodec( new CDVDAudioCodecFFmpeg(), hint, options );
   if( pCodec ) return pCodec;

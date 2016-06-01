@@ -389,18 +389,26 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput)
 
     m_pFormatContext->pb = m_ioContext;
 
+    AVDictionary *options = NULL;
+    if (iformat->name && (strcmp(iformat->name, "mp3") == 0 || strcmp(iformat->name, "mp2") == 0))
+    {
+      CLog::Log(LOGDEBUG, "%s - setting usetoc to 0 for accurate VBR MP3 seek", __FUNCTION__);
+      av_dict_set(&options, "usetoc", "0", 0);
+    }
+
     /* PLEX changed the seterror and friends */
     int res;
-    if ((res=avformat_open_input(&m_pFormatContext, strFile.c_str(), iformat, NULL) < 0))
+    if ((res=avformat_open_input(&m_pFormatContext, strFile.c_str(), iformat, &options) < 0))
     {
       SetError(GetErrorString(res));
       CLog::Log(LOGERROR, "%s - Error, could not open file %s", __FUNCTION__, strFile.c_str());
       Dispose();
+      av_dict_free(&options);
       return false;
     }
-    /* END PLEX */
+    av_dict_free(&options);
   }
-  
+
   // Avoid detecting framerate if advancedsettings.xml says so
   if (g_advancedSettings.m_videoFpsDetect == 0) 
       m_pFormatContext->fps_probe_size = 0;
@@ -863,7 +871,8 @@ bool CDVDDemuxFFmpeg::SeekTime(int time, bool backwords, double *startpts)
   }
 
   int64_t seek_pts = (int64_t)time * (AV_TIME_BASE / 1000);
-  if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE)
+  bool ismp3 = m_pFormatContext->iformat && (strcmp(m_pFormatContext->iformat->name, "mp3") == 0);
+  if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE && !ismp3)
     seek_pts += m_pFormatContext->start_time;
 
   int ret;
