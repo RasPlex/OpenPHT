@@ -89,7 +89,6 @@ if(TARGET_WIN32)
     ${root}/xbmc/win32
     ${root}/lib/ffmpeg
     ${root}/lib/ffmpeg/include-xbmc-win32
-    ${root}/lib/liblame/include
     ${root}/lib/win32
     "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include"
   )
