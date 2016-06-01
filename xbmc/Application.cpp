@@ -5036,6 +5036,7 @@ bool CApplication::ToggleDPMS(bool manual)
       m_dpmsIsActive = false;
       m_dpmsIsManual = false;
       SetRenderGUI(true);
+      CAnnouncementManager::Announce(GUI, "xbmc", "OnDPMSDeactivated");
       return m_dpms->DisablePowerSaving();
     }
     else
@@ -5045,6 +5046,7 @@ bool CApplication::ToggleDPMS(bool manual)
         m_dpmsIsActive = true;
         m_dpmsIsManual = manual;
         SetRenderGUI(false);
+        CAnnouncementManager::Announce(GUI, "xbmc", "OnDPMSActivated");
         return true;
       }
     }
