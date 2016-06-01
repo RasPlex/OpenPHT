@@ -617,7 +617,7 @@ msgid "Resolution"
 msgstr ""
 
 msgctxt "#170"
-msgid "Adjust display refresh rate to match video"
+msgid "Adjust display refresh rate"
 msgstr ""
 
 #empty string with id 171
@@ -871,11 +871,11 @@ msgid "Clear playlist on finish"
 msgstr ""
 
 msgctxt "#240"
-msgid "Display Mode"
+msgid "Display mode"
 msgstr ""
 
 msgctxt "#241"
-msgid "Full Screen #%d"
+msgid "Full screen #%d"
 msgstr ""
 
 msgctxt "#242"
@@ -883,7 +883,7 @@ msgid "Windowed"
 msgstr ""
 
 msgctxt "#243"
-msgid "Refresh Rate"
+msgid "Refresh rate"
 msgstr ""
 
 msgctxt "#244"
@@ -961,7 +961,7 @@ msgid "Scripts output"
 msgstr ""
 
 msgctxt "#263"
-msgid "Allow control of XBMC via HTTP"
+msgid "Allow remote control via HTTP"
 msgstr ""
 
 msgctxt "#264"
@@ -1891,7 +1891,7 @@ msgid "Overall audio headroom"
 msgstr ""
 
 msgctxt "#495"
-msgid "Upsample videos to GUI resolution"
+msgid "Upscale videos to GUI resolution"
 msgstr ""
 
 msgctxt "#496"
@@ -2848,7 +2848,7 @@ msgid "Remote control"
 msgstr ""
 
 msgctxt "#791"
-msgid "Allow programs on this system to control XBMC"
+msgid "Allow remote control by programs on this system"
 msgstr ""
 
 msgctxt "#792"
@@ -2860,7 +2860,7 @@ msgid "Port range"
 msgstr ""
 
 msgctxt "#794"
-msgid "Allow programs on other systems to control XBMC"
+msgid "Allow remote control by programs on other systems"
 msgstr ""
 
 msgctxt "#795"
@@ -3260,13 +3260,13 @@ msgid "Zeroconf"
 msgstr ""
 
 msgctxt "#1260"
-msgid "Announce these services to other systems via Zeroconf"
+msgid "Announce services to other systems"
 msgstr ""
 
 #empty strings from id 1261 to 1269
 
 msgctxt "#1270"
-msgid "Allow XBMC to receive AirPlay content"
+msgid "Enable AirPlay support"
 msgstr ""
 
 msgctxt "#1271"
@@ -4325,15 +4325,15 @@ msgid "Always enabled"
 msgstr ""
 
 msgctxt "#13109"
-msgid "Test & apply resolution"
+msgid "Test & apply the resolution"
 msgstr ""
 
 msgctxt "#13110"
-msgid "Save resolution?"
+msgid "Save this resolution?"
 msgstr ""
 
 msgctxt "#13111"
-msgid "Would you like to keep this resolution?"
+msgid "Would you like to keep this change?"
 msgstr ""
 
 msgctxt "#13112"
@@ -5103,7 +5103,7 @@ msgid "Allow hardware acceleration - OpenMax"
 msgstr ""
 
 msgctxt "#13431"
-msgid "Pixel Shaders"
+msgid "Pixel shaders"
 msgstr ""
 
 msgctxt "#13432"
@@ -5112,7 +5112,7 @@ msgstr ""
 
 #: xbmc/settings/GUISettings.cpp
 msgctxt "#13433"
-msgid "Play the next video automatically"
+msgid "Play next video automatically"
 msgstr ""
 
 #. If autoplay next video is set true
@@ -5262,13 +5262,13 @@ msgstr ""
 #empty strings from id 13554 to 13599
 
 msgctxt "#13600"
-msgid "Apple remote"
+msgid "Apple Remote"
 msgstr ""
 
 #empty string with id 13601
 
 msgctxt "#13602"
-msgid "Allow start of XBMC using the remote"
+msgid "Allow start of Kodi using the remote"
 msgstr ""
 
 msgctxt "#13603"
@@ -5286,11 +5286,11 @@ msgid "Standard"
 msgstr ""
 
 msgctxt "#13612"
-msgid "Universal Remote"
+msgid "Universal remote"
 msgstr ""
 
 msgctxt "#13613"
-msgid "Multi Remote (Harmony)"
+msgid "Harmony remote"
 msgstr ""
 
 #empty strings from id 13614 to 13619
@@ -5300,7 +5300,7 @@ msgid "Apple Remote Error"
 msgstr ""
 
 msgctxt "#13621"
-msgid "Apple Remote support could be enabled."
+msgid "Apple Remote support couldn't be enabled."
 msgstr ""
 
 #empty strings from id 13622 to 13999
@@ -5618,7 +5618,7 @@ msgid "Show EXIF picture information"
 msgstr ""
 
 msgctxt "#14083"
-msgid "Use a fullscreen window rather than true fullscreen"
+msgid "Use fullscreen window"
 msgstr ""
 
 msgctxt "#14084"
@@ -5743,7 +5743,7 @@ msgid "Buffering..."
 msgstr ""
 
 msgctxt "#15108"
-msgid "Navigation sounds"
+msgid "GUI sounds"
 msgstr ""
 
 msgctxt "#15109"
@@ -6145,7 +6145,7 @@ msgid "Auto select"
 msgstr ""
 
 msgctxt "#16020"
-msgid "De-interlace"
+msgid "Deinterlace"
 msgstr ""
 
 msgctxt "#16021"
@@ -6153,7 +6153,7 @@ msgid "Bob"
 msgstr ""
 
 msgctxt "#16022"
-msgid "Bob (inverted)"
+msgid "Bob - Inverted"
 msgstr ""
 
 #empty string with id 16023
@@ -6207,7 +6207,7 @@ msgid "Party mode playlist"
 msgstr ""
 
 msgctxt "#16036"
-msgid "De-interlace (Half)"
+msgid "Deinterlace (half)"
 msgstr ""
 
 msgctxt "#16037"
@@ -6341,11 +6341,11 @@ msgid "VDPAU - Noise reduction"
 msgstr ""
 
 msgctxt "#16313"
-msgid "Sharpness"
+msgid "VDPAU - Sharpness"
 msgstr ""
 
 msgctxt "#16314"
-msgid "Inverse Telecine"
+msgid "Inverse telecine"
 msgstr ""
 
 msgctxt "#16315"
@@ -11254,15 +11254,15 @@ msgstr ""
 #empty strings from id 34302 to 34399
 
 msgctxt "#34400"
-msgid "Video Rendering"
+msgid "Video rendering"
 msgstr ""
 
 msgctxt "#34401"
-msgid "Failed to init video filters/scalers, falling back to bilinear scaling"
+msgid "Failed to initialize video filters / scalers, falling back to bilinear scaling"
 msgstr ""
 
 msgctxt "#34402"
-msgid "Failed to initialize audio device"
+msgid "Failed to initialise audio device"
 msgstr ""
 
 msgctxt "#34403"
@@ -11330,7 +11330,7 @@ msgid "Keymap enabled"
 msgstr ""
 
 msgctxt "#35009"
-msgid "Do not use the custom keymap for this device"
+msgid "Don't use the custom keymap for this device"
 msgstr ""
 
 #empty strings from id 35010 to 35099
@@ -11344,7 +11344,7 @@ msgstr ""
 
 #: system/peripherals.xml
 msgctxt "#35102"
-msgid "Disable joystick when device is present"
+msgid "Disable joystick when this device is present"
 msgstr ""
 
 #empty strings from id 35103 to 35499
@@ -11397,31 +11397,31 @@ msgid "Enable switch side commands"
 msgstr ""
 
 msgctxt "#36006"
-msgid "Could not open the adapter"
+msgid "Couldn't open the adapter"
 msgstr ""
 
 msgctxt "#36007"
-msgid "Devices to power on when starting XBMC"
+msgid "Devices to power on during startup"
 msgstr ""
 
 msgctxt "#36008"
-msgid "Devices to power off when stopping XBMC"
+msgid "Devices to power off during shutdown"
 msgstr ""
 
 msgctxt "#36009"
-msgid "Put devices in standby mode when activating screensaver"
+msgid "Put devices in standby mode when activating the screensaver"
 msgstr ""
 
 msgctxt "#36010"
-msgid "Wake devices when deactivating screensaver"
+msgid "Wake devices when deactivating the screensaver"
 msgstr ""
 
 msgctxt "#36011"
-msgid "Could not detect the CEC com port. Set it up manually."
+msgid "Couldn't detect the CEC com port. Please configure it manually."
 msgstr ""
 
 msgctxt "#36012"
-msgid "Could not initialise the CEC adapter. Please check your settings."
+msgid "Couldn't initialise the CEC adapter. Please check your settings."
 msgstr ""
 
 #empty strings from id 36013 to 36014
@@ -11436,7 +11436,7 @@ msgid "Connected"
 msgstr ""
 
 msgctxt "#36017"
-msgid "Could not initialise the CEC adapter: libCEC was not found on your system."
+msgid "Couldn't initialise the CEC adapter: libCEC was not found on your system."
 msgstr ""
 
 msgctxt "#36018"
@@ -11448,7 +11448,7 @@ msgid "Connected to HDMI device"
 msgstr ""
 
 msgctxt "#36020"
-msgid "Make XBMC the active source when starting"
+msgid "Switch source to this device on startup"
 msgstr ""
 
 msgctxt "#36021"
@@ -11468,11 +11468,11 @@ msgid "Failed to set the new configuration. Please check your settings."
 msgstr ""
 
 msgctxt "#36025"
-msgid "Send 'inactive source' command when stopping XBMC"
+msgid "Send \"Inactive source\" command on shutdown"
 msgstr ""
 
 msgctxt "#36026"
-msgid "Put devices in standby mode when putting the PC in standby"
+msgid "Devices to also put in standby mode"
 msgstr ""
 
 msgctxt "#36027"
@@ -11500,7 +11500,7 @@ msgid "The port is busy. Only one program can access the CEC adapter"
 msgstr ""
 
 msgctxt "#36033"
-msgid "Pause playback when switching to another source"
+msgid "Action when switching to another source"
 msgstr ""
 
 #empty string with id 36034
@@ -11514,7 +11514,7 @@ msgstr ""
 #. adjust refreshrate
 #: xbmc/settings/GUISettings.cpp
 msgctxt "#36036"
-msgid "On start/stop"
+msgid "On start / stop"
 msgstr ""
 
 #: xbmc/peripherals/devices/PeripheralCecAdapter.cpp
@@ -11533,7 +11533,7 @@ msgid "TV and AVR device (explicit)"
 msgstr ""
 
 msgctxt "#36040"
-msgid "Unsupported libCEC interface version. %x is lower than the version XBMC supports (%x)"
+msgid "Detected version of libCEC interface (%x) is lower than the supported version %x."
 msgstr ""
 
 msgctxt "#36041"
@@ -11549,6 +11549,7 @@ msgstr ""
 msgctxt "#36043"
 msgid "Boost center channel when downmixing"
 msgstr ""
+
 msgctxt "#36434"
 msgid "Allow hardware acceleration - MMAL"
 msgstr ""
@@ -11702,6 +11703,14 @@ msgstr ""
 
 msgctxt "#38019"
 msgid "Support 8 channel DTS-HD audio decoding"
+msgstr ""
+
+msgctxt "#38027"
+msgid "Decode the stereo stream from 3D files"
+msgstr ""
+
+msgctxt "#38029"
+msgid "Enable Full HD HDMI modes for stereoscopic 3D"
 msgstr ""
 
 msgctxt "#38007"
