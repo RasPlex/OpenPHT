@@ -3415,6 +3415,9 @@ void CGUIWindowSettingsCategory::FillInPlexUpdateChannels(CSetting *pSetting)
   pControl->AddLabel(g_localizeStrings.Get(40003), CMyPlexUserInfo::ROLE_USER);
   pControl->AddLabel(g_localizeStrings.Get(40007), CMyPlexUserInfo::ROLE_PLEXPASS);
 
+  if (g_advancedSettings.m_bEnableBetaChannel)
+    pControl->AddLabel(g_localizeStrings.Get(40008), CMyPlexUserInfo::ROLE_NINJA);
+
   if (pControl->GetMaximum() < 1)
     /* only one choice */
     pControl->SetEnabled(false);

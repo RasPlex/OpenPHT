@@ -21,14 +21,14 @@ include_directories(
 )
 
 if(ENABLE_AUTOUPDATE)
-  if (NOT TARGET_RPI)
+  if (NOT TARGET_COMMON_LINUX)
     include(ExternalProject)
     ExternalProject_Add(Update-Installer
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR} -DCMAKE_OSX_ARCHITECTURES=${OSX_ARCH} -DSIGN_UPDATER=ON -DBINARY_SIGNING_TOOL=${plexdir}/scripts/WindowsSign.cmd
       SOURCE_DIR "${plexdir}/Update-Installer"
       INSTALL_DIR "${CMAKE_BINARY_DIR}"
     )
-  endif(NOT TARGET_RPI)
+  endif(NOT TARGET_COMMON_LINUX)
   if(TARGET_OSX)
     set_source_files_properties(${CMAKE_BINARY_DIR}/update_installer/updater PROPERTIES GENERATED true MACOSX_PACKAGE_LOCATION Resources/XBMC/tools)
     set_property(GLOBAL APPEND PROPERTY CONFIG_BUNDLED_FILES ${CMAKE_BINARY_DIR}/update_installer/updater)
@@ -110,8 +110,11 @@ set_target_properties(PlexMain PROPERTIES
   XCODE_ATTRIBUTE_GCC_INCREASE_PRECOMPILED_HEADER_SHARING YES
   XCODE_ATTRIBUTE_WARNING_CFLAGS "")
 if(USE_INTERNAL_FFMPEG)
-  add_dependencies(PlexMain ffmpeg Update-Installer)
+  add_dependencies(PlexMain ffmpeg)
 endif(USE_INTERNAL_FFMPEG)
+if(ENABLE_AUTOUPDATE AND NOT TARGET_COMMON_LINUX)
+  add_dependencies(PlexMain Update-Installer)
+endif(ENABLE_AUTOUPDATE AND NOT TARGET_COMMON_LINUX)
 
 # build test cases
 if(ENABLE_TESTING)

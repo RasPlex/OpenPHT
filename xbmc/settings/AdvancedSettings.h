@@ -396,6 +396,7 @@ class CAdvancedSettings
     bool m_bEnablePlexTokensInLogs;
     bool m_bCollapseSingleSeason;
     bool m_bRequireEncryptedConnection;
+    bool m_bEnableBetaChannel;
 
     unsigned int m_smartCacheUpperLimit;
     int m_iShowFirstRun;
