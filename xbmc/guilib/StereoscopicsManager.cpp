@@ -146,9 +146,8 @@ void CStereoscopicsManager::SetStereoMode(const RENDER_STEREO_MODE &mode)
 
     // HACK to apply stereo mode
     {
-      RENDER_STEREO_MODE mode = GetStereoMode();
-      CLog::Log(LOGDEBUG, "StereoscopicsManager: stereo mode setting changed to %s", ConvertGuiStereoModeToString(mode));
-      ApplyStereoMode(mode);
+      CLog::Log(LOGDEBUG, "StereoscopicsManager: stereo mode setting changed to %s", ConvertGuiStereoModeToString(applyMode));
+      ApplyStereoMode(applyMode);
     }
   }
 }
@@ -515,7 +514,8 @@ CStdString CStereoscopicsManager::GetVideoStereoMode()
 
 bool CStereoscopicsManager::IsVideoStereoscopic()
 {
-  return !GetVideoStereoMode().empty();
+  std::string mode = GetVideoStereoMode();
+  return !mode.empty() && mode != "mono";
 }
 
 void CStereoscopicsManager::OnPlaybackStarted(void)

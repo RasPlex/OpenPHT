@@ -1379,7 +1379,10 @@ bool CApplication::Initialize()
         g_windowManager.ActivateWindow(g_SkinInfo->GetFirstWindow());
       }
 #endif
+
+      CStereoscopicsManager::Get().Initialize();
     }
+
   }
   else //No GUI Created
   {
@@ -2014,6 +2017,7 @@ void CApplication::LoadSkin(const SkinPtr& skin)
   g_windowManager.AddMsgTarget(&g_playlistPlayer);
   g_windowManager.AddMsgTarget(&g_infoManager);
   g_windowManager.AddMsgTarget(&g_fontManager);
+  g_windowManager.AddMsgTarget(&CStereoscopicsManager::Get());
   g_windowManager.SetCallback(*this);
   g_windowManager.Initialize();
   CTextureCache::Get().Initialize();

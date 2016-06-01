@@ -50,6 +50,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "guilib/LocalizeStrings.h"
+#include "guilib/StereoscopicsManager.h"
 #include "utils/CPUInfo.h"
 #include "utils/StringUtils.h"
 #include "utils/MathUtils.h"
@@ -321,7 +322,8 @@ const infomap system_labels[] =  {{ "hasnetwork",       SYSTEM_ETHERNET_LINK_ACT
                                   { "alarmpos",         SYSTEM_ALARM_POS },
                                   { "isinhibit",        SYSTEM_ISINHIBIT },
                                   { "hasshutdown",      SYSTEM_HAS_SHUTDOWN },
-                                  { "haspvr",           SYSTEM_HAS_PVR }};
+                                  { "haspvr",           SYSTEM_HAS_PVR },
+                                  { "stereoscopicmode", SYSTEM_STEREOSCOPIC_MODE }};
 
 const infomap system_param[] =   {{ "hasalarm",         SYSTEM_HAS_ALARM },
                                   { "hascoreid",        SYSTEM_HAS_CORE_ID },
@@ -467,6 +469,8 @@ const infomap videoplayer[] =    {{ "title",            VIDEOPLAYER_TITLE },
                                   { "channelnumber",    VIDEOPLAYER_CHANNEL_NUMBER },
                                   { "channelgroup",     VIDEOPLAYER_CHANNEL_GROUP },
                                   { "hasepg",           VIDEOPLAYER_HAS_EPG },
+                                  { "isstereoscopic",   VIDEOPLAYER_IS_STEREOSCOPIC },
+                                  { "stereoscopicmode", VIDEOPLAYER_STEREOSCOPIC_MODE },
                                   /* PLEX */
                                   { "audiostream",      VIDEOPLAYER_AUDIOSTREAM },
                                   { "subtitlestream",   VIDEOPLAYER_SUBTITLESTREAM },
@@ -636,7 +640,9 @@ const infomap listitem_labels[]= {{ "thumb",            LISTITEM_THUMB },
                                   { "progress",         LISTITEM_PROGRESS },
                                   { "dateadded",        LISTITEM_DATE_ADDED },
                                   { "dbtype",           LISTITEM_DBTYPE },
-                                  { "dbid",             LISTITEM_DBID }};
+                                  { "dbid",             LISTITEM_DBID },
+                                  { "stereoscopicmode", LISTITEM_STEREOSCOPIC_MODE },
+                                  { "isstereoscopic",   LISTITEM_IS_STEREOSCOPIC }};
 
 const infomap visualisation[] =  {{ "locked",           VISUALISATION_LOCKED },
                                   { "preset",           VISUALISATION_PRESET },
@@ -1633,6 +1639,12 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
         strLabel.Format("%i", m_audioInfo.channels);
     }
     break;
+  case VIDEOPLAYER_STEREOSCOPIC_MODE:
+    if(g_application.m_pPlayer->IsPlaying())
+    {
+      strLabel = m_videoInfo.stereoMode;
+    }
+    break;
   case PLAYLIST_LENGTH:
   case PLAYLIST_POSITION:
   case PLAYLIST_RANDOM:
@@ -1807,13 +1819,13 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
     }
     break;
   case SYSTEM_SCREEN_MODE:
-    strLabel = g_settings.m_ResInfo[g_graphicsContext.GetVideoResolution()].strMode;
+    strLabel = g_graphicsContext.GetResInfo().strMode;
     break;
   case SYSTEM_SCREEN_WIDTH:
-    strLabel.Format("%i", g_settings.m_ResInfo[g_graphicsContext.GetVideoResolution()].iScreenWidth);
+    strLabel.Format("%i", g_graphicsContext.GetResInfo().iScreenWidth);
     break;
   case SYSTEM_SCREEN_HEIGHT:
-    strLabel.Format("%i", g_settings.m_ResInfo[g_graphicsContext.GetVideoResolution()].iScreenHeight);
+    strLabel.Format("%i", g_graphicsContext.GetResInfo().iScreenHeight);
     break;
   case SYSTEM_CURRENT_WINDOW:
     return g_localizeStrings.Get(g_windowManager.GetFocusedWindow());
@@ -1872,6 +1884,12 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
         strLabel.Format("%s (%s)", friendlyName.c_str(), g_application.getNetwork().GetHostName().c_str());
       else
         strLabel = friendlyName;
+    }
+    break;
+  case SYSTEM_STEREOSCOPIC_MODE:
+    {
+      int stereoMode = g_guiSettings.GetInt("videoscreen.stereoscopicmode");
+      strLabel = StringUtils::Format("%i", stereoMode);
     }
     break;
   case LCD_PLAY_ICON:
@@ -2718,6 +2736,12 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
         bReturn = m_currentFile->GetPVRChannelInfoTag()->GetEPGNow(epgTag);
       }
     break;
+    case VIDEOPLAYER_IS_STEREOSCOPIC:
+      if(g_application.m_pPlayer->IsPlaying())
+      {
+        bReturn = !m_videoInfo.stereoMode.empty();
+      }
+      break;
 
     /* PLEX */
     case SLIDESHOW_SHOW_DESCRIPTION:
@@ -5520,6 +5544,13 @@ CStdString CGUIInfoManager::GetItemLabel(const CFileItem *item, int info, CStdSt
         return dbid;
       }
     break;
+  case LISTITEM_STEREOSCOPIC_MODE:
+    {
+      std::string stereoMode = item->GetProperty("stereomode").asString();
+      if (stereoMode.empty() && item->HasVideoInfoTag())
+        stereoMode = CStereoscopicsManager::Get().NormalizeStereoMode(item->GetVideoInfoTag()->m_streamDetails.GetStereoMode());
+      return stereoMode;
+    }
     /* PLEX */
     case LISTITEM_STAR_DIFFUSE:
       {
@@ -5670,6 +5701,14 @@ bool CGUIInfoManager::GetItemBool(const CGUIListItem *item, int condition) const
       {
         return pItem->GetEPGInfoTag()->ChannelTag()->IsEncrypted();
       }
+    }
+    else if (condition == LISTITEM_IS_STEREOSCOPIC)
+    {
+      std::string stereoMode = pItem->GetProperty("stereomode").asString();
+      if (stereoMode.empty() && pItem->HasVideoInfoTag())
+          stereoMode = CStereoscopicsManager::Get().NormalizeStereoMode(pItem->GetVideoInfoTag()->m_streamDetails.GetStereoMode());
+      if (!stereoMode.empty() && stereoMode != "mono")
+        return true;
     }
   }
 

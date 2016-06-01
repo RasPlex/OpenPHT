@@ -31,6 +31,7 @@
 #include "addons/GUIDialogAddonSettings.h"
 #include "dialogs/GUIDialogFileBrowser.h"
 #include "guilib/GUIKeyboardFactory.h"
+#include "guilib/StereoscopicsManager.h"
 #include "dialogs/GUIDialogKaiToast.h"
 #include "dialogs/GUIDialogNumeric.h"
 #include "dialogs/GUIDialogProgress.h"
@@ -233,6 +234,7 @@ const BUILT_IN commands[] = {
   { "ToggleDebug",                false,  "Enables/disables debug mode" },
   { "StartPVRManager",            false,  "(Re)Starts the PVR manager" },
   { "StopPVRManager",             false,  "Stops the PVR manager" },
+  { "SetStereoMode",              true,   "Changes the stereo mode of the GUI. Params can be: toggle, next, previous, select, tomono or any of the supported stereomodes (off, split_vertical, split_horizontal, row_interleaved, hardware_based, anaglyph_cyan_red, anaglyph_green_magenta, anaglyph_yellow_blue, monoscopic)" }
 };
 
 bool CBuiltins::HasCommand(const CStdString& execString)
@@ -1661,6 +1663,17 @@ int CBuiltins::Execute(const CStdString& execString)
   else if (execute.Equals("stoppvrmanager"))
   {
     g_application.StopPVRManager();
+  }
+  else if (execute.Equals("setstereomode") && !parameter.empty())
+  {
+    CAction action = CStereoscopicsManager::Get().ConvertActionCommandToAction(execute, parameter);
+    if (action.GetID() != ACTION_NONE)
+      CApplicationMessenger::Get().SendAction(action);
+    else
+    {
+      CLog::Log(LOGERROR,"Builtin 'SetStereoMode' called with unknown parameter: %s", parameter.c_str());
+      return -2;
+    }
   }
   /* PLEX */
 #if defined(TARGET_DARWIN_OSX) || defined(TARGET_WINDOWS) || defined(TARGET_OPENELEC)
