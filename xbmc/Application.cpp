@@ -328,7 +328,6 @@ CApplication::CApplication(void)
   , m_progressTrackingItem(new CFileItem)
   , m_videoInfoScanner(new CVideoInfoScanner)
   , m_musicInfoScanner(new CMusicInfoScanner)
-  , m_seekHandler(new CSeekHandler)
   /* PLEX */
   , m_plexRemoteHandler(*new CPlexHTTPRemoteHandler)
   , m_pLaunchHost(NULL)
@@ -412,7 +411,6 @@ CApplication::~CApplication(void)
 #endif
 
   delete m_dpms;
-  delete m_seekHandler;
   delete m_pInertialScrollingHandler;
   delete m_pPlayer;
 
@@ -1409,7 +1407,11 @@ bool CApplication::Initialize()
 
   CAddonMgr::Get().StartServices(true);
 
+  // configure seek handler
+  CSeekHandler::GetInstance().Configure();
+
   // register action listeners
+  RegisterActionListener(&CSeekHandler::GetInstance());
   RegisterActionListener(&CPlayerController::GetInstance());
 
   CLog::Log(LOGNOTICE, "initialize done");
@@ -2900,13 +2902,6 @@ bool CApplication::OnAction(const CAction &action)
     ShowVolumeBar(&action);
     return true;
   }
-  // Check for global seek control
-  if (m_pPlayer->IsPlaying() && action.GetAmount() && (action.GetID() == ACTION_ANALOG_SEEK_FORWARD || action.GetID() == ACTION_ANALOG_SEEK_BACK))
-  {
-    if (!m_pPlayer->CanSeek()) return false;
-    m_seekHandler->Seek(action.GetID() == ACTION_ANALOG_SEEK_FORWARD, action.GetAmount(), action.GetRepeat());
-    return true;
-  }
   if (action.GetID() == ACTION_GUIPROFILE_BEGIN)
   {
     CGUIControlProfiler::Instance().SetOutputFile(CSpecialProtocol::TranslatePath("special://home/guiprofiler.xml"));
@@ -3001,7 +2996,7 @@ void CApplication::FrameMove(bool processEvents, bool processGUI)
     if (processGUI && m_renderGUI)
     {
       m_pInertialScrollingHandler->ProcessInertialScroll(frameTime);
-      m_seekHandler->Process();
+      CSeekHandler::GetInstance().Process();
     }
   }
   if (processGUI && m_renderGUI)
@@ -3602,6 +3597,7 @@ void CApplication::Stop(int exitCode)
   CAddonMgr::Get().StopServices(false);
 
     // unregister action listeners
+    UnregisterActionListener(&CSeekHandler::GetInstance());
     UnregisterActionListener(&CPlayerController::GetInstance());
 
 /* Python resource freeing must be done after skin has been unloaded, not before
@@ -4989,8 +4985,6 @@ bool CApplication::OnMessage(CGUIMessage& message)
 #ifdef TARGET_DARWIN
       DarwinSetScheduling(message.GetMessage());
 #endif
-      // reset the seek handler
-      m_seekHandler->Reset();
       CPlayList playList = g_playlistPlayer.GetPlaylist(g_playlistPlayer.GetCurrentPlaylist());
 
       // Update our infoManager with the new details etc.
@@ -5444,7 +5438,7 @@ void CApplication::ProcessSlow()
   if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO && m_pPlayer->IsPlayingVideo())
   {
     CGUIDialog *osd = dynamic_cast<CGUIDialog*>(g_windowManager.GetWindow(WINDOW_DIALOG_VIDEO_OSD));
-    if (osd && m_pPlayer->IsPausedPlayback() && !IsBuffering() && !osd->IsDialogRunning())
+    if (osd && m_pPlayer->IsPausedPlayback() && !CSeekHandler::GetInstance().InProgress() && !IsBuffering() && !osd->IsDialogRunning())
     {
       ThreadMessage tmsg = {TMSG_DIALOG_DOMODAL, WINDOW_DIALOG_VIDEO_OSD, WINDOW_FULLSCREEN_VIDEO, "pauseOpen"};
       CApplicationMessenger::Get().SendMessage(tmsg, false);
@@ -6107,7 +6101,7 @@ bool CApplication::IsBuffering() const
 {
   if (!m_pPlayer->HasPlayer())
     return false;
-  if (m_pPlayer->IsCaching() && m_pPlayer->IsPaused() && g_infoManager.GetSeeking() == false)
+  if (m_pPlayer->IsCaching() && m_pPlayer->IsPaused() && !CSeekHandler::GetInstance().InProgress())
     return true;
   return false;
 }

@@ -118,6 +118,7 @@ namespace INFO
 #define PLAYER_ONNEW                 54
 #define PLAYER_PLAYLIST              55
 /* END PLEX */
+#define PLAYER_SEEKSTEPSIZE          56
 
 #define WEATHER_CONDITIONS          100
 #define WEATHER_TEMPERATURE         101
@@ -804,6 +805,7 @@ public:
   CStdString GetCurrentSeekTime(TIME_FORMAT format = TIME_FORMAT_GUESS) const;
   int GetPlayTimeRemaining() const;
   int GetTotalPlayTime() const;
+  float GetSeekPercent() const;
   CStdString GetCurrentPlayTimeRemaining(TIME_FORMAT format) const;
   CStdString GetVersionShort(void);
   CStdString GetVersion();
@@ -811,13 +813,11 @@ public:
 
   bool GetDisplayAfterSeek();
   void SetDisplayAfterSeek(unsigned int timeOut = 2500, int seekOffset = 0);
-  void SetSeeking(bool seeking) { m_playerSeeking = seeking; };
   void SetShowTime(bool showtime) { m_playerShowTime = showtime; };
   void SetShowCodec(bool showcodec) { m_playerShowCodec = showcodec; };
   void SetShowInfo(bool showinfo) { m_playerShowInfo = showinfo; };
   void ToggleShowCodec() { m_playerShowCodec = !m_playerShowCodec; };
   bool ToggleShowInfo() { m_playerShowInfo = !m_playerShowInfo; return m_playerShowInfo; };
-  bool m_performingSeek;
 
   std::string GetSystemHeatInfo(int info);
   CTemperature GetGPUTemperature();
@@ -863,7 +863,6 @@ public:
   bool ConditionsChangedValues(const std::map<int, bool>& map);
 
   /* PLEX */
-  bool GetSeeking() const { return m_playerSeeking; };
   bool GetSlideshowShowDescription();
   void SetSlideshowShowDescription(bool show);
   CStdString GetVideoLabel(int item, const CFileItemPtr& file = CFileItemPtr());
@@ -953,7 +952,6 @@ protected:
   //Fullscreen OSD Stuff
   unsigned int m_AfterSeekTimeout;
   int m_seekOffset;
-  bool m_playerSeeking;
   bool m_playerShowTime;
   bool m_playerShowCodec;
   bool m_playerShowInfo;

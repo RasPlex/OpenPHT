@@ -5215,6 +5215,10 @@ msgctxt "#13553"
 msgid "%.1f Seconds"
 msgstr ""
 
+msgctxt "#13557"
+msgid "Skip delay"
+msgstr ""
+
 #empty strings from id 13554 to 13599
 
 msgctxt "#13600"

@@ -124,8 +124,8 @@
       <button id="9">BigStepBack</button>
       <button id="10">BigStepForward</button>
       <button id="12">Pause</button>
-      <!-- pageup     -->      <button id="13">BigStepForward</button>
-      <!-- pagedown   -->      <button id="14">BigStepBack</button>
+      <!-- pageup     -->      <button id="13">ChapterOrBigStepForward</button>
+      <!-- pagedown   -->      <button id="14">ChapterOrBigStepBack</button>
       <!-- SwipeLeft  -->      <button id="80">StepBack</button>
       <!-- SwipeRight -->      <button id="81">StepForward</button>
       <!-- SwipeUp    -->      <button id="82">BigStepForward</button>

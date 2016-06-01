@@ -118,8 +118,6 @@ CGUIInfoManager::CGUIInfoManager(void) :
   m_fanSpeed = 0;
   m_AfterSeekTimeout = 0;
   m_seekOffset = 0;
-  m_playerSeeking = false;
-  m_performingSeek = false;
   m_nextWindowID = WINDOW_INVALID;
   m_prevWindowID = WINDOW_INVALID;
   m_stringParameters.push_back("__ZZZZ__");   // to offset the string parameters by 1 to assure that all entries are non-zero
@@ -223,7 +221,6 @@ const infomap player_labels[] =  {{ "hasmedia",         PLAYER_HAS_MEDIA },     
                                   { "hasduration",      PLAYER_HASDURATION },
                                   { "passthrough",      PLAYER_PASSTHROUGH },
                                   { "cachelevel",       PLAYER_CACHELEVEL },          // labels from here
-                                  { "seekbar",          PLAYER_SEEKBAR },
                                   { "progress",         PLAYER_PROGRESS },
                                   { "progresscache",    PLAYER_PROGRESS_CACHE },
                                   { "volume",           PLAYER_VOLUME },
@@ -242,6 +239,7 @@ const infomap player_param[] =   {{ "art",              PLAYER_ITEM_ART }};
 
 const infomap player_times[] =   {{ "seektime",         PLAYER_SEEKTIME },
                                   { "seekoffset",       PLAYER_SEEKOFFSET },
+                                  { "seekstepsize",     PLAYER_SEEKSTEPSIZE },
                                   { "timeremaining",    PLAYER_TIME_REMAINING },
                                   { "timespeed",        PLAYER_TIME_SPEED },
                                   { "time",             PLAYER_TIME },
@@ -2117,7 +2115,7 @@ bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUI
             value = (int)(g_application.GetCachePercentage());
             break;
           case PLAYER_SEEKBAR:
-            value = (int)g_application.GetSeekHandler()->GetPercent();
+            value = (int)GetSeekPercent();
             break;
           case PLAYER_CACHELEVEL:
             value = (int)(g_application.m_pPlayer->GetCacheLevel());
@@ -2622,7 +2620,7 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
       }
     break;
     case PLAYER_SEEKING:
-      bReturn = m_playerSeeking;
+      bReturn = CSeekHandler::GetInstance().InProgress();
     break;
     case PLAYER_SHOWTIME:
       bReturn = m_playerShowTime;
@@ -3394,6 +3392,15 @@ CStdString CGUIInfoManager::GetMultiInfoLabel(const GUIInfo &info, int contextWi
       return "-" + seekOffset;
     if (m_seekOffset > 0)
       return "+" + seekOffset;
+  }
+  else if (info.m_info == PLAYER_SEEKSTEPSIZE)
+  {
+    int seekSize = CSeekHandler::GetInstance().GetSeekSize();
+    std::string strSeekSize = StringUtils::SecondsToTimeString(abs(seekSize), (TIME_FORMAT)info.GetData1());
+    if (seekSize < 0)
+      return "-" + strSeekSize;
+    if (seekSize > 0)
+      return "+" + strSeekSize;
   }
   else if (info.m_info == PLAYER_ITEM_ART)
   {
@@ -4307,8 +4314,7 @@ CStdString CGUIInfoManager::GetCurrentSeekTime(TIME_FORMAT format) const
 {
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
-  float time = GetTotalPlayTime() * g_application.GetSeekHandler()->GetPercent() * 0.01f;
-  return StringUtils::SecondsToTimeString((int)time, format);
+  return StringUtils::SecondsToTimeString(std::max(0.0, g_application.GetTime() + CSeekHandler::GetInstance().GetSeekSize()), format);
 }
 
 int CGUIInfoManager::GetTotalPlayTime() const
@@ -4321,6 +4327,23 @@ int CGUIInfoManager::GetPlayTimeRemaining() const
 {
   int iReverse = GetTotalPlayTime() - (int)g_application.GetTime();
   return iReverse > 0 ? iReverse : 0;
+}
+
+float CGUIInfoManager::GetSeekPercent() const
+{
+  if (GetTotalPlayTime() == 0)
+    return 0.0f;
+
+  float percentPlayTime = static_cast<float>(GetPlayTime()) / GetTotalPlayTime() * 0.1f;
+  float percentPerSecond = 100.0f / static_cast<float>(GetTotalPlayTime());
+  float percent = percentPlayTime + percentPerSecond * CSeekHandler::GetInstance().GetSeekSize();
+
+  if (percent > 100.0f)
+    percent = 100.0f;
+  if (percent < 0.0f)
+    percent = 0.0f;
+
+  return percent;
 }
 
 CStdString CGUIInfoManager::GetCurrentPlayTimeRemaining(TIME_FORMAT format) const
@@ -4579,7 +4602,6 @@ CStdString CGUIInfoManager::GetBuild()
 
 void CGUIInfoManager::SetDisplayAfterSeek(unsigned int timeOut, int seekOffset)
 {
-  g_infoManager.m_performingSeek = false;
   if (timeOut>0)
   {
     m_AfterSeekTimeout = CTimeUtils::GetFrameTime() +  timeOut;

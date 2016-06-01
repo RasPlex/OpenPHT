@@ -380,12 +380,6 @@ public:
 
   float GetDimScreenSaverLevel() const;
 
-  /*! \brief Retrieve the applications seek handler.
-   \return a constant pointer to the seek handler.
-   \sa CSeekHandler
-   */
-  const CSeekHandler *GetSeekHandler() const { return m_seekHandler; };
-
   bool SwitchToFullScreen();
 
   CSplash* GetSplash() { return m_splash; }
@@ -526,7 +520,6 @@ protected:
   bool InitDirectoriesWin32();
   void CreateUserDirs();
 
-  CSeekHandler *m_seekHandler;
   CInertialScrollingHandler *m_pInertialScrollingHandler;
   CNetwork    *m_network;
 #ifdef HAS_PERFORMANCE_SAMPLE

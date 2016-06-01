@@ -723,6 +723,7 @@ void CGUISettings::Initialize()
 
   // Playback/Music
   CSettingsCategory* mp = AddCategory(SETTINGS_VIDEOS, "musicplayer", 18107);
+  AddInt(mp, "musicplayer.seekdelay", 13557, 750, 0, 250, 3000, SPIN_CONTROL_INT_PLUS, MASK_MS, TEXT_NONE);
   AddSeparator(mp, "musicplayer.sep1");
   AddInt(mp, "musicplayer.crossfade", 13314, 0, 0, 1, 15, SPIN_CONTROL_INT_PLUS, MASK_SECS, TEXT_OFF);
   AddBool(mp, "musicplayer.crossfadealbumtracks", 13400, true);
@@ -831,6 +832,8 @@ void CGUISettings::Initialize()
   // FIXME: hide this setting until it is properly respected. In the meanwhile, default to AUTO.
   //AddInt(5, "videoplayer.displayresolution", 169, (int)RES_AUTORES, (int)RES_AUTORES, 1, (int)CUSTOM+MAX_RESOLUTIONS, SPIN_CONTROL_TEXT);
   AddInt(NULL, "videoplayer.displayresolution", 169, (int)RES_AUTORES, (int)RES_AUTORES, 1, (int)RES_AUTORES, SPIN_CONTROL_TEXT);
+
+  AddInt(adv, "videoplayer.seekdelay", 13557, 750, 0, 250, 3000, SPIN_CONTROL_INT_PLUS, MASK_MS, TEXT_NONE);
 
   map<int, int> adjustTypes;
   adjustTypes.insert(make_pair(351, ADJUST_REFRESHRATE_OFF));

@@ -89,6 +89,7 @@
 #include "peripherals/Peripherals.h"
 #include "peripherals/dialogs/GUIDialogPeripheralManager.h"
 #include "peripherals/devices/PeripheralImon.h"
+#include "utils/SeekHandler.h"
 
 #ifdef _WIN32
 #include "WIN32Util.h"
@@ -1517,6 +1518,8 @@ void CGUIWindowSettingsCategory::OnSettingChanged(BaseSettingControlPtr pSetting
       CLibrefmScrobbler::GetInstance()->Term();
     }
   }
+  else if (strSetting.Equals("videoplayer.seekdelay") || strSetting.Equals("musicplayer.seekdelay"))
+    CSeekHandler::GetInstance().Configure();
   else if (strSetting.Left(22).Equals("MusicPlayer.ReplayGain"))
   { // Update our replaygain settings
     g_guiSettings.m_replayGain.iType = g_guiSettings.GetInt("musicplayer.replaygaintype");
