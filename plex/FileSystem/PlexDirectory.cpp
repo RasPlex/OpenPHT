@@ -513,6 +513,12 @@ CFileItemPtr CPlexDirectory::NewPlexElement(XML_ELEMENT *element, const CFileIte
 
     newItem->SetProperty("key", newItem->GetArt("fanart"));
   }
+  else if (newItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_MOVIE &&
+           newItem->GetProperty("agent").asString() == "com.plexapp.agents.none")
+  {
+    newItem->SetPlexDirectoryType(PLEX_DIR_TYPE_HOME_MOVIES);
+    newItem->SetProperty("type", "homemovies");
+  }
 
   if (newItem->HasProperty("key"))
     newItem->SetPath(newItem->GetProperty("key").asString());

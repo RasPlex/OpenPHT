@@ -630,7 +630,7 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<posy>-3</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie)] + Control.IsVisible(11000)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip)] + Control.IsVisible(11000)</visible>
 								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
 								<control type="group">
 									<include>ListItemPoster</include>
@@ -646,7 +646,7 @@
 							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<posy>100</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie)] + !Control.IsVisible(11000)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip)] + !Control.IsVisible(11000)</visible>
 								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
 								<control type="group">
 									<include>ListItemPoster</include>
@@ -664,14 +664,14 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<posy>-3</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie)] + Control.IsVisible(11000)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip)] + Control.IsVisible(11000)</visible>
 								<include>ListItemPoster</include>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<posy>100</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie)] + !Control.IsVisible(11000)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip)] + !Control.IsVisible(11000)</visible>
 								<include>ListItemPoster</include>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
@@ -713,7 +713,7 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<posy>100</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip) | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
 								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
 								<control type="group">
 									<include>ListItemPoster</include>
@@ -733,7 +733,7 @@
 							</control>
 							<!-- movie & episode when only this list is visible -->
 							<control type="group">
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip) | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
 								<control type="group">
 									<include>ListItemPoster</include>
 								</control>
@@ -773,13 +773,13 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<posy>100</posy>
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip) | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
 								<include>ListItemPoster</include>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 							<!-- tv show episode when  only this list is visible -->
 							<control type="group">
-								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | ListItem.Type(clip) | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
 								<include>ListItemPoster</include>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>

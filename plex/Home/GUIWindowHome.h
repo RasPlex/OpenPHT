@@ -56,10 +56,12 @@ public:
   void Render() { CGUIWindow::Render(); }
   void Process(unsigned int currentTime, CDirtyRegionList &dirtyregions) { CGUIWindow::Process(currentTime, dirtyregions); }
 
+  virtual bool HasListItems() const { return true; };
+  virtual CFileItemPtr GetCurrentListItem(int offset = 0);
+
 private:
   virtual bool OnAction(const CAction &action);
   virtual bool CheckTimer(const CStdString& strExisting, const CStdString& strNew, int title, int line1, int line2);
-  virtual CFileItemPtr GetCurrentListItem(int offset = 0);
 
   void HideAllLists();
   void RestoreSection();

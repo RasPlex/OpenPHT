@@ -383,6 +383,7 @@ bool CGUIWindowHome::OnMessage(CGUIMessage& message)
   {
     m_lastSelectedItem = GetCurrentItemName();
     HideAllLists();
+    CGUIWindow::OnMessage(message);
     return true;
   }
 
@@ -712,6 +713,7 @@ CGUIStaticItemPtr CGUIWindowHome::ItemToSection(CFileItemPtr item)
   newItem->SetProperty("plex", true);
   newItem->SetProperty("sectionPath", item->GetPath());
   newItem->SetProperty("isSecure", item->GetProperty("isSecure"));
+  newItem->SetProperty("type", item->GetProperty("type"));
   newItem->SetPlexDirectoryType(item->GetPlexDirectoryType());
   newItem->m_bIsFolder = true;
 
@@ -788,7 +790,7 @@ void CGUIWindowHome::UpdateSections()
   if (g_guiSettings.GetBool("myplex.sharedsectionsonhome") && g_plexApplication.dataLoader->HasSharedSections())
   {
     CFileItemListPtr sharedSections = g_plexApplication.dataLoader->GetAllSharedSections();
-	sections->Append(*sharedSections.get());
+    sections->Append(*sharedSections.get());
   }
 
   for (int i = 0; i < oldList.size(); i ++)
@@ -902,6 +904,8 @@ void CGUIWindowHome::UpdateSections()
     item->SetProperty("plexchannels", true);
     item->SetProperty("sectionPath", "plexserver://channels/");
     item->SetProperty("navigateDirectly", true);
+    item->SetProperty("type", "channels");
+    item->SetPlexDirectoryType(PLEX_DIR_TYPE_CHANNELS);
 
     item->SetPath("XBMC.ActivateWindow(MyChannels,plexserver://channels,return)");
     item->SetClickActions(CGUIAction("", item->GetPath()));
@@ -921,6 +925,7 @@ void CGUIWindowHome::UpdateSections()
     item->SetPath("XBMC.ActivateWindow(MySharedContent,plexserver://shared,return)");
     item->SetClickActions(CGUIAction("", item->GetPath()));
     item->SetProperty("navigateDirectly", true);
+    item->SetProperty("type", "sharedsections");
     newList.push_back(item);
     listUpdated = true;
   }
@@ -953,6 +958,8 @@ void CGUIWindowHome::AddPlaylists(std::vector<CGUIListItemPtr>& list, bool& upda
   item->SetClickActions(CGUIAction("", item->GetPath()));
   item->SetProperty("sectionPath", path);
   item->SetProperty("navigateDirectly", true);
+  item->SetProperty("type", "playlists");
+  item->SetPlexDirectoryType(PLEX_DIR_TYPE_PLAYLIST);
 
   AddSection(path, CPlexSectionFanout::SECTION_TYPE_PLAYLISTS, true);
 

@@ -2103,25 +2103,20 @@ CStdString CGUIInfoManager::GetLabel(int info, int contextWindow, CStdString *fa
 // tries to get a integer value for use in progressbars/sliders and such
 bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUIListItem *item /* = NULL */) const
 {
-  /* PLEX */
-  // if we dont come with a valid item here, we try to grab the current window one, like we do for labels
-  if (!item)
-  {
-    CGUIWindow *window = GetWindowWithCondition(contextWindow, WINDOW_CONDITION_HAS_LIST_ITEMS); // true for has list items
-    if (window)
-    {
-      CFileItemPtr fileitem = window->GetCurrentListItem();
-      if (fileitem)
-        item = fileitem.get();
-    }
-  }
-  /* END PLEX */
-
   if (info >= MULTI_INFO_START && info <= MULTI_INFO_END)
     return GetMultiInfoInt(value, m_multiInfo[info - MULTI_INFO_START], contextWindow);
 
   if (info >= LISTITEM_START && info <= LISTITEM_END)
+  {
+    if (item == NULL)
+    {
+      CGUIWindow *window = GetWindowWithCondition(contextWindow, WINDOW_CONDITION_HAS_LIST_ITEMS); // true for has list items
+      if (window)
+        item = window->GetCurrentListItem().get();
+    }
+
     return GetItemInt(value, item, info);
+  }
 
   value = 0;
   switch( info )
@@ -2276,8 +2271,20 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
   bool bReturn = false;
   int condition = abs(condition1);
 
-  if (item && condition >= LISTITEM_START && condition < LISTITEM_END)
-    bReturn = GetItemBool(item, condition);
+  if (condition >= LISTITEM_START && condition < LISTITEM_END)
+  {
+    if (item)
+      bReturn = GetItemBool(item, condition);
+    else
+    {
+      CGUIWindow *window = GetWindowWithCondition(contextWindow, WINDOW_CONDITION_HAS_LIST_ITEMS); // true for has list items
+      if (window)
+      {
+        CFileItemPtr item = window->GetCurrentListItem();
+        bReturn = GetItemBool(item.get(), condition);
+      }
+    }
+  }
   // Ethernet Link state checking
   // Will check if system has a Ethernet Link connection! [Cable in!]
   // This can used for the skinner to switch off Network or Inter required functions
