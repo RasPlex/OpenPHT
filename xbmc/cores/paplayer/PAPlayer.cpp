@@ -651,7 +651,7 @@ inline void PAPlayer::ProcessStreams(double &freeBufferTime)
       {
         if (si->m_waitOnDrain)
         {
-          si->m_stream->Drain();
+          si->m_stream->Drain(true);
           si->m_waitOnDrain = false;
         }
         si->m_prepareTriggered = true;
@@ -671,7 +671,7 @@ inline void PAPlayer::ProcessStreams(double &freeBufferTime)
           {
             if (si->m_waitOnDrain)
             {
-              si->m_stream->Drain();
+              si->m_stream->Drain(true);
               si->m_waitOnDrain = false;
             }
             m_callback.OnQueueNextItem();
@@ -689,7 +689,7 @@ inline void PAPlayer::ProcessStreams(double &freeBufferTime)
       /* unregister the audio callback */
       si->m_stream->UnRegisterAudioCallback();
       si->m_decoder.Destroy();      
-      si->m_stream->Drain();
+      si->m_stream->Drain(false);
       m_finishing.push_back(si);
       return;
     }
@@ -856,15 +856,15 @@ bool PAPlayer::QueueData(StreamInfo *si)
   // we want complete frames
   samples -= samples % si->m_channelInfo.Count();
 
-  void* data = si->m_decoder.GetData(samples);
+  uint8_t* data = (uint8_t*)si->m_decoder.GetData(samples);
   if (!data)
   {
     CLog::Log(LOGERROR, "PAPlayer::QueueData - Failed to get data from the decoder");
     return false;
   }
 
-  unsigned int added = si->m_stream->AddData(data, samples * si->m_bytesPerSample);
-  si->m_framesSent += added / si->m_bytesPerFrame;
+  unsigned int added = si->m_stream->AddData(&data, 0, samples/si->m_channelInfo.Count(), 0);
+  si->m_framesSent += added;
 
   const ICodec* codec = si->m_decoder.GetCodec();
   m_playerGUIData.m_cacheLevel = codec ? codec->GetCacheLevel() : 0; //update for GUI

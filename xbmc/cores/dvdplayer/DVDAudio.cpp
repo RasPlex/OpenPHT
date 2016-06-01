@@ -202,9 +202,9 @@ DWORD CDVDAudio::AddPacketsRenderer(unsigned char* data, DWORD len, CSingleLock 
   DWORD  copied;
   do
   {
-    copied = m_pAudioStream->AddData(data, len);
-    data += copied;
-    len -= copied;
+    copied = m_pAudioStream->AddData(&data, 0, len / m_dwPacketSize);
+    data += copied * m_dwPacketSize;
+    len -= copied * m_dwPacketSize;
     if (len < m_dwPacketSize)
       break;
 
@@ -308,7 +308,7 @@ void CDVDAudio::Drain()
   Finish();
   CSingleLock lock (m_critSection);
   if (m_pAudioStream)
-    m_pAudioStream->Drain();
+    m_pAudioStream->Drain(true);
 }
 
 void CDVDAudio::RegisterAudioCallback(IAudioCallback* pCallback)

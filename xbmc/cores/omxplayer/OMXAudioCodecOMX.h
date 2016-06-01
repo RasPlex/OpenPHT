@@ -20,7 +20,7 @@
  *
  */
 
-#include "cores/AudioEngine/AEAudioFormat.h"
+#include "cores/AudioEngine/Utils/AEAudioFormat.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

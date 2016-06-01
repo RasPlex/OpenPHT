@@ -24,6 +24,7 @@
 #include "system.h"
 
 #include "DVDAudioCodec.h"
+#include "utils/StdString.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"

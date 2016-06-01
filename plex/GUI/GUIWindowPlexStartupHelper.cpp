@@ -24,8 +24,8 @@
 #include "addons/Skin.h"
 
 #ifdef TARGET_DARWIN_OSX
-#include "cores/AudioEngine/Engines/CoreAudio/CoreAudioDevice.h"
-#include "cores/AudioEngine/Engines/CoreAudio/CoreAudioHardware.h"
+#include "cores/AudioEngine/Sinks/osx/CoreAudioDevice.h"
+#include "cores/AudioEngine/Sinks/osx/CoreAudioHardware.h"
 #endif
 
 #include <boost/foreach.hpp>

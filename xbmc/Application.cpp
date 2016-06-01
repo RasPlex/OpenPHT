@@ -3853,8 +3853,6 @@ void CApplication::Stop(int exitCode)
 #ifndef __PLEX__
     SaveFileState(true);
 #else
-    g_audioManager.Enable(false);
-    g_audioManager.UnLoad();
     UpdateFileState("stopped");
 #endif
     

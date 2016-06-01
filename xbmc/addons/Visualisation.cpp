@@ -28,8 +28,8 @@
 #include "windowing/WindowingFactory.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
+#include "cores/IPlayer.h"
 #include "cores/AudioEngine/AEFactory.h"
-#include "cores/AudioEngine/Utils/AEConvert.h"
 #ifdef _LINUX
 #include <dlfcn.h>
 #include "filesystem/SpecialProtocol.h"
@@ -106,8 +106,7 @@ bool CVisualisation::Create(int x, int y, int w, int h)
 
     CreateBuffers();
 
-    if (g_application.m_pPlayer)
-      g_application.m_pPlayer->RegisterAudioCallback(this);
+    CAEFactory::RegisterAudioCallback(this);
 
     return true;
   }
@@ -171,7 +170,7 @@ void CVisualisation::Render()
 
 void CVisualisation::Stop()
 {
-  if (g_application.m_pPlayer) g_application.m_pPlayer->UnRegisterAudioCallback();
+  CAEFactory::UnregisterAudioCallback();
   if (Initialized())
   {
     CAddonDll<DllVisualisation, Visualisation, VIS_PROPS>::Stop();

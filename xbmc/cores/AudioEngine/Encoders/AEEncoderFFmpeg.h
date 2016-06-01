@@ -1,7 +1,7 @@
 #pragma once
 /*
- *      Copyright (C) 2010-2012 Team XBMC
- *      http://www.xbmc.org
+ *      Copyright (C) 2010-2013 Team XBMC
+ *      http://xbmc.org
  *
  *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,6 @@
  */
 
 #include "cores/AudioEngine/Interfaces/AEEncoder.h"
-#include "cores/AudioEngine/Utils/AERemap.h"
 #include "cores/AudioEngine/Utils/AEPackIEC61937.h"
 
 extern "C" {
@@ -36,27 +35,30 @@ public:
   CAEEncoderFFmpeg();
   virtual ~CAEEncoderFFmpeg();
 
-  virtual bool IsCompatible(AEAudioFormat format);
-  virtual bool Initialize(AEAudioFormat &format);
+  virtual bool IsCompatible(const AEAudioFormat& format);
+  virtual bool Initialize(AEAudioFormat &format, bool allow_planar_input = false);
   virtual void Reset();
 
   virtual unsigned int GetBitRate    ();
-  virtual AVCodecID    GetCodecID();
+  virtual AVCodecID    GetCodecID    ();
   virtual unsigned int GetFrames     ();
 
   virtual int Encode (float *data, unsigned int frames);
+  virtual int Encode (uint8_t *in, int in_size, uint8_t *out, int out_size);
   virtual int GetData(uint8_t **data);
   virtual double GetDelay(unsigned int bufferSize);
 private:
   std::string                m_CodecName;
-  AVCodecID                 m_CodecID;
+  AVCodecID                  m_CodecID;
   unsigned int              m_BitRate;
   CAEPackIEC61937::PackFunc m_PackFunc;
 
   AEAudioFormat     m_CurrentFormat;
   AVCodecContext   *m_CodecCtx;
+  SwrContext       *m_SwrCtx;
   CAEChannelInfo    m_Layout;
-  uint8_t           m_Buffer[IEC61937_DATA_OFFSET + AV_INPUT_BUFFER_MIN_SIZE];
+  AVPacket          m_Pkt;
+  uint8_t           m_Buffer[IEC61937_DATA_OFFSET + FF_MIN_BUFFER_SIZE];
   int               m_BufferSize;
   int               m_OutputSize;
   double            m_OutputRatio;
@@ -65,5 +67,9 @@ private:
   unsigned int      m_NeededFrames;
 
   unsigned int BuildChannelLayout(const int64_t ffmap, CAEChannelInfo& layout);
+
+  bool              m_NeedConversion;
+  uint8_t          *m_ResampBuffer;
+  int               m_ResampBufferSize;
 };
 

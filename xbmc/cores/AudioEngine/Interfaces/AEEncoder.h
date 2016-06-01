@@ -1,7 +1,7 @@
 #pragma once
 /*
- *      Copyright (C) 2010-2012 Team XBMC
- *      http://www.xbmc.org
+ *      Copyright (C) 2010-2013 Team XBMC
+ *      http://xbmc.org
  *
  *  This Program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  */
 
-#include "cores/AudioEngine/AEAudioFormat.h"
+#include "cores/AudioEngine/Utils/AEAudioFormat.h"
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -46,14 +46,15 @@ public:
    * @param format the format to compare
    * @return true if compatible, false if not
    */
-  virtual bool IsCompatible(AEAudioFormat format) = 0;
+  virtual bool IsCompatible(const AEAudioFormat& format) = 0;
 
   /**
    * Called to setup the encoder to accept data in the specified format
    * @param format the desired audio format, may be changed to suit the encoder
+   * @param allow_planar_input allow engine to use with planar formats
    * @return true on success, false on failure
    */
-  virtual bool Initialize(AEAudioFormat &format) = 0;
+  virtual bool Initialize(AEAudioFormat &format, bool allow_planar_input = false) = 0;
 
   /**
    * Reset the encoder for new data
@@ -85,6 +86,16 @@ public:
    * @return the number of samples consumed
    */
   virtual int Encode(float *data, unsigned int frames) = 0;
+
+  /**
+   * Encodes the supplied samples into a provided buffer
+   * @param in the PCM samples encoder requested format
+   * @param in_size input buffer size
+   * @param output buffer
+   * @param out_size output buffer size
+   * @return the number of samples consumed
+   */
+  virtual int Encode (uint8_t *in, int in_size, uint8_t *out, int out_size) { return 0; };
 
   /**
    * Get the encoded data
