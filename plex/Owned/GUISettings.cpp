@@ -347,79 +347,88 @@ void CGUISettings::Initialize()
   // System/Audio output
   CSettingsCategory* ao = AddCategory(SETTINGS_SYSTEM, "audiooutput", 772);
 
-  map<int,int> audiomode;
-  audiomode.insert(make_pair(338,AUDIO_ANALOG));
-  audiomode.insert(make_pair(339,AUDIO_IEC958));
-  audiomode.insert(make_pair(420,AUDIO_HDMI  ));
-#if defined(TARGET_RASPBERRY_PI)
-  AddInt(ao, "audiooutput.mode", 337, AUDIO_HDMI, audiomode, SPIN_CONTROL_TEXT);
-#else
-  AddInt(ao, "audiooutput.mode", 337, AUDIO_ANALOG, audiomode, SPIN_CONTROL_TEXT);
-#endif
+  AddString(ao, "audiooutput.audiodevice", 545, CStdString(CAEFactory::GetDefaultDevice(false)), SPIN_CONTROL_TEXT);
 
-  AddInt(ao, "audiooutput.defaultdelay", 297, 0, (int)(-g_advancedSettings.m_videoAudioDelayRange*1000), 25, (int)(g_advancedSettings.m_videoAudioDelayRange*1000), SPIN_CONTROL_INT_PLUS, MASK_MS, TEXT_OFF);
-#if defined(TARGET_DARWIN_IOS)
-  CSettingsCategory* aocat = g_sysinfo.IsAppleTV2() ? ao : NULL;
-#else
-  CSettingsCategory* aocat = ao;
-#endif
-  AddBool(aocat, "audiooutput.ac3passthrough"   , 364, true);
-  AddBool(aocat, "audiooutput.eac3passthrough"  , 472, true);
-  AddBool(aocat, "audiooutput.dtspassthrough"   , 254, true);
-#if !defined(TARGET_DARWIN) && !defined(TARGET_RASPBERRY_PI)
-  AddBool(aocat, "audiooutput.passthroughaac"   , 299, true);
-#else
-  AddBool(NULL, "audiooutput.passthroughaac"   , 299, false);
-#endif
-#if !defined(TARGET_DARWIN_IOS) && !defined(TARGET_RASPBERRY_PI)
-  AddBool(aocat, "audiooutput.multichannellpcm" , 348, true );
-#else
-  AddBool(NULL, "audiooutput.multichannellpcm" , 348, false );
-#endif
-#if !defined(TARGET_DARWIN) && !defined(TARGET_RASPBERRY_PI)
-  AddBool(aocat, "audiooutput.truehdpassthrough", 349, false );
-  AddBool(aocat, "audiooutput.dtshdpassthrough" , 347, false );
-#else
-  AddBool(NULL, "audiooutput.truehdpassthrough", 349, false );
-  AddBool(NULL, "audiooutput.dtshdpassthrough" , 347, false );
-#endif
-
-#ifdef TARGET_RASPBERRY_PI
-  AddBool(ao, "audiooutput.supportdtshdcpudecoding", 38118, false);
-#endif
-  AddBool(ao, "audiooutput.stereoupmix", 252, false);
-  AddBool(ao, "audiooutput.normalizelevels", 346, true);
-#ifdef TARGET_RASPBERRY_PI
-  AddInt(ao, "audiooutput.boostcenter", 36043, 0, 0, 1, 30, SPIN_CONTROL_INT);
-#endif
-
-  map<int,int> channelLayout;
-  for(int layout = AE_CH_LAYOUT_2_0; layout < AE_CH_LAYOUT_MAX; ++layout)
+  map<int, int> channelLayout;
+  for (int layout = AE_CH_LAYOUT_2_0; layout < AE_CH_LAYOUT_MAX; ++layout)
     channelLayout.insert(make_pair(34100 + layout, layout));
-  AddInt(ao, "audiooutput.channels", 18110, AE_CH_LAYOUT_2_0, channelLayout, SPIN_CONTROL_TEXT);
+  AddInt(ao, "audiooutput.channels", 34100, AE_CH_LAYOUT_2_0, channelLayout, SPIN_CONTROL_TEXT);
 
-#if defined(TARGET_DARWIN)
-#if defined(TARGET_DARWIN_IOS)
-  CStdString defaultDeviceName = "Default";
+  // Plex stuff
+  AddInt(ao, "audiooutput.defaultdelay", 297, 0, (int)(-g_advancedSettings.m_videoAudioDelayRange * 1000), 25, (int)(g_advancedSettings.m_videoAudioDelayRange * 1000), SPIN_CONTROL_INT_PLUS, MASK_MS, TEXT_OFF);
+
+  map<int, int> outputConfig;
+  outputConfig.insert(make_pair(338, AE_CONFIG_FIXED));
+  outputConfig.insert(make_pair(339, AE_CONFIG_AUTO));
+  outputConfig.insert(make_pair(420, AE_CONFIG_MATCH));
+  AddInt(ao, "audiooutput.config", 337, AE_CONFIG_AUTO, outputConfig, SPIN_CONTROL_TEXT);
+
+  map<int, int> samplerate;
+  samplerate.insert(make_pair(34124, 44100));
+  samplerate.insert(make_pair(34125, 48000));
+  samplerate.insert(make_pair(34126, 88200));
+  samplerate.insert(make_pair(34127, 96000));
+  samplerate.insert(make_pair(34128, 192000));
+  AddInt(ao, "audiooutput.samplerate", 458, 48000, samplerate, SPIN_CONTROL_TEXT);
+
+  AddBool(ao, "audiooutput.stereoupmix", 252, false);
+  AddBool(ao, "audiooutput.maintainoriginalvolume", 346, true);
+  AddInt(ao, "audiooutput.boostcenter", 38007, 0, 0, 1, 30, SPIN_CONTROL_INT, MASK_DB);
+
+  map<int, int> processquality;
+  if (CAEFactory::GetEngine() && CAEFactory::GetEngine()->SupportsQualityLevel(AE_QUALITY_LOW))
+    processquality.insert(make_pair(13506, AE_QUALITY_LOW));
+  if (CAEFactory::GetEngine() && CAEFactory::GetEngine()->SupportsQualityLevel(AE_QUALITY_MID))
+    processquality.insert(make_pair(13507, AE_QUALITY_MID));
+  if (CAEFactory::GetEngine() && CAEFactory::GetEngine()->SupportsQualityLevel(AE_QUALITY_HIGH))
+    processquality.insert(make_pair(13508, AE_QUALITY_HIGH));
+  if (CAEFactory::GetEngine() && CAEFactory::GetEngine()->SupportsQualityLevel(AE_QUALITY_REALLYHIGH))
+    processquality.insert(make_pair(13509, AE_QUALITY_REALLYHIGH));
+  if (CAEFactory::GetEngine() && CAEFactory::GetEngine()->SupportsQualityLevel(AE_QUALITY_GPU))
+    processquality.insert(make_pair(38010, AE_QUALITY_GPU));
+#ifdef TARGET_RASPBERRY_PI
+  AddInt(ao, "audiooutput.processquality", 13505, AE_QUALITY_GPU, processquality, SPIN_CONTROL_TEXT);
 #else
-  CStdString defaultDeviceName;
-  CCoreAudioHardware::GetOutputDeviceName(defaultDeviceName);
+  AddInt(ao, "audiooutput.processquality", 13505, AE_QUALITY_MID, processquality, SPIN_CONTROL_TEXT);
 #endif
-  AddString(ao, "audiooutput.audiodevice", 545, defaultDeviceName.c_str(), SPIN_CONTROL_TEXT);
-  AddString(ao, "audiooutput.passthroughdevice", 546, defaultDeviceName.c_str(), SPIN_CONTROL_TEXT);
-#else
+
+  map<int, int> streamsilence;
+  streamsilence.insert(make_pair(20422, XbmcThreads::EndTime::InfiniteValue));
+  streamsilence.insert(make_pair(13551, 0));
+  for (int seconds = 1; seconds <= 10; seconds++)
+    streamsilence.insert(make_pair(38500 + seconds, seconds));
+  AddInt(ao, "audiooutput.streamsilence", 421, 1, streamsilence, SPIN_CONTROL_TEXT);
+
+  AddBool(ao, "audiooutput.supportdtshdcpudecoding", 38019, false);
+
   AddSeparator(ao, "audiooutput.sep1");
-  AddString   (ao, "audiooutput.audiodevice"      , 545, CStdString(CAEFactory::GetDefaultDevice(false)), SPIN_CONTROL_TEXT);
-  AddString   (ao, "audiooutput.passthroughdevice", 546, CStdString(CAEFactory::GetDefaultDevice(true )), SPIN_CONTROL_TEXT);
-  AddSeparator(ao, "audiooutput.sep2");
-#endif
 
-  map<int,int> guimode;
-  guimode.insert(make_pair(34121, AE_SOUND_IDLE  ));
+  map<int, int> guimode;
+  guimode.insert(make_pair(34121, AE_SOUND_IDLE));
   guimode.insert(make_pair(34122, AE_SOUND_ALWAYS));
-  guimode.insert(make_pair(34123, AE_SOUND_OFF   ));
+  guimode.insert(make_pair(34123, AE_SOUND_OFF));
   AddInt(ao, "audiooutput.guisoundmode", 34120, AE_SOUND_IDLE, guimode, SPIN_CONTROL_TEXT);
 
+  AddSeparator(ao, "audiooutput.sep2");
+
+  AddBool(ao, "audiooutput.passthrough", 348, false);
+  AddString(ao, "audiooutput.passthroughdevice", 546, CStdString(CAEFactory::GetDefaultDevice(true)), SPIN_CONTROL_TEXT);
+
+  AddBool(ao, "audiooutput.ac3passthrough", 364, true);
+  AddBool(ao, "audiooutput.ac3transcode", 667, false);
+#ifndef TARGET_DARWIN
+  AddBool(ao, "audiooutput.eac3passthrough", 448, false);
+#else
+  AddBool(NULL, "audiooutput.eac3passthrough", 448, false);
+#endif
+  AddBool(ao, "audiooutput.dtspassthrough", 254, false);
+#ifndef TARGET_DARWIN
+  AddBool(ao, "audiooutput.truehdpassthrough", 349, false);
+  AddBool(ao, "audiooutput.dtshdpassthrough", 347, false);
+#else
+  AddBool(NULL, "audiooutput.truehdpassthrough", 349, false);
+  AddBool(NULL, "audiooutput.dtshdpassthrough", 347, false);
+#endif
 
 
   // System/Power saving
@@ -1423,11 +1432,9 @@ void CGUISettings::LoadXML(TiXmlElement *pRootElement, bool hideSettings /* = fa
   // FIXME: Check if the hardware supports it (if possible ;)
   //SetBool("audiooutput.ac3passthrough", g_audioConfig.GetAC3Enabled());
   //SetBool("audiooutput.dtspassthrough", g_audioConfig.GetDTSEnabled());
-  CLog::Log(LOGINFO, "Using %s output", GetInt("audiooutput.mode") == AUDIO_ANALOG ? "analog" : "digital");
   CLog::Log(LOGINFO, "AC3 pass through is %s", GetBool("audiooutput.ac3passthrough") ? "enabled" : "disabled");
   CLog::Log(LOGINFO, "EAC3 pass through is %s", GetBool("audiooutput.eac3passthrough") ? "enabled" : "disabled");
   CLog::Log(LOGINFO, "DTS pass through is %s", GetBool("audiooutput.dtspassthrough") ? "enabled" : "disabled");
-  CLog::Log(LOGINFO, "AAC pass through is %s", GetBool("audiooutput.passthroughaac") ? "enabled" : "disabled");
 
 #if defined(TARGET_DARWIN)
   // trap any previous vsync by driver setting, does not exist on OSX

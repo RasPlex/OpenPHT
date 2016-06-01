@@ -1620,7 +1620,6 @@ bool CApplication::Initialize()
       if (g_SkinInfo->HasSkinFile("PlexStartupHelper.xml") && !g_guiSettings.GetBool("system.firstrunwizard"))
       {
 #ifdef TARGET_RASPBERRY_PI
-        g_guiSettings.SetInt("audiooutput.mode", AUDIO_HDMI);
         g_guiSettings.SetInt("audiooutput.channels", AE_CH_LAYOUT_2_0); // this is why sound is stereo FIXME
         g_guiSettings.SetBool("audiooutput.ac3passthrough", false);
         g_guiSettings.SetBool("audiooutput.eac3passthrough", false);
@@ -3135,18 +3134,9 @@ bool CApplication::OnAction(const CAction &action)
 
   if (action.GetID() == ACTION_TOGGLE_DIGITAL_ANALOG)
   {
-    // we are only allowed to SetInt to a value supported in GUISettings, so we keep trying until it sticks
-    int mode = g_guiSettings.GetInt("audiooutput.mode");
-    for (int i = 0; i < AUDIO_COUNT; i++)
-    {
-      if (++mode == AUDIO_COUNT)
-        mode = 0;
-      g_guiSettings.SetInt("audiooutput.mode", mode);
-      if (g_guiSettings.GetInt("audiooutput.mode") == mode)
-         break;
-    }
+    bool passthrough = g_guiSettings.GetBool("audiooutput.passthrough");
+    g_guiSettings.SetBool("audiooutput.passthrough", !passthrough);
 
-    g_application.Restart();
     if (g_windowManager.GetActiveWindow() == WINDOW_SETTINGS_SYSTEM)
     {
       CGUIMessage msg(GUI_MSG_WINDOW_INIT, 0,0,WINDOW_INVALID,g_windowManager.GetActiveWindow());

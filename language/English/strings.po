@@ -917,7 +917,7 @@ msgid "Select destination directory"
 msgstr ""
 
 msgctxt "#252"
-msgid "Output stereo to all speakers"
+msgid "Stereo upmix"
 msgstr ""
 
 msgctxt "#253"
@@ -1247,15 +1247,15 @@ msgid "Framerate conversion"
 msgstr ""
 
 msgctxt "#337"
-msgid "Audio output"
+msgid "Output configuration"
 msgstr ""
 
 msgctxt "#338"
-msgid "Analog"
+msgid "Fixed"
 msgstr ""
 
 msgctxt "#339"
-msgid "Optical/Coax"
+msgid "Optimized"
 msgstr ""
 
 msgctxt "#340"
@@ -1283,7 +1283,7 @@ msgid "Year"
 msgstr ""
 
 msgctxt "#346"
-msgid "Boost volume level on downmix"
+msgid "Maintain original volume on downmix"
 msgstr ""
 
 #: xbmc/settings/GUISettings.cpp
@@ -1293,7 +1293,7 @@ msgstr ""
 
 #: xbmc/settings/GUISettings.cpp
 msgctxt "#348"
-msgid "- Multichannel LPCM capable receiver"
+msgid "Enable passthrough"
 msgstr ""
 
 #: xbmc/settings/GUISettings.cpp
@@ -1604,10 +1604,12 @@ msgid "High"
 msgstr ""
 
 msgctxt "#420"
-msgid "HDMI"
+msgid "Best match"
 msgstr ""
 
-#empty string with id 421
+msgctxt "#421"
+msgid "Keep audio device alive"
+msgstr ""
 
 msgctxt "#422"
 msgid "Delete album info"
@@ -1715,7 +1717,7 @@ msgid "Autorun media"
 msgstr ""
 
 msgctxt "#448"
-msgid "LCD"
+msgid "- Dolby Digital Plus (E-AC3) capable receiver"
 msgstr ""
 
 msgctxt "#449"
@@ -1754,7 +1756,9 @@ msgctxt "#457"
 msgid "Switch view"
 msgstr ""
 
-#empty string with id 458
+msgctxt "#458"
+msgid "- Limit sampling rate (kHz)"
+msgstr ""
 
 msgctxt "#459"
 msgid "Subs"
@@ -1808,11 +1812,7 @@ msgctxt "#471"
 msgid "Modchip"
 msgstr ""
 
-msgctxt "#472"
-msgid "- Dolby Digital Plus (E-AC3) capable receiver"
-msgstr ""
-
-#empty string with id 473
+#empty strings from id 472 to 473
 
 msgctxt "#474"
 msgid "Off"
@@ -2512,6 +2512,10 @@ msgstr ""
 
 msgctxt "#665"
 msgid "Compression level"
+msgstr ""
+
+msgctxt "#667"
+msgid "  - Enable Dolby Digital (AC3) transcoding"
 msgstr ""
 
 #empty strings from id 666 to 699
@@ -5137,11 +5141,11 @@ msgid "Video clock (Drop/Dupe audio)"
 msgstr ""
 
 msgctxt "#13503"
-msgid "Video clock (Resample audio)"
+msgid "Resample audio"
 msgstr ""
 
 msgctxt "#13504"
-msgid "Maximum resample amount (%)"
+msgid "Adjust PLL"
 msgstr ""
 
 msgctxt "#13505"
@@ -5149,7 +5153,7 @@ msgid "Resample quality"
 msgstr ""
 
 msgctxt "#13506"
-msgid "Low(fast)"
+msgid "Low (fast)"
 msgstr ""
 
 msgctxt "#13507"
@@ -5161,7 +5165,7 @@ msgid "High"
 msgstr ""
 
 msgctxt "#13509"
-msgid "Really high(slow!)"
+msgid "Really high (slow)"
 msgstr ""
 
 msgctxt "#13510"
@@ -11053,7 +11057,7 @@ msgstr ""
 #empty strings from id 34006 to 34099
 
 msgctxt "#34100"
-msgid "Speaker Configuration"
+msgid "Number of channels"
 msgstr ""
 
 msgctxt "#34101"
@@ -11122,8 +11126,28 @@ msgctxt "#34123"
 msgid "Never"
 msgstr ""
 
-#empty strings from id 34124 to 34200
-#34124-34200 reserved for future use
+msgctxt "#34124"
+msgid "44.1"
+msgstr ""
+
+msgctxt "#34125"
+msgid "48.0"
+msgstr ""
+
+msgctxt "#34126"
+msgid "88.2"
+msgstr ""
+
+msgctxt "#34127"
+msgid "96.0"
+msgstr ""
+
+msgctxt "#34128"
+msgid "192.0"
+msgstr ""
+
+#empty strings from id 34129 to 34200
+#34129-34200 reserved for future use
 
 msgctxt "#34201"
 msgid "Can't find a next item to play"
@@ -11477,6 +11501,22 @@ msgctxt "#37030"
 msgid "Unlimited"
 msgstr ""
 
+msgctxt "#38010"
+msgid "GPU accelerated"
+msgstr ""
+
+msgctxt "#38019"
+msgid "Support 8 channel DTS-HD audio decoding"
+msgstr ""
+
+msgctxt "#38007"
+msgid "Boost centre channel when downmixing"
+msgstr ""
+
+msgctxt "#38009"
+msgid "%i dB"
+msgstr ""
+
 #: system/peripherals.xml
 msgctxt "#38050"
 msgid "Remote button press delay before repeating (ms)"
@@ -11492,7 +11532,42 @@ msgctxt "#38052"
 msgid "Remote button press release time (ms)"
 msgstr ""
 
-#: system/settings/settings.xml
-msgctxt "#38118"
-msgid "Support 8 channel DTS-HD audio decoding"
+msgctxt "#38501"
+msgid "1 second"
+msgstr ""
+
+msgctxt "#38502"
+msgid "2 seconds"
+msgstr ""
+
+msgctxt "#38503"
+msgid "3 seconds"
+msgstr ""
+
+msgctxt "#38504"
+msgid "4 seconds"
+msgstr ""
+
+msgctxt "#38505"
+msgid "5 seconds"
+msgstr ""
+
+msgctxt "#38506"
+msgid "6 seconds"
+msgstr ""
+
+msgctxt "#38507"
+msgid "7 seconds"
+msgstr ""
+
+msgctxt "#38508"
+msgid "8 seconds"
+msgstr ""
+
+msgctxt "#38509"
+msgid "9 seconds"
+msgstr ""
+
+msgctxt "#38510"
+msgid "10 seconds"
 msgstr ""

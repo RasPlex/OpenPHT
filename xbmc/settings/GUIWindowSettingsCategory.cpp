@@ -636,6 +636,60 @@ void CGUIWindowSettingsCategory::UpdateSettings()
     BaseSettingControlPtr pSettingControl = m_vecSettings[i];
     pSettingControl->Update();
     CStdString strSetting = pSettingControl->GetSetting()->GetSetting();
+
+    if ( strSetting.Equals("audiooutput.channels")
+      || strSetting.Equals("audiooutput.samplerate")
+      || strSetting.Equals("audiooutput.stereoupmix")
+      || strSetting.Equals("audiooutput.passthrough"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+        pControl->SetVisible(CAEFactory::IsSettingVisible(strSetting));
+    }
+    else if (strSetting.Equals("audiooutput.processquality"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+        pControl->SetVisible(CAEFactory::SupportsQualitySetting());
+    }
+    else if (strSetting.Equals("audiooutput.supportdtshdcpudecoding"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+        pControl->SetEnabled(!g_guiSettings.GetBool("audiooutput.passthrough") || (!g_guiSettings.GetBool("audiooutput.dtshdpassthrough") && !g_guiSettings.GetBool("audiooutput.dtspassthrough")));
+    }
+    else if (strSetting.Equals("audiooutput.passthroughdevice")
+      || strSetting.Equals("audiooutput.ac3passthrough")
+      || strSetting.Equals("audiooutput.dtspassthrough"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+      {
+        pControl->SetVisible(CAEFactory::IsSettingVisible("audiooutput.passthrough"));
+        pControl->SetEnabled(g_guiSettings.GetBool("audiooutput.passthrough"));
+      }
+    }
+    else if (strSetting.Equals("audiooutput.ac3transcode"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+      {
+        pControl->SetVisible(CAEFactory::IsSettingVisible(strSetting));
+        pControl->SetEnabled(g_guiSettings.GetBool("audiooutput.passthrough") && g_guiSettings.GetBool("audiooutput.ac3passthrough"));
+      }
+    }
+    else if (strSetting.Equals("audiooutput.eac3passthrough")
+      || strSetting.Equals("audiooutput.truehdpassthrough")
+      || strSetting.Equals("audiooutput.dtshdpassthrough"))
+    {
+      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
+      if (pControl)
+      {
+        pControl->SetVisible(CAEFactory::IsSettingVisible(strSetting));
+        pControl->SetEnabled(g_guiSettings.GetBool("audiooutput.passthrough"));
+      }
+    }
+
 #ifdef HAVE_LIBVDPAU
     if (strSetting.Equals("videoplayer.vdpauUpscalingLevel"))
     {
@@ -847,30 +901,6 @@ void CGUIWindowSettingsCategory::UpdateSettings()
     { // only visible if we are doing FLAC ripping
       CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
       if (pControl) pControl->SetEnabled(g_guiSettings.GetInt("audiocds.encoder") == CDDARIP_ENCODER_FLAC);
-    }
-    else if (
-             strSetting.Equals("audiooutput.passthroughdevice") ||
-             strSetting.Equals("audiooutput.ac3passthrough") ||
-             strSetting.Equals("audiooutput.eac3passthrough") ||
-             strSetting.Equals("audiooutput.dtspassthrough") ||
-             strSetting.Equals("audiooutput.passthroughaac"))
-    { // only visible if we are in digital mode
-      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
-      if (pControl) pControl->SetEnabled(AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode")));
-    }
-    else if (
-             strSetting.Equals("audiooutput.multichannellpcm" ) ||
-             strSetting.Equals("audiooutput.truehdpassthrough") ||
-             strSetting.Equals("audiooutput.dtshdpassthrough" ))
-    {
-      CGUIControl *pControl = (CGUIControl *)GetControl(pSettingControl->GetID());
-      if (pControl)
-      {
-        if (strSetting.Equals("audiooutput.dtshdpassthrough") && !g_guiSettings.GetBool("audiooutput.dtspassthrough"))
-          pControl->SetEnabled(false);
-        else
-          pControl->SetEnabled(g_guiSettings.GetInt("audiooutput.mode") == AUDIO_HDMI);
-      }
     }
     else if (strSetting.Equals("musicplayer.crossfadealbumtracks"))
     {
@@ -2216,24 +2246,13 @@ void CGUIWindowSettingsCategory::OnSettingChanged(BaseSettingControlPtr pSetting
     if (strSetting.Equals("audiooutput.audiodevice"))
     {
       CGUISpinControlEx *pControl = (CGUISpinControlEx *)GetControl(pSettingControl->GetID());
-#if defined(TARGET_DARWIN)
-      // save the sinkname - since we don't have sinks on osx
-      // we need to get the fitting sinkname for the device label from the
-      // factory
-      std::string label2sink = pControl->GetCurrentLabel();
-      CAEFactory::VerifyOutputDevice(label2sink, false);
-      g_guiSettings.SetString("audiooutput.audiodevice", label2sink.c_str());
-#else
       g_guiSettings.SetString("audiooutput.audiodevice", m_AnalogAudioSinkMap[pControl->GetCurrentLabel()]);
-#endif
     }
-#if !defined(TARGET_DARWIN)
     else if (strSetting.Equals("audiooutput.passthroughdevice"))
     {
       CGUISpinControlEx *pControl = (CGUISpinControlEx *)GetControl(pSettingControl->GetID());
       g_guiSettings.SetString("audiooutput.passthroughdevice", m_DigitalAudioSinkMap[pControl->GetCurrentLabel()]);
     }
-#endif
     else if (strSetting.Equals("audiooutput.guisoundmode"))
     {
       CAEFactory::SetSoundMode(g_guiSettings.GetInt("audiooutput.guisoundmode"));
@@ -3262,7 +3281,6 @@ void CGUIWindowSettingsCategory::FillInAudioDevices(CSetting* pSetting, bool Pas
   int selectedValue = -1;
   AEDeviceList sinkList;
   CAEFactory::EnumerateOutputDevices(sinkList, Passthrough);
-#if !defined(TARGET_DARWIN)
   if (sinkList.size()==0)
   {
     pControl->AddLabel("Error - no devices found", 0);
@@ -3270,7 +3288,6 @@ void CGUIWindowSettingsCategory::FillInAudioDevices(CSetting* pSetting, bool Pas
   }
   else
   {
-#endif
     AEDeviceList::const_iterator iter = sinkList.begin();
     for (int i=0; iter != sinkList.end(); iter++)
     {
@@ -3289,9 +3306,7 @@ void CGUIWindowSettingsCategory::FillInAudioDevices(CSetting* pSetting, bool Pas
       i++;
     }
 
-#if !defined(TARGET_DARWIN)
   }
-#endif
 
   if (selectedValue < 0)
   {
@@ -3394,12 +3409,7 @@ void CGUIWindowSettingsCategory::FillInPlexUpdateChannels(CSetting *pSetting)
   pControl->Clear();
 
   pControl->AddLabel(g_localizeStrings.Get(40003), CMyPlexUserInfo::ROLE_USER);
-#ifdef TARGET_RASPBERRY_PI
-  pControl->AddLabel(g_localizeStrings.Get(40007), CMyPlexUserInfo::ROLE_EMPLOYEE);
-  pControl->AddLabel("Beta (unsupported!)", CMyPlexUserInfo::ROLE_NINJA);
-#else
   pControl->AddLabel(g_localizeStrings.Get(40007), CMyPlexUserInfo::ROLE_PLEXPASS);
-#endif
 
   if (pControl->GetMaximum() < 1)
     /* only one choice */

@@ -167,13 +167,7 @@ void CPlayerCoreFactory::GetPlayers( const CFileItem& item, VECPLAYERCORES &vecC
 
     if (bAdd)
     {
-      if( g_guiSettings.GetInt("audiooutput.mode") == AUDIO_ANALOG )
-      {
-        CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: adding PAPlayer (%d)", EPC_PAPLAYER);
-        vecCores.push_back(EPC_PAPLAYER);
-      }
-      else if (url.GetFileType().Equals("ac3") 
-            || url.GetFileType().Equals("dts"))
+      if (url.GetFileType().Equals("ac3") || url.GetFileType().Equals("dts"))
       {
         CLog::Log(LOGDEBUG, "CPlayerCoreFactory::GetPlayers: adding DVDPlayer (%d)", EPC_DVDPLAYER);
         vecCores.push_back(EPC_DVDPLAYER);

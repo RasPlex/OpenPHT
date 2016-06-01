@@ -46,7 +46,7 @@ vector<stringPair> CPlexFile::GetHeaderList()
   CStdString protocols = "protocols=shoutcast,http-video;videoDecoders=h264{profile:high&resolution:1080&level:51};audioDecoders=mp3,aac";
   CStdString augment = "";
   
-  if (AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode")))
+  if (g_guiSettings.GetBool("audiooutput.passthrough"))
   {
     if (g_guiSettings.GetBool("audiooutput.dtspassthrough"))
     {

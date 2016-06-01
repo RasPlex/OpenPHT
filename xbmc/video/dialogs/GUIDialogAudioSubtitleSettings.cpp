@@ -51,7 +51,8 @@ extern void xbox_audio_switch_channel(int iAudioStream, bool bAudioOnAllSpeakers
 #endif
 
 CGUIDialogAudioSubtitleSettings::CGUIDialogAudioSubtitleSettings(void)
-    : CGUIDialogSettings(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "VideoOSDSettings.xml")
+    : CGUIDialogSettings(WINDOW_DIALOG_AUDIO_OSD_SETTINGS, "VideoOSDSettings.xml"),
+    m_passthrough(false)
 {
 }
 
@@ -90,7 +91,7 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
   AddSlider(AUDIO_SETTINGS_VOLUME, 13376, &m_volume, VOLUME_MINIMUM, VOLUME_MAXIMUM / 100.0f, VOLUME_MAXIMUM, PercentAsDecibel, false);
   if (SupportsAudioFeature(IPC_AUD_AMP))
     AddSlider(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, 660, &g_settings.m_currentVideoSettings.m_VolumeAmplification, VOLUME_DRC_MINIMUM * 0.01f, (VOLUME_DRC_MAXIMUM - VOLUME_DRC_MINIMUM) / 6000.0f, VOLUME_DRC_MAXIMUM * 0.01f, FormatDecibel, false);
-  if (g_application.m_pPlayer && g_application.m_pPlayer->IsPassthrough())
+  if (g_guiSettings.GetBool("audiooutput.passthrough") || (g_application.m_pPlayer && g_application.m_pPlayer->IsPassthrough()))
   {
     EnableSettings(AUDIO_SETTINGS_VOLUME,false);
     EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION,false);
@@ -103,33 +104,27 @@ void CGUIDialogAudioSubtitleSettings::CreateSettings()
 #ifndef __PLEX__
   // only show stuff available in digital mode if we have digital output
   if (SupportsAudioFeature(IPC_AUD_OUTPUT_STEREO))
-    AddBool(AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS, 252, &g_settings.m_currentVideoSettings.m_OutputToAllSpeakers, AUDIO_IS_BITSTREAM(g_guiSettings.GetInt("audiooutput.mode")));
-
-  int settings[3] = { 338, 339, 420 }; //ANALOG, IEC958, HDMI
-  m_outputmode = g_guiSettings.GetInt("audiooutput.mode");
-  if (SupportsAudioFeature(IPC_AUD_SELECT_OUTPUT))
-    AddSpin(AUDIO_SETTINGS_DIGITAL_ANALOG, 337, &m_outputmode, 3, settings);
+    AddBool(AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS, 252, &g_settings.m_currentVideoSettings.m_OutputToAllSpeakers, true);
 #endif
 
-  // Do not display subtitle settings if subtitle is burned in when transcoding
-  if (g_application.m_pPlayer && g_application.m_pPlayer->IsTranscoded() && g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
-    return;
+  m_passthrough = g_guiSettings.GetBool("audiooutput.passthrough");
+  if (SupportsAudioFeature(IPC_AUD_SELECT_OUTPUT))
+    AddBool(AUDIO_SETTINGS_DIGITAL_ANALOG, 348, &m_passthrough);
 
-  AddSeparator(7);
-  /* PLEX */
-  if (!g_application.m_pPlayer)
-    m_subtitleVisible = false;
-  else
-  /* END PLEX */
-    m_subtitleVisible = g_application.m_pPlayer->GetSubtitleVisible();
+  if (!g_guiSettings.GetBool("plexmediaserver.transcodesubtitles"))
+  {
+    // TODO: also check m_item.GetProperty("plexDidTranscode").asBoolean()
+    AddSeparator(7);
 
-  AddBool(SUBTITLE_SETTINGS_ENABLE, 13397, &m_subtitleVisible);
-  if (SupportsSubtitleFeature(IPC_SUBS_OFFSET))
-    AddSlider(SUBTITLE_SETTINGS_DELAY, 22006, &g_settings.m_currentVideoSettings.m_SubtitleDelay, -g_advancedSettings.m_videoSubsDelayRange, 0.1f, g_advancedSettings.m_videoSubsDelayRange, FormatDelay);
-  if (SupportsSubtitleFeature(IPC_SUBS_SELECT))
-    AddSubtitleStreams(SUBTITLE_SETTINGS_STREAM);
-  if (SupportsSubtitleFeature(IPC_SUBS_EXTERNAL))
-    AddButton(SUBTITLE_SETTINGS_BROWSER,13250);
+    m_subtitleVisible = g_application.m_pPlayer && g_application.m_pPlayer->GetSubtitleVisible();
+    AddBool(SUBTITLE_SETTINGS_ENABLE, 13397, &m_subtitleVisible);
+    if (SupportsSubtitleFeature(IPC_SUBS_OFFSET))
+      AddSlider(SUBTITLE_SETTINGS_DELAY, 22006, &g_settings.m_currentVideoSettings.m_SubtitleDelay, -g_advancedSettings.m_videoSubsDelayRange, 0.1f, g_advancedSettings.m_videoSubsDelayRange, FormatDelay);
+    if (SupportsSubtitleFeature(IPC_SUBS_SELECT))
+      AddSubtitleStreams(SUBTITLE_SETTINGS_STREAM);
+    if (SupportsSubtitleFeature(IPC_SUBS_EXTERNAL))
+      AddButton(SUBTITLE_SETTINGS_BROWSER, 13250);
+  }
 
 #ifndef __PLEX__ /* Not possible in Plex */
   AddButton(AUDIO_SETTINGS_MAKE_DEFAULT, 12376);
@@ -150,33 +145,6 @@ void CGUIDialogAudioSubtitleSettings::AddAudioStreams(unsigned int id)
   m_audioStream = g_application.m_pPlayer->GetAudioStream();
 
   if( m_audioStream < 0 ) m_audioStream = 0;
-
-#ifndef __PLEX__
-  // check if we have a single, stereo stream, and if so, allow us to split into
-  // left, right or both
-  if (!setting.max)
-  {
-    CStdString strAudioInfo;
-    g_application.m_pPlayer->GetAudioInfo(strAudioInfo);
-    int iNumChannels = atoi(strAudioInfo.Right(strAudioInfo.size() - strAudioInfo.Find("chns:") - 5).c_str());
-    CStdString strAudioCodec = strAudioInfo.Mid(7, strAudioInfo.Find(") VBR") - 5);
-    bool bDTS = strstr(strAudioCodec.c_str(), "DTS") != 0;
-    bool bAC3 = strstr(strAudioCodec.c_str(), "AC3") != 0;
-    if (iNumChannels == 2 && !(bDTS || bAC3))
-    { // ok, enable these options
-/*      if (g_settings.m_currentVideoSettings.m_AudioStream == -1)
-      { // default to stereo stream
-        g_settings.m_currentVideoSettings.m_AudioStream = 0;
-      }*/
-      setting.max = 2;
-      for (int i = 0; i <= setting.max; i++)
-        setting.entry.push_back(make_pair(setting.entry.size(), g_localizeStrings.Get(13320 + i)));
-      m_audioStream = -g_settings.m_currentVideoSettings.m_AudioStream - 1;
-      m_settings.push_back(setting);
-      return;
-    }
-  }
-#endif
 
   // cycle through each audio stream and add it to our list control
   for (int i = 0; i <= setting.max; ++i)
@@ -259,24 +227,13 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
   }
   else if (setting.id == AUDIO_SETTINGS_STREAM)
   {
-    // first check if it's a stereo track that we can change between stereo, left and right
-    if (g_application.m_pPlayer->GetAudioStreamCount() == 1)
-    {
-      if (setting.max == 2)
-      { // we're in the case we want - call the code to switch channels etc.
-        // update the screen setting...
-        g_settings.m_currentVideoSettings.m_AudioStream = -1 - m_audioStream;
-        // call monkeyh1's code here...
-        //bool bAudioOnAllSpeakers = (g_guiSettings.GetInt("audiooutput.mode") == AUDIO_IEC958) && g_settings.m_currentVideoSettings.m_OutputToAllSpeakers;
-        return;
-      }
-    }
     // only change the audio stream if a different one has been asked for
-    if (g_application.m_pPlayer->GetAudioStream() != m_audioStream)
+    if (g_application.m_pPlayer && g_application.m_pPlayer->GetAudioStream() != m_audioStream)
     {
       g_settings.m_currentVideoSettings.m_AudioStream = m_audioStream;
       g_application.m_pPlayer->SetAudioStream(m_audioStream);    // Set the audio stream to the one selected
       EnableSettings(AUDIO_SETTINGS_VOLUME, !g_application.m_pPlayer->IsPassthrough());
+      EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, !g_application.m_pPlayer->IsPassthrough());
     }
   }
   else if (setting.id == AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS)
@@ -285,18 +242,10 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
   }
   else if (setting.id == AUDIO_SETTINGS_DIGITAL_ANALOG)
   {
-    bool bitstream = false;
+    g_guiSettings.SetBool("audiooutput.passthrough", m_passthrough);
 
-    switch(m_outputmode)
-    {
-      case 0: g_guiSettings.SetInt("audiooutput.mode", AUDIO_ANALOG ); break;
-      case 1: g_guiSettings.SetInt("audiooutput.mode", AUDIO_IEC958 ); bitstream = true; break;
-      case 2: g_guiSettings.SetInt("audiooutput.mode", AUDIO_HDMI   ); bitstream = true; break;
-    }
-
-    EnableSettings(AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS, bitstream);
-    g_application.Restart();
     EnableSettings(AUDIO_SETTINGS_VOLUME, !g_application.m_pPlayer->IsPassthrough());
+    EnableSettings(AUDIO_SETTINGS_VOLUME_AMPLIFICATION, !g_application.m_pPlayer->IsPassthrough());
   }
   else if (setting.id == SUBTITLE_SETTINGS_ENABLE)
   {
@@ -398,13 +347,20 @@ void CGUIDialogAudioSubtitleSettings::OnSettingChanged(SettingInfo &setting)
 
 void CGUIDialogAudioSubtitleSettings::FrameMove()
 {
-  m_volume = g_settings.m_fVolumeLevel;
-  UpdateSetting(AUDIO_SETTINGS_VOLUME);
+  // update the volume setting if necessary
+  float newVolume = g_settings.m_fVolumeLevel;
+  if (newVolume != m_volume)
+  {
+    m_volume = newVolume;
+    UpdateSetting(AUDIO_SETTINGS_VOLUME);
+  }
   if (g_application.m_pPlayer)
   {
     // these settings can change on the fly
     UpdateSetting(AUDIO_SETTINGS_DELAY);
-    UpdateSetting(SUBTITLE_SETTINGS_ENABLE);
+    UpdateSetting(AUDIO_SETTINGS_OUTPUT_TO_ALL_SPEAKERS);
+    UpdateSetting(AUDIO_SETTINGS_DIGITAL_ANALOG);
+    //UpdateSetting(SUBTITLE_SETTINGS_ENABLE);
     UpdateSetting(SUBTITLE_SETTINGS_DELAY);
   }
   CGUIDialogSettings::FrameMove();
