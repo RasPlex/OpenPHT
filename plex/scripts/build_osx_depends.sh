@@ -29,7 +29,7 @@ xcodepath=$(xcode-select -print-path)
 xcodebuild=$xcodepath/usr/bin/xcodebuild
 if [ $darwin = "osx" ]; then
   if [ -z $sdkversion ]; then
-    sdkversion=10.9
+    sdkversion=10.10
   fi
 else
   sdkversion=$($xcodebuild -showsdks | grep iphoneos | sort | tail -n 1 | awk '{ print $2}')
