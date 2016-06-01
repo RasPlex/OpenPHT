@@ -1,5 +1,6 @@
 include ../Makefile.include
 include ../config.site.mk
+DEPS= Makefile
 
 LIBNAME=boost
 VERSION=1_60_0
@@ -16,12 +17,12 @@ all: .installed
 $(TARBALLS_LOCATION)/$(ARCHIVE):
 	$(RETRIEVE_TOOL) $(RETRIEVE_TOOL_FLAGS) $(BASE_URL)/$(ARCHIVE)
 
-.installed: $(TARBALLS_LOCATION)/$(ARCHIVE)
+.installed: $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
 	rm -rf $(SOURCE)
 	$(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
 	echo $(SOURCE) > .gitignore
 	cd $(SOURCE); ./bootstrap.sh --prefix=$(PREFIX)
-	cd $(SOURCE); ./b2 --prefix=$(PREFIX) toolset=clang-darwin variant=release link=static $(CONFIGURE) --with-thread --with-date_time --with-regex install
+	cd $(SOURCE); ./b2 --prefix=$(PREFIX) toolset=clang-darwin variant=release link=static $(CONFIGURE) --with-thread --with-chrono --with-date_time --with-regex install
 	touch .installed
 
 clean:

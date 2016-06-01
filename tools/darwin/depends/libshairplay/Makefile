@@ -1,19 +1,18 @@
 include ../Makefile.include
-DEPS= Makefile lconv.patch
+include ../config.site.mk
+DEPS= Makefile
 
 # lib name, version
-LIBNAME=fontconfig
-VERSION=2.11.95
+LIBNAME=libshairplay
+VERSION=ce80e00
 SOURCE=$(LIBNAME)-$(VERSION)
-ARCHIVE=$(SOURCE).tar.bz2
+ARCHIVE=$(SOURCE).tar.xz
 
 # configuration settings
-export PATH:=$(TOOLCHAIN)/bin:$(PATH) 
-CONFIGURE=./configure --prefix=$(PREFIX) \
-  --with-freetype-config=$(PREFIX)/bin/freetype-config \
-  --disable-libxml2 --disable-docs
+CONFIGURE=./configure --prefix=$(PREFIX)
 
-LIBDYLIB=$(SOURCE)/src/.libs/lib$(LIBNAME).dylib
+
+LIBDYLIB=$(SOURCE)/src/lib/.libs/$(LIBNAME).dylib
 
 all: .installed
 
@@ -24,20 +23,19 @@ $(SOURCE): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
 	rm -rf $(SOURCE)
 	$(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
 	echo $(SOURCE) > .gitignore
-	cd $(SOURCE); patch -p1 < ../lconv.patch 
 	cd $(SOURCE); autoreconf -vif
 	cd $(SOURCE); $(CONFIGURE)
 
 $(LIBDYLIB): $(SOURCE)
-	make -C $(SOURCE)
+	make -j 1 -C $(SOURCE)
 
 .installed: $(LIBDYLIB)
 	make -C $(SOURCE) install
 	touch $@
 
 clean:
-	make -C $(SOURCE) clean
-	rm -f .installed
+	rm -rf $(SOURCE) .installed
 
 distclean::
 	rm -rf $(SOURCE) .installed
+

@@ -14,9 +14,9 @@ SUBDIRS := \
 	libvorbis libflac libmad fribidi libmpeg2 \
 	libass libcdio libsamplerate libcrystalhd \
 	libGLEW libsdl libsdl_image \
-	libmicrohttpd libmodplug libyajl libffi \
-	libplist libshairport libcec tinyxml \
-	boost breakpad
+	libmicrohttpd libmodplug yajl libffi \
+	libplist libshairplay libcec tinyxml \
+	boost breakpad libdcadec
 
 ifeq ($(DARWIN), ios)
   EXCLUDED = libcec libcrystalhd libGLEW libsdl libsdl_image

@@ -120,7 +120,7 @@ endif()
 set(non_link_libs
   rtmp
   plist
-  shairport
+  shairplay
   curl
   FLAC
   modplug
@@ -160,6 +160,8 @@ endforeach()
 foreach(lib ${osx_frameworks})
   plex_find_library(${lib} 1 0 ${dependdir}/Frameworks 1)
 endforeach()
+
+set(HAVE_YAJL_YAJL_VERSION_H 1)
 
 #### Deal with some generated files
 set(EXECUTABLE_NAME "OpenPHT")

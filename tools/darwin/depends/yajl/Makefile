@@ -1,28 +1,29 @@
 include ../Makefile.include
 include ../config.site.mk
-DEPS= Makefile cmake.patch
+DEPS= Makefile
 
 # lib name, version
-BASE_URL=https://chromium.googlesource.com/breakpad/breakpad/+archive
-LIBNAME=breakpad
-VERSION=chrome_49
+LIBNAME=yajl
+VERSION=2.1.0
 SOURCE=$(LIBNAME)-$(VERSION)
-FILENAME=$(VERSION).tar.gz
 ARCHIVE=$(SOURCE).tar.gz
-
-LIBDYLIB=$(SOURCE)/build/src/client/lib$(LIBNAME)_client.a
+# configuration settings
+LIBDYLIB=$(SOURCE)/build/$(LIBNAME)-$(VERSION)/lib/libyajl.dylib
 
 all: .installed
 
 $(TARBALLS_LOCATION)/$(ARCHIVE):
-	$(RETRIEVE_TOOL) $(RETRIEVE_TOOL_FLAGS) $(BASE_URL)/$(FILENAME)
+	$(RETRIEVE_TOOL) $(RETRIEVE_TOOL_FLAGS) $(BASE_URL)/$(ARCHIVE)
 
 $(SOURCE): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
-	rm -rf $(SOURCE); mkdir -p $(SOURCE)
-	$(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE) -C $(SOURCE)
+	rm -rf $(SOURCE)
+	$(ARCHIVE_TOOL) $(ARCHIVE_TOOL_FLAGS) $(TARBALLS_LOCATION)/$(ARCHIVE)
 	echo $(SOURCE) > .gitignore
+	sed -ie "s|ADD_CUSTOM_TARGET|#ADD_CUSTOM_TARGET|g" "$(SOURCE)/CMakeLists.txt"
+	sed -ie "s|./run_tests.sh|#./run_tests.sh|g" "$(SOURCE)/CMakeLists.txt"
+	sed -ie "s|WORKING_DIRECTORY|#WORKING_DIRECTORY|g" "$(SOURCE)/CMakeLists.txt"
+	sed -ie "s|ADD_SUBDIRECTORY(reformatter)|#ADD_SUBDIRECTORY(reformatter)|g" "$(SOURCE)/CMakeLists.txt"
 	cd $(SOURCE); rm -rf build; mkdir -p build
-	cd $(SOURCE); patch -p1 < ../cmake.patch
 	cd $(SOURCE)/build; CC="$(CC)" CXX="$(CXX)" cmake        \
 	  -DCMAKE_C_FLAGS:STRING="$(CPPFLAGS) $(CFLAGS)"     \
 	  -DCMAKE_CXX_FLAGS:STRING="$(CPPFLAGS) $(CXXFLAGS)" \
@@ -33,15 +34,15 @@ $(SOURCE): $(TARBALLS_LOCATION)/$(ARCHIVE) $(DEPS)
 	  -DCMAKE_FIND_ROOT_PATH=$(platform_sdk_path) ..
 
 $(LIBDYLIB): $(SOURCE)
-	make -j 1 -C $(SOURCE)/build
+	make -C $(SOURCE)/build
 
 .installed: $(LIBDYLIB)
 	make -C $(SOURCE)/build install
 	touch $@
 
 clean:
-	rm -rf $(SOURCE) .installed
+	make -C $(SOURCE)/build clean
+	rm -f .installed
 
 distclean::
 	rm -rf $(SOURCE) .installed
-
