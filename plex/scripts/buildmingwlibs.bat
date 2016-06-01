@@ -1,7 +1,7 @@
 rem batch file to compile mingw libs via BuildSetup
 
 rem set M$ env
-call "%VS110COMNTOOLS%vsvars32.bat" || exit /b 1
+call "%VS120COMNTOOLS%vsvars32.bat" || exit /b 1
 
 rem check for mingw env
 IF EXIST ..\..\project\BuildDependencies\msys\bin\sh.exe (

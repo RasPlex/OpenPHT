@@ -154,7 +154,6 @@ else(TARGET_COMMON_DARWIN)
 
   if(TARGET_WIN32)
     install(FILES ${root}/system/zlib1.dll DESTINATION ${BINPATH} COMPONENT RUNTIME)
-    install(FILES ${plexdir}/build/dependencies/vcredist/2012/vcredist_x86.exe DESTINATION ${BINPATH}/Dependencies COMPONENT VCREDIST RENAME vcredist_2012_x86.exe)
     install(FILES ${plexdir}/build/dependencies/vcredist/2013/vcredist_x86.exe DESTINATION ${BINPATH}/Dependencies COMPONENT VCREDIST RENAME vcredist_2013_x86.exe)
     install(DIRECTORY ${plexdir}/build/dependencies/dxsetup DESTINATION ${BINPATH}/Dependencies COMPONENT QDXSETUP)
     install(FILES ${plexdir}/Resources/Plex.ico ${plexdir}/Resources/PlexBanner.bmp DESTINATION ${RESOURCEPATH}/media COMPONENT RUNTIME)

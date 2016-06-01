@@ -2,7 +2,7 @@
 rem java why you so annoying?
 set path=%path:"C:\Program Files (x86)\Java\jre7\bin"=%
 
-call "%VS110COMNTOOLS%vsvars32.bat" || exit /b 1
+call "%VS120COMNTOOLS%vsvars32.bat" || exit /b 1
 
 rd /s /q c:\tmp
 rd /s /q upload
