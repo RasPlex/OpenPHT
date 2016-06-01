@@ -100,9 +100,7 @@ if(NOT OPENELEC)
 endif()
 
 # add our visualizations
-if(NOT TARGET_RPI)
-  add_subdirectory(xbmc/visualizations)
-endif()
+add_subdirectory(xbmc/visualizations)
 
 # global includes
 include_directories(

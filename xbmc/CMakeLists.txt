@@ -1,4 +1,4 @@
-set(subdirs cores addons dbwrappers dialogs filesystem guilib input interfaces music network
+set(subdirs cores contrib/kissfft addons dbwrappers dialogs filesystem guilib input interfaces music network
 peripherals pictures playlists powermanagement programs rendering settings storage threads
 utils video windowing windows pvr commons epg main test)
 
