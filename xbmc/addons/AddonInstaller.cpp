@@ -355,7 +355,6 @@ bool CAddonInstaller::CheckDependencies(const AddonPtr &addon,
 
 void CAddonInstaller::UpdateRepos(bool force, bool wait)
 {
-#ifndef __PLEX__
   CSingleLock lock(m_critSection);
   if (m_repoUpdateJob)
   {
@@ -393,7 +392,6 @@ void CAddonInstaller::UpdateRepos(bool force, bool wait)
       return;
     }
   }
-#endif
 }
 
 bool CAddonInstaller::HasJob(const CStdString& ID) const

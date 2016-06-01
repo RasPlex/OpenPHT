@@ -81,6 +81,7 @@ if(TARGET_COMMON_DARWIN)
   set_bundle_dir(SOURCES ${plexdir}/addons DEST Resources/XBMC/addons)
   set_bundle_dir(SOURCES ${plexdir}/Resources/system DEST Resources/XBMC/system)
 
+  set_bundle_dir(SOURCES ${root}/addons/repository.openpht.tv DEST Resources/XBMC/addons/repository.openpht.tv)
   set_bundle_dir(SOURCES ${root}/addons
                  DEST Resources/XBMC/addons
                  EXCLUDE .*/skin.confluence.*
@@ -133,6 +134,7 @@ else(TARGET_COMMON_DARWIN)
         PATTERN playercorefactory.xml EXCLUDE
         PATTERN peripherals.xml EXCLUDE)
 
+  install(DIRECTORY ${root}/addons/repository.openpht.tv DESTINATION ${RESOURCEPATH}/addons COMPONENT RUNTIME)
   install(DIRECTORY ${root}/addons DESTINATION ${RESOURCEPATH} COMPONENT RUNTIME
           PATTERN skin.confluence EXCLUDE
           PATTERN skin.touched EXCLUDE
