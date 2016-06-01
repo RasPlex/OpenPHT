@@ -283,6 +283,9 @@ int CStreamDetails::GetSubtitleStreamCount(void) const
 
 CStreamDetails::CStreamDetails(const CStreamDetails &that)
 {
+  m_pBestVideo = NULL;
+  m_pBestAudio = NULL;
+  m_pBestSubtitle = NULL;
   *this = that;
 }
 
