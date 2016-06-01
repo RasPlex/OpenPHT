@@ -568,7 +568,7 @@ void CGUIWindowPictures::OnItemLoaded(CFileItem *pItem)
 void CGUIWindowPictures::LoadPlayList(const CStdString& strPlayList)
 {
   CLog::Log(LOGDEBUG,"CGUIWindowPictures::LoadPlayList()... converting playlist into slideshow: %s", strPlayList.c_str());
-  auto_ptr<CPlayList> pPlayList (CPlayListFactory::Create(strPlayList));
+  unique_ptr<CPlayList> pPlayList(CPlayListFactory::Create(strPlayList));
   if ( NULL != pPlayList.get())
   {
     if (!pPlayList->Load(strPlayList))
