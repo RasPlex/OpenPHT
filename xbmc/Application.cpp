@@ -179,6 +179,7 @@
 #include "pictures/GUIWindowSlideShow.h"
 #include "windows/GUIWindowStartup.h"
 #include "video/VideoInfoScanner.h"
+#include "video/PlayerController.h"
 
 // Dialog includes
 #include "video/dialogs/GUIDialogVideoBookmarks.h"
@@ -1407,6 +1408,9 @@ bool CApplication::Initialize()
   m_slowTimer.StartZero();
 
   CAddonMgr::Get().StartServices(true);
+
+  // register action listeners
+  RegisterActionListener(&CPlayerController::GetInstance());
 
   CLog::Log(LOGNOTICE, "initialize done");
 
@@ -3596,6 +3600,9 @@ void CApplication::Stop(int exitCode)
 
   // Stop services before unloading Python
   CAddonMgr::Get().StopServices(false);
+
+    // unregister action listeners
+    UnregisterActionListener(&CPlayerController::GetInstance());
 
 /* Python resource freeing must be done after skin has been unloaded, not before
    some windows still need it when deinitializing during skin unloading. */
