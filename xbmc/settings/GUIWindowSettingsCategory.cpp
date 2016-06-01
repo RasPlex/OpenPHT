@@ -1362,7 +1362,7 @@ void CGUIWindowSettingsCategory::OnSettingChanged(BaseSettingControlPtr pSetting
     CSettingAddon *pSettingAddon = (CSettingAddon*)pSettingControl->GetSetting();
     if (pSettingAddon->m_type == ADDON_SKIN)
     {
-      g_application.ReloadSkin();
+      g_application.ReloadSkin(true);
     }
     else if (pSettingAddon->m_type == ADDON_SCRIPT_WEATHER)
     {

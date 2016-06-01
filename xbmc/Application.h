@@ -186,7 +186,7 @@ public:
   void RestartApp();
   void UnloadSkin(bool forReload = false);
   bool LoadUserWindows();
-  void ReloadSkin();
+  void ReloadSkin(bool confirm = false);
   const CStdString& CurrentFile();
   CFileItem& CurrentFileItem();
   virtual bool OnMessage(CGUIMessage& message);
@@ -424,7 +424,7 @@ public:
   /* END PLEX */
 protected:
   bool LoadSkin(const CStdString& skinID);
-  void LoadSkin(const boost::shared_ptr<ADDON::CSkinInfo>& skin);
+  bool LoadSkin(const boost::shared_ptr<ADDON::CSkinInfo>& skin);
   
   /*!
    \brief Delegates the action to all registered action handlers.
@@ -433,7 +433,7 @@ protected:
    */
   bool NotifyActionListeners(const CAction &action) const;
 
-  bool m_skinReloading; // if true we disallow LoadSkin until ReloadSkin is called
+  bool m_skinReverting;
 
 #if defined(TARGET_DARWIN_IOS)
   friend class CWinEventsIOS;
