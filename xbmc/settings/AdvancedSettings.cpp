@@ -1366,6 +1366,12 @@ void CAdvancedSettings::SetDebugMode(bool debug)
     CLog::SetLogLevel(level);
   }
 }
+
+bool CAdvancedSettings::CanLogComponent(int component) const
+{
+  return false;
+}
+
 /* PLEX */
 void CAdvancedSettings::SetVisualizeDirtyRegions(bool visualize)
 {

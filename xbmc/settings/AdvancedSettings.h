@@ -98,6 +98,8 @@ class CAdvancedSettings
     static void GetCustomRegexpReplacers(TiXmlElement *pRootElement, CStdStringArray& settings);
     static void GetCustomExtensions(TiXmlElement *pRootElement, CStdString& extensions);
 
+    bool CanLogComponent(int component) const;
+
     int m_audioHeadRoom;
     float m_ac3Gain;
     CStdString m_audioDefaultPlayer;
