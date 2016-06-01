@@ -77,6 +77,8 @@ private:
   bool m_needConvert;
   AEDataFormat m_srcFormat;
   int m_srcFrameSize;
+
+  double m_icyMetadataPts;
 };
 
 #endif

@@ -47,6 +47,7 @@ DVDPlayerCodec::DVDPlayerCodec()
   m_pResampler = NULL;
   m_needConvert = false;
   m_srcFrameSize = 0;
+  m_icyMetadataPts = (double)AV_NOPTS_VALUE;
 }
 
 DVDPlayerCodec::~DVDPlayerCodec()
@@ -225,6 +226,14 @@ bool DVDPlayerCodec::Init(const CStdString &strFile, unsigned int filecache)
     m_BitsPerSample = CAEUtil::DataFormatToBits(m_DataFormat);
   }
 
+  if (m_pDemuxer)
+  {
+    std::string metadata;
+    m_pDemuxer->GetIcyMetadataHeaders(metadata);
+    if (!metadata.empty())
+      m_icyMetadataPts = DVD_MSEC_TO_TIME(5000);
+  }
+
   m_strFileName = strFile;
   m_bInited = true;
 
@@ -269,6 +278,7 @@ void DVDPlayerCodec::DeInit()
 
   m_audioPos = 0;
   m_nDecodedLen = 0;
+  m_icyMetadataPts = (double)AV_NOPTS_VALUE;
 
   m_strFileName = "";
   m_bInited = false;
@@ -291,6 +301,7 @@ int64_t DVDPlayerCodec::Seek(int64_t iSeekTime)
   m_pAudioCodec->Reset();
 
   m_nDecodedLen = 0;
+  m_icyMetadataPts = m_icyMetadataPts == (double)AV_NOPTS_VALUE ? (double)AV_NOPTS_VALUE : m_icyMetadataPts;
 
   if (!ret)
     return DVD_NOPTS_VALUE;
@@ -392,6 +403,26 @@ int DVDPlayerCodec::ReadPCM(BYTE *pBuffer, int size, int *actualsize)
       m_audioPlanes[0] += *actualsize;
     }
     m_nDecodedLen -= *actualsize;
+  }
+
+  if (m_icyMetadataPts != (double)AV_NOPTS_VALUE && m_pDemuxer && m_pPacket && m_pPacket->pts > m_icyMetadataPts)
+  {
+    std::string metadata;
+    m_pDemuxer->GetIcyMetadataPacket(metadata);
+    if (!metadata.empty())
+    {
+      CRegExp reTitle(true);
+      reTitle.RegComp("StreamTitle=\'(.*?)\';");
+      if (reTitle.RegFind(metadata.c_str()) != -1)
+      {
+        std::string newtitle = reTitle.GetMatch(1);
+        bool result = (m_tag.GetTitle() != newtitle);
+        m_tag.SetTitle(newtitle);
+        if (result)
+          CApplicationMessenger::Get().SetCurrentSongTag(m_tag);
+      }
+    }
+    m_icyMetadataPts = m_pPacket->pts + DVD_MSEC_TO_TIME(500);
   }
 
   return READ_SUCCESS;

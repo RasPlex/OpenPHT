@@ -369,4 +369,10 @@ public:
    * return a user-presentable codec name of the given stream
    */
   virtual void GetStreamCodecName(int iStreamId, std::string &strName) {};
+
+  /*
+   * return shoutcast metadata
+   */
+  virtual void GetIcyMetadataHeaders(std::string &metadata) {};
+  virtual void GetIcyMetadataPacket(std::string &metadata) {};
 };

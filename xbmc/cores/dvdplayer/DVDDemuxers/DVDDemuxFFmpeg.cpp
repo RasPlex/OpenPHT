@@ -1574,6 +1574,30 @@ void CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId, std::string &strName)
   }
 }
 
+void CDVDDemuxFFmpeg::GetIcyMetadataHeaders(std::string &strMetadata)
+{
+  if (m_pFormatContext == NULL)
+    return;
+
+  char* icy_metadata = NULL;
+  av_opt_get(m_pFormatContext, "icy_metadata_headers", AV_OPT_SEARCH_CHILDREN, (uint8_t**)&icy_metadata);
+  if (icy_metadata != NULL)
+    strMetadata = icy_metadata;
+  av_free(icy_metadata);
+}
+
+void CDVDDemuxFFmpeg::GetIcyMetadataPacket(std::string &strMetadata)
+{
+  if (m_pFormatContext == NULL)
+    return;
+
+  char* icy_metadata = NULL;
+  av_opt_get(m_pFormatContext, "icy_metadata_packet", AV_OPT_SEARCH_CHILDREN, (uint8_t**)&icy_metadata);
+  if (icy_metadata != NULL)
+    strMetadata = icy_metadata;
+  av_free(icy_metadata);
+}
+
 bool CDVDDemuxFFmpeg::IsProgramChange()
 {
   if (m_program == UINT_MAX)
