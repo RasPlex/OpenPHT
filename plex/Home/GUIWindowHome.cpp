@@ -88,6 +88,7 @@
 #include "GUI/GUIPlexDefaultActionHandler.h"
 #include "GUI/GUIDialogPlexError.h"
 #include "settings/GUISettings.h"
+#include "Application.h"
 
 
 using namespace std;
@@ -128,6 +129,13 @@ bool CGUIWindowHome::OnAction(const CAction &action)
     CGUIMessage msg(GUI_MSG_SETFOCUS, GetID(), 300);
     OnMessage(msg);
 
+    return true;
+  }
+  
+  if ((action.GetID() == ACTION_PREVIOUS_MENU || action.GetID() == ACTION_NAV_BACK) &&
+      g_application.m_pPlayer->IsPlaying())
+  {
+    g_application.SwitchToFullScreen();
     return true;
   }
   
