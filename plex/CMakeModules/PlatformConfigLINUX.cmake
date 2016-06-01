@@ -22,7 +22,6 @@ set(LINK_PKG
   Lzo2
   FriBiDi
   Fontconfig
-  Samplerate
   YAJL
   microhttpd
   Crypto
@@ -68,7 +67,6 @@ set(INSTALL_LIB
   PNG
   TIFF
   Vorbis
-  LibMad
   Mpeg2
   Ass
   RTMP

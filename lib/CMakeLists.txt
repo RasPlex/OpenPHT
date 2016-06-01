@@ -11,7 +11,6 @@ if(USE_INTERNAL_FFMPEG)
 endif(USE_INTERNAL_FFMPEG)
 
 if(TARGET_WIN32)
-  add_subdirectory(libmad)
   add_subdirectory(libass)
   add_subdirectory(enca)
 endif()

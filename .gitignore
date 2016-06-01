@@ -429,7 +429,6 @@ lib/cmyth/Makefile
 /system/hdhomerun.dll
 /system/ssh.dll
 /system/sqlite3.dll
-/system/libsamplerate-0.dll
 /system/libnfs.dll
 /system/dnssd.dll
 /system/libcec.dll

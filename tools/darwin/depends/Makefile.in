@@ -11,8 +11,8 @@ SUBDIRS := \
 	liblzo2 freetype2 fontconfig \
 	openssl gmp nettle gnutls librtmp curl \
 	libjpeg-turbo tiff libpng libogg \
-	libvorbis libflac libmad fribidi libmpeg2 \
-	libass libcdio libsamplerate libcrystalhd \
+	libvorbis libflac fribidi libmpeg2 \
+	libass libcdio libcrystalhd \
 	libGLEW libsdl libsdl_image \
 	libmicrohttpd libmodplug yajl libffi \
 	libplist libshairplay libcec tinyxml \

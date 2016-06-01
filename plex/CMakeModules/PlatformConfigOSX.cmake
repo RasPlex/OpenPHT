@@ -84,7 +84,6 @@ set(external_libs
   freetype
   fontconfig
   sqlite3
-  samplerate
   microhttpd
   yajl
   jpeg
@@ -129,7 +128,6 @@ set(non_link_libs
   vorbisfile
   ogg
   ass
-  mad
   mpeg2
   png
   tiff

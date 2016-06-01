@@ -63,7 +63,6 @@ set(external_libs
   liblzo2
   dnssd
   zlib
-  libsamplerate-0
 )
 
 set(non_link_libs

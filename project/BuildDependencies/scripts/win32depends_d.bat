@@ -18,7 +18,6 @@ copy plex-depends\bin\libcurl.dll "%APP_PATH%\system\" /Y
 copy plex-depends\bin\libeay32.dll "%APP_PATH%\system\" /Y
 copy plex-depends\bin\libmicrohttpd-dll.dll "%APP_PATH%\system\webserver\" /Y
 copy plex-depends\bin\libogg.dll "%APP_PATH%\system\cdrip\" /Y
-copy plex-depends\bin\libsamplerate-0.dll "%APP_PATH%\system\" /Y
 copy plex-depends\bin\libshairplay-1.dll "%APP_PATH%\system\airplay\" /Y
 copy plex-depends\bin\libvorbis.dll "%APP_PATH%\system\cdrip\" /Y
 copy plex-depends\bin\libvorbisfile.dll "%APP_PATH%\system\players\paplayer\" /Y
