@@ -8,11 +8,20 @@ call "%VS120COMNTOOLS%vsvars32.bat" || exit /b 1
 
 SET PROMPTLEVEL=noprompt
 SET BUILDMODE=clean
+SET build32=yes
+SET build64=no
+SET msys2=msys64
+SET tools=mingw
 FOR %%b in (%1, %2, %3) DO (
   IF %%b==prompt SET PROMPTLEVEL=prompt
   IF %%b==noprompt SET PROMPTLEVEL=noprompt
   IF %%b==clean SET BUILDMODE=clean
   IF %%b==noclean SET BUILDMODE=noclean
+  IF %%b==build64 ( 
+    SET build64=yes 
+    SET build32=no
+    )
+  IF %%b==msvc SET tools=msvc
 )
 
 IF "%WORKDIR%"=="" (
@@ -31,9 +40,9 @@ rem cd %BS_DIR%
 IF EXIST %ERRORFILE% del %ERRORFILE% > NUL
 
 rem compiles a bunch of mingw libs and not more
-IF EXIST %WORKDIR%\project\BuildDependencies\msys\bin\sh.exe (
+IF EXIST %WORKDIR%\project\BuildDependencies\%msys2%\usr\bin\sh.exe (
   ECHO starting sh shell
-  %WORKDIR%\project\BuildDependencies\msys\bin\sh --login /xbmc/plex/scripts/buildmingwlibs.sh
+  %WORKDIR%\project\BuildDependencies\%msys2%\usr\bin\sh.exe --login -i /xbmc/plex/scripts/buildmingwlibs.sh --prompt=%PROMPTLEVEL% --mode=%BUILDMODE% --build32=%build32% --build64=%build64% --tools=%tools%
   GOTO END
 ) ELSE (
   GOTO ENDWITHERROR
