@@ -7,9 +7,9 @@ VERSION=1_60_0
 SOURCE=$(LIBNAME)_$(VERSION)
 ARCHIVE=$(SOURCE).tar.bz2
 
-CONFIGURE=
+CONFIGURE=cxxflags="-std=c++11 -stdlib=libc++" linkflags="-stdlib=libc++"
 ifeq ($(ARCH), i386)
-  CONFIGURE=architecture=x86 address-model=32 cxxflags="-arch i386" linkflags="-arch i386"
+  CONFIGURE=architecture=x86 address-model=32 cxxflags="-arch i386 -std=c++11 -stdlib=libc++" linkflags="-arch i386 -stdlib=libc++"
 endif
 
 all: .installed

@@ -15,8 +15,6 @@ if(NOT WIN32)
      ${root}/xbmc/visualizations/EGLHelpers
     )
     add_subdirectory(EGLHelpers)
-  else()
-    add_subdirectory(XBMCProjectM)
   endif()
 
   add_subdirectory(OpenGLSpectrum)
