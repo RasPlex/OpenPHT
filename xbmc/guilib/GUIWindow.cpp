@@ -220,6 +220,8 @@ bool CGUIWindow::Load(TiXmlElement* pRootElement)
     {
       XMLUtils::GetFloat(pChild, "posx", m_posX);
       XMLUtils::GetFloat(pChild, "posy", m_posY);
+      XMLUtils::GetFloat(pChild, "left", m_posX);
+      XMLUtils::GetFloat(pChild, "top", m_posY);
 
       TiXmlElement *originElement = pChild->FirstChildElement("origin");
       while (originElement)
@@ -389,7 +391,7 @@ void CGUIWindow::Close_Internal(bool forceClose /*= false*/, int nextWindowID /*
   }
 
   m_closing = false;
-  CGUIMessage msg(GUI_MSG_WINDOW_DEINIT, 0, 0);
+  CGUIMessage msg(GUI_MSG_WINDOW_DEINIT, 0, 0, nextWindowID);
   OnMessage(msg);
 }
 
@@ -585,7 +587,6 @@ bool CGUIWindow::OnMessage(CGUIMessage& message)
         CLog::Log(LOGDEBUG, "Unfocus WindowID: %i, ControlID: %i",GetID(), control->GetID());
       }
       return true;
-    break;
     }
 
   case GUI_MSG_SELCHANGED:
@@ -749,7 +750,7 @@ void CGUIWindow::AllocResources(bool forceLoad /*= FALSE */)
   else
   {
     CLog::Log(LOGDEBUG,"Window %s was already loaded", GetProperty("xmlfile").c_str());
-    CLog::Log(LOGDEBUG,"Alloc resources: %.2fm", 1000.f * (end - start) / freq);
+    CLog::Log(LOGDEBUG,"Alloc resources: %.2fms", 1000.f * (end - start) / freq);
   }
 #endif
   m_bAllocated = true;
@@ -766,6 +767,7 @@ void CGUIWindow::FreeResources(bool forceUnload /*= FALSE */)
   {
     delete m_windowXMLRootElement;
     m_windowXMLRootElement = NULL;
+    m_xmlIncludeConditions.clear();
   }
 }
 
@@ -781,6 +783,7 @@ void CGUIWindow::ClearAll()
   CGUIControlGroup::ClearAll();
   m_windowLoaded = false;
   m_dynamicResourceAlloc = true;
+  m_visibleCondition = 0;
 }
 
 bool CGUIWindow::Initialize()

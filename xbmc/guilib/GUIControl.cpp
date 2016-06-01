@@ -534,7 +534,7 @@ void CGUIControl::SetVisible(bool bVisible, bool setVisState)
   if (bVisible && setVisState)
   {  // TODO: currently we only update m_visible from GUI_MSG_VISIBLE (SET_CONTROL_VISIBLE)
      //       otherwise we just set m_forceHidden
-    GUIVISIBLE visible = m_visible;
+    GUIVISIBLE visible;
     if (m_visibleCondition)
       visible = g_infoManager.GetBoolValue(m_visibleCondition) ? VISIBLE : HIDDEN;
     else
@@ -549,6 +549,8 @@ void CGUIControl::SetVisible(bool bVisible, bool setVisState)
   {
     m_forceHidden = !bVisible;
     SetInvalid();
+    if (m_forceHidden)
+      MarkDirtyRegion();
   }
   if (m_forceHidden)
   { // reset any visible animations that are in process
@@ -586,8 +588,11 @@ bool CGUIControl::OnMouseOver(const CPoint &point)
   if (g_Mouse.GetState() != MOUSE_STATE_DRAG)
     g_Mouse.SetState(MOUSE_STATE_FOCUS);
   if (!CanFocus()) return false;
-  CGUIMessage msg(GUI_MSG_SETFOCUS, GetParentID(), GetID());
-  OnMessage(msg);
+  if (!HasFocus())
+  {
+    CGUIMessage msg(GUI_MSG_SETFOCUS, GetParentID(), GetID());
+    OnMessage(msg);
+  }
   return true;
 }
 
@@ -925,10 +930,13 @@ bool CGUIControl::CanFocusFromPoint(const CPoint &point) const
 
 void CGUIControl::UnfocusFromPoint(const CPoint &point)
 {
-  CPoint controlPoint(point);
-  m_transform.InverseTransformPosition(controlPoint.x, controlPoint.y);
-  if (!HitTest(controlPoint))
-    SetFocus(false);
+  if (HasFocus())
+  {
+    CPoint controlPoint(point);
+    m_transform.InverseTransformPosition(controlPoint.x, controlPoint.y);
+    if (!HitTest(controlPoint))
+      SetFocus(false);
+  }
 }
 
 bool CGUIControl::HasID(int id) const
