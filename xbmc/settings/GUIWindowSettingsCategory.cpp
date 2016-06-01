@@ -2813,13 +2813,14 @@ void CGUIWindowSettingsCategory::FillInResolutions(CStdString strSetting, Displa
   }
   else
   {
-    vector<RESOLUTION_WHR> resolutions = g_Windowing.ScreenResolutions(mode);
+    RESOLUTION_INFO info = g_settings.m_ResInfo[res];
+    vector<RESOLUTION_WHR> resolutions = g_Windowing.ScreenResolutions(info.iScreen, info.fRefreshRate);
 
     for (unsigned int idx = 0; idx < resolutions.size(); idx++)
     {
       CStdString strRes;
       strRes.Format("%dx%d%s", resolutions[idx].width, resolutions[idx].height,
-        (resolutions[idx].interlaced == D3DPRESENTFLAG_INTERLACED) ? "i" : "p");
+        (resolutions[idx].flags & D3DPRESENTFLAG_INTERLACED) ? "i" : "p");
       pControl->AddLabel(strRes, resolutions[idx].ResInfo_Index);
 
       RESOLUTION_INFO res1 = g_settings.m_ResInfo[res];

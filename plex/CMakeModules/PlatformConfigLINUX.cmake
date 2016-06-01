@@ -34,6 +34,7 @@ set(LINK_PKG
   LibRt
   FLAC
   DBUS
+  DRM
 )
 
 if(NOT OPENELEC)

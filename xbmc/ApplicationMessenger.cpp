@@ -546,6 +546,18 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
       }
       break;
 
+    case TMSG_VIDEORESIZE:
+      {
+        XBMC_Event newEvent;
+        memset(&newEvent, 0, sizeof(newEvent));
+        newEvent.type = XBMC_VIDEORESIZE;
+        newEvent.resize.w = pMsg->dwParam1;
+        newEvent.resize.h = pMsg->dwParam2;
+        g_application.OnEvent(newEvent);
+        g_windowManager.MarkDirty();
+      }
+      break;
+
     case TMSG_TOGGLEFULLSCREEN:
       g_graphicsContext.Lock();
       g_graphicsContext.ToggleFullScreenRoot();

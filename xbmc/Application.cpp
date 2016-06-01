@@ -295,9 +295,6 @@
 #include <shlobj.h>
 #include "win32util.h"
 #endif
-#ifdef HAS_XRANDR
-#include "windowing/X11/XRandR.h"
-#endif
 
 #ifdef TARGET_DARWIN_OSX
 #include "osx/CocoaInterface.h"
@@ -755,10 +752,6 @@ bool CApplication::Create()
     g_settings.m_logFolder = "special://masterprofile/";
   }
 
-#ifdef HAS_XRANDR
-  g_xrandr.LoadCustomModeLinesToAllOutputs();
-#endif
-
   /* PLEX */
   m_pLaunchHost = DetectLaunchHost();
   if (m_pLaunchHost)
@@ -930,7 +923,7 @@ bool CApplication::CreateGUI()
 
   uint32_t sdlFlags = 0;
 
-#if defined(HAS_SDL_OPENGL) || (HAS_GLES == 2)
+#if defined(TARGET_DARWIN_OSX)
   sdlFlags |= SDL_INIT_VIDEO;
 #endif
 
@@ -941,13 +934,13 @@ bool CApplication::CreateGUI()
   //depending on how it's compiled, SDL periodically calls XResetScreenSaver when it's fullscreen
   //this might bring the monitor out of standby, so we have to disable it explicitly
   //by passing 0 for overwrite to setsenv, the user can still override this by setting the environment variable
-#if defined(_LINUX) && !defined(TARGET_DARWIN)
+#if defined(TARGET_POSIX) && !defined(TARGET_DARWIN)
   setenv("SDL_VIDEO_ALLOW_SCREENSAVER", "1", 0);
 #endif
 
 #endif // HAS_SDL
 
-#ifdef _LINUX
+#ifdef TARGET_POSIX
   // for nvidia cards - vsync currently ALWAYS enabled.
   // the reason is that after screen has been setup changing this env var will make no difference.
   setenv("__GL_SYNC_TO_VBLANK", "1", 0);
@@ -985,31 +978,41 @@ bool CApplication::CreateGUI()
   }
 
   // Retrieve the matching resolution based on GUI settings
+  bool sav_res = false;
   g_guiSettings.m_LookAndFeelResolution = g_guiSettings.GetResolution();
   CLog::Log(LOGNOTICE, "Checking resolution %i", g_guiSettings.m_LookAndFeelResolution);
   if (!g_graphicsContext.IsValidResolution(g_guiSettings.m_LookAndFeelResolution))
   {
     CLog::Log(LOGNOTICE, "Setting safe mode %i", RES_DESKTOP);
-    g_guiSettings.SetResolution(RES_DESKTOP);
+    // defer saving resolution after window was created
+    g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    sav_res = true;
   }
 
   // update the window resolution
   g_Windowing.SetWindowResolution(g_guiSettings.GetInt("window.width"), g_guiSettings.GetInt("window.height"));
 
   if (g_advancedSettings.m_startFullScreen && g_guiSettings.m_LookAndFeelResolution == RES_WINDOW)
+  {
+    // defer saving resolution after window was created
     g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    sav_res = true;
+  }
 
   if (!g_graphicsContext.IsValidResolution(g_guiSettings.m_LookAndFeelResolution))
   {
     // Oh uh - doesn't look good for starting in their wanted screenmode
     CLog::Log(LOGERROR, "The screen resolution requested is not valid, resetting to a valid mode");
     g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    sav_res = true;
   }
-
   if (!InitWindow())
   {
     return false;
   }
+
+  if (sav_res)
+    g_guiSettings.SetResolution(RES_DESKTOP);
 
   if (g_advancedSettings.m_splashImage)
   {
@@ -1032,11 +1035,12 @@ bool CApplication::CreateGUI()
   if (!CButtonTranslator::GetInstance().Load())
     return false;
 
-  int iResolution = g_graphicsContext.GetVideoResolution();
+  RESOLUTION_INFO info = g_graphicsContext.GetResInfo();
   CLog::Log(LOGINFO, "GUI format %ix%i, Display %s",
-            g_settings.m_ResInfo[iResolution].iWidth,
-            g_settings.m_ResInfo[iResolution].iHeight,
-            g_settings.m_ResInfo[iResolution].strMode.c_str());
+            info.iWidth,
+            info.iHeight,
+            info.strMode.c_str());
+
   g_windowManager.Initialize();
 
   return true;
@@ -1044,26 +1048,20 @@ bool CApplication::CreateGUI()
 
 bool CApplication::InitWindow()
 {
+  RESOLUTION res = g_guiSettings.m_LookAndFeelResolution;
+
 #ifdef TARGET_DARWIN_OSX
   // force initial window creation to be windowed, if fullscreen, it will switch to it below
   // fixes the white screen of death if starting fullscreen and switching to windowed.
   bool bFullScreen = false;
-#ifndef __PLEX__
-  if (!g_Windowing.CreateNewWindow("XBMC", bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
-#else
-  if (!g_Windowing.CreateNewWindow("OpenPHT", bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
-#endif
+  if (!g_Windowing.CreateNewWindow(PLEX_TARGET_NAME, bFullScreen, g_settings.m_ResInfo[RES_WINDOW], OnEvent))
   {
     CLog::Log(LOGFATAL, "CApplication::Create: Unable to create window");
     return false;
   }
 #else
   bool bFullScreen = g_guiSettings.m_LookAndFeelResolution != RES_WINDOW;
-#ifndef __PLEX__
-  if (!g_Windowing.CreateNewWindow("XBMC", bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
-#else
-  if (!g_Windowing.CreateNewWindow("OpenPHT", bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
-#endif
+  if (!g_Windowing.CreateNewWindow(PLEX_TARGET_NAME, bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
   {
     CLog::Log(LOGFATAL, "CApplication::Create: Unable to create window");
     return false;
@@ -1076,7 +1074,7 @@ bool CApplication::InitWindow()
     return false;
   }
   // set GUI res and force the clear of the screen
-  g_graphicsContext.SetVideoResolution(g_guiSettings.m_LookAndFeelResolution);
+  g_graphicsContext.SetVideoResolution(res);
   g_fontManager.ReloadTTFFonts();
   return true;
 }
@@ -3864,7 +3862,6 @@ void CApplication::Stop(int exitCode)
       CLog::Log(LOGNOTICE, "Not saving settings (settings.xml is not present)");
 
     m_bStop = true;
-    m_AppActive = false;
     m_AppFocused = false;
     m_ExitCode = exitCode;
     CLog::Log(LOGNOTICE, "stop all");
@@ -5062,6 +5059,7 @@ bool CApplication::ToggleDPMS(bool manual)
     {
       m_dpmsIsActive = false;
       m_dpmsIsManual = false;
+      SetRenderGUI(true);
       return m_dpms->DisablePowerSaving();
     }
     else
@@ -5070,6 +5068,7 @@ bool CApplication::ToggleDPMS(bool manual)
       {
         m_dpmsIsActive = true;
         m_dpmsIsManual = manual;
+        SetRenderGUI(false);
         return true;
       }
     }
@@ -5823,6 +5822,12 @@ void CApplication::ProcessSlow()
     CAddonInstaller::Get().UpdateRepos();
 
   CAEFactory::GarbageCollect();
+
+  // if we don't render the gui there's no reason to start the screensaver.
+  // that way the screensaver won't kick in if we maximize the XBMC window
+  // after the screensaver start time.
+  if(!m_renderGUI)
+    ResetScreenSaverTimer();
 
   /* PLEX */
   if (g_windowManager.GetActiveWindow() == WINDOW_FULLSCREEN_VIDEO && IsPlayingVideo())
