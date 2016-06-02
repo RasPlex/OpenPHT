@@ -361,10 +361,11 @@ static void SinkInfoRequestCallback(pa_context *c, const pa_sink_info *i, int eo
     //add a default device first
     CAEDeviceInfo defaultDevice;
     defaultDevice.m_deviceName = std::string("Default");
-    defaultDevice.m_displayName = std::string("Default");
 #ifdef TARGET_OPENELEC
-    defaultDevice.m_displayNameExtra = std::string("Bluetooth Audio (PULSEAUDIO)");
+    defaultDevice.m_displayName = std::string("Bluetooth");
+    defaultDevice.m_displayNameExtra = std::string("");
 #else
+    defaultDevice.m_displayName = std::string("Default");
     defaultDevice.m_displayNameExtra = std::string("Default Output Device (PULSEAUDIO)");
 #endif
     defaultDevice.m_dataFormats.insert(defaultDevice.m_dataFormats.end(), defaultDataFormats, defaultDataFormats + ARRAY_SIZE(defaultDataFormats));
