@@ -480,6 +480,8 @@ int CGUIWindowAddonBrowser::SelectAddonID(const vector<ADDON::TYPE> &types, CStd
   for (ADDON::IVECADDONS addon = addons.begin(); addon != addons.end(); ++addon)
   {
     CFileItemPtr item(CAddonsDirectory::FileItemFromAddon(*addon, (*addon)->ID()));
+    if (items.Contains(item->GetPath()))
+      item->SetLabel(item->GetLabel() + " (" + g_localizeStrings.Get(24069) + ")");
     items.Add(item);
     addonMap[item->GetPath()] = *addon;
   }
