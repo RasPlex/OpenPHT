@@ -4842,8 +4842,8 @@ msgid "Apple Remote"
 msgstr "苹果遥控器"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "允许用遥控器启动 Kodi"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "允许用遥控器启动 OpenPHT"
 
 msgctxt "#13603"
 msgid "Sequence delay time"

@@ -5268,7 +5268,7 @@ msgstr ""
 #empty string with id 13601
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
+msgid "Allow start of OpenPHT using the remote"
 msgstr ""
 
 msgctxt "#13603"

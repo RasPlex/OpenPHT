@@ -907,7 +907,7 @@ msgstr "פלט סקריפטים"
 
 msgctxt "#263"
 msgid "Allow remote control via HTTP"
-msgstr "אפשר שליטה על Kodi דרך HTTP"
+msgstr "אפשר שליטה על OpenPHT דרך HTTP"
 
 msgctxt "#264"
 msgid "Record"
@@ -4842,8 +4842,8 @@ msgid "Apple Remote"
 msgstr "שלט Apple"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "אפשר הפעלת Kodi בעזרת השלט"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "אפשר הפעלת OpenPHT בעזרת השלט"
 
 msgctxt "#13603"
 msgid "Sequence delay time"

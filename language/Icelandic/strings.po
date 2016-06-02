@@ -4618,8 +4618,8 @@ msgid "Apple Remote"
 msgstr "Apple fjarstýring"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "Leyfa að ræsa Kodi með fjarstýringunni"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "Leyfa að ræsa OpenPHT með fjarstýringunni"
 
 msgctxt "#13603"
 msgid "Sequence delay time"

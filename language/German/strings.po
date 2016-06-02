@@ -4842,8 +4842,8 @@ msgid "Apple Remote"
 msgstr "Apple-Fernbedienung"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "Starten von Kodi über Fernbedienung erlauben"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "Starten von OpenPHT über Fernbedienung erlauben"
 
 msgctxt "#13603"
 msgid "Sequence delay time"
@@ -10635,11 +10635,11 @@ msgstr "Der Adapter konnte nicht angesprochen werden"
 
 msgctxt "#36007"
 msgid "Devices to power on during startup"
-msgstr "Beim Starten von Kodi einschalten"
+msgstr "Beim Starten von OpenPHT einschalten"
 
 msgctxt "#36008"
 msgid "Devices to power off during shutdown"
-msgstr "Beim Ausschalten von Kodi ausschalten"
+msgstr "Beim Ausschalten von OpenPHT ausschalten"
 
 msgctxt "#36009"
 msgid "Put devices in standby mode when activating the screensaver"
@@ -10675,7 +10675,7 @@ msgstr "Verbunden mit HDMI-Gerät"
 
 msgctxt "#36020"
 msgid "Switch source to this device on startup"
-msgstr "Beim Starten, Kodi als aktive Quelle melden "
+msgstr "Beim Starten, OpenPHT als aktive Quelle melden "
 
 msgctxt "#36021"
 msgid "Physical address (overrules HDMI port)"
@@ -10695,11 +10695,11 @@ msgstr "Konfiguration konnte nicht aktualisiert werden. Bitte Einstellungen übe
 
 msgctxt "#36025"
 msgid "Send \"Inactive source\" command on shutdown"
-msgstr "Beim Ausschalten, Kodi als inaktive Quelle melden"
+msgstr "Beim Ausschalten, OpenPHT als inaktive Quelle melden"
 
 msgctxt "#36026"
 msgid "Devices to also put in standby mode"
-msgstr "Geräte zusammen mit Kodi in Standby versetzen"
+msgstr "Geräte zusammen mit OpenPHT in Standby versetzen"
 
 msgctxt "#36027"
 msgid "This device needs servicing"

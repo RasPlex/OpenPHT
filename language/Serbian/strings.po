@@ -4486,8 +4486,8 @@ msgid "Apple Remote"
 msgstr "Apple Daljinski Upravljač"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "Dopusti pokretanje Kodi aplikacije korišćenjem daljinskog upravljača"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "Dopusti pokretanje OpenPHT aplikacije korišćenjem daljinskog upravljača"
 
 msgctxt "#13603"
 msgid "Sequence delay time"

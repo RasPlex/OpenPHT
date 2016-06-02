@@ -4818,8 +4818,8 @@ msgid "Apple Remote"
 msgstr "Apple 리모트"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "리모트를 사용하여 Kodi 시작 허용"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "리모트를 사용하여 OpenPHT 시작 허용"
 
 msgctxt "#13603"
 msgid "Sequence delay time"

@@ -4694,8 +4694,8 @@ msgid "Apple Remote"
 msgstr "Apple daljinski upravljač"
 
 msgctxt "#13602"
-msgid "Allow start of Kodi using the remote"
-msgstr "Omogući pokretanje Kodija koristeći daljinski upravljač"
+msgid "Allow start of OpenPHT using the remote"
+msgstr "Omogući pokretanje OpenPHTja koristeći daljinski upravljač"
 
 msgctxt "#13603"
 msgid "Sequence delay time"
@@ -10043,7 +10043,7 @@ msgstr "Neuspješno postavljanje novog podešavanja. Provjerite vaše postavke."
 
 msgctxt "#36025"
 msgid "Send \"Inactive source\" command on shutdown"
-msgstr "Pošaljite naredbu \"Neaktivan izvor\" pri isključivanju Kodija"
+msgstr "Pošaljite naredbu \"Neaktivan izvor\" pri isključivanju OpenPHTja"
 
 msgctxt "#36028"
 msgid "Ignore"
