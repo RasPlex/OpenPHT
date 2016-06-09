@@ -996,6 +996,10 @@ bool CGraphicContext::ToggleFullScreenRoot ()
   {
     SetVideoResolution(videoRes);
   }
+  else
+  {
+    SetVideoResolution(uiRes);
+  }
 
   return m_bFullScreenRoot;
 }
