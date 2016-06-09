@@ -150,7 +150,7 @@ bool CPlexTranscoderClientRPi::ShouldTranscode(CPlexServerPtr server, const CFil
   }
 #ifdef TARGET_RASPBERRY_PI_2
   // check if video resolution is to large for hevc
-  else if (videoCodec == "hvec" && (videoWidth > 1280 || videoHeight > 720))
+  else if (videoCodec == "hevc" && (videoWidth > 1280 || videoHeight > 720))
   {
     bShouldTranscode = true;
     ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
