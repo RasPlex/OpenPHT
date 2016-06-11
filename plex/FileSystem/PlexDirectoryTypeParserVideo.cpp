@@ -189,7 +189,7 @@ CPlexDirectoryTypeParserVideo::Process(CFileItem &item, CFileItem &mediaContaine
   {
     item.GetVideoInfoTag()->m_iDbId = item.GetProperty("playQueueItemID").asInteger();
   }
-  else if (item.HasProperty("ratingKey"))
+  else if (item.HasProperty("ratingKey") && item.GetProperty("ratingKey").asInteger(-1) >= 0)
   {
     item.GetVideoInfoTag()->m_iDbId = item.GetProperty("ratingKey").asInteger();
   }
