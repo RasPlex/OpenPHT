@@ -238,7 +238,7 @@ bool CRepositoryUpdateJob::DoWork()
         else
           CAddonInstaller::Get().Install(addon->ID(), true, referer);
       }
-      else if (g_settings.m_bAddonNotifications)
+      else if (g_settings.m_bAddonNotifications && addon->IsInUse())
       {
         CGUIDialogKaiToast::QueueNotification(addon->Icon(),
                                               g_localizeStrings.Get(24061),
