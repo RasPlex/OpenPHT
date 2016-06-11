@@ -4760,6 +4760,11 @@ bool CApplication::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
     m_iScreenSaveLock = 0;
     ResetScreenSaverTimer();
 
+    if (!m_screenSaver)
+    {
+      return true;
+    }
+
     if (m_screenSaver->ID() == "visualization")
     {
       // we can just continue as usual from vis mode
