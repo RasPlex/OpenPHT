@@ -24,8 +24,12 @@ using namespace PLAYLIST;
 bool CPlexPlayQueueManager::create(const CFileItem& container, const CStdString& uri,
                                    const CPlexPlayQueueOptions& options)
 {
+  ePlexMediaType mediaType = PlexUtils::GetMediaTypeFromItem(container);
+  if (mediaType == PLEX_MEDIA_TYPE_UNKNOWN)
+    return false;
+
   // look for existing PQ of same type
-  CPlexPlayQueuePtr pq = getPlayQueueOfType(PlexUtils::GetMediaTypeFromItem(container));
+  CPlexPlayQueuePtr pq = getPlayQueueOfType(mediaType);
   
   if (pq && pq->getVersion() > 1 && options.showPrompts)
   {
@@ -48,7 +52,7 @@ bool CPlexPlayQueueManager::create(const CFileItem& container, const CStdString&
   pq = getImpl(container);
   if (pq)
   {
-    m_playQueues[PlexUtils::GetMediaTypeFromItem(container)] = pq;
+    m_playQueues[mediaType] = pq;
     return pq->create(container, uri, options);
   }
 
