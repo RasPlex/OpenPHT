@@ -1155,6 +1155,14 @@ msgctxt "#32123"
 msgid "Disable window and dialog fade animation"
 msgstr ""
 
+msgctxt "#32124"
+msgid "Show "Play File" in Home menu"
+msgstr ""
+
+msgctxt "#32205"
+msgid "Play File"
+msgstr "Play File"
+
 msgctxt "#41000"
 msgid "System Settings"
 msgstr ""

@@ -218,6 +218,13 @@
 					<onclick>Skin.ToggleSetting(DisableWindowFade)</onclick>
 					<selected>Skin.HasSetting(DisableWindowFade)</selected>
 				</control>
+				<control type="radiobutton" id="223">
+					<description>Show "Play File" in Home menu</description>
+					<width>625</width>
+					<label>$LOCALIZE[32124]</label>
+					<onclick>Skin.ToggleSetting(HomeMenuPlayFile)</onclick>
+					<selected>Skin.HasSetting(HomeMenuPlayFile)</selected>
+				</control>
 			</control>
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="61">
