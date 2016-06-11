@@ -1014,7 +1014,7 @@ void CGUISettings::Initialize()
 
   // Plex "Appearance" Settings
   AddGroup(SETTINGS_APPEARANCE, 480);
-  //  CSettingsCategory* laf = AddCategory(SETTINGS_APPEARANCE,"lookandfeel", 166);
+  CSettingsCategory* laf = AddCategory(SETTINGS_APPEARANCE,"lookandfeel", 166);
   AddSeparator(NULL, "lookandfeel.sep2");
   AddBool(NULL, "lookandfeel.enablerssfeeds",13305,  false);
   AddString(NULL, "lookandfeel.rssedit", 21450, "", BUTTON_CONTROL_STANDARD);
@@ -1080,18 +1080,18 @@ void CGUISettings::Initialize()
   AddInt(bgm, "backgroundmusic.bgmusicvolume", 18101, 50, 5, 5, 100, SPIN_CONTROL_INT_PLUS, MASK_PERCENT);
 
   // Appearance/Advanced
-  CSettingsCategory* adva = AddCategory(SETTINGS_APPEARANCE, "advanced", 18105);
-  AddDefaultAddon(adva, "lookandfeel.skin",166,DEFAULT_SKIN, ADDON_SKIN);
-  AddString(adva, "lookandfeel.skinsettings", 21417, "", BUTTON_CONTROL_STANDARD);
-  AddString(adva, "lookandfeel.skintheme",15111,"SKINDEFAULT", SPIN_CONTROL_TEXT);
-  AddString(adva, "lookandfeel.skincolors",14078, "SKINDEFAULT", SPIN_CONTROL_TEXT);
-  AddString(adva, "lookandfeel.font",13303,"Default", SPIN_CONTROL_TEXT);
-  AddInt(adva, "lookandfeel.skinzoom",20109, 0, -20, 2, 20, SPIN_CONTROL_INT, MASK_PERCENT);
+  //CSettingsCategory* adva = AddCategory(SETTINGS_APPEARANCE, "advanced", 18105);
+  AddDefaultAddon(laf, "lookandfeel.skin",166,DEFAULT_SKIN, ADDON_SKIN);
+  AddString(laf, "lookandfeel.skinsettings", 21417, "", BUTTON_CONTROL_STANDARD);
+  AddString(laf, "lookandfeel.skintheme", 15111, "SKINDEFAULT", SPIN_CONTROL_TEXT);
+  AddString(laf, "lookandfeel.skincolors", 14078, "SKINDEFAULT", SPIN_CONTROL_TEXT);
+  AddString(laf, "lookandfeel.font", 13303, "Default", SPIN_CONTROL_TEXT);
+  AddInt(laf, "lookandfeel.skinzoom", 20109, 0, -20, 2, 20, SPIN_CONTROL_INT, MASK_PERCENT);
   AddInt(NULL, "lookandfeel.startupwindow",512,1, WINDOW_HOME, 1, WINDOW_PYTHON_END, SPIN_CONTROL_TEXT);
-  AddString(adva, "lookandfeel.soundskin",15108,"SKINDEFAULT", SPIN_CONTROL_TEXT);
+  AddString(laf, "lookandfeel.soundskin", 15108, "SKINDEFAULT", SPIN_CONTROL_TEXT);
 #ifndef __PLEX__
-  AddBool(adva, "lookandfeel.enableglobalslideshow", 15150, true);
-  AddString(adva, "locale.charset", 14091, "DEFAULT", SPIN_CONTROL_TEXT); // charset is set by the language file
+  AddBool(laf, "lookandfeel.enableglobalslideshow", 15150, true);
+  AddString(laf, "locale.charset", 14091, "DEFAULT", SPIN_CONTROL_TEXT); // charset is set by the language file
 #endif
 
 //  AddCategory(SETTINGS_APPEARANCE, "window", 0);
