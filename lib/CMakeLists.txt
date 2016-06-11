@@ -10,11 +10,6 @@ if(USE_INTERNAL_FFMPEG)
   add_subdirectory(ffmpeg)
 endif(USE_INTERNAL_FFMPEG)
 
-if(TARGET_WIN32)
-  add_subdirectory(libass)
-  add_subdirectory(enca)
-endif()
-
 # build our external projects
 set(CMAKE_SHARED_MODULE_PREFIX "")
 if(TARGET_POSIX)
