@@ -950,56 +950,40 @@ bool CGraphicContext::IsFullScreenRoot () const
 
 bool CGraphicContext::ToggleFullScreenRoot ()
 {
+  RESOLUTION newRes;
   RESOLUTION uiRes;  ///< resolution to save - not necessarily the same as the one we switch to (e.g. during video playback)
-  RESOLUTION videoRes;
-  bool setVideoRes = false;
 
   if (m_bFullScreenRoot)
   {
-    uiRes = RES_WINDOW;
+    newRes = uiRes = RES_WINDOW;
   }
   else
   {
     if (g_guiSettings.m_LookAndFeelResolution > RES_DESKTOP)
-      uiRes = g_guiSettings.m_LookAndFeelResolution;
+      newRes = g_guiSettings.m_LookAndFeelResolution;
     else
-      uiRes = (RESOLUTION) g_Windowing.DesktopResolution(g_Windowing.GetCurrentScreen());
+      newRes = (RESOLUTION) g_Windowing.DesktopResolution(g_Windowing.GetCurrentScreen());
+    uiRes = newRes;
 
 #if defined(HAS_VIDEO_PLAYBACK)
-    if (IsCalibrating())
+    if (IsFullScreenVideo() || IsCalibrating())
     {
       /* we need to trick renderer that we are fullscreen already so it gives us a valid value */
       m_bFullScreenRoot = true;
-      uiRes = g_renderManager.GetResolution();
+      newRes = g_renderManager.GetResolution();
       m_bFullScreenRoot = false;
-    }
-    // if video is playing we need to switch to resolution chosen by RenderManager
-    if (IsFullScreenVideo())
-    {
-      m_bFullScreenRoot = true;
-      videoRes = g_renderManager.GetResolution();
-      m_bFullScreenRoot = false;
-      setVideoRes = true;
     }
 #endif
   }
-
-  g_guiSettings.SetResolution(uiRes);
-
+  
   /* PLEX */
   // add some debug logging to track res changes when toggling fullscreen
   CLog::Log(LOGDEBUG, "Toggling full screen: %d", m_bFullScreenRoot);
-  CLog::Log(LOGDEBUG, "Setting resolution to: %dx%d", g_settings.m_ResInfo[uiRes].iWidth, g_settings.m_ResInfo[uiRes].iHeight);
+  CLog::Log(LOGDEBUG, "Setting resolution to: %dx%d", g_settings.m_ResInfo[newRes].iWidth, g_settings.m_ResInfo[newRes].iHeight);
   /* END PLEX */
 
-  if (setVideoRes)
-  {
-    SetVideoResolution(videoRes);
-  }
-  else
-  {
-    SetVideoResolution(uiRes);
-  }
+  SetVideoResolution(newRes);
+  g_guiSettings.SetResolution(uiRes);
 
   return m_bFullScreenRoot;
 }
