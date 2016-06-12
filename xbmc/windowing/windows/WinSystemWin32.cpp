@@ -599,7 +599,7 @@ void CWinSystemWin32::UpdateResolutions()
 
         RESOLUTION_INFO res;
         UpdateDesktopResolution(res, xbmcmonitor++, w, h, refreshRate, dwFlags);
-        g_settings.m_ResInfo.push_back(res);
+        g_settings.AddResolutionInfo(res);
         CLog::Log(LOGNOTICE, "Secondary mode: %s", res.strMode.c_str());
       }
     }
@@ -647,7 +647,7 @@ void CWinSystemWin32::AddResolution(const RESOLUTION_INFO &res)
       return; // already have this resolution
   }
 
-  g_settings.m_ResInfo.push_back(res);
+  g_settings.AddResolutionInfo(res);
 }
 
 bool CWinSystemWin32::UpdateResolutionsInternal()

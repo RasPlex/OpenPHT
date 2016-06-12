@@ -1101,7 +1101,7 @@ void CWinSystemOSX::UpdateResolutions()
     g_settings.m_ResInfo[RES_DESKTOP].strOutput = [dispName UTF8String];
   }
 
-  //TODO: CDisplaySettings::Get().ClearCustomResolutions();
+  g_settings.ClearCustomResolutions();
 
   // see resolution.h enum RESOLUTION for how the resolutions
   // have to appear in the resolution info vector in CDisplaySettings
@@ -1119,7 +1119,7 @@ void CWinSystemOSX::UpdateResolutions()
       res.strOutput = [dispName UTF8String];
     }
 
-    g_settings.m_ResInfo.push_back(res);
+    g_settings.AddResolutionInfo(res);
   }
 
   if (m_can_display_switch)
@@ -1383,7 +1383,7 @@ void CWinSystemOSX::FillInVideoModes()
         }
 
         g_graphicsContext.ResetOverscan(res);
-        g_settings.m_ResInfo.push_back(res);
+        g_settings.AddResolutionInfo(res);
       }
     }
   }

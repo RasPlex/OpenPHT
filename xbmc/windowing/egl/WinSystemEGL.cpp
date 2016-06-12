@@ -393,7 +393,7 @@ void CWinSystemEGL::UpdateResolutions()
     if ((int)g_settings.m_ResInfo.size() <= res_index)
     {
       RESOLUTION_INFO res;
-      g_settings.m_ResInfo.push_back(res);
+      g_settings.AddResolutionInfo(res);
     }
 
     g_graphicsContext.ResetOverscan(resolutions[i]);

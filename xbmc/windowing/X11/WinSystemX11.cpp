@@ -380,7 +380,7 @@ void CWinSystemX11::UpdateResolutions()
   }
 
   // erase previous stored modes
-  //TODO: CDisplaySettings::Get().ClearCustomResolutions();
+  g_settings.ClearCustomResolutions();
 
   CLog::Log(LOGINFO, "Available videomodes (xrandr):");
 
@@ -430,7 +430,7 @@ void CWinSystemX11::UpdateResolutions()
       res.bFullScreen  = true;
 
       g_graphicsContext.ResetOverscan(res);
-      g_settings.m_ResInfo.push_back(res);
+      g_settings.AddResolutionInfo(res);
     }
   }
   g_settings.ApplyCalibrations();
