@@ -460,7 +460,7 @@ bool CApplication::OnEvent(XBMC_Event& newEvent)
         RESOLUTION newRes = (RESOLUTION) g_Windowing.DesktopResolution(g_Windowing.GetCurrentScreen());
         if (newRes != g_graphicsContext.GetVideoResolution())
         {
-          g_guiSettings.SetResolution(newRes);
+          g_guiSettings.SetCurrentResolution(newRes, true);
           g_graphicsContext.SetVideoResolution(newRes);
         }
       }
@@ -868,13 +868,13 @@ bool CApplication::CreateGUI()
 
   // Retrieve the matching resolution based on GUI settings
   bool sav_res = false;
-  g_guiSettings.m_LookAndFeelResolution = g_guiSettings.GetResolution();
+  g_guiSettings.SetCurrentResolution(g_guiSettings.GetResolution());
   CLog::Log(LOGNOTICE, "Checking resolution %i", g_guiSettings.m_LookAndFeelResolution);
   if (!g_graphicsContext.IsValidResolution(g_guiSettings.m_LookAndFeelResolution))
   {
     CLog::Log(LOGNOTICE, "Setting safe mode %i", RES_DESKTOP);
     // defer saving resolution after window was created
-    g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    g_guiSettings.SetCurrentResolution(RES_DESKTOP);
     sav_res = true;
   }
 
@@ -884,7 +884,7 @@ bool CApplication::CreateGUI()
   if (g_advancedSettings.m_startFullScreen && g_guiSettings.m_LookAndFeelResolution == RES_WINDOW)
   {
     // defer saving resolution after window was created
-    g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    g_guiSettings.SetCurrentResolution(RES_DESKTOP);
     sav_res = true;
   }
 
@@ -892,7 +892,7 @@ bool CApplication::CreateGUI()
   {
     // Oh uh - doesn't look good for starting in their wanted screenmode
     CLog::Log(LOGERROR, "The screen resolution requested is not valid, resetting to a valid mode");
-    g_guiSettings.m_LookAndFeelResolution = RES_DESKTOP;
+    g_guiSettings.SetCurrentResolution(RES_DESKTOP);
     sav_res = true;
   }
   if (!InitWindow())
@@ -901,7 +901,7 @@ bool CApplication::CreateGUI()
   }
 
   if (sav_res)
-    g_guiSettings.SetResolution(RES_DESKTOP);
+    g_guiSettings.SetCurrentResolution(RES_DESKTOP, true);
 
   if (g_advancedSettings.m_splashImage)
   {
@@ -949,8 +949,8 @@ bool CApplication::InitWindow()
     return false;
   }
 #else
-  bool bFullScreen = g_guiSettings.m_LookAndFeelResolution != RES_WINDOW;
-  if (!g_Windowing.CreateNewWindow(PLEX_TARGET_NAME, bFullScreen, g_settings.m_ResInfo[g_guiSettings.m_LookAndFeelResolution], OnEvent))
+  bool bFullScreen = res != RES_WINDOW;
+  if (!g_Windowing.CreateNewWindow(PLEX_TARGET_NAME, bFullScreen, g_settings.m_ResInfo[res], OnEvent))
   {
     CLog::Log(LOGFATAL, "CApplication::Create: Unable to create window");
     return false;

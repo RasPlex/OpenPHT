@@ -1732,8 +1732,10 @@ void CGUIWindowSettingsCategory::OnSettingChanged(BaseSettingControlPtr pSetting
   else if (strSetting.Equals("videoscreen.screen"))
   {
     DisplayMode mode = g_guiSettings.GetInt("videoscreen.screen");
+    // get desktop resolution for screen
+    RESOLUTION newRes = g_guiSettings.GetResolutionForScreen();
     // Cascade
-    FillInResolutions("videoscreen.resolution", mode, RES_DESKTOP, true);
+    FillInResolutions("videoscreen.resolution", mode, newRes, true);
   }
   else if (strSetting.Equals("videoscreen.resolution"))
   {
@@ -2769,6 +2771,8 @@ void CGUIWindowSettingsCategory::FillInCharSets(CSetting *pSetting)
 DisplayMode CGUIWindowSettingsCategory::FillInScreens(CStdString strSetting, RESOLUTION res)
 {
   DisplayMode mode;
+  if (res == RES_WINDOW && !g_Windowing.CanDoWindowed())
+    res = RES_DESKTOP;
   if (res == RES_WINDOW)
     mode = DM_WINDOWED;
   else
@@ -2784,14 +2788,29 @@ DisplayMode CGUIWindowSettingsCategory::FillInScreens(CStdString strSetting, RES
     pControl->Clear();
 
     CStdString strScreen;
-    if (g_advancedSettings.m_canWindowed)
-      pControl->AddLabel(g_localizeStrings.Get(242), -1);
+    if (g_advancedSettings.m_canWindowed && g_Windowing.CanDoWindowed())
+      pControl->AddLabel(g_localizeStrings.Get(242), DM_WINDOWED);
+
+#if defined(HAS_GLX)
+    pControl->AddLabel(g_localizeStrings.Get(244), 0);
+#else
 
     for (int idx = 0; idx < g_Windowing.GetNumScreens(); idx++)
     {
-      strScreen.Format(g_localizeStrings.Get(241), g_settings.m_ResInfo[RES_DESKTOP + idx].iScreen + 1);
-      pControl->AddLabel(strScreen, g_settings.m_ResInfo[RES_DESKTOP + idx].iScreen);
+      int screen = g_settings.m_ResInfo[RES_DESKTOP + idx].iScreen;
+#if defined(TARGET_DARWIN_OSX)
+      if (!g_settings.m_ResInfo[RES_DESKTOP + idx].strOutput.empty())
+        pControl->AddLabel(g_settings.m_ResInfo[RES_DESKTOP + idx].strOutput, screen);
+      else
+#endif
+      {
+        strScreen.Format(g_localizeStrings.Get(241), screen + 1);
+        pControl->AddLabel(strScreen, screen);
+      }
     }
+
+#endif
+
     pControl->SetValue(mode);
     g_guiSettings.SetInt("videoscreen.screen", mode);
   }
@@ -2817,46 +2836,29 @@ void CGUIWindowSettingsCategory::FillInResolutions(CStdString strSetting, Displa
   else
   {
     RESOLUTION_INFO info = g_settings.m_ResInfo[res];
-    vector<RESOLUTION_WHR> resolutions = g_Windowing.ScreenResolutions(info.iScreen, info.fRefreshRate);
-
-    for (unsigned int idx = 0; idx < resolutions.size(); idx++)
+    std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
+    std::vector<RESOLUTION_WHR> resolutions = g_Windowing.ScreenResolutions(info.iScreen, info.fRefreshRate);
+    for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
     {
       CStdString strRes;
-      strRes.Format("%dx%d%s", resolutions[idx].width, resolutions[idx].height,
-        (resolutions[idx].flags & D3DPRESENTFLAG_INTERLACED) ? "i" : "p");
-      pControl->AddLabel(strRes, resolutions[idx].ResInfo_Index);
+      strRes.Format("%dx%d%s", resolution->width, resolution->height,
+        CGUISettings::ModeFlagsToString(resolution->flags, false).c_str());
+      pControl->AddLabel(strRes, resolution->ResInfo_Index);
 
-      RESOLUTION_INFO res1 = g_settings.m_ResInfo[res];
-      RESOLUTION_INFO res2 = g_settings.m_ResInfo[resolutions[idx].ResInfo_Index];
-      if (   res1.iScreen == res2.iScreen
-          && res1.iScreenWidth  == res2.iScreenWidth
-          && res1.iScreenHeight == res2.iScreenHeight
-          && (res1.dwFlags & D3DPRESENTFLAG_INTERLACED) == (res2.dwFlags & D3DPRESENTFLAG_INTERLACED))
-        spinres = (RESOLUTION) resolutions[idx].ResInfo_Index;
+      resolutionInfos.insert(std::make_pair((RESOLUTION)resolution->ResInfo_Index, g_settings.m_ResInfo[resolution->ResInfo_Index]));
     }
+
+    spinres = g_guiSettings.FindBestMatchingResolution(resolutionInfos, info.iScreen,
+      info.iScreenWidth, info.iScreenHeight,
+      info.fRefreshRate, info.dwFlags);
   }
 
   if (UserChange)
   {
-    // Auto-select the windowed or desktop resolution of the screen
-    int autoresolution = RES_DESKTOP;
-    if (mode == DM_WINDOWED)
-    {
-      autoresolution = RES_WINDOW;
-    }
-    else
-    {
-      for (int idx=0; idx < g_Windowing.GetNumScreens(); idx++)
-        if (g_settings.m_ResInfo[RES_DESKTOP + idx].iScreen == mode)
-        {
-          autoresolution = RES_DESKTOP + idx;
-          break;
-        }
-    }
-    pControl->SetValue(autoresolution);
+    pControl->SetValue(spinres);
 
     // Cascade
-    FillInRefreshRates("videoscreen.screenmode", (RESOLUTION) autoresolution, true);
+    FillInRefreshRates("videoscreen.screenmode", res, true);
   }
   else
   {
@@ -2887,17 +2889,19 @@ void CGUIWindowSettingsCategory::FillInRefreshRates(CStdString strSetting, RESOL
     pControl = (CGUISpinControlEx *)GetControl(control->GetID());
     pControl->Clear();
 
+    // only add "Windowed" if in windowed mode
     if (res == RES_WINDOW)
     {
       pControl->AddLabel(g_localizeStrings.Get(242), RES_WINDOW);
     }
     else
     {
-      for (unsigned int idx = 0; idx < refreshrates.size(); idx++)
+      bool match = false;
+      for (std::vector<REFRESHRATE>::const_iterator refreshrate = refreshrates.begin(); refreshrate != refreshrates.end(); ++refreshrate)
       {
         CStdString strRR;
-        strRR.Format("%.02f", refreshrates[idx].RefreshRate);
-        pControl->AddLabel(strRR, refreshrates[idx].ResInfo_Index);
+        strRR.Format("%.02f", refreshrate->RefreshRate);
+        pControl->AddLabel(strRR, refreshrate->ResInfo_Index);
       }
     }
   }
@@ -2928,12 +2932,12 @@ void CGUIWindowSettingsCategory::OnRefreshRateChanged(RESOLUTION nextRes)
   RESOLUTION lastRes = g_graphicsContext.GetVideoResolution();
   bool cancelled = false;
 
-  g_guiSettings.SetResolution(nextRes);
+  g_guiSettings.SetCurrentResolution(nextRes, true);
   g_graphicsContext.SetVideoResolution(nextRes);
 
   if (!CGUIDialogYesNo::ShowAndGetInput(13110, 13111, 20022, 20022, -1, -1, cancelled, 10000))
   {
-    g_guiSettings.SetResolution(lastRes);
+    g_guiSettings.SetCurrentResolution(lastRes, true);
     g_graphicsContext.SetVideoResolution(lastRes);
 
     DisplayMode mode = FillInScreens("videoscreen.screen", lastRes);

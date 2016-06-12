@@ -490,7 +490,7 @@ int CBuiltins::Execute(const CStdString& execString)
     else if (parameter.Equals("1080i")) res = RES_HDTV_1080i;
     if (g_graphicsContext.IsValidResolution(res))
     {
-      g_guiSettings.SetResolution(res);
+      g_guiSettings.SetCurrentResolution(res, true);
       g_graphicsContext.SetVideoResolution(res);
       g_application.ReloadSkin();
     }

@@ -543,7 +543,9 @@ void CGUISettings::Initialize()
   CSettingsCategory* advs = AddCategory(SETTINGS_SYSTEM, "advanced", 18105);
   AddString(advs, "advanced.labelvideo", 291, "", BUTTON_CONTROL_STANDARD);
 
-  //TODO: videoscreen.monitor
+#ifdef HAS_GLX
+  AddString(advs, "videoscreen.monitor", 246, "Default", SPIN_CONTROL_TEXT);
+#endif
 
   // this setting would ideally not be saved, as its value is systematically derived from videoscreen.screenmode.
   // contains a DISPLAYMODE
@@ -937,7 +939,7 @@ void CGUISettings::Initialize()
   AddInt(adv, "videoplayer.rendermethod", 18109, RENDER_METHOD_AUTO, renderers, SPIN_CONTROL_TEXT);
 
 #if defined(HAS_GL) || defined(HAS_DX)
-  AddInt(adv, "videoplayer.hqscalers", 13435, 0, 0, 10, 100, SPIN_CONTROL_INT, 14047);
+  AddInt(adv, "videoplayer.hqscalers", 13435, 20, 0, 10, 100, SPIN_CONTROL_INT, 14047);
 #endif
 
 #ifdef HAVE_LIBVDPAU
@@ -1611,69 +1613,146 @@ RESOLUTION CGUISettings::GetResolution() const
   return GetResFromString(GetString("videoscreen.screenmode"));
 }
 
+void CGUISettings::SetCurrentResolution(RESOLUTION resolution, bool save /* = false */)
+{
+  if (resolution == RES_WINDOW && !g_Windowing.CanDoWindowed())
+    resolution = RES_DESKTOP;
+
+  CLog::Log(LOGDEBUG, "Setting GUI settings res to: %dx%d", g_settings.m_ResInfo[resolution].iWidth, g_settings.m_ResInfo[resolution].iHeight);
+
+  if (save)
+  {
+    CStdString mode = GetStringFromRes(resolution);
+    SetString("videoscreen.screenmode", mode);
+  }
+  
+  if (resolution != m_LookAndFeelResolution)
+  {
+    m_LookAndFeelResolution = resolution;
+    SetChanged();
+  }
+}
+
 RESOLUTION CGUISettings::GetResFromString(const CStdString &res)
 {
   if (res == "DESKTOP")
     return RES_DESKTOP;
   else if (res == "WINDOW")
     return RES_WINDOW;
-  else if (res.GetLength() == 21)
+  else if (res.GetLength() >= 21)
   {
-    // format: SWWWWWHHHHHRRR.RRRRRP, where S = screen, W = width, H = height, R = refresh, P = interlace
-    int screen = atol(res.Mid(0,1).c_str());
-    int width = atol(res.Mid(1,5).c_str());
-    int height = atol(res.Mid(6,5).c_str());
-    float refresh = (float)atof(res.Mid(11,9).c_str());
+    // format: SWWWWWHHHHHRRR.RRRRRP333, where S = screen, W = width, H = height, R = refresh, P = interlace, 3 = stereo mode
+    int screen = std::strtol(res.Mid(0,1).c_str(), NULL, 10);
+    int width = std::strtol(res.Mid(1,5).c_str(), NULL, 10);
+    int height = std::strtol(res.Mid(6,5).c_str(), NULL, 10);
+    float refresh = (float)std::strtod(res.Mid(11,9).c_str(), NULL);
+    unsigned flags = 0;
+
     // look for 'i' and treat everything else as progressive,
-    // and use 100/200 to get a nice square_error.
-    int interlaced = (res.Right(1) == "i") ? 100:200;
-    // find the closest match to these in our res vector.  If we have the screen, we score the res
-    RESOLUTION bestRes = RES_DESKTOP;
-    float bestScore = FLT_MAX;
-    for (unsigned int i = RES_DESKTOP; i < g_settings.m_ResInfo.size(); ++i)
-    {
-      const RESOLUTION_INFO &info = g_settings.m_ResInfo[i];
-      if (info.iScreen != screen)
-        continue;
-      float score = 10 * (square_error((float)info.iScreenWidth, (float)width) +
-        square_error((float)info.iScreenHeight, (float)height) +
-        square_error(info.fRefreshRate, refresh) +
-        square_error((float)((info.dwFlags & D3DPRESENTFLAG_INTERLACED) ? 100:200), (float)interlaced));
-      if (score < bestScore)
-      {
-        bestScore = score;
-        bestRes = (RESOLUTION)i;
-      }
-    }
-    return bestRes;
+    if(res.Mid(20,1) == "i")
+      flags |= D3DPRESENTFLAG_INTERLACED;
+
+    if(res.Mid(21,3) == "sbs")
+      flags |= D3DPRESENTFLAG_MODE3DSBS;
+    else if(res.Mid(21,3) == "tab")
+      flags |= D3DPRESENTFLAG_MODE3DTB;
+
+    std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
+    for (size_t resolution = RES_DESKTOP; resolution < g_settings.m_ResInfo.size(); resolution++)
+      resolutionInfos.insert(std::make_pair((RESOLUTION)resolution, g_settings.m_ResInfo[resolution]));
+
+    return FindBestMatchingResolution(resolutionInfos, screen, width, height, refresh, flags);
   }
+
   return RES_DESKTOP;
+}
+
+RESOLUTION CGUISettings::FindBestMatchingResolution(const std::map<RESOLUTION, RESOLUTION_INFO> &resolutionInfos, int screen, int width, int height, float refreshrate, unsigned flags)
+{
+  // find the closest match to these in our res vector.  If we have the screen, we score the res
+  RESOLUTION bestRes = RES_DESKTOP;
+  float bestScore = FLT_MAX;
+  flags &= D3DPRESENTFLAG_MODEMASK;
+
+  for (std::map<RESOLUTION, RESOLUTION_INFO>::const_iterator it = resolutionInfos.begin(); it != resolutionInfos.end(); ++it)
+  {
+    const RESOLUTION_INFO &info = it->second;
+
+    if (info.iScreen != screen
+      || (info.dwFlags & D3DPRESENTFLAG_MODEMASK) != flags)
+      continue;
+
+    float score = 10 * (square_error((float)info.iScreenWidth, (float)width) +
+      square_error((float)info.iScreenHeight, (float)height) +
+      square_error(info.fRefreshRate, refreshrate));
+    if (score < bestScore)
+    {
+      bestScore = score;
+      bestRes = it->first;
+    }
+  }
+
+  return bestRes;
+}
+
+RESOLUTION CGUISettings::GetResolutionForScreen()
+{
+  DisplayMode mode = GetInt("videoscreen.screen");
+  if (mode == DM_WINDOWED)
+    return RES_WINDOW;
+
+  for (int idx=0; idx < g_Windowing.GetNumScreens(); idx++)
+  {
+    if (g_settings.m_ResInfo[RES_DESKTOP + idx].iScreen == mode)
+      return (RESOLUTION)(RES_DESKTOP + idx);
+  }
+
+  return RES_DESKTOP;
+}
+
+std::string CGUISettings::ModeFlagsToString(unsigned int flags, bool identifier)
+{
+  std::string res;
+  if (flags & D3DPRESENTFLAG_INTERLACED)
+    res += "i";
+  else
+    res += "p";
+
+  if (!identifier)
+    res += " ";
+
+  if (flags & D3DPRESENTFLAG_MODE3DSBS)
+    res += "sbs";
+  else if (flags & D3DPRESENTFLAG_MODE3DTB)
+    res += "tab";
+  else if (identifier)
+    res += "std";
+  return res;
+}
+
+CStdString CGUISettings::GetStringFromRes(RESOLUTION resolution, float refreshrate /* = 0.0f */)
+{
+  if (resolution == RES_WINDOW)
+    return "WINDOW";
+
+  if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)g_settings.m_ResInfo.size())
+  {
+    const RESOLUTION_INFO &info = g_settings.m_ResInfo[resolution];
+    // also handle RES_DESKTOP resolutions with non-default refresh rates
+    if (resolution != RES_DESKTOP || (refreshrate > 0.0f && refreshrate != info.fRefreshRate))
+    {
+      return StringUtils::Format("%1i%05i%05i%09.5f%s", info.iScreen,
+        info.iScreenWidth, info.iScreenHeight,
+        refreshrate > 0.0f ? refreshrate : info.fRefreshRate, ModeFlagsToString(info.dwFlags, true).c_str());
+    }
+  }
+
+  return "DESKTOP";
 }
 
 void CGUISettings::SetResolution(RESOLUTION res)
 {
-  CStdString mode;
-  if (res == RES_DESKTOP)
-    mode = "DESKTOP";
-  else if (res == RES_WINDOW)
-    mode = "WINDOW";
-  else if (res >= RES_CUSTOM && res < (RESOLUTION)g_settings.m_ResInfo.size())
-  {
-    const RESOLUTION_INFO &info = g_settings.m_ResInfo[res];
-    mode.Format("%1i%05i%05i%09.5f%s", info.iScreen,
-      info.iScreenWidth, info.iScreenHeight, info.fRefreshRate,
-      (info.dwFlags & D3DPRESENTFLAG_INTERLACED) ? "i":"p");
-  }
-  else
-  {
-    CLog::Log(LOGWARNING, "%s, setting invalid resolution %i", __FUNCTION__, res);
-    mode = "DESKTOP";
-  }
-  SetString("videoscreen.screenmode", mode);
-  m_LookAndFeelResolution = res;
-  CLog::Log(LOGDEBUG, "Setting GUI settings res to: %dx%d", g_settings.m_ResInfo[res].iWidth, g_settings.m_ResInfo[res].iHeight);
-
-  SetChanged();
+  SetCurrentResolution(res, true);
 }
 
 bool CGUISettings::SetLanguage(const CStdString &strLanguage)

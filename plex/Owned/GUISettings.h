@@ -526,7 +526,12 @@ public:
   void LoadMasterLock(TiXmlElement *pRootElement);
 
   RESOLUTION GetResolution() const;
+  void SetCurrentResolution(RESOLUTION resolution, bool save = false);
+  static std::string ModeFlagsToString(unsigned int flags, bool identifier);
   static RESOLUTION GetResFromString(const CStdString &res);
+  static CStdString GetStringFromRes(RESOLUTION resolution, float refreshrate = 0.0f);
+  static RESOLUTION FindBestMatchingResolution(const std::map<RESOLUTION, RESOLUTION_INFO> &resolutionInfos, int screen, int width, int height, float refreshrate, unsigned flags);
+  RESOLUTION GetResolutionForScreen();
   void SetResolution(RESOLUTION res);
   bool SetLanguage(const CStdString &strLanguage);
 
