@@ -1159,6 +1159,14 @@ msgctxt "#32124"
 msgid "Show "Play File" in Home menu"
 msgstr ""
 
+msgctxt "#32125"
+msgid "Default path for "Play File""
+msgstr ""
+
+msgctxt "#32126"
+msgid " - Reset"
+msgstr ""
+
 msgctxt "#32205"
 msgid "Play File"
 msgstr "Play File"

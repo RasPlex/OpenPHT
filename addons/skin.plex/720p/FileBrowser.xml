@@ -71,8 +71,8 @@
 					<control type="list" id="450">
 						<width>560</width>
 						<height>300</height>
-						<onleft>414</onleft>
-						<onright>414</onright>
+						<onleft>413</onleft>
+						<onright>413</onright>
 						<onup>450</onup>
 						<ondown>450</ondown>
 						<pagecontrol>61</pagecontrol>
@@ -112,15 +112,15 @@
 					</control>
 					<control type="scrollbar" id="61">
 						<description>Scroll Bar</description>
-						<posy>-5</posy>
-						<posx>570</posx>
+						<posy>-8</posy>
+						<posx>566</posx>
 						<width>20</width>
-						<height>300</height>
+						<height>312</height>
 					</control>
 				</control>
 				<control type="label" id="412">
 					<description>Path</description>
-					<posy>420</posy>
+					<posy>410</posy>
 					<posx>30</posx>
 					<width>560</width>
 					<font>Bold-17</font>
@@ -171,8 +171,9 @@
 				<control type="group">
 					<posx>0</posx>
 					<posy>438</posy>
-					<!--><control type="button" id="413">
+					<control type="button" id="413">
 						<description>Ok Button</description>
+						<posx>70</posx>
 						<onleft>414</onleft>
 						<onright>414</onright>
 						<onup>450</onup>
@@ -180,12 +181,12 @@
 						<textoffsety>3</textoffsety>
 						<label>$LOCALIZE[186]</label>
 						<include>DialogPressButton</include>
-					</control>-->
+					</control>
 					<control type="button" id="414">
 						<description>Cancel Button</description>
-						<posx>210</posx>
-						<onleft>450</onleft>
-						<onright>450</onright>
+						<posx>330</posx>
+						<onleft>413</onleft>
+						<onright>413</onright>
 						<onup>450</onup>
 						<width>200</width>
 						<textoffsety>3</textoffsety>

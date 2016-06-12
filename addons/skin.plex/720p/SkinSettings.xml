@@ -225,6 +225,21 @@
 					<onclick>Skin.ToggleSetting(HomeMenuPlayFile)</onclick>
 					<selected>Skin.HasSetting(HomeMenuPlayFile)</selected>
 				</control>
+				<control type="radiobutton" id="224">
+					<description>Show "Play File" in Home menu</description>
+					<width>625</width>
+					<label>$LOCALIZE[32125]</label>
+					<onclick>Skin.SetPath(HomeMenuPlayFilePath)</onclick>
+					<selected>!IsEmpty(Skin.String(HomeMenuPlayFilePath))</selected>
+					<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
+				</control>
+				<control type="button" id="225">
+					<description>Reset default path for "Play File"</description>
+					<width>625</width>
+					<label>$LOCALIZE[32126]</label>
+					<onclick>Skin.Reset(HomeMenuPlayFilePath)</onclick>	
+					<visible>Skin.HasSetting(HomeMenuPlayFile) + !IsEmpty(Skin.String(HomeMenuPlayFilePath))</visible>
+				</control>
 			</control>
 			<!-- Scrollbar -->
 			<control type="scrollbar" id="61">
