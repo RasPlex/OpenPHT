@@ -37,7 +37,7 @@
 <keymap>
   <global>
     <remote>
-      <play>Play</play>
+      <play>PlayPause</play>
       <pause>Pause</pause>
       <stop>Stop</stop>
       <forward>FastForward</forward>
