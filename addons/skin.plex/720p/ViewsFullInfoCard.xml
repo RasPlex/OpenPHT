@@ -263,7 +263,7 @@
 								<height>215</height>
 								<fadetime>300</fadetime>
 								<aspectratio scalediffuse="false" align="center" aligny="top">scale</aspectratio>
-								<texture fallback="default-thumb-big.png" background="true">$INFO[ListItem.Art(thumb)]</texture>
+								<texture fallback="default-thumb-big.png" background="true">$INFO[EpisodeThumbVar]</texture>
 								<visible>IsEmpty(ListItem.Property(Fanart_Image)) | Container.PlexContent(Homemovies) | Container.PlexContent(Photos) | Container.PlexContent(Artists) | [Container.PlexContent(Channel) + ListItem.Type(photo)] | [Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode)]]</visible>
 							</control>
 							<include>ListItemFullInfoThumbCardUnwatchedOverlay</include>
@@ -652,7 +652,7 @@
 							<include>HomeListItemFullInfoThumbCard</include>
 							<control type="image">
 								<include>HomeListItemFullInfoThumbSize</include>
-								<texture background="true">$INFO[Container(11001).ListItem.Art(thumb)]</texture>
+								<texture background="true">$VAR[OnDeckEpisodeThumbVar]</texture>
 								<visible>!Container(11001).ListItem.Type(movie)</visible>
 							</control>
 							<control type="image">
@@ -675,13 +675,21 @@
 							<include>HomeListItemFullInfoThumbCard</include>
 							<control type="image">
 								<include>HomeListItemFullInfoThumbSize</include>
-								<texture background="true">$INFO[Container(11000).ListItem.Art(thumb)]</texture>
+								<texture background="true">$VAR[RecentlyAddedEpisodeThumbVar]</texture>
 								<visible>!Container(11000).ListItem.Type(movie) | !Container(11000).ListItem.Type(season)</visible>
 							</control>
 							<control type="image">
 								<include>HomeListItemFullInfoThumbSize</include>
 								<texture background="true">$INFO[Container(11000).ListItem.Property(Fanart_Image)]</texture>
 								<visible>Container(11000).ListItem.Type(movie) | Container(11000).ListItem.Type(season)</visible>
+							</control>
+							<control type="image">
+								<posx>367</posx>
+								<posy>210</posy>
+								<width>30</width>
+								<height>30</height>
+								<texture>$INFO[Container(11000).ListItem.Overlay]</texture>
+								<visible>Container(11000).ListItem.Status(InProgress)</visible>
 							</control>
 						</control>
 						<!-- queue & recommended -->

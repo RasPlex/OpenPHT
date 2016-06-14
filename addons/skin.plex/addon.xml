@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="skin.plex" version="1.6.0" name="OpenPHT" provider-name="Team RasPlex">
+<addon id="skin.plex" version="1.6.1" name="OpenPHT" provider-name="OpenPHT Team">
 	<requires>
 		<import addon="xbmc.gui" version="4.0.0"/>
 	</requires>
@@ -8,7 +8,7 @@
 		<res width="1280" height="800" aspect="16:10" default="false" folder="720p"/>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary lang="en">OpenPHT by Team RasPlex (OpenPHT's default skin)</summary>
+		<summary lang="en">OpenPHT by the OpenPHT Team (OpenPHT's default skin)</summary>
 		<description lang="en">"OpenPHT" is the default skin for OpenPHT.</description>
 		<disclaimer lang="en">"OpenPHT" is the default skin for OpenPHT, removing it may cause issues.</disclaimer>
 		<platform>all</platform>
