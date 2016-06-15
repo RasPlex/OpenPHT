@@ -507,14 +507,14 @@
 						<label>$LOCALIZE[31960]</label>
 						<onclick>Dialog.Close(4998)</onclick>
 						<onclick>Plex.Suspend</onclick>
-						<visible>!System.isSystem(rasplex)</visible>
+						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
 					</item>
 					<item id="113">
 						<description>Shut Down</description>
 						<label>$LOCALIZE[31961]</label>
 						<onclick>Dialog.Close(4998)</onclick>
 						<onclick>Plex.Powerdown</onclick>
-						<visible>!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)</visible>
+						<visible>System.CanPowerDown + [!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)]</visible>
 					</item>
 					<item id="114">
 						<description>Restart</description>
@@ -630,7 +630,7 @@
 						<label>$LOCALIZE[31960]</label>
 						<onclick>Dialog.Close(4998)</onclick>
 						<onclick>Plex.Suspend</onclick>
-						<visible>!System.isSystem(rasplex)</visible>
+						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
 					</item>
 					<item id="114">
 						<description>Restart</description>
