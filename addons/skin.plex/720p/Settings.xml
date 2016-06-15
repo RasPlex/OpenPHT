@@ -1,31 +1,5 @@
 <?xml version="1.0"?>
 <window id="4">
-	<defaultcontrol>9000</defaultcontrol>
 	<allowoverlay>no</allowoverlay>
-	<controls>
-		<control type="image">
-			<description>Background</description>
-			<include>Base</include>
-			<include>FullScreenStretched</include>
-			<colordiffuse>FF111315</colordiffuse>
-		</control>
-		<control type="image">
-			<description>Background</description>
-			<width>1280</width>
-			<height>360</height>
-			<include>Black</include>
-		</control>
-		<control type="image">
-			<description>Background</description>
-			<posy>360</posy>
-			<width>1280</width>
-			<height>360</height>
-			<include>Base</include>
-			<colordiffuse>FFd1801c</colordiffuse>
-			<animation effect="fade" start="0" end="6" time="0" condition="true">Conditional</animation>
-		</control>
-		<include>debugInfos</include>
-		<include>Grid</include>
-		<include>Non16x9Cache</include>
-	</controls>
+	<onload>Action(PreviousMenu)</onload>
 </window>
