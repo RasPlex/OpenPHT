@@ -240,7 +240,7 @@ msgstr "Percorso dello Script Lyrics"
 
 msgctxt "#31047"
 msgid "Not Available"
-msgstr ""
+msgstr "Non Disponibile"
 
 
 #empty strings from id 31048 to 31049
@@ -393,7 +393,7 @@ msgstr "Fanart"
 
 msgctxt "#31119"
 msgid "Synopsis"
-msgstr "Descrizione"
+msgstr "Sinossi"
 
 
 msgctxt "#31120"
@@ -498,7 +498,7 @@ msgstr "Non visto"
 
 msgctxt "#31140"
 msgid "First Aired"
-msgstr ""
+msgstr "Prima Visione"
 
 
 msgctxt "#31141"
@@ -1077,32 +1077,32 @@ msgstr "Nota: Una volta premuto 'OK' qesto messaggio non apparirà più"
 
 msgctxt "#31851"
 msgid "[COLOR=orange]Plex[/COLOR] bridges the gap between your Mac and your home theater, doing so with a visually appealing user interface that provides instant access to your media. [COLOR=orange]Plex[/COLOR] can play a wide range of video, audio and photo formats as well as online streaming audio and video. The real power of [COLOR=orange]Plex[/COLOR] is found in its library features: Organize your media into versatile libraries, automatically retrieve metadata from the Internet and display your library using one of the visually stunning skins."
-msgstr ""
+msgstr "[COLOR=orange]Plex[/COLOR] colma il divario tra il tuo Mac e il tuo home theater, e lo fa con un'interfaccia utente accativante che garantisce accesso istantaneo ai tuoi media. [COLOR=orange]Plex[/COLOR] può riprodurre un'ampia gamma di formati video, audio e immagini cosiccome streaming audio e video online. Il vero potere di [COLOR=orange]Plex[/COLOR] si trova nelle funzioni della sua libreria: Organizza i tuoi media in librerie versatili, recupera automaticamente metadati da Internet e mostra la tua collezione usando una delle visivamente impressionanti skin."
 
 
 msgctxt "#31852"
 msgid "At Plex, we would like to thank the following projects, without whom none of this would be possible:"
-msgstr ""
+msgstr "Noi di Plex vorremmo ringraziare i seguenti progetti, senza cui niente di questo sarebbe possibile:"
 
 
 msgctxt "#31853"
 msgid "[COLOR=orange]XBMC[/COLOR]: The most important one, for supplying us with a great foundation to build on."
-msgstr ""
+msgstr "[COLOR=orange]XBMC[/COLOR]: Il più importante, per averci fornito grandi fondamenta su cui costruire."
 
 
 msgctxt "#31854"
 msgid "[COLOR=orange]Team RazorFish[/COLOR]: The talented team who created the original MediaStream skin."
-msgstr ""
+msgstr "[COLOR=orange]Team RazorFish[/COLOR]: Il talentuoso team che ha creato originariamente la skin MediaStream."
 
 
 msgctxt "#31855"
 msgid "[COLOR=orange]FFmpeg[/COLOR]: Without this, there would be no decoding of video inside Plex. A critical component, to be sure."
-msgstr ""
+msgstr [COLOR=orange]FFmpeg[/COLOR]: Senza questo, non ci sarebbe la decodifica dei video in Plex. Un componente critico, sicuramente.""
 
 
 msgctxt "#31856"
 msgid "[COLOR=orange]SQLite[/COLOR]: The media database is stored using this excellent, industry standard free database."
-msgstr ""
+msgstr "[COLOR=orange]SQLite[/COLOR]: I dati dei media sono conservati usando questo database gratis, eccellente e di standard industriale."
 
 
 msgctxt "#31857"
@@ -1122,7 +1122,7 @@ msgstr ""
 
 msgctxt "#31860"
 msgid "Please visit http://www.plexapp.com/credits.php for links and more information."
-msgstr ""
+msgstr "Per favore visita http://www.plexapp.com/credits.php per link e altre informazioni."
 
 
 #Profiles
