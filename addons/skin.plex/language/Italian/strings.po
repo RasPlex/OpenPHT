@@ -247,7 +247,7 @@ msgstr ""
 
 msgctxt "#31050"
 msgid "Items"
-msgstr ""
+msgstr "Elementi"
 
 
 #Programs
@@ -312,12 +312,12 @@ msgstr "Il"
 
 msgctxt "#31068"
 msgid "User ID:"
-msgstr ""
+msgstr "ID Utente:"
 
 
 msgctxt "#31069"
 msgid "Password:"
-msgstr ""
+msgstr "Password:"
 
 
 #Power
@@ -438,7 +438,7 @@ msgstr "Dettagli Episodio"
 
 msgctxt "#31128"
 msgid "Banner"
-msgstr ""
+msgstr "Banner"
 
 
 msgctxt "#31129"
@@ -448,32 +448,32 @@ msgstr "Valutazione"
 
 msgctxt "#31130"
 msgid "IMDb Rating"
-msgstr ""
+msgstr "Valutazione IMDb"
 
 
 msgctxt "#31131"
 msgid "Genre"
-msgstr ""
+msgstr "Genere"
 
 
 msgctxt "#31132"
 msgid "Duration"
-msgstr ""
+msgstr "Durata"
 
 
 msgctxt "#31133"
 msgid "Subtitles"
-msgstr ""
+msgstr "Sottotitoli"
 
 
 msgctxt "#31134"
 msgid "Cast"
-msgstr ""
+msgstr "Cast"
 
 
 msgctxt "#31135"
 msgid "Director"
-msgstr ""
+msgstr "Regista"
 
 
 msgctxt "#31136"
@@ -483,17 +483,17 @@ msgstr "Scrittore"
 
 msgctxt "#31137"
 msgid "Episodes"
-msgstr ""
+msgstr "Episodi"
 
 
 msgctxt "#31138"
 msgid "Watched"
-msgstr ""
+msgstr "Visto"
 
 
 msgctxt "#31139"
 msgid "Unwatched"
-msgstr ""
+msgstr "Non visto"
 
 
 msgctxt "#31140"
@@ -503,27 +503,27 @@ msgstr ""
 
 msgctxt "#31141"
 msgid "Season"
-msgstr ""
+msgstr "Stagione"
 
 
 msgctxt "#31142"
 msgid "Movie"
-msgstr ""
+msgstr "Film"
 
 
 msgctxt "#31143"
 msgid "TV Show"
-msgstr ""
+msgstr "Spettacolo TV"
 
 
 msgctxt "#31144"
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 
 msgctxt "#31145"
 msgid "Specials"
-msgstr ""
+msgstr "Speciali"
 
 
 #Music
@@ -576,12 +576,12 @@ msgstr "Testi"
 
 msgctxt "#31229"
 msgid "Artist"
-msgstr ""
+msgstr "Artista"
 
 
 msgctxt "#31230"
 msgid "Album"
-msgstr ""
+msgstr "Album"
 
 
 #Settings
@@ -634,7 +634,7 @@ msgstr "Dest."
 
 msgctxt "#31610"
 msgid "Playback"
-msgstr ""
+msgstr "Riproduzione"
 
 
 #empty strings from id 31611 to 31619
@@ -905,7 +905,7 @@ msgstr "Visualizza AM/PM nell'orologio"
 
 msgctxt "#31697"
 msgid "Hide Photo Description in Slideshow"
-msgstr ""
+msgstr "Nascondi Descrizione Foto nello Slideshow"
 
 
 #Options Menu
@@ -1000,17 +1000,17 @@ msgstr "Menu Opzioni"
 
 msgctxt "#31720"
 msgid "Grid"
-msgstr ""
+msgstr "Griglia"
 
 
 msgctxt "#31721"
 msgid "Episodes List"
-msgstr ""
+msgstr "Lista Episodi"
 
 
 msgctxt "#31722"
 msgid "Plugin Stream"
-msgstr ""
+msgstr "Flusso Plugin"
 
 
 #Credits
@@ -1070,7 +1070,7 @@ msgstr "Clicca \"OK\" per continuare e cominciare ad usare la nostra skin"
 
 msgctxt "#31811"
 msgid "Note: This is the only time you will see this message once you hit \"OK\""
-msgstr "Nota: Una volta premuto 'OK' qesto messaggio non apparira' piu'"
+msgstr "Nota: Una volta premuto 'OK' qesto messaggio non apparirà più"
 
 
 #empty strings from id 31812 to 31850
@@ -1158,32 +1158,32 @@ msgstr "L'Immagine Profilo"
 
 msgctxt "#31950"
 msgid "Go to your"
-msgstr ""
+msgstr "Vai al tuo"
 
 
 msgctxt "#31951"
 msgid "Visit"
-msgstr ""
+msgstr "Visita"
 
 
 msgctxt "#31952"
 msgid "Channel Directory"
-msgstr ""
+msgstr "Elenco dei Canali"
 
 
 msgctxt "#31953"
 msgid "Get"
-msgstr ""
+msgstr "Ottieni"
 
 
 msgctxt "#31954"
 msgid "Help"
-msgstr ""
+msgstr "Aiuto"
 
 
 msgctxt "#31955"
 msgid "Preferences"
-msgstr ""
+msgstr "Preferenze"
 
 
 msgctxt "#31956"
@@ -1200,7 +1200,7 @@ msgstr ""
 
 msgctxt "#31961"
 msgid "Shut Down"
-msgstr ""
+msgstr "Spegni"
 
 
 msgctxt "#31962"
@@ -1222,22 +1222,22 @@ msgstr ""
 
 msgctxt "#31970"
 msgid "Channels"
-msgstr ""
+msgstr "Canali"
 
 
 msgctxt "#31971"
 msgid "Video Channels"
-msgstr ""
+msgstr "Canali Video"
 
 
 msgctxt "#31972"
 msgid "Music Channels"
-msgstr ""
+msgstr "Canali Musicali"
 
 
 msgctxt "#31973"
 msgid "Picture Channels"
-msgstr ""
+msgstr "Canali Immagini"
 
 
 #empty strings from id 31974 to 31980
@@ -1283,7 +1283,7 @@ msgstr ""
 
 msgctxt "#32001"
 msgid "OpenPHT Setup"
-msgstr ""
+msgstr "Setup di OpenPHT"
 
 
 #empty string with id 32002
@@ -1303,25 +1303,25 @@ msgstr "Imposta Valutazione"
 
 msgctxt "#32101"
 msgid "Episodes added"
-msgstr ""
+msgstr "Episodi aggiunti"
 
 
 msgctxt "#32102"
 msgid "All Episodes"
-msgstr ""
+msgstr "Tutti gli Episodi"
 
 
 msgctxt "#32103"
 msgid "There is no description available for this "
-msgstr ""
+msgstr "Non c'è la descrizione per questo "
 
 
 msgctxt "#32104"
 msgid "You can add one for it in the Media Manager"
-msgstr ""
+msgstr "Puoi aggiungerne una nel Media Manager"
 
 
 msgctxt "#32105"
 msgid "* Plot hidden to avoid spoilers *"
-msgstr ""
+msgstr "* Trama nascosta per evitare spoiler*"
 
