@@ -21,32 +21,32 @@ msgstr "Esplora"
 
 msgctxt "#31001"
 msgid "Videos"
-msgstr "I Video"
+msgstr "Video"
 
 
 msgctxt "#31002"
 msgid "Music"
-msgstr "La Musica"
+msgstr "Musica"
 
 
 msgctxt "#31003"
 msgid "Pictures"
-msgstr "Le Immagini"
+msgstr "Immagini"
 
 
 msgctxt "#31004"
 msgid "Applications"
-msgstr "I Programmi"
+msgstr "Programmi"
 
 
 msgctxt "#31005"
 msgid "Weather"
-msgstr "Il Meteo"
+msgstr "Meteo"
 
 
 msgctxt "#31006"
 msgid "System"
-msgstr "Il Sistema"
+msgstr "Sistema"
 
 
 msgctxt "#31007"
@@ -190,7 +190,7 @@ msgstr "Ind. IP"
 
 msgctxt "#31037"
 msgid "Hard Drive Space"
-msgstr "Spazio Su Disco"
+msgstr "Spazio su Disco"
 
 
 msgctxt "#31038"
@@ -272,7 +272,7 @@ msgstr "Applicazioni"
 
 msgctxt "#31060"
 msgid "Settings"
-msgstr "Settaggi"
+msgstr "Impostazioni"
 
 
 msgctxt "#31061"
@@ -353,7 +353,7 @@ msgstr "Ricarica skin"
 
 msgctxt "#31111"
 msgid "Movies"
-msgstr "I Film"
+msgstr "Film"
 
 
 msgctxt "#31112"
@@ -368,7 +368,7 @@ msgstr "Clip"
 
 msgctxt "#31114"
 msgid "Episode"
-msgstr "Episodio:"
+msgstr "Episodio"
 
 
 msgctxt "#31115"
@@ -551,7 +551,7 @@ msgstr "Clicca Per I Testi"
 
 msgctxt "#31224"
 msgid "Open MENU for Options"
-msgstr "Apri Il MENU"
+msgstr "Apri il MENU"
 
 
 msgctxt "#31225"
@@ -566,7 +566,7 @@ msgstr "Cambia"
 
 msgctxt "#31227"
 msgid "Your Preset"
-msgstr "Il Preset"
+msgstr "Il tuo Preset"
 
 
 msgctxt "#31228"
@@ -666,7 +666,7 @@ msgstr "Seleziona"
 
 msgctxt "#31625"
 msgid "Use Default"
-msgstr "Usa Il Default"
+msgstr "Usa Default"
 
 
 #empty strings from id 31626 to 31649
@@ -1188,14 +1188,14 @@ msgstr "Preferenze"
 
 msgctxt "#31956"
 msgid "Show"
-msgstr ""
+msgstr "Mostra"
 
 
 #empty strings from id 31957 to 31959
 
 msgctxt "#31960"
 msgid "Sleep"
-msgstr ""
+msgstr "Sospendi"
 
 
 msgctxt "#31961"
@@ -1205,17 +1205,17 @@ msgstr "Spegni"
 
 msgctxt "#31962"
 msgid "Power Menu"
-msgstr ""
+msgstr "Menu Alimentazione"
 
 
 msgctxt "#31963"
 msgid "displays"
-msgstr ""
+msgstr "schermi"
 
 
 msgctxt "#31964"
 msgid "Sleep Display"
-msgstr ""
+msgstr "Sospensione Schermo"
 
 
 #empty strings from id 31965 to 31969
@@ -1244,27 +1244,27 @@ msgstr "Canali Immagini"
 
 msgctxt "#31981"
 msgid "Show Thumbnails in List View"
-msgstr ""
+msgstr "Mostra immagini nella Vista Elenco"
 
 
 msgctxt "#31982"
 msgid "Show Plot in Video OSD"
-msgstr ""
+msgstr "Mostra trama in OSD video"
 
 
 msgctxt "#31983"
 msgid "Show Picture Descriptions in Slideshow"
-msgstr ""
+msgstr "Mostra descrizioni immagini negli slideshow"
 
 
 msgctxt "#31984"
 msgid "Show Now Playing Information in Visualisations"
-msgstr ""
+msgstr "Mostra 'In riproduzione' nelle visualizzazioni"
 
 
 msgctxt "#31985"
 msgid "Show Separate Menu Items for Plug-in Sections"
-msgstr ""
+msgstr "Mostra menu separati per le sezioni Plug-in"
 
 
 #empty strings from id 31986 to 31998
@@ -1278,7 +1278,7 @@ msgstr ""
 
 msgctxt "#32000"
 msgid "Please choose the type of audio connector used on this computer.  If you're unsure, or if you're using built-in speakers, you can accept the default and continue.  You can access this setting at any time in the Preferences."
-msgstr ""
+msgstr "Per favore scegli il tipo di connettore audio usato su questo computer. Se non sei sicuro, o se stai usando gli altoparlanti integrati, accetta l'opzione default e continua. Puoi accedere nuovamente a questa impostazione nelle Preferenze."
 
 
 msgctxt "#32001"
@@ -1290,7 +1290,7 @@ msgstr "Setup di OpenPHT"
 
 msgctxt "#32003"
 msgid "[B]Welcome to Plex![/B]  [CR][CR]In order to ensure the best experience, let's take a minute to determine some audio settings and get signed in to [B]myPlex[/B].  [CR][CR][B]myPlex[/B] lets you queue and share online videos, and access shared media from your friends' libraries.  [CR][CR]If you don't already have a free [B]myPlex[/B] account, you can create one now at [COLOR=orange]http://my.plexapp.com[/COLOR] before continuing."
-msgstr ""
+msgstr "[B]Benvenuto in Plex![/B] [CR][CR]Per garantire la migliore esperienza possibile, prendiamo un minuti per determinare alcune impostazioni audio e connettersi a [B]myPlex[/BR]. [CR][CR][B]myPlex[/B] ti conesente di accodare e convidere video online e accedere a media condivisi dalle librerie dei tuoi amici. [CR][CR]Se non hai già un account gratuito [B]myPlex[/B], puoi crearne uno ora su [COLOR=orange]http://my.plexapp.com[/COLOR] prima di continuare."
 
 
 #Other
