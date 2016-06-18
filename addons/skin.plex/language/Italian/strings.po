@@ -513,7 +513,7 @@ msgstr "Film"
 
 msgctxt "#31143"
 msgid "TV Show"
-msgstr "Spettacolo TV"
+msgstr "Serie TV"
 
 
 msgctxt "#31144"
