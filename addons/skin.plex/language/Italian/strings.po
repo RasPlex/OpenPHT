@@ -1107,17 +1107,17 @@ msgstr "[COLOR=orange]SQLite[/COLOR]: I dati dei media sono conservati usando qu
 
 msgctxt "#31857"
 msgid "[COLOR=orange]CxImage[/COLOR]: The workhorse code responsible for loading images and photos. It uses lots of other libraries like libPNG, libJPEG, etc."
-msgstr ""
+msgstr "[COLOR=orange]CxImage[/COLOR]: Il "muletto" responsabile del caricamento di immmagini e foto. Usa molte altre librerie com libPNG, libJPEG, etc."
 
 
 msgctxt "#31858"
 msgid "[COLOR=orange]FreeType[/COLOR]: This code is responsible for the beautiful rendering of fonts within the application."
-msgstr ""
+msgstr "[COLOR=orange]FreeType[/COLOR]: Il responsabile per il fantastico rendering dei caratteri nell'applicazione."
 
 
 msgctxt "#31859"
 msgid "[COLOR=orange]Python[/COLOR]: The media center embeds the Python interpreter to provide powerful scripting functionality."
-msgstr ""
+msgstr "[COLOR=orange]Python[/COLOR]: Il media center contiene l'interprete Python per fornire potenti funzionalità di scripting."
 
 
 msgctxt "#31860"
@@ -1140,17 +1140,17 @@ msgstr "Modifica"
 
 msgctxt "#31902"
 msgid "Profile"
-msgstr "Il Profilo"
+msgstr "Profilo"
 
 
 msgctxt "#31903"
 msgid "Profile name"
-msgstr "Il Nome Profilo"
+msgstr "Nome Profilo"
 
 
 msgctxt "#31904"
 msgid "Profile picture"
-msgstr "L'Immagine Profilo"
+msgstr "Immagine Profilo"
 
 
 #Plex additions
@@ -1278,7 +1278,7 @@ msgstr ""
 
 msgctxt "#32000"
 msgid "Please choose the type of audio connector used on this computer.  If you're unsure, or if you're using built-in speakers, you can accept the default and continue.  You can access this setting at any time in the Preferences."
-msgstr "Per favore scegli il tipo di connettore audio usato su questo computer. Se non sei sicuro, o se stai usando gli altoparlanti integrati, accetta l'opzione default e continua. Puoi accedere nuovamente a questa impostazione nelle Preferenze."
+msgstr "Per favore scegli il tipo di connettore audio usato su questo computer. Se non sei sicuro, o se stai usando gli altoparlanti integrati, accetta l'opzione default e continua.  Puoi accedere nuovamente a questa impostazione nelle Preferenze."
 
 
 msgctxt "#32001"
@@ -1290,7 +1290,7 @@ msgstr "Setup di OpenPHT"
 
 msgctxt "#32003"
 msgid "[B]Welcome to Plex![/B]  [CR][CR]In order to ensure the best experience, let's take a minute to determine some audio settings and get signed in to [B]myPlex[/B].  [CR][CR][B]myPlex[/B] lets you queue and share online videos, and access shared media from your friends' libraries.  [CR][CR]If you don't already have a free [B]myPlex[/B] account, you can create one now at [COLOR=orange]http://my.plexapp.com[/COLOR] before continuing."
-msgstr "[B]Benvenuto in Plex![/B] [CR][CR]Per garantire la migliore esperienza possibile, prendiamo un minuti per determinare alcune impostazioni audio e connettersi a [B]myPlex[/BR]. [CR][CR][B]myPlex[/B] ti conesente di accodare e convidere video online e accedere a media condivisi dalle librerie dei tuoi amici. [CR][CR]Se non hai già un account gratuito [B]myPlex[/B], puoi crearne uno ora su [COLOR=orange]http://my.plexapp.com[/COLOR] prima di continuare."
+msgstr "[B]Benvenuto in Plex![/B]  [CR][CR]Per garantire la migliore esperienza possibile, prendiamo un minuti per determinare alcune impostazioni audio e connettersi a [B]myPlex[/BR].  [CR][CR][B]myPlex[/B] ti conesente di accodare e convidere video online e accedere a media condivisi dalle librerie dei tuoi amici.  [CR][CR]Se non hai già un account gratuito [B]myPlex[/B], puoi crearne uno ora su [COLOR=orange]http://my.plexapp.com[/COLOR] prima di continuare."
 
 
 #Other
@@ -1323,5 +1323,5 @@ msgstr "Puoi aggiungerne una nel Media Manager"
 
 msgctxt "#32105"
 msgid "* Plot hidden to avoid spoilers *"
-msgstr "* Trama nascosta per evitare spoiler*"
+msgstr "* Trama nascosta per evitare spoiler *"
 
