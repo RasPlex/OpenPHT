@@ -75,32 +75,32 @@ set(INSTALL_LIB
 )
 
 foreach(l ${INSTALL_LIB})
-  plex_find_package(${l} 1 0)
+  plex_find_package(${l} 1 2)
 endforeach()
 
 option(ENABLE_SHAIRPLAY "Enable ShairPlay?" ON)
 if(ENABLE_SHAIRPLAY)
-  plex_find_package(ShairPlay 1 0)
+  plex_find_package(ShairPlay 1 2)
 endif()
 
 option(ENABLE_SHAIRPORT "Enable ShairPort?" OFF)
 if(ENABLE_SHAIRPORT AND NOT ENABLE_SHAIRPLAY)
-  plex_find_package(ShairPort 1 0)
+  plex_find_package(ShairPort 1 2)
 endif()
 
 option(ENABLE_VAAPI "Enable VAAPI?" ON)
 if(ENABLE_VAAPI)
-  plex_find_package(VAAPI 1 0)
+  plex_find_package(VAAPI 1 2)
 endif()
 
 option(ENABLE_VDPAU "Enable VDPAU?" ON)
 if(ENABLE_VDPAU)
-  plex_find_package(VDPAU 1 0)
+  plex_find_package(VDPAU 1 2)
 endif()
 
 option(ENABLE_CEC "Enable CEC?" ON)
 if(ENABLE_CEC)
-  plex_find_package(CEC 1 0)
+  plex_find_package(CEC 1 2)
 endif()
 
 plex_find_package(Threads 1 0)
