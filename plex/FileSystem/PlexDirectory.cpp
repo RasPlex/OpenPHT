@@ -493,6 +493,12 @@ CFileItemPtr CPlexDirectory::NewPlexElement(XML_ELEMENT *element, const CFileIte
     newItem->SetPlexDirectoryType(PLEX_DIR_TYPE_HOME_MOVIES);
     newItem->SetProperty("type", "homemovies");
   }
+  else if (newItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE &&
+    baseUrl.GetHostName() == "myplex" && boost::starts_with(baseUrl.GetFileName(), "pms/playlists"))
+  {
+    newItem->SetPlexDirectoryType(PLEX_DIR_TYPE_CLIP);
+    newItem->SetProperty("type", "clip");
+  }
 
   if (newItem->HasProperty("key"))
     newItem->SetPath(newItem->GetProperty("key").asString());
