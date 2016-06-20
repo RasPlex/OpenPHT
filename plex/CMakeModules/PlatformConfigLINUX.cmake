@@ -45,6 +45,14 @@ if(NOT USE_INTERNAL_FFMPEG)
   list(APPEND LINK_PKG FFmpeg)
 else()
   set(FFMPEG_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/lib/ffmpeg ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/src/ffmpeg-build)
+  list(APPEND CONFIG_PLEX_LINK_LIBRARIES 
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libavcodec.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libavformat.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libavutil.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libpostproc.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libswscale.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libavfilter.so
+       ${CMAKE_BINARY_DIR}/lib/ffmpeg/ffmpeg/lib/libswresample.so)
 endif()
 
 if(ENABLE_PYTHON)
