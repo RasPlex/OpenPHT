@@ -3509,9 +3509,9 @@ bool CDVDPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
   if(pMenus && pMenus->IsInMenu())
     hint.stills = true;
 
-  if (hint.stereo_mode.empty() && m_item.m_selectedMediaPart && m_item.m_selectedMediaPart->HasProperty("file"))
+  if ((hint.stereo_mode.empty() || hint.stereo_mode == "mono") && m_item.m_selectedMediaPart && m_item.m_selectedMediaPart->HasProperty("file"))
     hint.stereo_mode = CStereoscopicsManager::Get().DetectStereoModeByString(m_item.m_selectedMediaPart->GetProperty("file").asString(m_filename));
-  if (hint.stereo_mode.empty())
+  if (hint.stereo_mode.empty() || hint.stereo_mode == "mono")
     hint.stereo_mode = CStereoscopicsManager::Get().DetectStereoModeByString(m_filename);
 
   if(hint.flags & AV_DISPOSITION_ATTACHED_PIC)
