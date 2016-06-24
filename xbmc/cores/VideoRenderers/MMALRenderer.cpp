@@ -241,8 +241,8 @@ CMMALRenderer::CMMALRenderer()
   m_bConfigured = false;
   m_bMMALConfigured = false;
   m_iYV12RenderBuffer = 0;
-  m_sharpness = -2.0f;
   m_inflight = 0;
+  m_sharpness = -2.0f;
 }
 
 CMMALRenderer::~CMMALRenderer()

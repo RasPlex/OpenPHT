@@ -118,8 +118,8 @@ protected:
   RENDER_STEREO_MODE        m_video_stereo_mode;
   RENDER_STEREO_MODE        m_display_stereo_mode;
   bool                      m_StereoInvert;
-  float                     m_sharpness;
   int                       m_inflight;
+  float                     m_sharpness;
 
   CCriticalSection m_sharedSection;
   MMAL_COMPONENT_T *m_vout;
