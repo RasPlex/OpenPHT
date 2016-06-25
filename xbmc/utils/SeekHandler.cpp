@@ -66,24 +66,28 @@ void CSeekHandler::Configure()
   m_forwardSeekSteps.clear();
   m_backwardSeekSteps.clear();
 
-  std::vector<int> forwardSeekSteps;
-  forwardSeekSteps.push_back(30);
-  forwardSeekSteps.push_back(60);
-  m_forwardSeekSteps.insert(std::make_pair(SEEK_TYPE_MUSIC, forwardSeekSteps));
-  forwardSeekSteps.push_back(120);
-  forwardSeekSteps.push_back(180);
-  forwardSeekSteps.push_back(300);
-  m_forwardSeekSteps.insert(std::make_pair(SEEK_TYPE_VIDEO, forwardSeekSteps));
+  std::map<SeekType, std::string> seekTypeSettingMap;
+  seekTypeSettingMap.insert(std::make_pair(SEEK_TYPE_VIDEO, g_advancedSettings.m_videoSeekSteps));
+  seekTypeSettingMap.insert(std::make_pair(SEEK_TYPE_MUSIC, g_advancedSettings.m_musicSeekSteps));
 
-  std::vector<int> backwardSeekSteps;
-  backwardSeekSteps.push_back(-15);
-  backwardSeekSteps.push_back(-30);
-  backwardSeekSteps.push_back(-60);
-  m_backwardSeekSteps.insert(std::make_pair(SEEK_TYPE_MUSIC, backwardSeekSteps));
-  backwardSeekSteps.push_back(-120);
-  backwardSeekSteps.push_back(-180);
-  backwardSeekSteps.push_back(-300);
-  m_backwardSeekSteps.insert(std::make_pair(SEEK_TYPE_VIDEO, backwardSeekSteps));
+  for (std::map<SeekType, std::string>::iterator it = seekTypeSettingMap.begin(); it != seekTypeSettingMap.end(); ++it)
+  {
+    std::vector<int> forwardSeekSteps;
+    std::vector<int> backwardSeekSteps;
+
+    std::vector<std::string> seekSteps = StringUtils::Split(it->second, ",");
+    for (std::vector<std::string>::iterator it = seekSteps.begin(); it != seekSteps.end(); ++it)
+    {
+      int stepSeconds = std::strtol((*it).c_str(), NULL, 10);
+      if (stepSeconds < 0)
+        backwardSeekSteps.insert(backwardSeekSteps.begin(), stepSeconds);
+      else
+        forwardSeekSteps.push_back(stepSeconds);
+    }
+
+    m_forwardSeekSteps.insert(std::make_pair(it->first, forwardSeekSteps));
+    m_backwardSeekSteps.insert(std::make_pair(it->first, backwardSeekSteps));
+  }
 }
 
 void CSeekHandler::Reset()

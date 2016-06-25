@@ -397,6 +397,8 @@ class CAdvancedSettings
     bool m_bCollapseSingleSeason;
     bool m_bRequireEncryptedConnection;
     bool m_bEnableBetaChannel;
+    CStdString m_videoSeekSteps;
+    CStdString m_musicSeekSteps;
 
     unsigned int m_smartCacheUpperLimit;
     int m_iShowFirstRun;

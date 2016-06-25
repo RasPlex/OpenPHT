@@ -395,6 +395,8 @@ void CAdvancedSettings::Initialize()
   m_bUseMatroskaTranscodes = true;
   m_bRequireEncryptedConnection = false;
   m_bEnableBetaChannel = false;
+  m_videoSeekSteps = "-300,-180,-120,-60,-30,-15,+30,+60,+120,+180,+300";
+  m_musicSeekSteps = "-60,-30,-15,+30,+60";
   /* END PLEX */
 
 #ifdef TARGET_RASPBERRY_PI
@@ -1224,6 +1226,8 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
   XMLUtils::GetBoolean(pRootElement, "usematroskatranscode", m_bUseMatroskaTranscodes);
   XMLUtils::GetBoolean(pRootElement, "requireencryptedconnection", m_bRequireEncryptedConnection);
   XMLUtils::GetBoolean(pRootElement, "enablebetachannel", m_bEnableBetaChannel);
+  XMLUtils::GetString(pRootElement, "videoseeksteps", m_videoSeekSteps);
+  XMLUtils::GetString(pRootElement, "musicseeksteps", m_musicSeekSteps);
   /* END PLEX */
 
   // load in the GUISettings overrides:
