@@ -1009,6 +1009,9 @@ void CGUISettings::Initialize()
   AddBool(qual, "plexmediaserver.transcodesubtitles", 52502, false);
 
   CSettingsCategory* pms = AddCategory(SETTINGS_SERVICE, "plexmediaserver", 40210);
+#ifndef TARGET_OPENELEC
+  AddBool(pms, "plexmediaserver.localhost", 40215, true);
+#endif
   AddBool(pms, "plexmediaserver.manualaddress", 40211, false);
   AddString(pms, "plexmediaserver.address", 40212, "0.0.0.0", EDIT_CONTROL_IP_INPUT);
   AddString(pms,"plexmediaserver.port", 792, "32400", EDIT_CONTROL_NUMBER_INPUT, false, 792);

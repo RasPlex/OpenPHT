@@ -584,7 +584,11 @@ msgctxt "#40214"
 msgid "Quality"
 msgstr "Quality"
 
-#empty strings from id 40215 to 40299
+msgctxt "#40215"
+msgid "Scan localhost"
+msgstr "Scan localhost"
+
+#empty strings from id 40216 to 40299
 
 msgctxt "#40300"
 msgid "Set Quit Timer"
