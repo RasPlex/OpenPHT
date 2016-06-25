@@ -1275,7 +1275,7 @@ bool CApplication::Initialize()
   CDatabaseManager::Get().Initialize();
 
   /* PLEX */
-#ifdef TARGET_RASPBERRY_PI
+#ifdef TARGET_OPENELEC
   if (g_application.getNetwork().IsAvailable(true))
 #endif
   g_plexApplication.Start();
@@ -1354,7 +1354,7 @@ bool CApplication::Initialize()
 #else
       if (g_SkinInfo->HasSkinFile("PlexStartupHelper.xml") && !g_guiSettings.GetBool("system.firstrunwizard"))
       {
-#ifdef TARGET_RASPBERRY_PI
+#ifdef TARGET_OPENELEC
         g_guiSettings.SetInt("audiooutput.channels", AE_CH_LAYOUT_2_0); // this is why sound is stereo FIXME
         g_guiSettings.SetBool("audiooutput.ac3passthrough", false);
         g_guiSettings.SetBool("audiooutput.eac3passthrough", false);

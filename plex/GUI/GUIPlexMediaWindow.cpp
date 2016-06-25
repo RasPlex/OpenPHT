@@ -659,7 +659,7 @@ bool CGUIPlexMediaWindow::GetDirectory(const CStdString &strDirectory, CFileItem
 
   bool ret = CGUIMediaWindow::GetDirectory(u.Get(), items);
 
-#ifndef TARGET_RASPBERRY_PI
+#ifndef TARGET_OPENELEC
   m_thumbCache.Load(items);
 #endif
 

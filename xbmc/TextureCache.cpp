@@ -51,7 +51,7 @@ CTextureCache &CTextureCache::Get()
 
 CTextureCache::CTextureCache()
 /* PLEX */
-#ifndef TARGET_RASPBERRY_PI
+#ifndef TARGET_OPENELEC
   : CJobQueue(false, 2)
 #endif
 /* END PLEX */
