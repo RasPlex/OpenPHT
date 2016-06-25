@@ -148,14 +148,12 @@ bool CPlexTranscoderClientRPi::ShouldTranscode(CPlexServerPtr server, const CFil
     bShouldTranscode = true;
     ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
   }
-#ifdef TARGET_RASPBERRY_PI_2
   // check if video resolution is to large for hevc
-  else if (videoCodec == "hevc" && (videoWidth > 1280 || videoHeight > 720))
+  else if (videoCodec == "hevc" && videoWidth > g_guiSettings.GetInt("plexmediaserver.limithevc"))
   {
     bShouldTranscode = true;
     ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
   }
-#endif
   // check if seetings are to transcoding for local media
   else if ( isLocal && localQuality > 0 && localQuality < videoBitRate )
   {

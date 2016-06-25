@@ -1008,6 +1008,29 @@ void CGUISettings::Initialize()
 
   AddBool(qual, "plexmediaserver.transcodesubtitles", 52502, false);
 
+  map<int, int> limithevc;
+  limithevc.insert(make_pair(52640, 0));
+  limithevc.insert(make_pair(52641, 960));
+  limithevc.insert(make_pair(52642, 1280));
+  limithevc.insert(make_pair(52643, 1920));
+#if !defined(TARGET_RASPBERRY_PI)
+  limithevc.insert(make_pair(52644, 2560));
+  limithevc.insert(make_pair(52645, 3840));
+  limithevc.insert(make_pair(52646, 7680));
+#endif
+#if defined(TARGET_RASPBERRY_PI_1)
+  int defaultHevc = 0;
+#elif defined(TARGET_RASPBERRY_PI_2)
+  int defaultHevc = 1280;
+#else
+  int defaultHevc = 7680;
+#endif
+#if defined(TARGET_RASPBERRY_PI_1)
+  AddInt(NULL, "plexmediaserver.limithevc", 52639, defaultHevc, limithevc, SPIN_CONTROL_TEXT);
+#else
+  AddInt(qual, "plexmediaserver.limithevc", 52639, defaultHevc, limithevc, SPIN_CONTROL_TEXT);
+#endif
+
   CSettingsCategory* pms = AddCategory(SETTINGS_SERVICE, "plexmediaserver", 40210);
 #ifndef TARGET_OPENELEC
   AddBool(pms, "plexmediaserver.localhost", 40215, true);

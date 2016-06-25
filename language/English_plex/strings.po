@@ -1203,3 +1203,35 @@ msgstr "Go to Show"
 msgctxt "#52636"
 msgid "Go to Season"
 msgstr "Go to Season"
+
+msgctxt "#52639"
+msgid "Direct Play HEVC up to"
+msgstr "Direct Play HEVC up to"
+
+msgctxt "#52640"
+msgid "None"
+msgstr "None"
+
+msgctxt "#52641"
+msgid "540p"
+msgstr "540p"
+
+msgctxt "#52642"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#52643"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#52644"
+msgid "1440p"
+msgstr "1440p"
+
+msgctxt "#52645"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#52646"
+msgid "Unlimited"
+msgstr "Unlimited"

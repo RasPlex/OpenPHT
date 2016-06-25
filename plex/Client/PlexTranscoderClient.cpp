@@ -266,6 +266,11 @@ bool CPlexTranscoderClient::ShouldTranscode(CPlexServerPtr server, const CFileIt
   else
     transcodeSetting = remoteBitrate();
   
+  if (item.GetProperty("mediatag-videocodec").asString() == "hevc"
+    && g_guiSettings.GetInt("plexmediaserver.limithevc") < 7680
+    && item.GetProperty("width").asInteger() > g_guiSettings.GetInt("plexmediaserver.limithevc"))
+    return true;
+
   if (transcodeForced())
     return transcodeSetting != 0;
   else
