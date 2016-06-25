@@ -544,13 +544,13 @@ void CGUISettings::Initialize()
   AddString(advs, "advanced.labelvideo", 291, "", BUTTON_CONTROL_STANDARD);
 
 #ifdef HAS_GLX
-  AddString(advs, "videoscreen.monitor", 246, "Default", SPIN_CONTROL_TEXT);
+  AddString(NULL, "videoscreen.monitor", 246, "Default", EDIT_CONTROL_INPUT);
 #endif
 
   // this setting would ideally not be saved, as its value is systematically derived from videoscreen.screenmode.
   // contains a DISPLAYMODE
 #if !defined(TARGET_DARWIN_IOS_ATV2) && !defined(TARGET_RASPBERRY_PI)
-  AddInt(advs, "videoscreen.screen", 240, 0, -1, 1, 32, SPIN_CONTROL_TEXT);
+  AddInt(g_Windowing.CanDoWindowed() ? advs : NULL, "videoscreen.screen", 240, 0, -1, 1, 32, SPIN_CONTROL_TEXT);
 #endif
   // this setting would ideally not be saved, as its value is systematically derived from videoscreen.screenmode.
   // contains an index to the g_settings.m_ResInfo array. the only meaningful fields are iScreen, iWidth, iHeight.
@@ -973,8 +973,8 @@ void CGUISettings::Initialize()
   AddBool(g_sysinfo.HasVDADecoder() ? adv: NULL, "videoplayer.usevda", 13429, true);
 #endif
 
-  AddInt(adv, "videoplayer.limitguiupdate", 38013, 10, 0, 5, 25, SPIN_CONTROL_INT, 38016, 38015);
 #ifdef TARGET_RASPBERRY_PI
+  AddInt(adv, "videoplayer.limitguiupdate", 38013, 10, 0, 5, 25, SPIN_CONTROL_INT, 38016, 38015);
   AddBool(adv, "videoplayer.supportmvc", 38027, true);
 #endif
 
