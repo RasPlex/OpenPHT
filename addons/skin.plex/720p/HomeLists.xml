@@ -941,7 +941,7 @@
 							<!-- when only this list is visible -->
 							<control type="group">
 								<visible>!Control.IsVisible(11004)</visible>
-								<posy>103</posy>
+								<posy>102</posy>
 								<visible>ListItem.Type(clip)</visible>
 								<include>ListItemWideCard</include>
 								<include>ListItemWide</include>
@@ -964,7 +964,7 @@
 							<!-- when only this list is visible -->
 							<control type="group">
 								<visible>!Control.IsVisible(11004)</visible>
-								<posy>108</posy>
+								<posy>102</posy>
 								<visible>ListItem.Type(clip)</visible>
 								<include>ListItemWideCard</include>
 								<include>ListItemWide</include>
