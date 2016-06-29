@@ -640,4 +640,47 @@
 		<recordedtv>KEY_PVR</recordedtv> 
 		<liveradio>KEY_RADIO</liveradio> 
 	</remote>
+
+	<remote device="VLSystem_MPlay_Blast">
+		<play>KEY_PLAY</play>
+		<pause>KEY_PAUSE</pause>
+		<stop>KEY_STOP</stop>
+		<forward>KEY_FASTFORWARD</forward>
+		<reverse>KEY_REWIND</reverse>
+		<left>KEY_LEFT</left>
+		<right>KEY_RIGHT</right>
+		<up>KEY_UP</up>
+		<down>KEY_DOWN</down>
+		<pageplus>KEY_CHANNELUP</pageplus>
+		<pageminus>KEY_CHANNELDOWN</pageminus>
+		<select>KEY_OK</select>
+		<back>KEY_BACK</back>
+		<skipplus>KEY_NEXT</skipplus>
+		<skipminus>KEY_PREVIOUS</skipminus>
+		<volumeplus>KEY_VOLUMEUP</volumeplus>
+		<volumeminus>KEY_VOLUMEDOWN</volumeminus>
+		<myvideo>KEY_VIDEO</myvideo>
+		<mymusic>KEY_AUDIO</mymusic>
+		<mypictures>KEY_PHOTO</mypictures>
+		<mytv>KEY_TV</mytv>
+		<power>KEY_POWER</power>
+		<mute>KEY_MUTE</mute>
+		<one>KEY_1</one>
+		<two>KEY_2</two>
+		<three>KEY_3</three>
+		<four>KEY_4</four>
+		<five>KEY_5</five>
+		<six>KEY_6</six>
+		<seven>KEY_7</seven>
+		<eight>KEY_8</eight>
+		<nine>KEY_9</nine>
+		<zero>KEY_0</zero>
+		<record>KEY_RECORD</record>
+		<display>KEY_ZOOM</display>
+		<title>Guide</title>
+		<info>Detail</info>
+		<menu>Exit_Click</menu>
+		<menu>Run_DClick</menu>
+	</remote>
+
 </lircmap>
