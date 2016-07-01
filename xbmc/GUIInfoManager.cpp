@@ -977,6 +977,7 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition)
         {
           if (param == "rasplex") return SYSTEM_ISRASPLEX;
           else if (param == "openelec") return SYSTEM_ISOPENELEC;
+          else if (param == "openpht") return SYSTEM_ISOPENPHT;
         }
         /* END PLEX */
         else if (prop.name == "addontitle")
@@ -2558,6 +2559,10 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
 #else
     bReturn = false;
 #endif
+  }
+  else if (condition == SYSTEM_ISOPENPHT)
+  {
+    bReturn = true;
   }
   else if (condition == VIDEOPLAYER_HASNEXT)
   {

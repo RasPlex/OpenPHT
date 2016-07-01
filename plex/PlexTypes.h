@@ -190,6 +190,7 @@ class CMusicThumbLoader;
 #define SYSTEM_NO_PLEX_SERVERS      5004
 #define SYSTEM_ISRASPLEX            5005
 #define SYSTEM_ISOPENELEC           5006
+#define SYSTEM_ISOPENPHT            5020
 #define CONTAINER_PLEXCONTENT       5007
 #define CONTAINER_PLEXFILTER        5008
 #define CONTAINER_UNIFORM_PROPERTY  5009
