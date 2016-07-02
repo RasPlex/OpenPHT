@@ -1,8 +1,11 @@
 add_subdirectory(VideoShaders)
 find_all_sources(. videorenderers_SRCS)
 
-if(NOT TARGET_RPI)
+if(NOT TARGET_RPI AND NOT TARGET_AML)
   list(REMOVE_ITEM videorenderers_SRCS ./LinuxRendererGLES.cpp)
+endif()
+
+if(NOT TARGET_RPI)
   list(REMOVE_ITEM videorenderers_SRCS ./MMALRenderer.cpp)
 endif()
 

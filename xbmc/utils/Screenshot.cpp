@@ -45,6 +45,10 @@
 #include "utils/log.h"
 #include "settings/GUISettings.h"
 
+#if defined(HAS_LIBAMCODEC)
+#include "utils/ScreenshotAML.h"
+#endif
+
 using namespace XFILE;
 
 CScreenshotSurface::CScreenshotSurface()
@@ -159,6 +163,11 @@ bool CScreenshotSurface::capture()
   }
 
   delete [] surface;
+  
+#if defined(HAS_LIBAMCODEC)
+  // Captures the current visible videobuffer and blend it into m_buffer (captured overlay)
+  CScreenshotAML::CaptureVideoFrame(m_buffer, m_width, m_height);
+#endif
 
 #else
   //nothing to take a screenshot from

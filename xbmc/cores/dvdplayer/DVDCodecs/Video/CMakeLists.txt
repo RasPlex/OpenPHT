@@ -17,6 +17,11 @@ if(NOT TARGET_RPI)
   list(REMOVE_ITEM video_SRCS ./MMALCodec.cpp)
 endif()
 
+if(NOT TARGET_AML)
+  list(REMOVE_ITEM video_SRCS ./AMLCodec.cpp)
+  list(REMOVE_ITEM video_SRCS ./DVDVideoCodecAmlogic.cpp)
+endif()
+
 if (NOT TARGET_LINUX AND NOT TARGET_FREEBSD)
   list(REMOVE_ITEM video_SRCS ./VDPAU.cpp)
   list(REMOVE_ITEM video_SRCS ./VAAPI.cpp)

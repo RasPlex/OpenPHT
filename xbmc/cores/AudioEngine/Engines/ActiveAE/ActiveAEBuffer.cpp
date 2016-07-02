@@ -143,7 +143,11 @@ CActiveAEBufferPoolResample::CActiveAEBufferPoolResample(AEAudioFormat inputForm
   if (AE_IS_RAW(m_inputFormat.m_dataFormat))
     m_inputFormat.m_dataFormat = AE_FMT_S16NE;
   m_resampler = NULL;
+#ifdef HAS_LIBAMCODEC
+  m_fillPackets = true;
+#else
   m_fillPackets = false;
+#endif
   m_drain = false;
   m_empty = true;
   m_procSample = NULL;

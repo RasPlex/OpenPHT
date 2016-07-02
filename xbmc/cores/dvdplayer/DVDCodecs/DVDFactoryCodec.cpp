@@ -41,6 +41,10 @@
 #if defined(HAS_MMAL)
 #include "linux/RBP.h"
 #endif
+#if defined(HAS_LIBAMCODEC)
+#include "utils/AMLUtils.h"
+#include "Video/DVDVideoCodecAmlogic.h"
+#endif
 #include "Audio/DVDAudioCodecFFmpeg.h"
 #include "Audio/DVDAudioCodecPassthrough.h"
 #include "Overlay/DVDOverlayCodecSSA.h"
@@ -145,6 +149,11 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
 #elif defined(TARGET_DARWIN)
   hwSupport += "VideoToolBoxDecoder:no ";
 #endif
+#if defined(HAS_LIBAMCODEC)
+  hwSupport += "AMCodec:yes ";
+#else
+  hwSupport += "AMCodec:no ";
+#endif
 #if defined(HAVE_LIBOPENMAX)
   hwSupport += "OpenMax:yes ";
 #elif defined(TARGET_POSIX)
@@ -181,6 +190,25 @@ CDVDVideoCodec* CDVDFactoryCodec::CreateVideoCodec(CDVDStreamInfo &hint, const C
      // If dvd is an mpeg2 and hint.stills
      if ( (pCodec = OpenCodec(new CDVDVideoCodecLibMpeg2(), hint, options)) ) return pCodec;
   }
+
+#if defined(HAS_LIBAMCODEC)
+  // amcodec can handle dvd playback.
+  if (!hint.software && g_guiSettings.GetBool("videoplayer.useamcodec"))
+  {
+    switch(hint.codec)
+    {
+      case AV_CODEC_ID_MPEG4:
+      case AV_CODEC_ID_MSMPEG4V2:
+      case AV_CODEC_ID_MSMPEG4V3:
+        // Avoid h/w decoder for SD; Those files might use features
+        // not supported and can easily be soft-decoded
+        if (hint.width <= 800)
+          break;
+      default:
+        if ( (pCodec = OpenCodec(new CDVDVideoCodecAmlogic(), hint, options)) ) return pCodec;
+    }
+  }
+#endif
 
 #if defined(TARGET_DARWIN_OSX)
   if (!hint.software && g_guiSettings.GetBool("videoplayer.usevda") && !g_advancedSettings.m_useFfmpegVda)

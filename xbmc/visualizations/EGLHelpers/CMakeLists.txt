@@ -1,4 +1,4 @@
-if(TARGET_RPI)
+if(TARGET_RPI OR TARGET_AML)
   find_all_sources(. EGL_HELPER_SRC)
   add_library(EGLHelpers STATIC ${EGL_HELPER_SRC})
   target_link_libraries(EGLHelpers ${CONFIG_LIBRARY_OPENGL})

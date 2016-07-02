@@ -38,6 +38,7 @@
 #include "settings/AdvancedSettings.h"
 #if defined(HAS_LIBAMCODEC)
 #include "utils/AMLUtils.h"
+#include "utils/SysfsUtils.h"
 #endif
 
 
@@ -527,7 +528,40 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
   if (aml_present())
   {
     aml_set_audio_passthrough(m_passthrough);
-    device = "default";
+
+    int aml_digital_codec = 0;
+    if (m_passthrough)
+    {
+        switch(format.m_dataFormat)
+        {
+          case AE_FMT_AC3:
+            aml_digital_codec = 2;
+            break;
+
+          case AE_FMT_DTS:
+            aml_digital_codec = 3;
+            break;
+
+          case AE_FMT_EAC3:
+            aml_digital_codec = 4;
+            break;
+
+          case AE_FMT_DTSHD:
+            aml_digital_codec = 5;
+            break;
+
+          case AE_FMT_TRUEHD:
+            aml_digital_codec = 7;
+            break;
+
+          default:
+            if (inconfig.channels > 2)
+              aml_digital_codec = 6;
+            else
+              aml_digital_codec = 0;
+        }
+    }
+    SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
   }
 #endif
 

@@ -942,6 +942,10 @@ void CGUISettings::Initialize()
   AddInt(adv, "videoplayer.hqscalers", 13435, 20, 0, 10, 100, SPIN_CONTROL_INT, 14047);
 #endif
 
+#ifdef HAS_LIBAMCODEC
+  AddBool(adv, "videoplayer.useamcodec", 13438, true);
+#endif
+
 #ifdef HAVE_LIBVDPAU
   AddBool(adv, "videoplayer.usevdpau", 13425, true);
   AddBool(adv, "videoplayer.usevdpaumixer", 13437, true);
@@ -1018,14 +1022,14 @@ void CGUISettings::Initialize()
   limithevc.insert(make_pair(52645, 3840));
   limithevc.insert(make_pair(52646, 7680));
 #endif
-#if defined(TARGET_RASPBERRY_PI_1)
+#if defined(TARGET_RASPBERRY_PI_1) || defined(TARGET_WETEK_PLAY)
   int defaultHevc = 0;
 #elif defined(TARGET_RASPBERRY_PI_2)
   int defaultHevc = 1280;
 #else
   int defaultHevc = 7680;
 #endif
-#if defined(TARGET_RASPBERRY_PI_1)
+#if defined(TARGET_RASPBERRY_PI_1) || defined(TARGET_WETEK_PLAY)
   AddInt(NULL, "plexmediaserver.limithevc", 52639, defaultHevc, limithevc, SPIN_CONTROL_TEXT);
 #else
   AddInt(qual, "plexmediaserver.limithevc", 52639, defaultHevc, limithevc, SPIN_CONTROL_TEXT);

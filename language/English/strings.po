@@ -5132,6 +5132,10 @@ msgctxt "#13437"
 msgid "Prefer VDPAU video mixer"
 msgstr ""
 
+msgctxt "#13438"
+msgid "Allow hardware acceleration - amcodec"
+msgstr ""
+
 msgctxt "#13441"
 msgid "Use MPEG-2 VDPAU"
 msgstr ""
