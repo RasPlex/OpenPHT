@@ -142,17 +142,17 @@ bool CPlexTranscoderClientRPi::ShouldTranscode(CPlexServerPtr server, const CFil
   int localQuality = localBitrate();
   int remoteQuality = remoteBitrate();
 
-  // check if video resolution is to large
+  // check if video resolution is too large
   if (videoWidth > 1920 || videoHeight > 1080)
   {
     bShouldTranscode = true;
-    ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
+    ReasonWhy.Format("Video resolution too large: %dx%d", videoWidth, videoHeight);
   }
-  // check if video resolution is to large for hevc
+  // check if video resolution is too large for hevc
   else if (videoCodec == "hevc" && videoWidth > g_guiSettings.GetInt("plexmediaserver.limithevc"))
   {
     bShouldTranscode = true;
-    ReasonWhy.Format("Video resolution to large: %dx%d", videoWidth, videoHeight);
+    ReasonWhy.Format("Video resolution too large: %dx%d", videoWidth, videoHeight);
   }
   // check if seetings are to transcoding for local media
   else if ( isLocal && localQuality > 0 && localQuality < videoBitRate )
