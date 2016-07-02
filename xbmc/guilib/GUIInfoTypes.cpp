@@ -42,6 +42,54 @@ CGUIInfoBool::~CGUIInfoBool()
 {
 }
 
+bool CGUIInfoLabel::ReplaceSpecialKeywordReferences(const std::string &strInput, const std::string &strKeyword, const StringReplacerFunc &func, std::string &strOutput)
+{
+  // replace all $strKeyword[value] with resolved strings
+  std::string dollarStrPrefix = "$" + strKeyword + "[";
+
+  size_t index = 0;
+  size_t startPos;
+
+  while ((startPos = strInput.find(dollarStrPrefix, index)) != std::string::npos)
+  {
+    size_t valuePos = startPos + dollarStrPrefix.size();
+    size_t endPos = StringUtils::FindEndBracket(strInput, '[', ']', valuePos);
+    if (endPos != std::string::npos)
+    {
+      if (index == 0)  // first occurrence?
+        strOutput.clear();
+      strOutput += strInput.substr(index, startPos - index);            // append part from the left side
+      strOutput += func(strInput.substr(valuePos, endPos - valuePos));  // resolve and append value part
+      index = endPos + 1;
+    }
+    else
+    {
+      // if closing bracket is missing, report error and leave incomplete reference in
+      CLog::Log(LOGERROR, "Error parsing value - missing ']' in \"%s\"", strInput.c_str());
+      break;
+    }
+  }
+
+  if (index)  // if we replaced anything
+  {
+    strOutput += strInput.substr(index);  // append leftover from the right side
+    return true;
+  }
+
+  return false;
+}
+
+bool CGUIInfoLabel::ReplaceSpecialKeywordReferences(std::string &work, const std::string &strKeyword, const StringReplacerFunc &func)
+{
+  std::string output;
+  if (ReplaceSpecialKeywordReferences(work, strKeyword, func, output))
+  {
+    work = output;
+    return true;
+  }
+  return false;
+}
+
 void CGUIInfoBool::Parse(const CStdString &expression, int context)
 {
   if (expression == "true")

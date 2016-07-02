@@ -53,6 +53,8 @@ public:
    \param value [out] the resulting string. Remains untouched if no <tag> is available, else is appended (or cleared based on the clear parameter).
    \param clear       if true, clears the string prior to adding tags, if tags are available. Defaults to false.
    */
+  static std::string GetAttribute(const TiXmlElement *element, const char *tag);
+
   static bool GetAdditiveString(const TiXmlNode* rootNode, const char* tag, const CStdString& separator, CStdString& value, bool clear = false);
   static bool GetStringArray(const TiXmlNode* rootNode, const char* tag, std::vector<std::string>& arrayValue, bool clear = false, const std::string separator = "");
   static bool GetEncoding(const CXBMCTinyXML* pDoc, CStdString& strEncoding);
