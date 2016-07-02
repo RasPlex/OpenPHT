@@ -53,7 +53,7 @@
 				<colordiffuse>orange</colordiffuse>
 				<aspectratio>keep</aspectratio>
 				<animation effect="fade" start="0" end="100" time="0" condition="true">Conditional</animation>
-				<visible>!Control.Isvisible(999)</visible>
+				<visible>![ Control.Isvisible(999) | system.getbool(input.enablemouse) ]</visible>
 			</control>
 			<control type="image">
 				<posx>372</posx>
@@ -69,6 +69,7 @@
 	</include>
 	<include name="MenuFocusedLabel">
 		<control type="group">
+			<animation effect="slide" end="0,-100" condition="system.getbool(input.enablemouse)">Conditional</animation>
 			<posx>363</posx>
 			<posy>456</posy>
 			<include>ShowHomeClassic</include>
@@ -98,7 +99,15 @@
 			</control>
 		</control>
 	</include>
+
+	<!-- HomeMenu -->
 	<include name="HomeMenu">
+		<include condition="system.getbool(input.enablemouse)">HomeMenu_List</include>
+		<include condition="!system.getbool(input.enablemouse)">HomeMenu_Wraplist</include>
+	</include>
+
+	<!-- HomeMenu (Keyboard) -->
+	<include name="HomeMenu_Wraplist">
 		<!-- Main Menu -->
 		<control type="group">
 			<include>FadeDialog</include>
@@ -230,4 +239,150 @@
 			</control>
 		</control>
 	</include>
+
+	<!-- HomeMenu (Mouse) -->
+	<include name="HomeMenu_List">
+		<!-- Main Menu -->
+		<control type="group">
+			<include>FadeDialog</include>
+			<include>MenuSeparatorVertical</include>
+			<include>MenuFocusedLabel</include>
+			<!-- Arrow -->
+			<control type="image">
+				<posy>680</posy>
+				<posx>30</posx>
+				<width>12</width>
+				<height>18</height>
+				<aspectratio>scale</aspectratio>
+				<texture flipx="true">left-menu-indicator-arrow.png</texture>
+				<animation effect="rotate" end="-180" center="36,689" time="300" condition="Window.IsActive(4998)">Conditional</animation>
+				<animation type="Conditional" condition="ControlGroup(5000).HasFocus()" reversible="false">
+					<effect type="fade" start="100" end="0" time="0"/>
+				</animation>
+			</control>
+			<!-- Mouse Trigger -->
+			<control type="button">
+				<posy>660</posy>
+				<posx>10</posx>
+				<width>60</width>
+				<height>60</height>
+				<texturefocus>-</texturefocus>
+				<texturenofocus>-</texturenofocus>
+				<onclick>Plex.ActivateWindow(4998)</onclick>
+			</control>
+
+			<!-- list -->
+			<control type="list" id="300">
+				<description>Home Main Menu</description>
+				<posx>0</posx>
+				<posy>60</posy>
+				<width>372</width>
+				<height>600</height>
+				<onup>300</onup>
+				<ondown>300</ondown>
+				<onleft>Plex.ActivateWindow(4998)</onleft>
+				<onright>5000</onright>
+				<focusposition>6</focusposition>
+				<scrolltime>200</scrolltime>
+				<animation type="Conditional" condition="!Window.IsActive(4998)" reversible="false">
+					<effect type="rotatey" center="304" start="80,455" end="0,455" time="300"/>
+					<effect type="fade" start="0" end="100" time="50" delay="0"/>
+				</animation>
+				<animation type="Conditional" condition="Window.IsActive(4998)" reversible="false">
+					<effect type="rotatey" center="304" start="0,455" end="80,455" time="300"/>
+					<effect type="fade" start="100" end="0" time="230"/>
+				</animation>
+				<animation type="Conditional" condition="ControlGroup(5000).HasFocus()" reversible="false">
+					<effect type="fade" start="100" end="0" time="0"/>
+				</animation>
+				<itemlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>white</textcolor>
+						<shadowcolor>FF333333</shadowcolor>
+					</control>
+				</itemlayout>
+				<focusedlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>orange</textcolor>
+						<shadowcolor>FF222222</shadowcolor>
+					</control>
+					<control type="label">
+						<posx>372</posx>
+						<posy>42</posy>
+						<width>360</width>
+						<height>20</height>
+						<label>$INFO[ListItem.Label2]</label>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Bold-14</font>
+						<textcolor>white</textcolor>
+						<shadowcolor>FF222222</shadowcolor>
+						<visible>[!Skin.HasSetting(DontIndicateSecureServers) + IsEmpty(ListItem.Property(isSecure))] | [Skin.HasSetting(DontIndicateSecureServers) + !IsEmpty(ListItem.Property(SectionNameCollision))]</visible>
+					</control>
+					<control type="label">
+						<posx>354</posx>
+						<posy>42</posy>
+						<width>323</width>
+						<height>20</height>
+						<label>$INFO[ListItem.Label2]</label>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Bold-14</font>
+						<textcolor>white</textcolor>
+						<shadowcolor>FF222222</shadowcolor>
+						<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
+					</control>
+					<control type="image">
+						<posy>44</posy>
+						<posx>358</posx>
+						<width>14</width>
+						<height>14</height>
+						<texture>icon-lock-round-simplified.png</texture>
+						<colordiffuse>CC5CB85C</colordiffuse>
+						<visible>!IsEmpty(ListItem.Property(isSecure)) + !Skin.HasSetting(DontIndicateSecureServers)</visible>
+					</control>
+				</focusedlayout>
+				<!-- additional menu items -->
+				<content>
+					<item id="7">
+						<description>Search</description>
+						<label>$LOCALIZE[137]</label>
+						<onclick>Plex.ActivateWindow(10051)</onclick>
+					</item>
+					<item id="114">
+						<description>Update and Restart</description>
+						<label>$LOCALIZE[40018]</label>
+						<onclick>Plex.UpdateAndRestart</onclick>
+						<visible>System.UpdateIsAvailable</visible>
+					</item>
+					<item id="121">
+						<description>Play File</description>
+						<label>$LOCALIZE[32205]</label>
+						<onclick>Skin.Reset(PlayFilePath)</onclick>
+						<onclick>Skin.SetFile(PlayFilePath,,$ESCINFO[Skin.String(HomeMenuPlayFilePath)])</onclick>
+						<onclick>PlayMedia($ESCINFO[Skin.String(PlayFilePath)])</onclick>
+						<onclick>Skin.Reset(PlayFilePath)</onclick>
+						<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
+					</item>
+				</content>
+			</control>
+		</control>
+	</include>
+
 </includes>

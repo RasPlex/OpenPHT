@@ -6,7 +6,7 @@
 		<animation effect="slide" start="0" end="-104" time="0" condition="Skin.String(SectionType,playqueue) + [Player.HasAudio | Player.HasVideo]">Conditional</animation>
 	</include>
 	<include name="leftMenuSlide">
-		<animation effect="slide" start="0" end="246" time="500" condition="ControlGroup(1300).HasFocus()">Conditional</animation>
+		<animation effect="slide" start="0" end="246" time="500" condition="ControlGroup(1300).HasFocus() | ControlGroup(1301).HasFocus">Conditional</animation>
 		<animation effect="slide" start="0" end="-246" time="500" condition="ControlGroup(1300).HasFocus()">WindowClose</animation>
 		<animation effect="slide" start="0" end="-246" time="500" condition="ControlGroup(1300).HasFocus() + Container.PlexContent(Secondary)">Conditional</animation>
 	</include>
@@ -70,7 +70,7 @@
 				<height>18</height>
 				<aspectratio>scale</aspectratio>
 				<texture flipx="true">left-menu-indicator-arrow.png</texture>
-				<animation effect="rotate" end="-180" center="36,689" time="500" condition="ControlGroup(1300).HasFocus">Conditional</animation>
+				<animation effect="rotate" end="-180" center="36,689" time="500" condition="ControlGroup(1300).HasFocus | ControlGroup(1301).HasFocus">Conditional</animation>
 				<visible>[!Container.PlexContent(Albums) | [Container.PlexContent(Albums) + !IsEmpty(Container.Property(primaryFilterActivated))]] + !Container.PlexContent(Songs) + !Container.PlexContent(Seasons) + [!Container.PlexContent(Episodes) | [Container.PlexContent(Episodes) + !IsEmpty(Container.Property(primaryFilterActivated)) + IsEmpty(Container.Property(PlexPreplay))]] + ![Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode)]] + ![Control.IsVisible(88)]</visible>
 			</control>
 		</control>
@@ -397,7 +397,18 @@
 		<visible>Player.HasAudio | Player.HasVideo</visible>
 	</include>
 	<!-- Home menu -->
-	<include name="PivotMenuHome">
+        <include name="PivotMenuHome">
+                <include condition="system.getbool(input.enablemouse)">PivotMenuHome_List</include>
+                <include condition="!system.getbool(input.enablemouse)">PivotMenuHome_Wraplist</include>
+        </include>
+
+        <include name="PivotMenuHomeMinimal">
+                <include condition="system.getbool(input.enablemouse)">PivotMenuHomeMinimal_List</include>
+                <include condition="!system.getbool(input.enablemouse)">PivotMenuHomeMinimal_Wraplist</include>
+        </include>
+
+	<!-- HomeMenu (Keyboard) -->
+	<include name="PivotMenuHome_Wraplist">
 		<!-- Main Menu -->
 		<control type="group" id="1400">
 			<!-- list -->
@@ -527,7 +538,7 @@
 			</control>
 		</control>
 	</include>
-	<include name="PivotMenuHomeMinimal">
+	<include name="PivotMenuHomeMinimal_Wraplist">
 		<!-- Main Menu -->
 		<control type="group" id="1400">
 			<!-- list -->
@@ -643,6 +654,276 @@
 			</control>
 		</control>
 	</include>
+
+	<!-- HomeMenu (Mouse) -->
+	<include name="PivotMenuHome_List">
+		<!-- Main Menu -->
+		<control type="group" id="1400">
+
+			<!-- Mouse Trigger -->
+			<control type="button">
+				<posy>660</posy>
+				<posx>10</posx>
+				<width>60</width>
+				<height>60</height>
+				<onclick>Dialog.Close(4998)</onclick>
+				<include>Mouse_Trigger</include>
+			</control>
+
+			<!-- list -->
+			<control type="list" id="1300">
+				<description>Home Secondary Menu</description>
+				<posx>0</posx>
+				<posy>60</posy>
+				<width>372</width>
+				<height>600</height>
+				<onup>1300</onup>
+				<ondown>1300</ondown>
+				<onleft>-</onleft>
+				<onright>Dialog.Close(4998)</onright>
+				<focusposition>2</focusposition>
+				<scrolltime>200</scrolltime>
+				<animation type="WindowOpen" condition="true" reversible="false">
+					<effect type="rotatey" center="304" start="-90,455" end="0,455" time="300"/>
+					<effect type="fade" start="0" end="100" time="50" delay="0"/>
+				</animation>
+				<animation type="WindowClose" condition="true" reversible="false">
+					<effect type="rotatey" center="304" start="0,455" end="-90,455" time="300"/>
+					<effect type="fade" start="100" end="0" time="230"/>
+				</animation>
+				<itemlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>white</textcolor>
+						<shadowcolor>FF333333</shadowcolor>
+					</control>
+				</itemlayout>
+				<focusedlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>orange</textcolor>
+						<shadowcolor>FF222222</shadowcolor>
+					</control>
+				</focusedlayout>
+				<!-- additional menu items -->
+				<content>
+					<item id="8">
+						<description>Switch User</description>
+						<label>Switch User</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
+						<visible>System.IsSignedIn + System.UserIsInHome</visible>
+					</item>
+					<item id="9">
+						<description>Sign In</description>
+						<label>Sign in</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
+						<visible>!System.IsSignedIn</visible>
+					</item>
+					<item id="12">
+						<description>Channel Directory</description>
+						<label> $LOCALIZE[31952]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
+						<textcolor>50FFFFFF</textcolor>
+						<visible>!System.UserIsRestricted</visible>
+					</item>
+					<item id="6">
+						<description>Preferences</description>
+						<label>$LOCALIZE[31955]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
+						<visible>!System.UserIsRestricted</visible>
+					</item>
+					<item id="101">
+						<description>OE Settings Button</description>
+						<label> $LOCALIZE[41000] </label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>RunAddon(service.libreelec.settings)</onclick>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+					</item>
+					<item id="102">
+						<description>Control Global Caching</description>
+						<label> $LOCALIZE[41001] </label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(10208)</onclick>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+					</item>
+					<item id="111">
+						<description>Quit</description>
+						<label>$LOCALIZE[31007]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.Quit</onclick>
+						<visible>!System.isSystem(openelec)</visible>
+					</item>
+					<item id="112">
+						<description>Sleep</description>
+						<label>$LOCALIZE[31960]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.Suspend</onclick>
+						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
+					</item>
+					<item id="113">
+						<description>Shut Down</description>
+						<label>$LOCALIZE[31961]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.Powerdown</onclick>
+						<visible>System.CanPowerDown + [!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)]</visible>
+					</item>
+					<item id="114">
+						<description>Restart</description>
+						<label>$LOCALIZE[31072]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>System.Exec(reboot)</onclick>
+						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+					</item>
+				</content>
+			</control>
+		</control>
+	</include>
+
+	<include name="PivotMenuHomeMinimal_List">
+
+		<!-- Mouse Trigger -->
+		<control type="button">
+			<posy>660</posy>
+			<posx>10</posx>
+			<width>60</width>
+			<height>60</height>
+			<onclick>Dialog.Close(4998)</onclick>
+			<include>Mouse_Trigger</include>
+		</control>
+
+		<!-- Main Menu -->
+		<control type="group" id="1400">
+			<!-- list -->
+			<control type="list" id="1300">
+				<description>Home Secondary Menu</description>
+				<posx>0</posx>
+				<posy>60</posy>
+				<width>372</width>
+				<height>600</height>
+				<onup>1300</onup>
+				<ondown>1300</ondown>
+				<onleft>-</onleft>
+				<onright>Dialog.Close(4998)</onright>
+				<focusposition>1</focusposition>
+				<scrolltime>200</scrolltime>
+				<animation type="WindowOpen" condition="true" reversible="false">
+					<effect type="rotatey" center="304" start="-90,455" end="0,455" time="300"/>
+					<effect type="fade" start="0" end="100" time="50" delay="0"/>
+				</animation>
+				<animation type="WindowClose" condition="true" reversible="false">
+					<effect type="rotatey" center="304" start="0,455" end="-90,455" time="300"/>
+					<effect type="fade" start="100" end="0" time="230"/>
+				</animation>
+				<itemlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>white</textcolor>
+						<shadowcolor>FF333333</shadowcolor>
+					</control>
+				</itemlayout>
+				<focusedlayout width="600" height="60">
+					<control type="label">
+						<posx>372</posx>
+						<width>360</width>
+						<height>60</height>
+						<label>$INFO[ListItem.Label]</label>
+						<info>ListItem.Label</info>
+						<align>right</align>
+						<aligny>center</aligny>
+						<font>Regular-28</font>
+						<textcolor>orange</textcolor>
+						<shadowcolor>FF222222</shadowcolor>
+					</control>
+				</focusedlayout>
+				<!-- additional menu items -->
+				<content>
+					<item id="8">
+						<description>Switch User</description>
+						<label>Switch User</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
+						<visible>System.IsSignedIn + System.UserIsInHome</visible>
+					</item>
+					<item id="9">
+						<description>Sign In</description>
+						<label>Sign in</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
+						<visible>!System.IsSignedIn</visible>
+					</item>
+					<item id="12">
+						<description>Channel Directory</description>
+						<label> $LOCALIZE[31952]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
+						<textcolor>50FFFFFF</textcolor>
+						<visible>!System.UserIsRestricted</visible>
+					</item>
+					<item id="6">
+						<description>Preferences</description>
+						<label>$LOCALIZE[31955]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
+						<visible>!System.UserIsRestricted</visible>
+					</item>
+					<item id="101">
+						<description>OE Settings Button</description>
+						<label> $LOCALIZE[41000] </label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>RunAddon(service.libreelec.settings)</onclick>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+					</item>
+					<item id="102">
+						<description>Control Global Caching</description>
+						<label> $LOCALIZE[41001] </label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>XBMC.ActivateWindow(10208)</onclick>
+						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+					</item>
+					<item id="112">
+						<description>Sleep</description>
+						<label>$LOCALIZE[31960]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>Plex.Suspend</onclick>
+						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
+					</item>
+					<item id="114">
+						<description>Restart</description>
+						<label>$LOCALIZE[31072]</label>
+						<onclick>Dialog.Close(4998)</onclick>
+						<onclick>System.Exec(reboot)</onclick>
+						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+					</item>
+				</content>
+			</control>
+		</control>
+	</include>
+
 	<!-- Library menu -->
 	<include name="LeftSideMenu">
 		<control type="group" id="995">
@@ -650,6 +931,16 @@
 			<include>leftMenuInitSlide</include>
 			<include>leftMenuSlide</include>
 			<include>leftMenuBg</include>
+
+			<!-- Next Viewmode (Mouse Trigger) -->
+			<control type="button">
+				<posx>1278</posx>
+				<height>720</height>
+				<width>2</width>
+				<onfocus>Container.NextViewMode</onfocus>
+				<include>Mouse_Trigger</include>
+			</control>
+
 			<!-- sidebar video & photos -->
 			<control type="grouplist" id="998">
 				<visible>Container.PlexContent(Movies) | Container.PlexContent(TVShows) | Container.PlexContent(Seasons) | Container.PlexContent(Clips) | Container.PlexContent(Episodes) | Container.PlexContent(Homemovies) | Container.PlexContent(Channel) | Container.PlexContent(Photos)</visible>
@@ -813,103 +1104,117 @@
 					<visible>ListItem.Status(watched)</visible>
 				</control>
 			</control>
+
 			<!-- filters & sorting menu -->
-			<control type="grouplist" id="1300">
-				<animation type="Conditional" condition="!Window.IsActive(10202)" reversible="false">
-					<effect type="rotatey" center="-120" start="80" end="0" time="300"/>
-					<effect type="fade" start="0" end="100" time="0" delay="0"/>
-				</animation>
-				<animation type="Conditional" condition="Window.IsActive(10202)" reversible="false">
-					<effect type="rotatey" center="-120" start="0" end="80" time="300"/>
-					<effect type="fade" start="100" end="0" time="250"/>
-				</animation>
-				<posx>-253</posx>
-				<posy>0</posy>
-				<width>253</width>
-				<height>720</height>
-				<onup>-</onup>
-				<ondown>-</ondown>
-				<onright>777</onright>
-				<orientation>vertical</orientation>
-				<scrolltime>150</scrolltime>
-				<!-- FILTERS -->
-				<!-- primary filter list title -->
-				<control type="label" id="19008">
-					<description>Title</description>
-					<posx>255</posx>
-					<include>leftMenuTitle</include>
+			<control type="group" id="1301">
+
+				<!-- Mouse Trigger -->
+				<control type="button">
+					<posx>-253</posx>
+					<posy>0</posy>
+					<width>255</width>
+					<height>720</height>
+					<visible>!IsEmpty(Container.Property(PlexFilter))</visible>
+					<include>Mouse_Trigger</include>
 				</control>
-				<!-- primary filters list -->
-				<control type="grouplist" id="19000">
-					<height max="1000">auto</height>
+
+				<control type="grouplist" id="1300">
+					<animation type="Conditional" condition="!Window.IsActive(10202)" reversible="false">
+						<effect type="rotatey" center="-120" start="80" end="0" time="300"/>
+						<effect type="fade" start="0" end="100" time="0" delay="0"/>
+					</animation>
+					<animation type="Conditional" condition="Window.IsActive(10202)" reversible="false">
+						<effect type="rotatey" center="-120" start="0" end="80" time="300"/>
+						<effect type="fade" start="100" end="0" time="250"/>
+					</animation>
+					<posx>-253</posx>
+					<posy>0</posy>
+					<width>253</width>
+					<height>720</height>
 					<onup>-</onup>
-					<ondown>29999</ondown>
+					<ondown>-</ondown>
 					<onright>777</onright>
-					<itemgap>0</itemgap>
+					<orientation>vertical</orientation>
+					<scrolltime>150</scrolltime>
+					<!-- FILTERS -->
+					<!-- primary filter list title -->
+					<control type="label" id="19008">
+						<description>Title</description>
+						<posx>255</posx>
+						<include>leftMenuTitle</include>
+					</control>
+					<!-- primary filters list -->
+					<control type="grouplist" id="19000">
+						<height max="1000">auto</height>
+						<onup>-</onup>
+						<ondown>29999</ondown>
+						<onright>777</onright>
+						<itemgap>0</itemgap>
+					</control>
+					<!-- secondary filters list title -->
+					<control type="label" id="19009">
+						<description>Secondary Title</description>
+						<posx>255</posx>
+						<include>leftMenuTitle</include>
+						<label>FILTER</label>
+						<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
+					</control>
+					<!-- secondary filters list -->
+					<control type="grouplist" id="19001">
+						<height max="1000">auto</height>
+						<onup>19000</onup>
+						<ondown>32000</ondown>
+						<onright>777</onright>
+						<itemgap>0</itemgap>
+					</control>
+					<!-- SORTING -->
+					<!-- sorting list title -->
+					<control type="label" id="19019">
+						<description>Title</description>
+						<posx>255</posx>
+						<include>leftMenuTitle</include>
+						<label>SORT</label>
+						<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
+					</control>
+					<!-- sorting list -->
+					<control type="grouplist" id="19010">
+						<height max="1000">auto</height>
+						<onup>19001</onup>
+						<ondown>30000</ondown>
+						<onright>777</onright>
+						<itemgap>0</itemgap>
+					</control>
 				</control>
-				<!-- secondary filters list title -->
-				<control type="label" id="19009">
-					<description>Secondary Title</description>
-					<posx>255</posx>
-					<include>leftMenuTitle</include>
-					<label>FILTER</label>
-					<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
+				<control type="group">
+					<visible>false</visible>
+					<!-- filters buttons -->
+					<control type="button" id="19005">
+						<textoffsetx>35</textoffsetx>
+						<onup>19000</onup>
+						<ondown>31000</ondown>
+						<include>leftMenuClearFilters</include>
+					</control>
+					<control type="radiobutton" id="19006">
+						<textoffsetx>35</textoffsetx>
+						<include>leftMenuFormat</include>
+						<include>leftMenuFilterRadioButton</include>
+					</control>
+					<control type="label" id="19007">
+						<textoffsetx>40</textoffsetx>
+						<include>leftMenuFormat</include>
+						<font>Regular-14</font>
+						<shadowcolor>ff222222</shadowcolor>
+						<textcolor>FFFFCCCC</textcolor>
+					</control>
+					<!-- sorting buttons -->
+					<control type="filterorderbutton" id="19011">
+						<textoffsetx>35</textoffsetx>
+						<include>leftMenuFormat</include>
+						<include>leftMenuSortingButton</include>
+					</control>
 				</control>
-				<!-- secondary filters list -->
-				<control type="grouplist" id="19001">
-					<height max="1000">auto</height>
-					<onup>19000</onup>
-					<ondown>32000</ondown>
-					<onright>777</onright>
-					<itemgap>0</itemgap>
-				</control>
-				<!-- SORTING -->
-				<!-- sorting list title -->
-				<control type="label" id="19019">
-					<description>Title</description>
-					<posx>255</posx>
-					<include>leftMenuTitle</include>
-					<label>SORT</label>
-					<visible>!IsEmpty(Container.Property(hasAdvancedFilters))</visible>
-				</control>
-				<!-- sorting list -->
-				<control type="grouplist" id="19010">
-					<height max="1000">auto</height>
-					<onup>19001</onup>
-					<ondown>30000</ondown>
-					<onright>777</onright>
-					<itemgap>0</itemgap>
-				</control>
+				<include>NowPlayingSideBar</include>
 			</control>
-			<control type="group">
-				<visible>false</visible>
-				<!-- filters buttons -->
-				<control type="button" id="19005">
-					<textoffsetx>35</textoffsetx>
-					<onup>19000</onup>
-					<ondown>31000</ondown>
-					<include>leftMenuClearFilters</include>
-				</control>
-				<control type="radiobutton" id="19006">
-					<textoffsetx>35</textoffsetx>
-					<include>leftMenuFormat</include>
-					<include>leftMenuFilterRadioButton</include>
-				</control>
-				<control type="label" id="19007">
-					<textoffsetx>40</textoffsetx>
-					<include>leftMenuFormat</include>
-					<font>Regular-14</font>
-					<shadowcolor>ff222222</shadowcolor>
-					<textcolor>FFFFCCCC</textcolor>
-				</control>
-				<!-- sorting buttons -->
-				<control type="filterorderbutton" id="19011">
-					<textoffsetx>35</textoffsetx>
-					<include>leftMenuFormat</include>
-					<include>leftMenuSortingButton</include>
-				</control>
-			</control>
-			<include>NowPlayingSideBar</include>
 		</control>
 	</include>
 	<!-- Settings menu -->
@@ -953,6 +1258,15 @@
 			</control>
 			<control type="group">
 				<animation effect="fade" start="0" end="50" time="0" condition="true">Conditional</animation>
+
+				<!-- Mouse Trigger -->
+				<control type="button">
+					<width>70</width>
+					<height>720</height>
+					<onfocus>Plex.ActivateWindow(4997)</onfocus>
+					<include>Mouse_Trigger</include>
+				</control>
+
 				<control type="image">
 					<posx>0</posx>
 					<posy>108</posy>
@@ -1008,6 +1322,16 @@
 		<control type="group">
 			<include>leftMenuInitSlide</include>
 			<include>leftMenuBgSettings</include>
+
+			<!-- Mouse Trigger -->
+			<control type="button">
+				<posx>70</posx>
+				<width>200</width>
+				<height>720</height>
+				<onfocus>Dialog.Close(4997)</onfocus>
+				<include>Mouse_Trigger</include>
+			</control>
+
 			<control type="grouplist" id="997">
 				<posx>0</posx>
 				<posy>108</posy>

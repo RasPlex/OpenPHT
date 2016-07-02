@@ -551,7 +551,7 @@
 			<control type="group" id="200">
 				<posx>270</posx>
 				<posy>5</posy>
-				<visible allowhiddenfocus="true">ControlGroup(200).HasFocus</visible>
+				<visible allowhiddenfocus="true">true</visible>
 				<!-- play/pause -->
 				<control type="image">
 					<posy>13</posy>

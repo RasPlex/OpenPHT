@@ -596,4 +596,14 @@
 			<animation effect="fade" start="0" end="100" time="100" condition="true">WindowClose</animation>
 		</control>
 	</include>
+	<!-- Mouse Trigger -->
+	<include name="Mouse_Trigger">
+		<label>-</label>
+		<font>-</font>
+		<onfocus>-</onfocus>
+		<onclick>-</onclick>
+		<texturenofocus>-</texturenofocus>
+		<texturefocus>-</texturefocus>
+		<visible>system.getbool(input.enablemouse)</visible>
+	</include>
 </includes>

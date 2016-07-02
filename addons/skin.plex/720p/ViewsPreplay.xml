@@ -1063,8 +1063,8 @@
 		<!-- extras -->
 		<include>leftMenuBg</include>
 		<control type="group">
-			<animation effect="slide" start="0" end="297" time="500" condition="Control.HasFocus(30)">Conditional</animation>
-			<posx>-224</posx>
+			<animation effect="slide" start="0" end="397" time="500" condition="Control.HasFocus(30)">Conditional</animation>
+			<posx>-324</posx>
 			<control type="group">
 				<posx>0</posx>
 				<posy>20</posy>

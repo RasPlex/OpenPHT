@@ -469,6 +469,12 @@
 	</include>
 	<!-- lists -->
 	<include name="HomeLists">
+		<include condition="system.getbool(input.enablemouse)">HomeLists_List</include>
+		<include condition="!system.getbool(input.enablemouse)">HomeLists_Wraplist</include>
+	</include>
+
+       <!-- Deck (Keyboard) -->
+       <include name="HomeLists_Wraplist">
 		<!-- lists -->
 		<control type="group" id="5000">
 			<include>FadeDialog</include>
@@ -1298,4 +1304,829 @@
 			<include>HomeListItemFullInfo</include>
 		</control>
 	</include>
+
+
+       <!-- Deck (Mouse) -->
+       <include name="HomeLists_List">
+		<!-- lists -->
+		<control type="group" id="5000">
+			<include>FadeDialog</include>
+			<visible>[Control.IsVisible(11000) | Control.IsVisible(11001) | Control.IsVisible(11002) | Control.IsVisible(11003) | Control.IsVisible(11004) | Control.IsVisible(11005) | Control.IsVisible(11006) | Control.IsVisible(11007) | Control.IsVisible(12000)]</visible>
+			<posx>391</posx>
+			<posy>-100</posy>
+			<width>890</width>
+			<height>720</height>
+			<!-- list titles & bg's & arrows (see includes on top for formatting) -->
+			<control type="group">
+				<!-- "on deck" & "Watch Later" -->
+				<control type="group">
+					<!-- with "recently added" or "recommended" or "PQ video" -->
+					<control type="group">
+						<visible>[Control.IsVisible(11000) + Control.IsVisible(11001)] | [Control.IsVisible(11003) + Control.IsVisible(11004)] | [Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						<posy>215</posy>
+						<control type="image">
+							<include>ListBgTop</include>
+						</control>
+						<control type="image">
+							<include>ListTitleBgTop</include>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>On Deck</label>
+							<visible>[Control.IsVisible(11000) + Control.IsVisible(11001)]</visible>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>Watch Later</label>
+							<visible>[Control.IsVisible(11003) + Control.IsVisible(11004)]</visible>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>Video</label>
+							<visible>[Control.IsVisible(11005) + Control.IsVisible(11007)]</visible>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>Video</label>
+							<visible>[Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						</control>
+					</control>
+					<!-- alone -->
+					<control type="group">
+						<visible>[!Control.IsVisible(11000) + Control.IsVisible(11001)] | [Control.IsVisible(11003) + !Control.IsVisible(11004)] | [!Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						<posy>320</posy>
+						<control type="image">
+							<include>ListBgTop</include>
+						</control>
+						<control type="image">
+							<include>ListTitleBgTop</include>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>On Deck</label>
+							<visible>[!Control.IsVisible(11000) + Control.IsVisible(11001)]</visible>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>Watch Later</label>
+							<visible>[Control.IsVisible(11003) + !Control.IsVisible(11004)]</visible>
+						</control>
+						<control type="label" id="8002">
+							<include>ListTitle</include>
+							<label>Video</label>
+							<visible>[!Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						</control>
+						<!-- arrow -->
+						<control type="group">
+							<posy>243</posy>
+							<include>ListArrow</include>
+						</control>
+					</control>
+				</control>
+				<!-- "recently added" & "recently used" & "recommendations" & "play lists" -->
+				<control type="group">
+					<visible>Control.IsVisible(11000) | Control.IsVisible(11002) | Control.IsVisible(11003) | Control.IsVisible(11004) | Control.IsVisible(11005) | [Control.IsVisible(11006) + !Control.IsVisible(11007)] | [Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+					<!-- with "on deck" or "Watch Later + recommendations" or "PQ music" -->
+					<control type="group">
+						<visible>Control.IsVisible(11001) | [Control.IsVisible(11003) + Control.IsVisible(11004)] | [Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						<posy>666</posy>
+						<control type="image">
+							<include>ListBgBottom</include>
+						</control>
+						<control type="image">
+							<include>ListTitleBgBottom</include>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Recently Added</label>
+							<visible>Control.IsVisible(11001)</visible>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Recommended</label>
+							<visible>[Control.IsVisible(11003) + Control.IsVisible(11004)]</visible>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Music</label>
+							<visible>[Control.IsVisible(11006) + Control.IsVisible(11007)]</visible>
+						</control>
+					</control>
+					<!-- alone -->
+					<control type="group">
+						<visible>[Control.IsVisible(11000) + !Control.IsVisible(11001)] | [Control.IsVisible(11003) + !Control.IsVisible(11004)] | [!Control.IsVisible(11003) + Control.IsVisible(11004)] | Control.IsVisible(11002) | Control.IsVisible(11005) | [Control.IsVisible(11006) + !Control.IsVisible(11007)]</visible>
+						<posy>563</posy>
+						<control type="image">
+							<include>ListBgBottom</include>
+						</control>
+						<control type="image">
+							<include>ListTitleBgBottom</include>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Recently Added</label>
+							<visible>Control.IsVisible(11000)</visible>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Recently Used</label>
+							<visible>Control.IsVisible(11002)</visible>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Recommended</label>
+							<visible>Control.IsVisible(11004) + !Control.IsVisible(11003)</visible>
+						</control>						
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Playlists</label>
+							<visible>Control.IsVisible(11005)</visible>
+						</control>
+						<control type="label" id="8001">
+							<include>ListTitle</include>
+							<label>Music</label>
+							<visible>[Control.IsVisible(11006)]</visible>
+						</control>
+						<!-- arrow -->
+						<include>ListArrow</include>
+					</control>
+				</control>
+			</control>
+			<!-- Container for the new lists -->
+
+			<!-- "On Deck" & "Recently Added" -->
+			<control type="group" id="5100">
+				<posx>-3</posx>
+				<posy>320</posy>
+				<width>890</width>
+				<height>720</height>
+				<ondown>5200</ondown>
+				<onup>310</onup>
+				<onright>350</onright>
+				<onleft>350</onleft>
+				<orientation>vertical</orientation>
+
+				<!-- On Deck (11001) -->
+				<control type="group" id="7002">
+					<control type="list" id="11001">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown condition="Control.IsVisible(11000)">7001</ondown>
+						<ondown condition="!Control.IsVisible(11000)">300</ondown>
+						<onup>300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>0</posx>
+						<width>860</width>
+						<height>230</height>
+						<animation effect="slide" end="0,-109" condition="Control.IsVisible(11000)">Conditional</animation>
+
+						<itemlayout width="139" height="230" condition="!Container(11001).ListItem.Type(clip) | Skin.HasSetting(HomeVideosPortrait)">
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + Control.IsVisible(11000)</visible>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+							<!-- movie & episode when only this list is visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + !Control.IsVisible(11000)</visible>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+						</itemlayout>
+						<focusedlayout width="139" height="330" condition="!Container(11001).ListItem.Type(clip) | Skin.HasSetting(HomeVideosPortrait)">
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + Control.IsVisible(11000)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+							<!-- movie & episode when only this list is visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + !Control.IsVisible(11000)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+						</focusedlayout>
+						<itemlayout width="211" height="230" condition="Container(11001).ListItem.Type(clip) + !Skin.HasSetting(HomeVideosPortrait)">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11000)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<control type="image">
+									<visible>ControlGroup(7005).HasFocus</visible>
+									<include>ListItemWideDimmer</include>
+								</control>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11000)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="211" height="230" condition="Container(11001).ListItem.Type(clip) + !Skin.HasSetting(HomeVideosPortrait)">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11000)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11000)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+
+				<!-- Recently Added (11000) -->
+				<control type="group" id="7001">
+					<control type="list" id="11000">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown>300</ondown>
+						<onup condition="Control.IsVisible(11001)">7002</onup>
+						<onup condition="!Control.IsVisible(11001)">300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>0</posx>
+						<width>860</width>
+						<height>230</height>
+						<animation effect="slide" end="0,100" condition="Control.IsVisible(11001)">Conditional</animation>
+
+						<itemlayout width="139" height="230" condition="!Container(11000).ListItem.Type(clip) | Skin.HasSetting(HomeVideosPortrait)">
+							<!-- album -->
+							<control type="group">
+								<visible>ListItem.Type(album)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitleAlbum</include>
+							</control>
+							<!-- photos -->
+							<control type="group">
+								<visible>ListItem.Type(photo)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareDate</include>
+								<include>ListItemSquareTitle</include>
+							</control>
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+							<!-- movie & episode when only this list is visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+						</itemlayout>
+						<focusedlayout width="139" height="230" condition="!Container(11000).ListItem.Type(clip) | Skin.HasSetting(HomeVideosPortrait)">
+							<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
+							<!-- album -->
+							<control type="group">
+								<visible>ListItem.Type(album)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitleAlbum</include>
+								<include>ListItemSquareSelectedBorder</include>
+							</control>
+							<!-- photos -->
+							<control type="group">
+								<visible>ListItem.Type(photo)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareDate</include>
+								<include>ListItemSquareTitle</include>
+								<include>ListItemSquareSelectedBorder</include>
+							</control>
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+							<!-- tv show episode when  only this list is visible -->
+							<control type="group">
+								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+						</focusedlayout>
+						<itemlayout width="211" height="230" condition="Container(11000).ListItem.Type(clip) + !Skin.HasSetting(HomeVideosPortrait)">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11001)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<control type="image">
+									<visible>ControlGroup(7003).HasFocus</visible>
+									<include>ListItemWideDimmer</include>
+								</control>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11001)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="211" height="230" condition="Container(11000).ListItem.Type(clip) + !Skin.HasSetting(HomeVideosPortrait)">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11001)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11001)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideDate</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+			</control>
+
+
+			<!-- "Watch Later" & "Recommendations" -->
+			<control type="grouplist" id="5200">
+				<visible>true</visible>
+				<posx>0</posx>
+				<posy>90</posy>
+				<width>890</width>
+				<height>720</height>
+				<ondown>5200</ondown>
+				<onup>310</onup>
+				<onright>350</onright>
+				<onleft>350</onleft>
+				<orientation>vertical</orientation>
+				<!-- Watch Later (11003) -->
+				<control type="group" id="7003">
+					<height>230</height>
+					<control type="list" id="11003">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown condition="Control.IsVisible(11004)">7005</ondown>
+						<ondown condition="!Control.IsVisible(11004)">300</ondown>
+						<onup>300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>-12</posx>
+						<posy>131</posy>
+						<width>880</width>
+						<height>500</height>
+						<itemlayout width="211" height="230">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11004)</visible>
+								<posy>-10</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<control type="image">
+									<visible>ControlGroup(7005).HasFocus</visible>
+									<include>ListItemWideDimmer</include>
+								</control>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11004)</visible>
+								<posy>102</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="211" height="230">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11004)</visible>
+								<posy>-10</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11004)</visible>
+								<posy>102</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+				<!-- Recommended (11004) -->
+				<control type="group" id="7005">
+					<height>230</height>
+					<control type="list" id="11004">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown>300</ondown>
+						<onup condition="Control.IsVisible(11003)">7003</onup>
+						<onup condition="!Control.IsVisible(11003)">300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>-12</posx>
+						<posy>0</posy>
+						<width>880</width>
+						<height>400</height>
+						<itemlayout width="211" height="230">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11003)</visible>
+								<posy>102</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<control type="image">
+									<visible>ControlGroup(7003).HasFocus</visible>
+									<include>ListItemWideDimmer</include>
+								</control>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11003)</visible>
+								<posy>0</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="211" height="230">
+							<!-- when both lists are visible -->
+							<control type="group">
+								<visible>Control.IsVisible(11003)</visible>
+								<posy>102</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+							<!-- when only this list is visible -->
+							<control type="group">
+								<visible>!Control.IsVisible(11003)</visible>
+								<posy>0</posy>
+								<visible>ListItem.Type(clip)</visible>
+								<include>ListItemWideCard</include>
+								<include>ListItemWide</include>
+								<include>ListItemWideTitleProvider</include>
+								<include>ListItemWideTitle</include>
+								<include>ListItemWideSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+			</control>
+			<!-- "Recently Used" -->
+			<control type="grouplist" id="5300">
+				<visible>true</visible>
+				<posx>0</posx>
+				<posy>226</posy>
+				<width>860</width>
+				<height>720</height>
+				<ondown>-</ondown>
+				<onup>-</onup>
+				<onright>350</onright>
+				<onleft>350</onleft>
+				<orientation>vertical</orientation>
+				<!-- RecentlyAccessed(11002) -->
+				<control type="group" id="7004">
+					<height>230</height>
+					<control type="list" id="11002">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown>300</ondown>
+						<onup>300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>-14</posx>
+						<posy>100</posy>
+						<width>880</width>
+						<height>400</height>
+						<itemlayout width="140" height="230">
+							<!-- channel -->
+							<control type="group">
+								<visible>ListItem.Type(channel)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="140" height="230">
+							<!-- channel -->
+							<control type="group">
+								<visible>ListItem.Type(channel)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitle</include>
+								<include>ListItemSquareSelectedBorder</include>
+							</control>
+						</focusedlayout>
+						<height>200</height>
+					</control>
+				</control>
+			</control>
+			<!-- "Playlists" -->
+			<control type="grouplist" id="5400">
+				<visible>true</visible>
+				<posx>0</posx>
+				<posy>226</posy>
+				<width>860</width>
+				<height>720</height>
+				<ondown>300</ondown>
+				<onup>300</onup>
+				<onright>350</onright>
+				<onleft>350</onleft>
+				<orientation>vertical</orientation>
+				<!-- All (11005) -->
+				<control type="group" id="7005">
+					<height>230</height>
+					<control type="list" id="11005">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown>300</ondown>
+						<onup>300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>-6</posx>
+						<posy>100</posy>
+						<width>870</width>
+						<height>330</height>
+						<itemlayout width="140" height="230">
+							<control type="group">
+								<include>ListItemSquareCompositeCard</include>
+								<include>ListItemSquareComposite</include>
+								<include>ListItemSquareCompositeTitleServer</include>
+								<include>ListItemSquareCompositeTitle</include>
+							</control>
+						</itemlayout>
+						<focusedlayout width="140" height="230">
+							<control type="group">
+								<include>ListItemSquareCompositeCard</include>
+								<include>ListItemSquareComposite</include>
+								<include>ListItemSquareCompositeTitleServer</include>
+								<include>ListItemSquareCompositeTitle</include>
+								<include>ListItemSquareCompositeSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+			</control>
+			<!-- "Play Queues" -->
+			<control type="grouplist" id="5500">
+				<visible>true</visible>
+				<posx>-3</posx>
+				<posy>84</posy>
+				<width>890</width>
+				<height>720</height>
+				<ondown>5200</ondown>
+				<onup>310</onup>
+				<onright>350</onright>
+				<onleft>350</onleft>
+				<orientation>vertical</orientation>
+				<!-- Video (11007) -->
+				<control type="group" id="7007">
+					<height>230</height>
+					<control type="list" id="11007">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<onup>300</onup>
+						<ondown condition="Control.IsVisible(11006)">7006</ondown>
+						<ondown condition="!Control.IsVisible(11006)">300</ondown>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>0</posx>
+						<posy>129</posy>
+						<width>860</width>
+						<height>340</height>
+						<itemlayout width="139" height="230">
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<posy>-3</posy>
+								<visible>Control.IsVisible(11006)</visible>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7006).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+							<!-- movie & episode when only this list is visible -->
+							<control type="group">
+								<posy>101</posy>
+								<visible>!Control.IsVisible(11006)</visible>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
+							</control>
+						</itemlayout>
+						<focusedlayout width="139" height="230">
+							<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
+							<!-- movie & episode when both lists are visible -->
+							<control type="group">
+								<posy>-3</posy>
+								<visible>Control.IsVisible(11006)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+							<!-- movie & episode when  only this list is visible -->
+							<control type="group">
+								<posy>101</posy>
+								<visible>!Control.IsVisible(11006)</visible>
+								<include>ListItemPoster</include>
+								<include>ListItemPosterSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+				<!-- Music (11006) -->
+				<control type="group" id="7006">
+					<visible allowhiddenfocus="false">true</visible>
+					<height>230</height>
+					<control type="list" id="11006">
+						<visible allowhiddenfocus="false">false</visible>
+						<orientation>horizontal</orientation>
+						<ondown>300</ondown>
+						<onup condition="Control.IsVisible(11007)">7007</onup>
+						<onup condition="!Control.IsVisible(11007)">300</onup>
+						<onright>-</onright>
+						<onleft>300</onleft>
+						<posx>0</posx>
+						<posy>6</posy>
+						<width>860</width>
+						<height>330</height>
+						<itemlayout width="139" height="330">
+							<!-- music when only this list is visible -->
+							<control type="group">
+								<posy>-3</posy>
+								<visible>!Control.IsVisible(11007)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitle</include>
+							</control>
+							<!-- music when both lists are visible -->
+							<control type="group">
+								<posy>100</posy>
+								<visible>Control.IsVisible(11007)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitle</include>
+								<control type="image">
+									<visible>ControlGroup(7007).HasFocus</visible>
+									<include>ListItemSquareDimmer</include>
+								</control>
+							</control>
+						</itemlayout>
+						<focusedlayout width="139" height="330">
+							<!-- music when only this list is visible -->
+							<control type="group">
+								<posy>-3</posy>
+								<visible>!Control.IsVisible(11007)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitle</include>
+								<include>ListItemSquareSelectedBorder</include>
+							</control>
+							<!-- music when both lists are visible -->
+							<control type="group">
+								<posy>100</posy>
+								<visible>Control.IsVisible(11007)</visible>
+								<include>ListItemSquareCard</include>
+								<include>ListItemSquare</include>
+								<include>ListItemSquareTitleArtist</include>
+								<include>ListItemSquareTitle</include>
+								<include>ListItemSquareSelectedBorder</include>
+							</control>
+						</focusedlayout>
+					</control>
+				</control>
+			</control>
+		</control>
+		<!-- Item Full Info -->
+		<control type="group">
+			<include>HomeListItemFullInfo</include>
+		</control>
+	</include>
+
+
+
 </includes>

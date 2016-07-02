@@ -2,8 +2,8 @@
   <global>
     <mouse>
       <leftclick>Select</leftclick>
-      <middleclick>back</middleclick>
-      <rightclick>ContextMenu</rightclick>
+      <middleclick>ContextMenu</middleclick>
+      <rightclick>Back</rightclick>
       <wheelup>Up</wheelup>
       <wheeldown>Down</wheeldown>
       <doubleclick>doubleclick</doubleclick>
@@ -15,6 +15,8 @@
     <mouse>
       <wheeldown>volumeDown</wheeldown>
       <wheelup>volumeUp</wheelup>
+      <middleclick>OSD</middleclick>
+      <rightclick>OSD</rightclick>
     </mouse>
   </fullscreenvideo>
   <SlideShow>
