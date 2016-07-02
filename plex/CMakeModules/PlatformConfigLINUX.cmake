@@ -169,6 +169,11 @@ if(${CMAKE_HOST_SYSTEM_PROCESSOR} STREQUAL "x86_64")
   set(ARCH "x86_64-linux")
 else()
   set(ARCH "i486-linux")
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+    endif()
+  endif()
 endif()
 
 ## remove annying useless warnings
