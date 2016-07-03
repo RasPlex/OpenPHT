@@ -319,7 +319,7 @@ void CPlexServerManager::SetBestServer(CPlexServerPtr server, bool force)
     return;
   
   CSingleLock lk(m_serverManagerLock);
-  if (!m_bestServer || force || m_bestServer->Equals(server))
+  if (!m_bestServer || force || m_bestServer->Equals(server) || m_bestServer->IsShared())
   {
     CLog::Log(LOGDEBUG, "CPlexServerManager::SetBestServer bestServer updated to %s", server->toString().c_str());
 
@@ -359,8 +359,7 @@ void CPlexServerManager::ServerReachabilityDone(const CPlexServerPtr& server, bo
   
   if (success)
   {
-    if (!server->IsShared() &&
-        (server->GetServerClass().empty() || !server->GetServerClass().Equals(PLEX_SERVER_CLASS_SECONDARY)))
+    if (server->GetServerClass().empty() || !server->GetServerClass().Equals(PLEX_SERVER_CLASS_SECONDARY))
       SetBestServer(server, false);
     NotifyAboutServer(server);
   }
