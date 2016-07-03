@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="skin.plex" version="1.6.1" name="OpenPHT" provider-name="OpenPHT Team">
+<addon id="skin.plex" version="1.6.3" name="OpenPHT" provider-name="OpenPHT Team">
 	<requires>
 		<import addon="xbmc.gui" version="4.0.0"/>
 	</requires>
