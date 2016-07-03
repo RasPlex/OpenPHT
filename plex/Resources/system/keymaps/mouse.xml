@@ -1,16 +1,24 @@
 <keymap>
   <global>
     <mouse>
-      <leftclick>leftclick</leftclick>
-      <middleclick>middleclick</middleclick>
-      <rightclick>rightclick</rightclick>
-      <doubleclick>doubleclick</doubleclick>
-      <wheeldown>wheeldown</wheeldown>
+      <leftclick>Select</leftclick>
+      <middleclick>ContextMenu</middleclick>
+      <rightclick>Back</rightclick>
       <wheelup>wheelup</wheelup>
+      <wheeldown>wheeldown</wheeldown>
+      <doubleclick>doubleclick</doubleclick>
       <mousedrag>mousedrag</mousedrag>
       <mousemove>mousemove</mousemove>
     </mouse>
   </global>
+  <fullscreenvideo>
+    <mouse>
+      <wheeldown>volumeDown</wheeldown>
+      <wheelup>volumeUp</wheelup>
+      <middleclick>Pause</middleclick>
+      <rightclick>OSD</rightclick>
+    </mouse>
+  </fullscreenvideo>
   <SlideShow>
     <mouse>
       <leftclick>Pause</leftclick>

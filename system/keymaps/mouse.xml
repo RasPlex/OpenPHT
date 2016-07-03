@@ -4,8 +4,8 @@
       <leftclick>Select</leftclick>
       <middleclick>ContextMenu</middleclick>
       <rightclick>Back</rightclick>
-      <wheelup>Up</wheelup>
-      <wheeldown>Down</wheeldown>
+      <wheelup>wheelup</wheelup>
+      <wheeldown>wheeldown</wheeldown>
       <doubleclick>doubleclick</doubleclick>
       <mousedrag>mousedrag</mousedrag>
       <mousemove>mousemove</mousemove>
@@ -15,7 +15,7 @@
     <mouse>
       <wheeldown>volumeDown</wheeldown>
       <wheelup>volumeUp</wheelup>
-      <middleclick>OSD</middleclick>
+      <middleclick>Pause</middleclick>
       <rightclick>OSD</rightclick>
     </mouse>
   </fullscreenvideo>
