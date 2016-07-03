@@ -1013,8 +1013,8 @@ msgid "Show shared libraries in menu"
 msgstr "Show shared libraries in menu"
 
 msgctxt "#52210"
-msgid "Show queue and recommendations"
-msgstr "Show queue and recommendations"
+msgid "Show watch later and recommended"
+msgstr "Show watch later and recommended"
 
 msgctxt "#52211"
 msgid "Automatic sign in"
@@ -1039,6 +1039,10 @@ msgstr "Disable server side scaling of fanart"
 msgctxt "#52216"
 msgid "Disable server side scaling of photos"
 msgstr "Disable server side scaling of photos"
+
+msgctxt "#52217"
+msgid "Show watched in watch later and recommended"
+msgstr "Show watched in watch later and recommended"
 
 msgctxt "#52300"
 msgid "Media Server went away"

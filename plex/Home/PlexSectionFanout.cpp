@@ -85,10 +85,11 @@ void CPlexSectionFanout::Refresh(bool force)
   {
     if (!g_advancedSettings.m_bHideFanouts)
     {
-      PlexUtils::AppendPathToURL(trueUrl, "queue/unwatched");
+      bool useAll = g_guiSettings.GetBool("myplex.queuewatched");
+      PlexUtils::AppendPathToURL(trueUrl, useAll ? "queue/all" : "queue/unwatched");
       m_outstandingJobs.push_back(LoadSection(trueUrl, CONTENT_LIST_QUEUE));
       trueUrl = CURL(m_url);
-      PlexUtils::AppendPathToURL(trueUrl, "recommendations/unwatched");
+      PlexUtils::AppendPathToURL(trueUrl, useAll ? "recommendations/all" : "recommendations/unwatched");
       m_outstandingJobs.push_back(LoadSection(trueUrl, CONTENT_LIST_RECOMMENDATIONS));
     }
   }
