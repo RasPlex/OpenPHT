@@ -326,6 +326,9 @@ void CGUIWindowPlexSearch::Reset()
     CGUIMessage msg(GUI_MSG_SETFOCUS, GetID(), 70);
     OnMessage(msg);
   }
+
+  m_lastFocusedContainer = -1;
+  m_lastFocusedItem = -1;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
