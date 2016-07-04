@@ -75,6 +75,13 @@ CGUIIncludes::CGUIIncludes()
   m_constantNodes.insert("timeperimage");
   m_constantNodes.insert("fadetime");
   m_constantNodes.insert("pauseatend");
+
+  m_expressionAttributes.insert("condition");
+
+  m_expressionNodes.insert("visible");
+  m_expressionNodes.insert("enable");
+  m_expressionNodes.insert("usealttexture");
+  m_expressionNodes.insert("selected");
 }
 
 CGUIIncludes::~CGUIIncludes()
@@ -174,6 +181,17 @@ bool CGUIIncludes::LoadIncludesFromXML(const TiXmlElement *root)
       m_skinvariables.insert(make_pair(tagName, *node));
     }
     node = node->NextSiblingElement("variable");
+  }
+
+  node = root->FirstChildElement("expression");
+  while (node)
+  {
+    if (node->Attribute("name") && node->FirstChild())
+    {
+      std::string tagName = node->Attribute("name");
+      m_expressions.insert(make_pair(tagName, node->FirstChild()->ValueStr()));
+    }
+    node = node->NextSiblingElement("expression");
   }
 
   return true;
@@ -309,11 +327,15 @@ void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<int, bool
   { // check the attribute against our set
     if (m_constantAttributes.count(attribute->Name()))
       attribute->SetValue(ResolveConstant(attribute->ValueStr()));
+    if (m_expressionAttributes.count(attribute->Name()))
+      attribute->SetValue(ResolveExpressions(attribute->ValueStr()));
     attribute = attribute->Next();
   }
   // also do the value
   if (node->FirstChild() && node->FirstChild()->Type() == TiXmlNode::TINYXML_TEXT && m_constantNodes.count(node->ValueStr()))
     node->FirstChild()->SetValue(ResolveConstant(node->FirstChild()->ValueStr()));
+  if (node->FirstChild() && node->FirstChild()->Type() == TiXmlNode::TINYXML_TEXT && m_expressionNodes.count(node->ValueStr()))
+    node->FirstChild()->SetValue(ResolveExpressions(node->FirstChild()->ValueStr()));
 }
 
 bool CGUIIncludes::GetParameters(const TiXmlElement *include, const char *valueAttribute, Params& params)
@@ -459,6 +481,19 @@ CStdString CGUIIncludes::ResolveConstant(const CStdString &constant) const
   CStdString value;
   StringUtils::JoinString(values, ",", value);
   return value;
+}
+
+std::string CGUIIncludes::ResolveExpressions(const std::string &expression) const
+{
+  std::string work(expression);
+  CGUIInfoLabel::ReplaceSpecialKeywordReferences(work, "EXP", [&](const std::string &str) -> std::string {
+    std::map<std::string, std::string>::const_iterator it = m_expressions.find(str);
+    if (it != m_expressions.end())
+      return it->second;
+    return "";
+  });
+
+  return work;
 }
 
 const INFO::CSkinVariableString* CGUIIncludes::CreateSkinVariable(const CStdString& name, int context)
