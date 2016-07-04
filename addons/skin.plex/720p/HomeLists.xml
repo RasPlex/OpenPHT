@@ -686,14 +686,34 @@
 							<control type="group">
 								<posy>-3</posy>
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + Control.IsVisible(11000)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<posy>100</posy>
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + !Control.IsVisible(11000)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 						</focusedlayout>
@@ -843,13 +863,42 @@
 							<control type="group">
 								<posy>100</posy>
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
-							<!-- tv show episode when  only this list is visible -->
+							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
-								<include>ListItemPoster</include>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 						</focusedlayout>
@@ -1517,13 +1566,33 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + Control.IsVisible(11000)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)]] + !Control.IsVisible(11000)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7001).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 						</focusedlayout>
@@ -1667,13 +1736,42 @@
 							<!-- movie & episode when both lists are visible -->
 							<control type="group">
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + Control.IsVisible(11001)</visible>
-								<include>ListItemPoster</include>
+								<animation effect="fade" start="100" end="50" time="300" condition="ControlGroup(7002).HasFocus">Conditional</animation>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
-							<!-- tv show episode when  only this list is visible -->
+							<!-- movie & episode when only this list is visible -->
 							<control type="group">
 								<visible>[ListItem.Type(episode) | ListItem.Type(movie) | [ListItem.Type(clip) + Skin.HasSetting(HomeVideosPortrait)] | ListItem.Type(season)] + !Control.IsVisible(11001)</visible>
-								<include>ListItemPoster</include>
+								<control type="group">
+									<include>ListItemPoster</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(episode)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV2</include>
+									<include>ListItemInProgress</include>
+								</control>
+								<control type="group">
+									<visible>ListItem.Type(season)</visible>
+									<include>ListItemPosterCard</include>
+									<include>ListItemPosterTitleTV3</include>
+									<include>ListItemInProgress</include>
+								</control>
 								<include>ListItemPosterSelectedBorder</include>
 							</control>
 						</focusedlayout>
