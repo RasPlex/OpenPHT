@@ -33,7 +33,7 @@
 #include "utils/StringUtils.h"
 #include "settings/AdvancedSettings.h"
 #include "cores/VideoRenderers/RenderManager.h"
-#include "RenderFlags.h"
+#include "../RenderFlags.h"
 #include "win32/WIN32Util.h"
 #include "utils/Log.h"
 
