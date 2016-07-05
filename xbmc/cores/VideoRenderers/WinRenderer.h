@@ -27,8 +27,8 @@
 #include "guilib/D3DResource.h"
 #include "RenderCapture.h"
 #include "settings/VideoSettings.h"
-#include "DXVA.h"
-#include "DXVAHD.h"
+#include "HwDecRender/DXVA.h"
+#include "HwDecRender/DXVAHD.h"
 
 #define ALIGN(value, alignment) (((value)+((alignment)-1))&~((alignment)-1))
 #define CLAMP(a, min, max) ((a) > (max) ? (max) : ( (a) < (min) ? (min) : a ))
