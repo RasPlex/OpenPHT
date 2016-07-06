@@ -184,8 +184,6 @@ bool CGUIWindowFullScreen::OnAction(const CAction &action)
 
   case ACTION_SHOW_OSD_TIME:
     m_bShowCurrentTime = !m_bShowCurrentTime;
-    if(!m_bShowCurrentTime)
-      g_infoManager.SetDisplayAfterSeek(0); //Force display off
     g_infoManager.SetShowTime(m_bShowCurrentTime);
     return true;
     break;
@@ -590,17 +588,8 @@ void CGUIWindowFullScreen::FrameMove()
 {
   if (g_application.m_pPlayer->GetPlaySpeed() != 1)
     g_infoManager.SetDisplayAfterSeek();
-  if (m_bShowCurrentTime)
-    g_infoManager.SetDisplayAfterSeek();
 
   if (!g_application.m_pPlayer->HasPlayer()) return;
-
-#ifndef __PLEX__
-  if( g_application.m_pPlayer->IsCaching() )
-  {
-    g_infoManager.SetDisplayAfterSeek(0); //Make sure these stuff aren't visible now
-  }
-#endif
 
   //------------------------
   m_showCodec.Update();
