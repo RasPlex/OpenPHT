@@ -591,6 +591,8 @@ bool CGUIPlexMediaWindow::OnAction(const CAction &action)
       action.GetID() >= KEY_ASCII || // KEY_ASCII means that we letterjumped.
       action.GetID() == ACTION_FIRST_PAGE ||
       action.GetID() == ACTION_LAST_PAGE ||
+      action.GetID() == ACTION_MOUSE_LEFT_CLICK ||
+      action.GetID() == ACTION_MOUSE_DRAG ||
       action.GetID() == ACTION_MOUSE_WHEEL_UP ||
       action.GetID() == ACTION_MOUSE_WHEEL_DOWN)
   {
