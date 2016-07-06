@@ -28,7 +28,19 @@
 
 #include "cores/omxplayer/OMXImage.h"
 
-#include "utils/TimeUtils.h"
+#include "guilib/GraphicContext.h"
+#include "settings/Settings.h"
+
+#include <sys/ioctl.h>
+#include <linux/ioctl.h>
+#include "rpi_user_vcsm.h"
+
+#define MAJOR_NUM 100
+#define IOCTL_MBOX_PROPERTY _IOWR(MAJOR_NUM, 0, char *)
+#define DEVICE_FILE_NAME "/dev/vcio"
+
+static int mbox_open();
+static void mbox_close(int file_desc);
 
 CRBP::CRBP() : m_vsync(true)
 {
@@ -44,6 +56,12 @@ CRBP::CRBP() : m_vsync(true)
   m_codec_mpg2_enabled = false;
   m_codec_wvc1_enabled = false;
   m_last_pll_adjust = 1.0;
+  m_p = NULL;
+  m_x = 0;
+  m_y = 0;
+  m_enabled = 0;
+  m_mb = mbox_open();
+  vcsm_init();
 }
 
 CRBP::~CRBP()
@@ -127,6 +145,7 @@ DISPMANX_DISPLAY_HANDLE_T CRBP::OpenDisplay(uint32_t device)
   if (m_display == DISPMANX_NO_HANDLE)
   {
     m_display = vc_dispmanx_display_open( 0 /*screen*/ );
+    init_cursor();
   }
   return m_display;
 }
@@ -134,6 +153,7 @@ DISPMANX_DISPLAY_HANDLE_T CRBP::OpenDisplay(uint32_t device)
 void CRBP::CloseDisplay(DISPMANX_DISPLAY_HANDLE_T display)
 {
   CSingleLock lock(m_critSection);
+  uninit_cursor();
   assert(display == m_display);
   vc_dispmanx_display_close(m_display);
   m_display = DISPMANX_NO_HANDLE;
@@ -238,6 +258,235 @@ void CRBP::Deinitialize()
   m_omx_image_init  = false;
   m_initialized     = false;
   m_omx_initialized = false;
+  uninit_cursor();
+  delete m_p;
+  m_p = NULL;
+  if (m_mb)
+    mbox_close(m_mb);
+  m_mb = 0;
+  vcsm_exit();
+}
+
+static int mbox_property(int file_desc, void *buf)
+{
+   int ret_val = ioctl(file_desc, IOCTL_MBOX_PROPERTY, buf);
+
+   if (ret_val < 0)
+   {
+     CLog::Log(LOGERROR, "%s: ioctl_set_msg failed:%d", __FUNCTION__, ret_val);
+   }
+   return ret_val;
+}
+
+static int mbox_open()
+{
+   int file_desc;
+
+   // open a char device file used for communicating with kernel mbox driver
+   file_desc = open(DEVICE_FILE_NAME, 0);
+   if (file_desc < 0)
+   {
+     CLog::Log(LOGERROR, "%s: Can't open device file: %s (%d)", __FUNCTION__, DEVICE_FILE_NAME, file_desc);
+     CLog::Log(LOGERROR, "Try creating a device file with: sudo mknod %s c %d 0", __FUNCTION__, DEVICE_FILE_NAME, MAJOR_NUM);
+   }
+   return file_desc;
+}
+
+static void mbox_close(int file_desc)
+{
+  close(file_desc);
+}
+
+static unsigned mem_lock(int file_desc, unsigned handle)
+{
+   int i=0;
+   unsigned p[32];
+   p[i++] = 0; // size
+   p[i++] = 0x00000000; // process request
+
+   p[i++] = 0x3000d; // (the tag id)
+   p[i++] = 4; // (size of the buffer)
+   p[i++] = 4; // (size of the data)
+   p[i++] = handle;
+
+   p[i++] = 0x00000000; // end tag
+   p[0] = i*sizeof *p; // actual size
+
+   mbox_property(file_desc, p);
+   return p[5];
+}
+
+unsigned mem_unlock(int file_desc, unsigned handle)
+{
+   int i=0;
+   unsigned p[32];
+   p[i++] = 0; // size
+   p[i++] = 0x00000000; // process request
+
+   p[i++] = 0x3000e; // (the tag id)
+   p[i++] = 4; // (size of the buffer)
+   p[i++] = 4; // (size of the data)
+   p[i++] = handle;
+
+   p[i++] = 0x00000000; // end tag
+   p[0] = i*sizeof *p; // actual size
+
+   mbox_property(file_desc, p);
+   return p[5];
+}
+
+unsigned int mailbox_set_cursor_info(int file_desc, int width, int height, int format, uint32_t buffer, int hotspotx, int hotspoty)
+{
+   int i=0;
+   unsigned int p[32];
+   p[i++] = 0; // size
+   p[i++] = 0x00000000; // process request
+   p[i++] = 0x00008010; // set cursor state
+   p[i++] = 24; // buffer size
+   p[i++] = 24; // data size
+
+   p[i++] = width;
+   p[i++] = height;
+   p[i++] = format;
+   p[i++] = buffer;           // ptr to VC memory buffer. Doesn't work in 64bit....
+   p[i++] = hotspotx;
+   p[i++] = hotspoty;
+
+   p[i++] = 0x00000000; // end tag
+   p[0] = i*sizeof(*p); // actual size
+
+   mbox_property(file_desc, p);
+   return p[5];
+
+}
+
+unsigned int mailbox_set_cursor_position(int file_desc, int enabled, int x, int y)
+{
+   int i=0;
+   unsigned p[32];
+   p[i++] = 0; // size
+   p[i++] = 0x00000000; // process request
+   p[i++] = 0x00008011; // set cursor state
+   p[i++] = 12; // buffer size
+   p[i++] = 12; // data size
+
+   p[i++] = enabled;
+   p[i++] = x;
+   p[i++] = y;
+
+   p[i++] = 0x00000000; // end tag
+   p[0] = i*sizeof *p; // actual size
+
+   mbox_property(file_desc, p);
+   return p[5];
+}
+
+CGPUMEM::CGPUMEM(unsigned int numbytes, bool cached)
+{
+  m_numbytes = numbytes;
+  m_vcsm_handle = vcsm_malloc_cache(numbytes, cached ? VCSM_CACHE_TYPE_HOST : VCSM_CACHE_TYPE_NONE, (char *)"CGPUMEM");
+  assert(m_vcsm_handle);
+  m_vc_handle = vcsm_vc_hdl_from_hdl(m_vcsm_handle);
+  assert(m_vc_handle);
+  m_arm = vcsm_lock(m_vcsm_handle);
+  assert(m_arm);
+  m_vc = mem_lock(g_RBP.GetMBox(), m_vc_handle);
+  assert(m_vc);
+}
+
+CGPUMEM::~CGPUMEM()
+{
+  mem_unlock(g_RBP.GetMBox(), m_vc_handle);
+  vcsm_unlock_ptr(m_arm);
+  vcsm_free(m_vcsm_handle);
+}
+
+// Call this to clean and invalidate a region of memory
+void CGPUMEM::Flush()
+{
+  struct vcsm_user_clean_invalid_s iocache = {};
+  iocache.s[0].handle = m_vcsm_handle;
+  iocache.s[0].cmd = 3; // clean+invalidate
+  iocache.s[0].addr = (int) m_arm;
+  iocache.s[0].size  = m_numbytes;
+  vcsm_clean_invalid( &iocache );
+}
+
+#define T 0
+#define W 0xffffffff
+#define B 0xff000000
+
+const static uint32_t default_cursor_pixels[] =
+{
+   B,B,B,B,B,B,B,B,B,T,T,T,T,T,T,T,
+   B,W,W,W,W,W,W,B,T,T,T,T,T,T,T,T,
+   B,W,W,W,W,W,B,T,T,T,T,T,T,T,T,T,
+   B,W,W,W,W,B,T,T,T,T,T,T,T,T,T,T,
+   B,W,W,W,W,W,B,T,T,T,T,T,T,T,T,T,
+   B,W,W,B,W,W,W,B,T,T,T,T,T,T,T,T,
+   B,W,B,T,B,W,W,W,B,T,T,T,T,T,T,T,
+   B,B,T,T,T,B,W,W,W,B,T,T,T,T,T,T,
+   B,T,T,T,T,T,B,W,W,W,B,T,T,T,T,T,
+   T,T,T,T,T,T,T,B,W,W,W,B,T,T,T,T,
+   T,T,T,T,T,T,T,T,B,W,W,W,B,T,T,T,
+   T,T,T,T,T,T,T,T,T,B,W,W,W,B,T,T,
+   T,T,T,T,T,T,T,T,T,T,B,W,W,W,B,T,
+   T,T,T,T,T,T,T,T,T,T,T,B,W,W,W,B,
+   T,T,T,T,T,T,T,T,T,T,T,T,B,W,B,T,
+   T,T,T,T,T,T,T,T,T,T,T,T,T,B,T,T
+};
+
+#undef T
+#undef W
+#undef B
+
+void CRBP::init_cursor()
+{
+  if (!m_mb)
+    return;
+  if (!m_p)
+    m_p = new CGPUMEM(64 * 64 * 4, false);
+  if (m_p && m_p->m_arm && m_p->m_vc)
+    set_cursor(default_cursor_pixels, 16, 16, 0, 0);
+}
+
+void CRBP::set_cursor(const void *pixels, int width, int height, int hotspot_x, int hotspot_y)
+{
+  if (!m_mb || !m_p || !m_p->m_arm || !m_p->m_vc || !pixels || width * height > 64 * 64)
+    return;
+  memcpy(m_p->m_arm, pixels, width * height * 4);
+  unsigned int s = mailbox_set_cursor_info(m_mb, width, height, 0, m_p->m_vc, hotspot_x, hotspot_y);
+  assert(s == 0);
+}
+
+void CRBP::update_cursor(int x, int y, bool enabled)
+{
+  if (!m_mb || !m_p || !m_p->m_arm || !m_p->m_vc)
+    return;
+
+  RESOLUTION res = g_graphicsContext.GetVideoResolution();
+  CRect gui(0, 0, g_settings.m_ResInfo[res].iWidth, g_settings.m_ResInfo[res].iHeight);
+  CRect display(0, 0, g_settings.m_ResInfo[res].iScreenWidth, g_settings.m_ResInfo[res].iScreenHeight);
+
+  int x2 = x * display.Width()  / gui.Width();
+  int y2 = y * display.Height() / gui.Height();
+
+  if (g_graphicsContext.GetStereoMode() == RENDER_STEREO_MODE_SPLIT_HORIZONTAL)
+    y2 *= 2;
+  else if (g_graphicsContext.GetStereoMode() == RENDER_STEREO_MODE_SPLIT_VERTICAL)
+    x2 *= 2;
+  if (m_x != x2 || m_y != y2 || m_enabled != enabled)
+    mailbox_set_cursor_position(m_mb, enabled, x2, y2);
+  m_x = x2;
+  m_y = y2;
+  m_enabled = enabled;
+}
+
+void CRBP::uninit_cursor()
+{
+  if (!m_mb || !m_p || !m_p->m_arm || !m_p->m_vc)
+    return;
+  mailbox_set_cursor_position(m_mb, 0, 0, 0);
 }
 
 double CRBP::AdjustHDMIClock(double adjust)
