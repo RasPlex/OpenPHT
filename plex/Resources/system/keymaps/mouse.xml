@@ -1,9 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  id 0: left     -->                                                                              
+<!--  id 1: right    -->                                                                          
+<!--  id 2: middle   -->                                                                         
 <keymap>
   <global>
     <mouse>
-      <leftclick>Select</leftclick>
+      <leftclick>leftclick</leftclick>
       <middleclick>ContextMenu</middleclick>
       <rightclick>Back</rightclick>
+      <longclick id="1">ContextMenu</longclick>
       <wheelup>wheelup</wheelup>
       <wheeldown>wheeldown</wheeldown>
       <doubleclick>doubleclick</doubleclick>
@@ -11,20 +16,37 @@
       <mousemove>mousemove</mousemove>
     </mouse>
   </global>
+  <home>
+    <mouse>
+      <leftclick>Select</leftclick>
+      <doubleclick>Play</doubleclick>
+    </mouse>
+  </home>
   <fullscreenvideo>
     <mouse>
       <wheeldown>volumeDown</wheeldown>
       <wheelup>volumeUp</wheelup>
-      <middleclick>Pause</middleclick>
-      <rightclick>OSD</rightclick>
+      <rightclick>Pause</rightclick>
+      <longclick id="0">OSD</longclick>
+      <longclick id="1">Stop</longclick>
     </mouse>
   </fullscreenvideo>
+  <VideoOSD>
+    <mouse>
+      <wheeldown>volumeDown</wheeldown>
+      <wheelup>volumeUp</wheelup>
+      <rightclick>Pause</rightclick>
+      <longclick id="0">OSD</longclick>
+      <longclick id="1">Stop</longclick>
+    </mouse>
+  </VideoOSD>
   <SlideShow>
     <mouse>
-      <leftclick>Pause</leftclick>
-      <rightclick>PreviousMenu</rightclick>
+      <leftclick>NextPicture</leftclick>
+      <middleclick>Pause</middleclick>
       <wheelup>PreviousPicture</wheelup>
       <wheeldown>NextPicture</wheeldown>
     </mouse>
   </SlideShow>
 </keymap>
+
