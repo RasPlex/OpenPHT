@@ -82,21 +82,21 @@ void CAppParamParser::Parse(const char* argv[], int nArgs)
 
 void CAppParamParser::DisplayVersion()
 {
-  printf("XBMC Media Center %s\n", g_infoManager.GetVersion().c_str());
+  printf("OpenPHT %s\n", g_infoManager.GetVersion().c_str());
   printf("Copyright (C) 2005-2012 Team XBMC - http://www.xbmc.org\n");
   exit(0);
 }
 
 void CAppParamParser::DisplayHelp()
 {
-  printf("Usage: xbmc [OPTION]... [FILE]...\n\n");
+  printf("Usage: %s [OPTION]... [FILE]...\n\n", PLEX_TARGET_NAME);
   printf("Arguments:\n");
   printf("  -d <n>\t\tdelay <n> seconds before starting\n");
-  printf("  -fs\t\t\tRuns XBMC in full screen\n");
-  printf("  --standalone\t\tXBMC runs in a stand alone environment without a window \n");
+  printf("  -fs\t\t\tRuns OpenPHT in full screen\n");
+  printf("  --standalone\t\tOpenPHT runs in a stand alone environment without a window \n");
   printf("\t\t\tmanager and supporting applications. For example, that\n");
   printf("\t\t\tenables network settings.\n");
-  printf("  -p or --portable\tXBMC will look for configurations in install folder instead of ~/.xbmc\n");
+  printf("  -p or --portable\tOpenPHT will look for configurations in install folder instead of ~/.plexht\n");
   printf("  --legacy-res\t\tEnables screen resolutions such as PAL, NTSC, etc.\n");
 #ifdef HAS_LIRC
   printf("  -l or --lircdev\tLircDevice to use default is " LIRC_DEVICE " .\n");
