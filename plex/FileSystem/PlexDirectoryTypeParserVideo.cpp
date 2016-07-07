@@ -74,16 +74,31 @@ CPlexDirectoryTypeParserVideo::Process(CFileItem &item, CFileItem &mediaContaine
   if (item.HasProperty("audienceRating") && item.GetProperty("audienceRating").asDouble() >= 0.0)
     item.SetProperty("audienceRatingPercent", (int)(item.GetProperty("audienceRating").asDouble() * 10.0));
 
-  if (item.HasProperty("ratingImage") && boost::starts_with(item.GetProperty("ratingImage").asString(), "rottentomatoes://image.rating."))
+  if (item.HasProperty("ratingImage") && boost::starts_with(item.GetProperty("ratingImage").asString(), "imdb://image.rating"))
+  {
+    item.SetProperty("ratingType", "imdb");
+    item.SetProperty("ratingImage", "imdb.png");
+  }
+  else if (item.HasProperty("ratingImage") && boost::starts_with(item.GetProperty("ratingImage").asString(), "rottentomatoes://image.rating."))
+  {
+    item.SetProperty("ratingType", "rottentomatoes");
     item.SetProperty("ratingImage", "rottentomatoes-" + item.GetProperty("ratingImage").asString().substr(30) + ".png");
+  }
   else
     item.ClearProperty("ratingImage");
+
   if (item.HasProperty("audienceRatingImage") && boost::starts_with(item.GetProperty("audienceRatingImage").asString(), "rottentomatoes://image.rating."))
+  {
+    item.SetProperty("ratingType", "rottentomatoes");
     item.SetProperty("audienceRatingImage", "rottentomatoes-" + item.GetProperty("audienceRatingImage").asString().substr(30) + ".png");
+  }
   else
-    item.ClearProperty("audienceRatingImage");
-  if (!item.HasProperty("audienceRatingImage") && item.HasProperty("ratingImage"))
-    item.SetProperty("audienceRatingImage", "rottentomatoes-plus.png");
+  {
+    if (item.HasProperty("audienceRating") && item.HasProperty("ratingType") && item.GetProperty("ratingType").asString() == "rottentomatoes")
+      item.SetProperty("audienceRatingImage", "rottentomatoes-plus.png");
+    else
+      item.ClearProperty("audienceRatingImage");
+  }
 
   if (item.HasProperty("summary") && !item.GetProperty("summary").empty())
     videoTag.m_strPlot = videoTag.m_strPlotOutline = item.GetProperty("summary").asString();

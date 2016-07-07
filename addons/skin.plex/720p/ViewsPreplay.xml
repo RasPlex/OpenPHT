@@ -1236,7 +1236,7 @@
 					<height>20</height>
 					<texture>$INFO[ListItem.StarRating]</texture>
 					<aspectratio align="right" aligny="center">keep</aspectratio>
-					<visible>IsEmpty(ListItem.Property(hasUserRating)) + [IsEmpty(ListItem.Property(audienceRatingPercent)) | Skin.HasSetting(HideRottenTomatoesRating)]</visible>
+					<visible>IsEmpty(ListItem.Property(hasUserRating)) + [IsEmpty(ListItem.Property(ratingType)) | Skin.HasSetting(HideRottenTomatoesRating)]</visible>
 				</control>
 				<control type="image">
 					<posy>80</posy>
@@ -1248,9 +1248,52 @@
 					<colordiffuse>orange</colordiffuse>
 					<visible>!IsEmpty(ListItem.Property(hasUserRating))</visible>
 				</control>
+				<!-- IMDb Rating -->
+				<control type="grouplist">
+					<visible>StringCompare(ListItem.Property(ratingType),imdb) + IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
+					<posy>82</posy>
+					<posx>240r</posx>
+					<width>200</width>
+					<height>24</height>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<control type="image">
+						<width>50</width>
+						<height>24</height>
+						<texture>$INFO[ListItem.Property(ratingImage)]</texture>
+						<aspectratio align="right" aligny="center">keep</aspectratio>
+					</control>
+					<control type="label">
+						<height>28</height>
+						<width min="20" max="80">auto</width>
+						<font>Bold-22</font>
+						<label> $INFO[ListItem.Property(rating)]</label>
+					</control>
+				</control>
+				<control type="grouplist">
+					<visible>StringCompare(ListItem.Property(ratingType),imdb) + !IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
+					<posy>110</posy>
+					<posx>240r</posx>
+					<width>200</width>
+					<height>24</height>
+					<orientation>horizontal</orientation>
+					<align>right</align>
+					<control type="image">
+						<width>50</width>
+						<height>24</height>
+						<texture>$INFO[ListItem.Property(ratingImage)]</texture>
+						<aspectratio align="right" aligny="center">keep</aspectratio>
+					</control>
+					<control type="label">
+						<height>28</height>
+						<width min="20" max="80">auto</width>
+						<font>Bold-22</font>
+						<label> $INFO[ListItem.Property(rating)]</label>
+					</control>
+				</control>
 				<!-- RT Rating -->
 				<control type="grouplist">
-					<visible>!IsEmpty(ListItem.Property(audienceRatingPercent)) + IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
+					<visible>StringCompare(ListItem.Property(ratingType),rottentomatoes) + IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
 					<posy>82</posy>
 					<posx>240r</posx>
 					<width>200</width>
@@ -1262,11 +1305,13 @@
 						<height>24</height>
 						<texture>$INFO[ListItem.Property(ratingImage)]</texture>
 						<aspectratio align="right" aligny="center">keep</aspectratio>
+						<visible>!IsEmpty(ListItem.Property(ratingImage))</visible>
 					</control>
 					<control type="label">
 						<height>28</height>
 						<width min="20" max="80">auto</width>
 						<label>$INFO[ListItem.Property(ratingPercent)]%  </label>
+						<visible>!IsEmpty(ListItem.Property(ratingImage))</visible>
 					</control>
 					<control type="image">
 						<width>24</width>
@@ -1281,7 +1326,7 @@
 					</control>
 				</control>
 				<control type="grouplist">
-					<visible>!IsEmpty(ListItem.Property(audienceRatingPercent)) + !IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
+					<visible>StringCompare(ListItem.Property(ratingType),rottentomatoes) + !IsEmpty(ListItem.Property(hasUserRating)) + !Skin.HasSetting(HideRottenTomatoesRating)</visible>
 					<posy>110</posy>
 					<posx>240r</posx>
 					<width>200</width>
@@ -1293,11 +1338,13 @@
 						<height>24</height>
 						<texture>$INFO[ListItem.Property(ratingImage)]</texture>
 						<aspectratio align="right" aligny="center">keep</aspectratio>
+						<visible>!IsEmpty(ListItem.Property(ratingImage))</visible>
 					</control>
 					<control type="label">
 						<height>28</height>
 						<width min="20" max="80">auto</width>
 						<label>$INFO[ListItem.Property(ratingPercent)]%  </label>
+						<visible>!IsEmpty(ListItem.Property(ratingImage))</visible>
 					</control>
 					<control type="image">
 						<width>24</width>
