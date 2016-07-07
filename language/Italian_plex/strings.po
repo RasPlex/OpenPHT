@@ -479,7 +479,7 @@ msgstr "In ritardo di: %2.3fs"
 
 msgctxt "#22005"
 msgid "Ahead by: %2.3fs"
-msgstr "In anticip di: %2.3fs"
+msgstr "In anticipo di: %2.3fs"
 
 
 msgctxt "#33075"
