@@ -8,9 +8,9 @@
 	</requires>
 	<extension point="xbmc.addon.repository"
 		name="OpenPHT Add-on Repository">
-		<info compressed="true">https://addons.openpht.tv/openpht-1.6/addons.xml</info>
-		<checksum>https://addons.openpht.tv/openpht-1.6/addons.xml.md5</checksum>
-		<datadir zip="true">https://addons.openpht.tv/openpht-1.6</datadir>
+		<info compressed="true">https://addons.openpht.tv/openpht-1.7/addons.xml</info>
+		<checksum>https://addons.openpht.tv/openpht-1.7/addons.xml.md5</checksum>
+		<datadir zip="true">https://addons.openpht.tv/openpht-1.7</datadir>
 		<hashes>true</hashes>
 	</extension>
 	<extension point="xbmc.addon.metadata">
