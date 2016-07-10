@@ -104,7 +104,7 @@ public:
 #ifndef __PLEX__
   XBMCClientWrapperImpl(eRemoteMode f_mode, const std::string& fcr_address = "localhost", int f_port = 9777, bool f_verbose_mode=false);
 #else
-  XBMCClientWrapperImpl(eRemoteMode f_mode, const std::string& fcr_address = "localhost", int f_port = 9778, bool f_verbose_mode=false);
+  XBMCClientWrapperImpl(eRemoteMode f_mode, const std::string& fcr_address = "localhost", int f_port = 9777, bool f_verbose_mode=false);
 #endif
   ~XBMCClientWrapperImpl();
   void setUniversalModeTimeout(double f_timeout){
@@ -405,7 +405,7 @@ void XBMCClientWrapperImpl::populateMultiRemoteModeMap(){
 #ifndef __PLEX__
   return [self initWithMode:DEFAULT_MODE serverAddress:@"localhost" port:9777 verbose: false];
 #else
-  return [self initWithMode:DEFAULT_MODE serverAddress:@"localhost" port:9778 verbose: false];
+  return [self initWithMode:DEFAULT_MODE serverAddress:@"localhost" port:9777 verbose: false];
 #endif
 }
 - (id) initWithMode:(eRemoteMode) f_mode serverAddress:(NSString*) fp_server port:(int) f_port verbose:(bool) f_verbose{

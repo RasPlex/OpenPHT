@@ -20,7 +20,7 @@ std::string g_server_address="localhost";
 #ifndef __PLEX__
 int         g_server_port = 9777;
 #else
-int         g_server_port = 9778;
+int         g_server_port = 9777;
 #endif
 std::string g_app_path = "";
 std::string g_app_home = "";
@@ -153,7 +153,7 @@ void ParseOptions(int argc, char** argv)
 #ifndef __PLEX__
   g_server_port = 9777;
 #else
-  g_server_port = 9778;
+  g_server_port = 9777;
 #endif
   g_mode = DEFAULT_MODE;
   g_app_path = "";

@@ -2013,7 +2013,7 @@ void CGUIWindowSettingsCategory::OnSettingChanged(BaseSettingControlPtr pSetting
 #ifndef __PLEX__
     ValidatePortNumber(pSettingControl, "9777", "9777");
 #else
-    ValidatePortNumber(pSettingControl, "9778", "9778");
+    ValidatePortNumber(pSettingControl, "9777", "9777");
 #endif
     //restart eventserver without asking user
     if (g_application.StopEventServer(true, false))

@@ -1311,6 +1311,11 @@ bool CApplication::Initialize()
     /* PLEX select plex skin if it's the first time you run it with mediastream */
     if (g_guiSettings.GetString("lookandfeel.skin") != DEFAULT_SKIN && !g_guiSettings.GetBool("system.firstrunwizard"))
       g_guiSettings.SetString("lookandfeel.skin", DEFAULT_SKIN);
+
+    // Make sure we set esport back to default on existing installations
+    if (g_guiSettings.GetString("services.esport") == "9778")
+      g_guiSettings.SetString("services.esport", "9777");
+
     /* END PLEX */
 
     if (!LoadSkin(g_guiSettings.GetString("lookandfeel.skin")) && !LoadSkin(DEFAULT_SKIN))
