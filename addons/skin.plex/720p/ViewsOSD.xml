@@ -47,9 +47,9 @@
 		<control type="button" id="708">
 			<width>37</width>
 			<height>24</height>
-			<onleft condition="Window.IsActive(playercontrols) | Window.IsActive(nowplaying)">715</onleft>
-			<onleft condition="Window.IsActive(plexplayqueue)">714</onleft>
-			<onright>710</onright>
+			<onleft condition="Window.IsActive(playercontrols) | Window.IsActive(nowplaying)">716</onleft>
+			<onleft condition="Window.IsActive(plexplayqueue)">715</onleft>
+			<onright>709</onright>
 			<texturefocus>-</texturefocus>
 			<texturenofocus>-</texturenofocus>
 			<onclick>XBMC.PlayerControl(Repeat)</onclick>
@@ -63,19 +63,41 @@
 			<width>22</width>
 			<height>22</height>
 			<texture>b-previous.png</texture>
+			<visible>!Control.HasFocus(709)</visible>
+			<colordiffuse>FFCCCCCC</colordiffuse>
+		</control>
+		<control type="button" id="709">
+			<width>22</width>
+			<height>22</height>
+			<texturefocus>b-previous.png</texturefocus>
+			<texturenofocus>b-previous.png</texturenofocus>
+			<onleft>708</onleft>
+			<onright>710</onright>
+			<onup condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</onup>
+			<ondown condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</ondown>
+			<onclick>PlayerControl(Previous)</onclick>
+			<visible allowhiddenfocus="true">Control.HasFocus(709)</visible>
+			<colordiffuse>orange</colordiffuse>
+		</control>
+	</include>
+	<include name="OSDRewindButton">
+		<control type="image">
+			<width>22</width>
+			<height>22</height>
+			<texture>b-rewind.png</texture>
 			<visible>!Control.HasFocus(710)</visible>
 			<colordiffuse>FFCCCCCC</colordiffuse>
 		</control>
 		<control type="button" id="710">
 			<width>22</width>
 			<height>22</height>
-			<texturefocus>b-previous.png</texturefocus>
-			<texturenofocus>b-previous.png</texturenofocus>
-			<onleft>708</onleft>
+			<texturefocus>b-rewind.png</texturefocus>
+			<texturenofocus>b-rewind.png</texturenofocus>
+			<onleft>709</onleft>
 			<onright>711</onright>
 			<onup condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</onup>
 			<ondown condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</ondown>
-			<onclick>PlayerControl(Previous)</onclick>
+			<onclick>PlayerControl(SmallSkipBackward)</onclick>
 			<visible allowhiddenfocus="true">Control.HasFocus(710)</visible>
 			<colordiffuse>orange</colordiffuse>
 		</control>
@@ -110,27 +132,51 @@
 			<colordiffuse>orange</colordiffuse>
 		</control>
 	</include>
-	<include name="OSDNextButton">
+	<include name="OSDForwardButton">
 		<control type="image">
 			<width>22</width>
 			<height>22</height>
-			<texture>b-next.png</texture>
+			<texture>b-forward.png</texture>
 			<visible>!Control.HasFocus(712)</visible>
 			<colordiffuse>FFCCCCCC</colordiffuse>
 		</control>
 		<control type="button" id="712">
 			<width>22</width>
 			<height>22</height>
-			<texturefocus>b-next.png</texturefocus>
-			<texturenofocus>b-next.png</texturenofocus>
+			<texturefocus>b-forward.png</texturefocus>
+			<texturenofocus>b-forward.png</texturenofocus>
 			<onleft>711</onleft>
 			<onright>713</onright>
 			<onup condition="Window.IsActive(plexplayqueue)">54</onup>
 			<ondown condition="Window.IsActive(plexplayqueue)">54</ondown>
 			<onup condition="Window.IsActive(playercontrols)">3</onup>
 			<ondown condition="Window.IsActive(playercontrols)">3</ondown>
-			<onclick>PlayerControl(Next)</onclick>
+			<onclick>PlayerControl(SmallSkipForward)</onclick>
 			<visible allowhiddenfocus="true">Control.HasFocus(712)</visible>
+			<colordiffuse>orange</colordiffuse>
+		</control>
+	</include>
+	<include name="OSDNextButton">
+		<control type="image">
+			<width>22</width>
+			<height>22</height>
+			<texture>b-next.png</texture>
+			<visible>!Control.HasFocus(713)</visible>
+			<colordiffuse>FFCCCCCC</colordiffuse>
+		</control>
+		<control type="button" id="713">
+			<width>22</width>
+			<height>22</height>
+			<texturefocus>b-next.png</texturefocus>
+			<texturenofocus>b-next.png</texturenofocus>
+			<onleft>712</onleft>
+			<onright>714</onright>
+			<onup condition="Window.IsActive(plexplayqueue)">54</onup>
+			<ondown condition="Window.IsActive(plexplayqueue)">54</ondown>
+			<onup condition="Window.IsActive(playercontrols)">3</onup>
+			<ondown condition="Window.IsActive(playercontrols)">3</ondown>
+			<onclick>PlayerControl(Next)</onclick>
+			<visible allowhiddenfocus="true">Control.HasFocus(713)</visible>
 			<colordiffuse>orange</colordiffuse>
 		</control>
 	</include>
@@ -139,24 +185,24 @@
 			<width>23</width>
 			<height>23</height>
 			<texture>b-stop3.png</texture>
-			<visible>!Control.HasFocus(713)</visible>
+			<visible>!Control.HasFocus(714)</visible>
 			<colordiffuse>FFCCCCCC</colordiffuse>
 		</control>
-		<control type="button" id="713">
+		<control type="button" id="714">
 			<width>23</width>
 			<height>23</height>
 			<texturefocus>b-stop3.png</texturefocus>
 			<texturenofocus>b-stop3.png</texturenofocus>
-			<onleft>712</onleft>
-			<onright condition="Window.IsActive(playercontrols) | Window.IsActive(plexplayqueue)">714</onright>
-			<onright condition="Window.IsActive(nowplaying)">715</onright>
+			<onleft>713</onleft>
+			<onright condition="Window.IsActive(playercontrols) | Window.IsActive(plexplayqueue)">715</onright>
+			<onright condition="Window.IsActive(nowplaying)">716</onright>
 			<onup condition="Window.IsActive(plexplayqueue)">54</onup>
 			<ondown condition="Window.IsActive(plexplayqueue)">54</ondown>
 			<onup condition="Window.IsActive(playercontrols)">3</onup>
 			<ondown condition="Window.IsActive(playercontrols)">3</ondown>
 			<onclick>PlayerControl(Stop)</onclick>
 			<onclick>Dialog.Close(playercontrols)</onclick>
-			<visible allowhiddenfocus="true">Control.HasFocus(713)</visible>
+			<visible allowhiddenfocus="true">Control.HasFocus(714)</visible>
 			<colordiffuse>orange</colordiffuse>
 		</control>
 	</include>
@@ -165,21 +211,21 @@
 			<width>39</width>
 			<height>22</height>
 			<texture>b-nowplaying3.png</texture>
-			<visible>!Control.HasFocus(714)</visible>
+			<visible>!Control.HasFocus(715)</visible>
 			<colordiffuse>FFCCCCCC</colordiffuse>
 		</control>
-		<control type="button" id="714">
+		<control type="button" id="715">
 			<width>39</width>
 			<height>22</height>
 			<texturefocus>b-nowplaying3.png</texturefocus>
 			<texturenofocus>b-nowplaying3.png</texturenofocus>
-			<onleft>713</onleft>
-			<onright condition="Window.IsActive(playercontrols)">715</onright>
+			<onleft>714</onleft>
+			<onright condition="Window.IsActive(playercontrols)">716</onright>
 			<onright condition="Window.IsActive(plexplayqueue)">555</onright>
 			<onup condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</onup>
 			<ondown condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</ondown>
 			<onclick>fullscreen</onclick>
-			<visible allowhiddenfocus="true">Control.HasFocus(714)</visible>
+			<visible allowhiddenfocus="true">Control.HasFocus(715)</visible>
 			<colordiffuse>orange</colordiffuse>
 		</control>
 	</include>
@@ -188,16 +234,16 @@
 			<width>20</width>
 			<height>20</height>
 			<texture>b-list.png</texture>
-			<visible>!Control.HasFocus(715)</visible>
+			<visible>!Control.HasFocus(716)</visible>
 			<colordiffuse>FFCCCCCC</colordiffuse>
 		</control>
-		<control type="button" id="715">
+		<control type="button" id="716">
 			<width>20</width>
 			<height>20</height>
 			<texturefocus>b-list.png</texturefocus>
 			<texturenofocus>-</texturenofocus>
-			<onleft condition="Window.IsActive(playercontrols)">714</onleft>
-			<onleft condition="Window.IsActive(nowplaying)">713</onleft>
+			<onleft condition="Window.IsActive(playercontrols)">715</onleft>
+			<onleft condition="Window.IsActive(nowplaying)">714</onleft>
 			<onright condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</onright>
 			<onright condition="Window.IsActive(nowplaying)">708</onright>
 			<onup condition="Window.IsActive(plexplayqueue) | Window.IsActive(playercontrols)">555</onup>
@@ -205,7 +251,7 @@
 			<enable>System.PlexPlayQueue(music)</enable>
 			<onclick>Dialog.Close(PlayerControls)</onclick>
 			<onclick>ReplaceWindow(10094, plexserver://playqueue/audio)</onclick>
-			<visible allowhiddenfocus="true">Control.HasFocus(715)</visible>
+			<visible allowhiddenfocus="true">Control.HasFocus(716)</visible>
 			<colordiffuse>orange</colordiffuse>
 		</control>
 	</include>
@@ -420,6 +466,17 @@
 				<width>1040</width>
 				<info>Player.Seekbar</info>
 				<visible>Player.Seeking</visible>
+			</control>
+			<!-- Slider (Mouse) -->
+			<control type="slider">
+				<posx>100</posx>
+				<posy>20</posy>
+				<width>1040</width>
+				<height>24</height>
+				<action>seek</action>
+				<texturesliderbar>-</texturesliderbar>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
 			</control>
 			<control type="image">
 				<posx>20</posx>
@@ -961,6 +1018,17 @@
 				<width>1040</width>
 				<info>Player.Seekbar</info>
 				<visible>Player.Seeking</visible>
+			</control>
+			<!-- Slider (Mouse) -->
+			<control type="slider">
+				<posx>100</posx>
+				<posy>66</posy>
+				<width>1040</width>
+				<height>20</height>
+				<action>seek</action>
+				<texturesliderbar>-</texturesliderbar>
+				<textureslidernib>-</textureslidernib>
+				<textureslidernibfocus>-</textureslidernibfocus>
 			</control>
 		</control>
 	</include>

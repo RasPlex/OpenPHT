@@ -71,7 +71,7 @@
 				<aspectratio>scale</aspectratio>
 				<texture flipx="true">left-menu-indicator-arrow.png</texture>
 				<animation effect="rotate" end="-180" center="36,689" time="500" condition="ControlGroup(1300).HasFocus | ControlGroup(1301).HasFocus">Conditional</animation>
-				<visible>[!Container.PlexContent(Albums) | [Container.PlexContent(Albums) + !IsEmpty(Container.Property(primaryFilterActivated))]] + !Container.PlexContent(Songs) + !Container.PlexContent(Seasons) + [!Container.PlexContent(Episodes) | [Container.PlexContent(Episodes) + !IsEmpty(Container.Property(primaryFilterActivated)) + IsEmpty(Container.Property(PlexPreplay))]] + ![Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode)]] + ![Control.IsVisible(88)]</visible>
+				<visible>[!Container.PlexContent(Albums) | [Container.PlexContent(Albums) + !IsEmpty(Container.Property(primaryFilterActivated))]] + !Container.PlexContent(Songs) + !Container.PlexContent(Seasons) + [!Container.PlexContent(Episodes) | [Container.PlexContent(Episodes) + !IsEmpty(Container.Property(primaryFilterActivated)) + IsEmpty(Container.Property(PlexPreplay))]] + ![Container.PlexContent(Channel) + [ListItem.Type(clip) | ListItem.Type(episode)]] + ![Control.IsVisible(88)] + !system.getbool(input.enablemouse)</visible>
 			</control>
 		</control>
 	</include>
@@ -407,7 +407,7 @@
                 <include condition="!system.getbool(input.enablemouse)">PivotMenuHomeMinimal_Wraplist</include>
         </include>
 
-	<!-- HomeMenu (Keyboard) -->
+	<!-- SubMenu (Keyboard) -->
 	<include name="PivotMenuHome_Wraplist">
 		<!-- Main Menu -->
 		<control type="group" id="1400">
@@ -462,79 +462,7 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="8">
-						<description>Switch User</description>
-						<label>Switch User</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
-						<visible>System.IsSignedIn + System.UserIsInHome</visible>
-					</item>
-					<item id="9">
-						<description>Sign In</description>
-						<label>Sign in</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
-						<visible>!System.IsSignedIn</visible>
-					</item>
-					<item id="12">
-						<description>Channel Directory</description>
-						<label> $LOCALIZE[31952]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
-						<textcolor>50FFFFFF</textcolor>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="6">
-						<description>Preferences</description>
-						<label>$LOCALIZE[31955]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="101">
-						<description>OE Settings Button</description>
-						<label> $LOCALIZE[41000] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.libreelec.settings)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="102">
-						<description>Control Global Caching</description>
-						<label> $LOCALIZE[41001] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="111">
-						<description>Quit</description>
-						<label>$LOCALIZE[31007]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Quit</onclick>
-						<visible>!System.isSystem(openelec)</visible>
-					</item>
-					<item id="112">
-						<description>Sleep</description>
-						<label>$LOCALIZE[31960]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Suspend</onclick>
-						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
-					</item>
-					<item id="113">
-						<description>Shut Down</description>
-						<label>$LOCALIZE[31961]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Powerdown</onclick>
-						<visible>System.CanPowerDown + [!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)]</visible>
-					</item>
-					<item id="114">
-						<description>Restart</description>
-						<label>$LOCALIZE[31072]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>System.Exec(reboot)</onclick>
-						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
-					</item>
-				</content>
+				<include>PivotMenuHome_Items</include>
 			</control>
 		</control>
 	</include>
@@ -592,82 +520,33 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="8">
-						<description>Switch User</description>
-						<label>Switch User</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
-						<visible>System.IsSignedIn + System.UserIsInHome</visible>
-					</item>
-					<item id="9">
-						<description>Sign In</description>
-						<label>Sign in</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
-						<visible>!System.IsSignedIn</visible>
-					</item>
-					<item id="12">
-						<description>Channel Directory</description>
-						<label> $LOCALIZE[31952]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
-						<textcolor>50FFFFFF</textcolor>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="6">
-						<description>Preferences</description>
-						<label>$LOCALIZE[31955]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="101">
-						<description>OE Settings Button</description>
-						<label> $LOCALIZE[41000] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.libreelec.settings)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="102">
-						<description>Control Global Caching</description>
-						<label> $LOCALIZE[41001] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="112">
-						<description>Sleep</description>
-						<label>$LOCALIZE[31960]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Suspend</onclick>
-						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
-					</item>
-					<item id="114">
-						<description>Restart</description>
-						<label>$LOCALIZE[31072]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>System.Exec(reboot)</onclick>
-						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
-					</item>
-				</content>
+				<include>PivotMenuHomeMinimal_Items</include>
 			</control>
 		</control>
 	</include>
 
-	<!-- HomeMenu (Mouse) -->
+	<!-- SubMenu (Mouse) -->
 	<include name="PivotMenuHome_List">
 		<!-- Main Menu -->
 		<control type="group" id="1400">
-
-			<!-- Mouse Trigger -->
+			<!-- Navigation (Mouse) -->
 			<control type="button">
-				<posy>660</posy>
-				<posx>10</posx>
-				<width>60</width>
-				<height>60</height>
+				<posx>20</posx>
+				<posy>670</posy>
+				<width>30</width>
+				<height>30</height>
+				<texturefocus flipx="true">left-menu-back-icon-s.png</texturefocus>
+				<texturenofocus flipx="true">left-menu-back-icon.png</texturenofocus>
 				<onclick>Dialog.Close(4998)</onclick>
-				<include>Mouse_Trigger</include>
+				<include>leftMenuBarButton</include>
+				<animation type="WindowOpen" condition="true" reversible="false">
+					<effect type="rotatey" center="30,0" start="-180,0" end="0,0" time="300"/>
+					<effect type="fade" start="0" end="100" time="150" delay="0"/>
+				</animation>
+				<animation type="WindowClose" condition="true" reversible="false">
+					<effect type="rotatey" center="30,0" start="0,0" end="-180.0" time="300"/>
+					<effect type="fade" start="100" end="0" time="150" delay="0"/>
+				</animation>
 			</control>
 
 			<!-- list -->
@@ -720,97 +599,33 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="8">
-						<description>Switch User</description>
-						<label>Switch User</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
-						<visible>System.IsSignedIn + System.UserIsInHome</visible>
-					</item>
-					<item id="9">
-						<description>Sign In</description>
-						<label>Sign in</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
-						<visible>!System.IsSignedIn</visible>
-					</item>
-					<item id="12">
-						<description>Channel Directory</description>
-						<label> $LOCALIZE[31952]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
-						<textcolor>50FFFFFF</textcolor>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="6">
-						<description>Preferences</description>
-						<label>$LOCALIZE[31955]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="101">
-						<description>OE Settings Button</description>
-						<label> $LOCALIZE[41000] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.libreelec.settings)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="102">
-						<description>Control Global Caching</description>
-						<label> $LOCALIZE[41001] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="111">
-						<description>Quit</description>
-						<label>$LOCALIZE[31007]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Quit</onclick>
-						<visible>!System.isSystem(openelec)</visible>
-					</item>
-					<item id="112">
-						<description>Sleep</description>
-						<label>$LOCALIZE[31960]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Suspend</onclick>
-						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
-					</item>
-					<item id="113">
-						<description>Shut Down</description>
-						<label>$LOCALIZE[31961]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Powerdown</onclick>
-						<visible>System.CanPowerDown + [!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)]</visible>
-					</item>
-					<item id="114">
-						<description>Restart</description>
-						<label>$LOCALIZE[31072]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>System.Exec(reboot)</onclick>
-						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
-					</item>
-				</content>
+				<include>PivotMenuHome_Items</include>
 			</control>
 		</control>
 	</include>
-
 	<include name="PivotMenuHomeMinimal_List">
-
-		<!-- Mouse Trigger -->
-		<control type="button">
-			<posy>660</posy>
-			<posx>10</posx>
-			<width>60</width>
-			<height>60</height>
-			<onclick>Dialog.Close(4998)</onclick>
-			<include>Mouse_Trigger</include>
-		</control>
-
 		<!-- Main Menu -->
 		<control type="group" id="1400">
+			<!-- Navigation (Mouse) -->
+			<control type="button">
+				<posx>20</posx>
+				<posy>670</posy>
+				<width>30</width>
+				<height>30</height>
+				<texturefocus flipx="true">left-menu-back-icon-s.png</texturefocus>
+				<texturenofocus flipx="true">left-menu-back-icon.png</texturenofocus>
+				<onclick>Dialog.Close(4998)</onclick>
+				<include>leftMenuBarButton</include>
+				<animation type="WindowOpen" condition="true" reversible="false">
+					<effect type="rotatey" center="30,0" start="-180,0" end="0,0" time="300"/>
+					<effect type="fade" start="0" end="100" time="150" delay="0"/>
+				</animation>
+				<animation type="WindowClose" condition="true" reversible="false">
+					<effect type="rotatey" center="30,0" start="0,0" end="-180.0" time="300"/>
+					<effect type="fade" start="100" end="0" time="150" delay="0"/>
+				</animation>
+			</control>
+
 			<!-- list -->
 			<control type="list" id="1300">
 				<description>Home Secondary Menu</description>
@@ -861,67 +676,148 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="8">
-						<description>Switch User</description>
-						<label>Switch User</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(selectuser)</onclick>
-						<visible>System.IsSignedIn + System.UserIsInHome</visible>
-					</item>
-					<item id="9">
-						<description>Sign In</description>
-						<label>Sign in</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(plexlogin)</onclick>
-						<visible>!System.IsSignedIn</visible>
-					</item>
-					<item id="12">
-						<description>Channel Directory</description>
-						<label> $LOCALIZE[31952]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
-						<textcolor>50FFFFFF</textcolor>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="6">
-						<description>Preferences</description>
-						<label>$LOCALIZE[31955]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
-						<visible>!System.UserIsRestricted</visible>
-					</item>
-					<item id="101">
-						<description>OE Settings Button</description>
-						<label> $LOCALIZE[41000] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>RunAddon(service.libreelec.settings)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="102">
-						<description>Control Global Caching</description>
-						<label> $LOCALIZE[41001] </label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>XBMC.ActivateWindow(10208)</onclick>
-						<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
-					</item>
-					<item id="112">
-						<description>Sleep</description>
-						<label>$LOCALIZE[31960]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>Plex.Suspend</onclick>
-						<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
-					</item>
-					<item id="114">
-						<description>Restart</description>
-						<label>$LOCALIZE[31072]</label>
-						<onclick>Dialog.Close(4998)</onclick>
-						<onclick>System.Exec(reboot)</onclick>
-						<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
-					</item>
-				</content>
+				<include>PivotMenuHomeMinimal_Items</include>
 			</control>
 		</control>
+	</include>
+
+	<!-- SubMenu Items -->
+	<include name="PivotMenuHome_Items">
+		<content>
+			<item id="8">
+				<description>Switch User</description>
+				<label>Switch User</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(selectuser)</onclick>
+				<visible>System.IsSignedIn + System.UserIsInHome</visible>
+			</item>
+			<item id="9">
+				<description>Sign In</description>
+				<label>Sign in</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.ActivateWindow(plexlogin)</onclick>
+				<visible>!System.IsSignedIn</visible>
+			</item>
+			<item id="12">
+				<description>Channel Directory</description>
+				<label> $LOCALIZE[31952]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
+				<textcolor>50FFFFFF</textcolor>
+				<visible>!System.UserIsRestricted</visible>
+			</item>
+			<item id="6">
+				<description>Preferences</description>
+				<label>$LOCALIZE[31955]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
+				<visible>!System.UserIsRestricted</visible>
+			</item>
+			<item id="101">
+				<description>OE Settings Button</description>
+				<label> $LOCALIZE[41000] </label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>RunAddon(service.libreelec.settings)</onclick>
+				<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+			</item>
+			<item id="102">
+				<description>Control Global Caching</description>
+				<label> $LOCALIZE[41001] </label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(10208)</onclick>
+				<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+			</item>
+			<item id="111">
+				<description>Quit</description>
+				<label>$LOCALIZE[31007]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Quit</onclick>
+				<visible>!System.isSystem(openelec)</visible>
+			</item>
+			<item id="112">
+				<description>Sleep</description>
+				<label>$LOCALIZE[31960]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Suspend</onclick>
+				<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
+			</item>
+			<item id="113">
+				<description>Shut Down</description>
+				<label>$LOCALIZE[31961]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Powerdown</onclick>
+				<visible>System.CanPowerDown + [!System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions)]</visible>
+			</item>
+			<item id="114">
+				<description>Restart</description>
+				<label>$LOCALIZE[31072]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>System.Exec(reboot)</onclick>
+				<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+			</item>
+		</content>
+	</include>
+
+	<include name="PivotMenuHomeMinimal_Items">
+		<content>
+			<item id="8">
+				<description>Switch User</description>
+				<label>Switch User</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(selectuser)</onclick>
+				<visible>System.IsSignedIn + System.UserIsInHome</visible>
+			</item>
+			<item id="9">
+				<description>Sign In</description>
+				<label>Sign in</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.ActivateWindow(plexlogin)</onclick>
+				<visible>!System.IsSignedIn</visible>
+			</item>
+			<item id="12">
+				<description>Channel Directory</description>
+				<label> $LOCALIZE[31952]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.ActivateWindow(1,plexserver://channeldirectory,return)</onclick>
+				<textcolor>50FFFFFF</textcolor>
+				<visible>!System.UserIsRestricted</visible>
+			</item>
+			<item id="6">
+				<description>Preferences</description>
+				<label>$LOCALIZE[31955]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(appearancesettings)</onclick>
+				<visible>!System.UserIsRestricted</visible>
+			</item>
+			<item id="101">
+				<description>OE Settings Button</description>
+				<label> $LOCALIZE[41000] </label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>RunAddon(service.libreelec.settings)</onclick>
+				<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+			</item>
+			<item id="102">
+				<description>Control Global Caching</description>
+				<label> $LOCALIZE[41001] </label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>XBMC.ActivateWindow(10208)</onclick>
+				<visible>System.isSystem(openelec) + !System.UserIsRestricted</visible>
+			</item>
+			<item id="112">
+				<description>Sleep</description>
+				<label>$LOCALIZE[31960]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Suspend</onclick>
+				<visible>System.CanSuspend + !System.isSystem(rasplex)</visible>
+			</item>
+			<item id="114">
+				<description>Restart</description>
+				<label>$LOCALIZE[31072]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>System.Exec(reboot)</onclick>
+				<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+			</item>
+		</content>
 	</include>
 
 	<!-- Library menu -->
@@ -932,13 +828,64 @@
 			<include>leftMenuSlide</include>
 			<include>leftMenuBg</include>
 
-			<!-- Next Viewmode (Mouse Trigger) -->
-			<control type="button">
-				<posx>1278</posx>
-				<height>720</height>
-				<width>2</width>
-				<onfocus>Container.NextViewMode</onfocus>
-				<include>Mouse_Trigger</include>
+			<!-- sidebar mouse navigation -->
+			<control type="grouplist" id="994">
+				<posy>440</posy>
+				<posx>20</posx>
+				<width>74</width>
+				<aligny>top</aligny>
+				<orientation>vertical</orientation>
+				<itemgap>20</itemgap>
+				<usecontrolcoords>true</usecontrolcoords>
+				<onup>998</onup>
+				<visible>system.getbool(input.enablemouse)</visible>
+
+				<!-- Now Playing -->
+				<control type="button">
+					<posx>-10</posx>
+					<width>50</width>
+					<height>100</height>
+					<texturefocus>-</texturefocus>
+					<texturenofocus>-</texturenofocus>
+					<onclick condition="Player.hasAudio | Player.hasVideo">fullscreen</onclick>
+				</control>
+
+				<!-- Viewmode -->
+				<control type="button">
+					<width>32</width>
+					<height>32</height>
+					<texturefocus>left-menu-viewmode-icon-s.png</texturefocus>
+					<texturenofocus>left-menu-viewmode-icon.png</texturenofocus>
+					<onclick>Container.NextViewmode</onclick>
+					<visible>!Window.IsVisible(10090)</visible>
+				</control>
+				<control type="button">
+					<width>32</width>
+					<height>32</height>
+					<texturefocus>-</texturefocus>
+					<texturenofocus>-</texturenofocus>
+					<onclick>-</onclick>
+					<visible>Window.IsVisible(10090)</visible>
+				</control>
+
+				<!-- Home -->
+				<control type="button">
+					<width>32</width>
+					<height>32</height>
+					<texturefocus>left-menu-home-icon-s.png</texturefocus>
+					<texturenofocus>left-menu-home-icon.png</texturenofocus>
+					<onclick>ActivateWindow(Home)</onclick>
+				</control>
+
+				<!-- Back -->
+				<control type="button">
+					<width>32</width>
+					<height>32</height>
+					<texturefocus>left-menu-back-icon-s.png</texturefocus>
+					<texturenofocus>left-menu-back-icon.png</texturenofocus>
+					<onclick>Back</onclick>
+				</control>
+
 			</control>
 
 			<!-- sidebar video & photos -->
@@ -1112,8 +1059,16 @@
 				<control type="button">
 					<posx>-253</posx>
 					<posy>0</posy>
-					<width>255</width>
+					<width>250</width>
 					<height>720</height>
+					<visible>!IsEmpty(Container.Property(PlexFilter))</visible>
+					<include>Mouse_Trigger</include>
+				</control>
+				<control type="button">
+					<posx>-253</posx>
+					<posy>0</posy>
+					<width>300</width>
+					<height>40</height>
 					<visible>!IsEmpty(Container.Property(PlexFilter))</visible>
 					<include>Mouse_Trigger</include>
 				</control>

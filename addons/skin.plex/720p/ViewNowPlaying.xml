@@ -231,6 +231,15 @@
 		<texturebg border="8">OSDProgressBack2.png</texturebg>
 		<midtexture border="8">OSDProgressMid-orange.png</midtexture>
 	</include>
+	<include name="ProgressSlider">
+		<width>550</width>
+		<height>16</height>
+		<aligny>center</aligny>
+		<action>seek</action>
+		<texturesliderbar>-</texturesliderbar>
+		<textureslidernib>-</textureslidernib>
+		<textureslidernibfocus>-</textureslidernibfocus>
+	</include>
 	<!-- Animations -->
 	<include name="Fade">
 		<animation effect="fade" start="100" end="0" time="500">Hidden</animation>
@@ -285,6 +294,8 @@
 			<animation effect="fade" time="500">VisibleChange</animation>
 			<animation effect="fade" start="100" end="0" time="200" condition="Control.IsVisible(999) + Window.IsActive(home)">Conditional</animation>
 			<animation effect="fade" start="100" end="0" time="0" condition="Skin.String(SectionType,playqueue) + [Player.HasAudio | Player.HasVideo]">Conditional</animation>
+			<animation effect="slide" end="0,-120" time="0" condition="system.getbool(input.enablemouse) + [ Player.HasAudio | Player.HasVideo ] + !Window.isVisible(Home)">Conditional</animation>
+
 			<!-- music -->
 			<control type="group">
 				<posy>528</posy>
@@ -577,6 +588,11 @@
 					<posy>292</posy>
 					<include>ProgressBar</include>
 				</control>
+				<control type="slider">
+					<posx>545</posx>
+					<posy>292</posy>
+					<include>ProgressSlider</include>
+				</control>
 				<control type="group">
 					<posx>960</posx>
 					<posy>400</posy>
@@ -608,6 +624,11 @@
 					<posy>292</posy>
 					<include>ProgressBar</include>
 				</control>
+				<control type="slider">
+					<posx>535</posx>
+					<posy>292</posy>
+					<include>ProgressSlider</include>
+				</control>
 			</control>
 		</control>
 		<!-- flipped -->
@@ -634,6 +655,11 @@
 					<posx>120</posx>
 					<posy>297</posy>
 					<include>ProgressBar</include>
+				</control>
+				<control type="slider">
+					<posx>120</posx>
+					<posy>297</posy>
+					<include>ProgressSlider</include>
 				</control>
 				<control type="group">
 					<posx>-4</posx>
@@ -665,6 +691,11 @@
 					<posx>145</posx>
 					<posy>292</posy>
 					<include>ProgressBar</include>
+				</control>
+				<control type="slider">
+					<posx>145</posx>
+					<posy>292</posy>
+					<include>ProgressSlider</include>
 				</control>
 			</control>
 		</control>
@@ -710,8 +741,14 @@
 				<!-- previous -->
 				<control type="group">
 					<posy>13</posy>
-					<posx>238</posx>
+					<posx>198</posx>
 					<include>OSDPreviousButton</include>
+				</control>
+				<!-- rewind -->
+				<control type="group">
+					<posy>13</posy>
+					<posx>238</posx>
+					<include>OSDRewindButton</include>
 				</control>
 				<!-- play/pause -->
 				<control type="group">
@@ -719,10 +756,16 @@
 					<posx>280</posx>
 					<include>OSDPlayButton</include>
 				</control>
-				<!-- next -->
+				<!-- forward -->
 				<control type="group">
 					<posy>13</posy>
 					<posx>319</posx>
+					<include>OSDForwardButton</include>
+				</control>
+				<!-- next -->
+				<control type="group">
+					<posy>13</posy>
+					<posx>359</posx>
 					<include>OSDNextButton</include>
 				</control>
 				<!-- stop -->

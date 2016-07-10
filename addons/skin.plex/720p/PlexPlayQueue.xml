@@ -854,8 +854,14 @@
 								<!-- previous -->
 								<control type="group">
 									<posy>13</posy>
-									<posx>220</posx>
+									<posx>182</posx>
 									<include>OSDPreviousButton</include>
+								</control>
+								<!-- rewind -->
+								<control type="group">
+									<posy>13</posy>
+									<posx>222</posx>
+									<include>OSDRewindButton</include>
 								</control>
 								<!-- play/pause -->
 								<control type="group">
@@ -863,10 +869,16 @@
 									<posx>262</posx>
 									<include>OSDPlayButton</include>
 								</control>
-								<!-- next -->
+								<!-- forward -->
 								<control type="group">
 									<posy>13</posy>
 									<posx>302</posx>
+									<include>OSDForwardButton</include>
+								</control>
+								<!-- next -->
+								<control type="group">
+									<posy>13</posy>
+									<posx>342</posx>
 									<include>OSDNextButton</include>
 								</control>
 								<!-- stop -->

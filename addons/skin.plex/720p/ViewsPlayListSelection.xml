@@ -287,6 +287,17 @@
 			<texturebg border="8">OSDProgressBack2.png</texturebg>
 			<midtexture border="8">OSDProgressMid-orange.png</midtexture>
 		</control>
+		<!-- Slider (Mouse) -->
+		<control type="slider">
+			<posx>255</posx>
+			<posy>341</posy>
+			<width>334</width>
+			<height>16</height>
+			<action>seek</action>
+			<texturesliderbar>-</texturesliderbar>
+			<textureslidernib>-</textureslidernib>
+			<textureslidernibfocus>-</textureslidernibfocus>
+		</control>
 		<control type="label">
 			<posx>235</posx>
 			<posy>350</posy>

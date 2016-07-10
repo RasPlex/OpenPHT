@@ -214,28 +214,7 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="7">
-						<description>Search</description>
-						<label>$LOCALIZE[137]</label>
-						<onclick>Plex.ActivateWindow(10051)</onclick>
-					</item>
-					<item id="114">
-						<description>Update and Restart</description>
-						<label>$LOCALIZE[40018]</label>
-						<onclick>Plex.UpdateAndRestart</onclick>
-						<visible>System.UpdateIsAvailable</visible>
-					</item>
-					<item id="121">
-						<description>Play File</description>
-						<label>$LOCALIZE[32205]</label>
-						<onclick>Skin.Reset(PlayFilePath)</onclick>
-						<onclick>Skin.SetFile(PlayFilePath,,$ESCINFO[Skin.String(HomeMenuPlayFilePath)])</onclick>
-						<onclick>PlayMedia($ESCINFO[Skin.String(PlayFilePath)])</onclick>
-						<onclick>Skin.Reset(PlayFilePath)</onclick>
-						<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
-					</item>
-				</content>
+				<include>HomeMenu_Items</include>
 			</control>
 		</control>
 	</include>
@@ -247,28 +226,28 @@
 			<include>FadeDialog</include>
 			<include>MenuSeparatorVertical</include>
 			<include>MenuFocusedLabel</include>
-			<!-- Arrow -->
-			<control type="image">
-				<posy>680</posy>
-				<posx>30</posx>
-				<width>12</width>
-				<height>18</height>
-				<aspectratio>scale</aspectratio>
-				<texture flipx="true">left-menu-indicator-arrow.png</texture>
-				<animation effect="rotate" end="-180" center="36,689" time="300" condition="Window.IsActive(4998)">Conditional</animation>
+
+			<!-- Navigation (Mouse) -->
+			<control type="button">
+				<posx>20</posx>
+				<posy>670</posy>
+				<width>30</width>
+				<height>30</height>
+				<texturefocus>left-menu-back-icon-s.png</texturefocus>
+				<texturenofocus>left-menu-back-icon.png</texturenofocus>
+				<onclick>Plex.ActivateWindow(4998)</onclick>
+				<include>leftMenuBarButton</include>
+				<animation type="Conditional" condition="Window.IsActive(4998)" reversible="false">
+					<effect type="rotatey" center="30,0" start="0,0" end="-180.0" time="300"/>
+					<effect type="fade" start="100" end="0" time="150" delay="0"/>
+				</animation>
+				<animation type="Conditional" condition="!Window.IsActive(4998)" reversible="false">
+					<effect type="rotatey" center="30,0" start="-180,0" end="0,0" time="300"/>
+					<effect type="fade" start="0" end="100" time="150" delay="0"/>
+				</animation>
 				<animation type="Conditional" condition="ControlGroup(5000).HasFocus()" reversible="false">
 					<effect type="fade" start="100" end="0" time="0"/>
 				</animation>
-			</control>
-			<!-- Mouse Trigger -->
-			<control type="button">
-				<posy>660</posy>
-				<posx>10</posx>
-				<width>60</width>
-				<height>60</height>
-				<texturefocus>-</texturefocus>
-				<texturenofocus>-</texturenofocus>
-				<onclick>Plex.ActivateWindow(4998)</onclick>
 			</control>
 
 			<!-- list -->
@@ -359,30 +338,47 @@
 					</control>
 				</focusedlayout>
 				<!-- additional menu items -->
-				<content>
-					<item id="7">
-						<description>Search</description>
-						<label>$LOCALIZE[137]</label>
-						<onclick>Plex.ActivateWindow(10051)</onclick>
-					</item>
-					<item id="114">
-						<description>Update and Restart</description>
-						<label>$LOCALIZE[40018]</label>
-						<onclick>Plex.UpdateAndRestart</onclick>
-						<visible>System.UpdateIsAvailable</visible>
-					</item>
-					<item id="121">
-						<description>Play File</description>
-						<label>$LOCALIZE[32205]</label>
-						<onclick>Skin.Reset(PlayFilePath)</onclick>
-						<onclick>Skin.SetFile(PlayFilePath,,$ESCINFO[Skin.String(HomeMenuPlayFilePath)])</onclick>
-						<onclick>PlayMedia($ESCINFO[Skin.String(PlayFilePath)])</onclick>
-						<onclick>Skin.Reset(PlayFilePath)</onclick>
-						<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
-					</item>
-				</content>
+				<include>HomeMenu_Items</include>
 			</control>
 		</control>
+	</include>
+
+	<!-- HomeMenu Items -->
+	<include name="HomeMenu_Items">
+		<content>
+			<item>
+				<description>Now Playing</description>
+				<label>[COLOR=orangeLight]$LOCALIZE[13350][/COLOR]</label>
+				<onclick>fullscreen</onclick>
+				<visible>Player.hasVideo | Player.hasAudio</visible>
+			</item>
+			<item id="7">
+				<description>Search</description>
+				<label>$LOCALIZE[137]</label>
+				<onclick>Plex.ActivateWindow(10051)</onclick>
+			</item>
+			<item id="114">
+				<description>Update and Restart</description>
+				<label>$LOCALIZE[40018]</label>
+				<onclick>Plex.UpdateAndRestart</onclick>
+				<visible>System.UpdateIsAvailable</visible>
+			</item>
+			<item id="121">
+				<description>Play File</description>
+				<label>$LOCALIZE[32205]</label>
+				<onclick>Skin.Reset(PlayFilePath)</onclick>
+				<onclick>Skin.SetFile(PlayFilePath,,$ESCINFO[Skin.String(HomeMenuPlayFilePath)])</onclick>
+				<onclick>PlayMedia($ESCINFO[Skin.String(PlayFilePath)])</onclick>
+				<onclick>Skin.Reset(PlayFilePath)</onclick>
+				<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
+			</item>
+
+			<item>
+				<label>Skip Forward</label>
+				<onclick>PlayerControl(SmallSkipForward)</onclick>
+			</item>
+
+		</content>
 	</include>
 
 </includes>
