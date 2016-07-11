@@ -372,12 +372,6 @@
 				<onclick>Skin.Reset(PlayFilePath)</onclick>
 				<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
 			</item>
-
-			<item>
-				<label>Skip Forward</label>
-				<onclick>PlayerControl(SmallSkipForward)</onclick>
-			</item>
-
 		</content>
 	</include>
 
