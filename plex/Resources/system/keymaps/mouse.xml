@@ -8,10 +8,11 @@
       <leftclick>leftclick</leftclick>
       <middleclick>ContextMenu</middleclick>
       <rightclick>Back</rightclick>
-      <longclick id="1">ContextMenu</longclick>
+      <longclick id="0">ContextMenu</longclick>
+      <longclick id="1">ContextMenu</longclick>      
       <wheelup>wheelup</wheelup>
       <wheeldown>wheeldown</wheeldown>
-      <doubleclick>doubleclick</doubleclick>
+      <doubleclick>select</doubleclick>
       <mousedrag>mousedrag</mousedrag>
       <mousemove>mousemove</mousemove>
     </mouse>
@@ -20,6 +21,7 @@
     <mouse>
       <leftclick>Select</leftclick>
       <doubleclick>Play</doubleclick>
+      <longclick id="0">Play</longclick>
     </mouse>
   </home>
   <fullscreenvideo>
@@ -27,6 +29,7 @@
       <wheeldown>volumeDown</wheeldown>
       <wheelup>volumeUp</wheelup>
       <rightclick>Pause</rightclick>
+      <middleclick>OSD</middleclick>
       <longclick id="0">OSD</longclick>
       <longclick id="1">Stop</longclick>
     </mouse>
@@ -36,6 +39,7 @@
       <wheeldown>volumeDown</wheeldown>
       <wheelup>volumeUp</wheelup>
       <rightclick>Pause</rightclick>
+      <middleclick>OSD</middleclick>
       <longclick id="0">OSD</longclick>
       <longclick id="1">Stop</longclick>
     </mouse>
@@ -46,7 +50,14 @@
       <middleclick>Pause</middleclick>
       <wheelup>PreviousPicture</wheelup>
       <wheeldown>NextPicture</wheeldown>
+      <rightclick>PreviousMenu</rightclick>
     </mouse>
   </SlideShow>
+  <PlexSearch>
+    <mouse>
+      <leftclick>Select</leftclick>
+      <rightclick>PreviousMenu</rightclick>
+    </mouse>
+  </PlexSearch>
 </keymap>
 
