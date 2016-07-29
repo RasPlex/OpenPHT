@@ -90,7 +90,12 @@ bool CGUILabel::Process(unsigned int currentTime)
   // TODO Add the correct processing
 
   bool overFlows = (m_renderRect.Width() + 0.5f < m_textLayout.GetTextWidth()); // 0.5f to deal with floating point rounding issues
-  return (overFlows && m_scrolling);
+  bool renderSolid = (m_color == COLOR_DISABLED);
+
+  if (overFlows && m_scrolling && !renderSolid)
+    return m_textLayout.UpdateScrollinfo(m_scrollInfo);
+
+  return false;
 }
 
 void CGUILabel::Render()

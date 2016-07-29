@@ -83,7 +83,7 @@ bool CGUIListLabel::UpdateColors()
 
 void CGUIListLabel::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
-  if (m_label.Process(currentTime))
+  if (m_label.Process(currentTime) && HasFocus())
     MarkDirtyRegion();
 
   CGUIControl::Process(currentTime, dirtyregions);
