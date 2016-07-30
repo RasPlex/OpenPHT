@@ -90,6 +90,7 @@ namespace MUSIC_INFO
 #define TMSG_RENDERER_FLUSH       312
 #define TMSG_INHIBITIDLESHUTDOWN  313
 #define TMSG_LOADPROFILE          314
+#define TMSG_ACTIVATESCREENSAVER  315
 #define TMSG_SETVIDEORESOLUTION   319
 #define TMSG_VIDEORESIZE          321
 
@@ -209,6 +210,7 @@ public:
   void RestartApp();
   void Reset();
   void InhibitIdleShutdown(bool inhibit);
+  void ActivateScreensaver();
   void SwitchToFullscreen(); //
   void Minimize(bool wait = false);
   void ExecOS(const CStdString command, bool waitExit = false);
