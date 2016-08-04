@@ -319,6 +319,8 @@
   </NumericInput>
   <NowPlaying>
     <joystick name="AppleRemote">
+      <button id="1">VolumeUp</button>
+      <button id="2">VolumeDown</button>
       <button id="8">Stop</button>
     </joystick>
   </NowPlaying>
