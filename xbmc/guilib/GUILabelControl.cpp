@@ -34,8 +34,6 @@ CGUILabelControl::CGUILabelControl(int parentID, int controlID, float posX, floa
   ControlType = GUICONTROL_LABEL;
   m_startHighlight = m_endHighlight = 0;
   m_minWidth = 0;
-  if ((labelInfo.align & XBFONT_RIGHT) && m_width)
-    m_posX -= m_width;
 }
 
 CGUILabelControl::~CGUILabelControl(void)
