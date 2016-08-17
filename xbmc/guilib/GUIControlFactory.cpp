@@ -728,7 +728,8 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   CTextureInfo textureCheckMark, textureCheckMarkNF;
   CTextureInfo textureFocus, textureNoFocus;
   CTextureInfo textureAltFocus, textureAltNoFocus;
-  CTextureInfo textureRadioOn, textureRadioOff;
+  CTextureInfo textureRadioOnFocus, textureRadioOnNoFocus;
+  CTextureInfo textureRadioOffFocus, textureRadioOffNoFocus;
   CTextureInfo imageNoFocus, imageFocus;
   /* PLEX */
   CTextureInfo textureOrderOff, textureOrderAsc, textureOrderDesc;
@@ -928,10 +929,19 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   XMLUtils::GetFloat(pControlNode, "sliderheight", sliderHeight);
   GetTexture(pControlNode, "texturecheckmark", textureCheckMark);
   GetTexture(pControlNode, "texturecheckmarknofocus", textureCheckMarkNF);
-  GetTexture(pControlNode, "textureradiofocus", textureRadioOn);    // backward compatibility
-  GetTexture(pControlNode, "textureradionofocus", textureRadioOff);
-  GetTexture(pControlNode, "textureradioon", textureRadioOn);
-  GetTexture(pControlNode, "textureradiooff", textureRadioOff);
+
+  if (!GetTexture(pControlNode, "textureradioonfocus", textureRadioOnFocus) || !GetTexture(pControlNode, "textureradioonnofocus", textureRadioOnNoFocus))
+  {
+    GetTexture(pControlNode, "textureradiofocus", textureRadioOnFocus);    // backward compatibility
+    GetTexture(pControlNode, "textureradioon", textureRadioOnFocus);
+    textureRadioOnNoFocus = textureRadioOnFocus;
+  }
+  if (!GetTexture(pControlNode, "textureradioofffocus", textureRadioOffFocus) || !GetTexture(pControlNode, "textureradiooffnofocus", textureRadioOffNoFocus))
+  {
+    GetTexture(pControlNode, "textureradionofocus", textureRadioOffFocus);    // backward compatibility
+    GetTexture(pControlNode, "textureradiooff", textureRadioOffFocus);
+    textureRadioOffNoFocus = textureRadioOffFocus;
+  }
 
   /* PLEX */
   GetTexture(pControlNode, "textureorderoff", textureOrderOff);
@@ -1238,7 +1248,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
       parentID, id, posX, posY, width, height,
       textureFocus, textureNoFocus,
       labelInfo,
-      textureRadioOn, textureRadioOff);
+      textureRadioOnFocus, textureRadioOnNoFocus, textureRadioOffFocus, textureRadioOffNoFocus);
 
     ((CGUIRadioButtonControl *)control)->SetLabel(strLabel);
     ((CGUIRadioButtonControl *)control)->SetRadioDimensions(radioPosX, radioPosY, radioWidth, radioHeight);
