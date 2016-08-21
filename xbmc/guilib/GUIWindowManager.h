@@ -33,6 +33,7 @@
 #include "IMsgTargetCallback.h"
 #include "DirtyRegionTracker.h"
 #include "utils/GlobalsHandling.h"
+#include "guilib/Key.h"
 #include <list>
 
 class CGUIDialog;
@@ -198,6 +199,31 @@ private:
 private :
   bool m_restrictedAccessMode;
   /* END PLEX */
+
+  class CGUIWindowManagerIdCache
+  {
+  public:
+    CGUIWindowManagerIdCache(void) : m_id(WINDOW_INVALID) {}
+    CGUIWindow *Get(int id)
+    {
+      if (id == m_id)
+        return m_window;
+      return NULL;
+    }
+    void Set(int id, CGUIWindow *window)
+    {
+      m_id = id;
+      m_window = window;
+    }
+    void Invalidate(void)
+    {
+      m_id = WINDOW_INVALID;
+    }
+  private:
+    int m_id;
+    CGUIWindow *m_window;
+  };
+  mutable CGUIWindowManagerIdCache m_idCache;
 };
 
 /*!
