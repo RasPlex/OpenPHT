@@ -38,6 +38,7 @@ public:
   InfoBool(const CStdString &expression, int context)
     : m_value(false),
       m_context(context),
+      m_listItemDependent(false),
       m_expression(expression),
       m_lastUpdate(0)
   {
@@ -52,6 +53,7 @@ public:
    */
   inline bool Get(unsigned int time, const CGUIListItem *item = NULL)
   {
+    //if (item && m_listItemDependent)
     if (item)
       Update(item);
     else if (time - m_lastUpdate > 0)
@@ -77,6 +79,7 @@ protected:
 
   bool m_value;                ///< current value
   int m_context;               ///< contextual information to go with the condition
+  bool m_listItemDependent;    ///< do not cache if a listitem pointer is given
 
 private:
   CStdString m_expression;     ///< original expression

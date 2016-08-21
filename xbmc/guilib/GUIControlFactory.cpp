@@ -825,13 +825,13 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
         posX -= width;
     }
     if (!width) // no width specified, so compute from parent
-      width = std::max(rect.Width() - posX, 0.0f);
+      width = max(rect.Width() - posX, 0.0f);
   }
   if (!GetDimensions(pControlNode, "top", "bottom", "centertop", "centerbottom", "height", rect.Height(), posY, height, minHeight))
   {
     GetPosition(pControlNode, "posy", rect.Height(), posY);
     if (!height)
-      height = std::max(rect.Height() - posY, 0.0f);
+      height = max(rect.Height() - posY, 0.0f);
   }
 
   XMLUtils::GetFloat(pControlNode, "offsetx", offset.x);
