@@ -41,7 +41,6 @@
 					<posx>802</posx>
 					<posy>20</posy>
 					<width>600</width>
-					<height>0</height>
 					<label>$INFO[ListItem.Label]</label>
 					<align>right</align>
 					<aligny>center</aligny>
@@ -55,7 +54,6 @@
 					<posx>806</posx>
 					<posy>20</posy>
 					<width>600</width>
-					<height>0</height>
 					<label>$INFO[ListItem.Label]</label>
 					<align>right</align>
 					<aligny>center</aligny>

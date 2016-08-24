@@ -75,7 +75,6 @@
 			<include>ShowHomeClassic</include>
 			<control type="label">
 				<width>353</width>
-				<height>0</height>
 				<label>$INFO[Container(300).ListItem(0).Label]</label>
 				<align>right</align>
 				<aligny>center</aligny>
@@ -154,7 +153,6 @@
 						<posx>372</posx>
 						<posy>20</posy>
 						<width>360</width>
-						<height>0</height>
 						<label>$INFO[ListItem.Label]</label>
 						<info>ListItem.Label</info>
 						<align>right</align>
@@ -169,7 +167,6 @@
 						<posx>363</posx>
 						<posy>53</posy>
 						<width>353</width>
-						<height>0</height>
 						<label>$INFO[ListItem.Label]</label>
 						<align>right</align>
 						<aligny>center</aligny>

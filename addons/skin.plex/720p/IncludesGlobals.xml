@@ -77,18 +77,26 @@
 		<colordiffuse>FF000000</colordiffuse>
 	</include>
 	<include name="ArrowBlack">
+		<width>14</width>
+		<height>30</height>
 		<texture>arrow-big.png</texture>
 		<colordiffuse>FF000000</colordiffuse>
 	</include>
 	<include name="ArrowBlackLeft">
+		<width>14</width>
+		<height>30</height>
 		<texture flipx="true">arrow-big.png</texture>
 		<colordiffuse>FF000000</colordiffuse>
 	</include>
 	<include name="ArrowBlackUp">
+		<width>30</width>
+		<height>14</height>
 		<texture>arrow-big-up.png</texture>
 		<colordiffuse>FF000000</colordiffuse>
 	</include>
 	<include name="ArrowBlackDown">
+		<width>30</width>
+		<height>14</height>
 		<texture flipy="true">arrow-big-up.png</texture>
 		<colordiffuse>FF000000</colordiffuse>
 	</include>

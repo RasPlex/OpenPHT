@@ -11,10 +11,13 @@
 		<!-- ViewsDialog.xml -->
 		<include>DialogRating</include>
 		<control type="group">
-			<posx>180</posx>
+			<posx>96</posx>
 			<posy>266</posy>
 			<control type="image" id="10">
+				<width>300</width>
+				<height>40</height>
 				<texture>rating0.png</texture>
+				<aspectratio>keep</aspectratio>
 				<colordiffuse>orange</colordiffuse>
 			</control>
 		</control>

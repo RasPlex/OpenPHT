@@ -233,6 +233,8 @@
 					<control type="image">
 						<posy>365</posy>
 						<posx>391</posx>
+						<width>14</width>
+						<height>30</height>
 						<texture background="true">arrow-big.png</texture>
 						<colordiffuse>orange</colordiffuse>
 						<animation effect="fade" start="0" end="100" time="500" delay="100" condition="true">Visible</animation>
@@ -311,51 +313,51 @@
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>$INFO[Listitem.Art(mediaTag::contentRating)]</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>![Control.IsVisible(88) + Player.HasVideo]</visible>
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>icon-photoalbum.png</texture>
 							<visible>ListItem.Type(photoAlbum)</visible>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>icon-video.png</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>Container.PlexContent(Channels) + ListItem.Type(video)</visible>
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>icon-music.png</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>Container.PlexContent(Channels) + ListItem.Type(music)</visible>
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>icon-photo.png</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>Container.PlexContent(Channels) + ListItem.Type(photos)</visible>
 						</control>
@@ -627,6 +629,8 @@
 					<control type="image">
 						<posy>440</posy>
 						<posx>391</posx>
+						<width>14</width>
+						<height>30</height>
 						<texture background="true">arrow-big.png</texture>
 						<colordiffuse>orange</colordiffuse>
 						<animation effect="fade" start="0" end="100" time="500" delay="100" condition="true">Visible</animation>
@@ -747,21 +751,21 @@
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>$INFO[Container(11001).Listitem.Art(mediaTag::contentRating)]</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>ControlGroup(7002).HasFocus</visible>
 						</control>
 						<control type="image">
 							<posy>37</posy>
-							<posx>960r</posx>
+							<posx>300</posx>
 							<width>50</width>
 							<height>40</height>
 							<texture>$INFO[Container(11000).Listitem.Art(mediaTag::contentRating)]</texture>
-							<aspectratio align="right" aligny="bottom">keep</aspectratio>
+							<aspectratio>keep</aspectratio>
 							<colordiffuse>FF999999</colordiffuse>
 							<visible>ControlGroup(7001).HasFocus</visible>
 						</control>

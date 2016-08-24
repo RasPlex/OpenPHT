@@ -3,6 +3,10 @@
 	<!-- OK DONE -->
 	<default type="label">
 		<description>Default Label</description>
+		<posx>0</posx>
+		<posy>0</posy>
+		<width>0</width>
+		<height>1</height>
 		<align>left</align>
 		<aligny>center</aligny>
 		<font>DefaultFont</font>

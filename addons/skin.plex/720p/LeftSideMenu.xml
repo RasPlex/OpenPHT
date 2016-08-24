@@ -437,7 +437,6 @@
 						<posx>372</posx>
 						<posy>20</posy>
 						<width>360</width>
-						<height>0</height>
 						<label>$INFO[ListItem.Label]</label>
 						<info>ListItem.Label</info>
 						<align>right</align>
@@ -452,7 +451,6 @@
 						<posx>363</posx>
 						<posy>53</posy>
 						<width>353</width>
-						<height>0</height>
 						<info>ListItem.Label</info>
 						<align>right</align>
 						<aligny>center</aligny>
@@ -495,7 +493,6 @@
 						<posx>372</posx>
 						<posy>20</posy>
 						<width>360</width>
-						<height>0</height>
 						<label>$INFO[ListItem.Label]</label>
 						<info>ListItem.Label</info>
 						<align>right</align>
@@ -510,7 +507,6 @@
 						<posx>363</posx>
 						<posy>53</posy>
 						<width>353</width>
-						<height>0</height>
 						<info>ListItem.Label</info>
 						<align>right</align>
 						<aligny>center</aligny>
@@ -1187,7 +1183,6 @@
 					<!-- menu label -->
 					<control type="label">
 						<width>1400</width>
-						<height>0</height>
 						<label>$VAR[TopBarSelectedItemStrings]</label>
 						<align>left</align>
 						<aligny>center</aligny>
@@ -1199,7 +1194,6 @@
 					</control>
 					<control type="label">
 						<width>1400</width>
-						<height>0</height>
 						<label>$VAR[TopBarSelectedItemStrings]</label>
 						<align>left</align>
 						<aligny>center</aligny>
@@ -1225,48 +1219,56 @@
 				<control type="image">
 					<posx>0</posx>
 					<posy>108</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-photos.png</texture>
 					<visible>!Skin.String(SettingsCategory,appearance)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>108</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-photos-s.png</texture>
 					<visible>Skin.String(SettingsCategory,appearance)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>158</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-video.png</texture>
 					<visible>!Skin.String(SettingsCategory,playback)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>158</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-video-s.png</texture>
 					<visible>Skin.String(SettingsCategory,playback)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>208</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-system.png</texture>
 					<visible>!Skin.String(SettingsCategory,system)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>208</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-system-s.png</texture>
 					<visible>Skin.String(SettingsCategory,system)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>258</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-network.png</texture>
 					<visible>!Skin.String(SettingsCategory,network)</visible>
 				</control>
 				<control type="image">
 					<posx>0</posx>
 					<posy>258</posy>
+					<include>leftMenuPreplayButton</include>
 					<texture>b-s-network-s.png</texture>
 					<visible>Skin.String(SettingsCategory,network)</visible>
 				</control>
