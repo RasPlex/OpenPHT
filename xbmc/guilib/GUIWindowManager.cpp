@@ -202,12 +202,10 @@ void CGUIWindowManager::CreateWindows()
   Add(new CGUIWindowPrograms);
 #ifndef __PLEX__
   Add(new CGUIWindowPictures);
+#endif
   Add(new CGUIWindowFileManager);
-#endif
   Add(new CGUIWindowSettings);
-#ifndef __PLEX__
   Add(new CGUIWindowSystemInfo);
-#endif
 #ifdef HAS_GL
   Add(new CGUIWindowTestPatternGL);
 #endif
