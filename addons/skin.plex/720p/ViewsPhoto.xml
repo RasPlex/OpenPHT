@@ -22,7 +22,7 @@
 	</include>
 	<include name="PhotoThumb">
 		<control type="group">
-			<visible>ListItem.Type(photo)</visible>
+			<!--<visible>ListItem.Type(photo)</visible> // Support video in photo section -->
 			<control type="image">
 				<posx>0</posx>
 				<posy>0</posy>
