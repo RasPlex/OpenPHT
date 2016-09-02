@@ -118,13 +118,11 @@ void CPlexSectionFanout::Refresh(bool force)
       if (m_sectionType != SECTION_TYPE_ALBUM && !g_guiSettings.GetBool("myplex.recentlywatched"))
         trueUrl.SetOption("unwatched", "1");
 
-#if 0
-      if (m_sectionType == SECTION_TYPE_SHOW)
+      if (m_sectionType == SECTION_TYPE_SHOW && g_guiSettings.GetBool("myplex.recentlystacked"))
       {
         trueUrl.SetOption("stack", "1");
         trueUrl.SetOption("includeParentData", "1");
       }
-#endif
 
       PlexUtils::AppendPathToURL(trueUrl, "recentlyAdded");
 

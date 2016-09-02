@@ -1044,6 +1044,10 @@ msgctxt "#52217"
 msgid "Show watched in watch later and recommended"
 msgstr "Show watched in watch later and recommended"
 
+msgctxt "#52218"
+msgid "Stack TV Shows in recently added"
+msgstr "Stack TV Shows in recently added"
+
 msgctxt "#52300"
 msgid "Media Server went away"
 msgstr "Media Server went away"
