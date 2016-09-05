@@ -1,5 +1,6 @@
 %global _enable_debug_package 0
 %global debug_package %{nil}
+Autoreq: 0
 
 Summary:            OpenPHT is a community driven fork of Plex Home Theater
 Name:               openpht
@@ -28,7 +29,6 @@ BuildRequires:      openssl-devel
 BuildRequires:      glew-devel
 BuildRequires:      avahi-devel
 BuildRequires:      flac-devel
-BuildRequires:      ffmpeg-devel
 BuildRequires:      python-devel
 BuildRequires:      libtiff-devel
 BuildRequires:      libvorbis-devel
@@ -63,7 +63,6 @@ Requires:      openssl
 Requires:      glew
 Requires:      avahi
 Requires:      flac
-Requires:      ffmpeg
 Requires:      python
 Requires:      libtiff
 Requires:      libvorbis
@@ -109,9 +108,13 @@ make -j2
 %install
 cd build
 make install
+cp ../dist/openpht %{buildroot}/usr/bin/openpht
+chmod 755 %{buildroot}/usr/bin/openpht
+cp ../dist/openpht.desktop %{buildroot}/usr/share/applications/openpht.desktop
+chmod 644 %{buildroot}/usr/share/applications/openpht.desktop
 
 %files
 %doc CONTRIBUTORS LICENSE.GPL README
 %{_bindir}/*
-%{_libdir}/*
+%{_prefix}/lib/*
 %{_datadir}/*
