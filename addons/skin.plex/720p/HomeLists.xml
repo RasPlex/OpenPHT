@@ -193,7 +193,19 @@
 				<font>Bold-14</font>
 				<textcolor>white</textcolor>
 				<wrapmultiline>false</wrapmultiline>
-				<visible>![IsEmpty(ListItem.Season) | IsEmpty(ListItem.Episode)]</visible>
+				<visible>![IsEmpty(ListItem.Season) | IsEmpty(ListItem.Episode)] + !StringCompare(ListItem.Property(UnWatchedEpisodes),1)</visible>
+				<animation effect="fade" start="0" end="80" time="400" condition="true">Conditional</animation>
+			</control>
+			<control type="label">
+				<width>110</width>
+				<align>center</align>
+				<aligny>center</aligny>
+				<scroll>false</scroll>
+				<label>S$INFO[ListItem.Season] [COLOR=orange]&#xB7;[/COLOR] E$INFO[ListItem.Episode]</label>
+				<font>Bold-14</font>
+				<textcolor>white</textcolor>
+				<wrapmultiline>false</wrapmultiline>
+				<visible>![IsEmpty(ListItem.Season) | IsEmpty(ListItem.Episode)] + StringCompare(ListItem.Property(UnWatchedEpisodes),1)</visible>
 				<animation effect="fade" start="0" end="80" time="400" condition="true">Conditional</animation>
 			</control>
 			<control type="label">
