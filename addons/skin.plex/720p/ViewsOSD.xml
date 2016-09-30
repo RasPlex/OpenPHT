@@ -342,7 +342,7 @@
 		<value condition="[Player.Paused + !Player.Caching] + !Player.Seeking + !Player.DisplayAfterSeek">PAUSED</value>
 		<value condition="[Player.Paused + Player.Caching] + !Player.Seeking">CACHING $INFO[Player.CacheLevel]%</value>
 		<value condition="!IsEmpty(Player.SeekStepSize) + ![player.forwarding | player.rewinding]">SEEKING $INFO[Player.SeekStepSize]</value>
-		<value condition="Player.DisplayAfterSeek + ![player.forwarding | player.rewinding]">SEEKING $INFO[Player.SeekOffset]</value>
+		<value condition="Player.DisplayAfterSeek + ![player.forwarding | player.rewinding | player.showtime]">SEEKING $INFO[Player.SeekOffset]</value>
 		<value condition="!Player.DisplayAfterSeek + Player.Seeking">SEEKING</value>
 		<value condition="Player.Forwarding2x">FORWARDING 2x</value>
 		<value condition="Player.Forwarding4x">FORWARDING 4x</value>
@@ -486,7 +486,7 @@
 				<fadetime>1</fadetime>
 				<aspectratio align="left" aligny="bottom">keep</aspectratio>
 				<texture>$INFO[VideoPlayer.SeekImage]</texture>
-				<visible>Player.Seeking + !IsEmpty(VideoPlayer.SeekImage)</visible>
+				<visible>Player.Seeking + !IsEmpty(VideoPlayer.SeekImage) + !Player.ShowTime</visible>
 			</control>
 		</control>
 	</include>
