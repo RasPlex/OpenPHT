@@ -97,7 +97,9 @@
 					<viewtype label="PanelSharedSecondary">panel</viewtype>
 					<onup>50</onup>
 					<ondown>50</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>50</onleft>
 					<orientation>vertical</orientation>
 					<posx>53</posx>

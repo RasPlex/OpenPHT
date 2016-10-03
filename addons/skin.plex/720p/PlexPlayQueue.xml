@@ -6,6 +6,11 @@
 	<onload>Skin.SetString(SectionType,playqueue)</onload>
 	<onunload>Skin.Reset(SectionType)</onunload>
 	<controls>
+		<!-- Scrollbar -->
+		<control type="group">
+			<posx>8</posx>
+			<include>Scrollbar</include>
+		</control>
 		<!-- music play queue -->
 		<control type="group">
 			<visible>Container.PlexContent(songs) | [Container.PlexContent(channel) + System.PlexPlayQueue(Music)]</visible>
@@ -59,7 +64,9 @@
 						<scrolltime>200</scrolltime>
 						<onleft condition="!Player.HasAudio">998</onleft>
 						<onleft condition="Player.HasAudio">300</onleft>
-						<onright>54</onright>
+						<!--<onright>54</onright>-->
+						<onright>1111</onright>
+						<pagecontrol>1111</pagecontrol>
 						<onup>54</onup>
 						<ondown>54</ondown>
 						<itemlayout height="49" width="520">

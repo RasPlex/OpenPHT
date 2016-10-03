@@ -182,27 +182,34 @@
 					<selected>Skin.HasSetting(HideRottenTomatoesRating)</selected>
 				</control>
 				<control type="radiobutton" id="217">
+					<description>Hide Scrollbars</description>
+					<width>625</width>
+					<label>$LOCALIZE[32129]</label>
+					<onclick>Skin.ToggleSetting(HideScrollbars)</onclick>
+					<selected>Skin.HasSetting(HideScrollbars)</selected>
+				</control>
+				<control type="radiobutton" id="218">
 					<description>Show Shut Down/Restart to restricted users</description>
 					<width>625</width>
 					<label>$LOCALIZE[32122]</label>
 					<onclick>Skin.ToggleSetting(ShowRestrictedPowerOptions)</onclick>
 					<selected>Skin.HasSetting(ShowRestrictedPowerOptions)</selected>
 				</control>
-				<control type="radiobutton" id="218">
+				<control type="radiobutton" id="219">
 					<description>Disable window and dialog fade animation</description>
 					<width>625</width>
 					<label>$LOCALIZE[32123]</label>
 					<onclick>Skin.ToggleSetting(DisableWindowFade)</onclick>
 					<selected>Skin.HasSetting(DisableWindowFade)</selected>
 				</control>
-				<control type="radiobutton" id="219">
+				<control type="radiobutton" id="220">
 					<description>Show Play File in Home menu</description>
 					<width>625</width>
 					<label>$LOCALIZE[32124]</label>
 					<onclick>Skin.ToggleSetting(HomeMenuPlayFile)</onclick>
 					<selected>Skin.HasSetting(HomeMenuPlayFile)</selected>
 				</control>
-				<control type="radiobutton" id="220">
+				<control type="radiobutton" id="221">
 					<description>Default path for Play File</description>
 					<width>625</width>
 					<label>$LOCALIZE[32125]</label>
@@ -210,7 +217,7 @@
 					<selected>!IsEmpty(Skin.String(HomeMenuPlayFilePath))</selected>
 					<visible>Skin.HasSetting(HomeMenuPlayFile)</visible>
 				</control>
-				<control type="button" id="221">
+				<control type="button" id="222">
 					<description>Reset default path for Play File</description>
 					<width>625</width>
 					<label>$LOCALIZE[32126]</label>

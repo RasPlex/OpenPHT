@@ -31,6 +31,8 @@
 			<include>BGGrainy</include>
 			<animation effect="fade" start="0" end="80" time="0" condition="true">Conditional</animation>
 		</control>
+		<!-- Scrollbar -->
+		<include>Scrollbar</include>
 		<!-- list -->
 		<control type="group">
 			<include>FadeDialog</include>
@@ -64,7 +66,9 @@
 					<posx>505</posx>
 					<width>805</width>
 					<height>655</height>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>58</onleft>
 					<onup>58</onup>
 					<ondown>58</ondown>

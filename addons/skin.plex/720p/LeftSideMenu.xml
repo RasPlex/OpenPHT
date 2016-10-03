@@ -826,43 +826,14 @@
 
 			<!-- sidebar mouse navigation -->
 			<control type="grouplist" id="994">
-				<posy>440</posy>
+				<posy>610</posy>
 				<posx>20</posx>
 				<width>74</width>
-				<aligny>top</aligny>
 				<orientation>vertical</orientation>
 				<itemgap>20</itemgap>
 				<usecontrolcoords>true</usecontrolcoords>
 				<onup>998</onup>
 				<visible>system.getbool(input.enablemouse)</visible>
-
-				<!-- Now Playing -->
-				<control type="button">
-					<posx>-10</posx>
-					<width>50</width>
-					<height>100</height>
-					<texturefocus>-</texturefocus>
-					<texturenofocus>-</texturenofocus>
-					<onclick condition="Player.hasAudio | Player.hasVideo">fullscreen</onclick>
-				</control>
-
-				<!-- Viewmode -->
-				<control type="button">
-					<width>32</width>
-					<height>32</height>
-					<texturefocus>left-menu-viewmode-icon-s.png</texturefocus>
-					<texturenofocus>left-menu-viewmode-icon.png</texturenofocus>
-					<onclick>Container.NextViewmode</onclick>
-					<visible>!Window.IsVisible(10090)</visible>
-				</control>
-				<control type="button">
-					<width>32</width>
-					<height>32</height>
-					<texturefocus>-</texturefocus>
-					<texturenofocus>-</texturenofocus>
-					<onclick>-</onclick>
-					<visible>Window.IsVisible(10090)</visible>
-				</control>
 
 				<!-- Home -->
 				<control type="button">
@@ -917,6 +888,16 @@
 					<onclick>Plex.ShuffleAll()</onclick>
 					<include>leftMenuBarButton</include>
 				</control>
+				<!-- Viewmode -->
+				<control type="button" id="115">
+					<texturefocus>left-menu-viewmode-icon-s.png</texturefocus>
+					<texturenofocus>left-menu-viewmode-icon.png</texturenofocus>
+					<onclick>Container.NextViewmode</onclick>
+					<width>30</width>
+					<height>30</height>
+					<include>leftMenuBarButton</include>
+					<animation effect="slide" end="22,0" condition="true">Conditional</animation>
+				</control>
 				<!-- Now Playing -->
 				<control type="button" id="106">
 					<texturefocus>-</texturefocus>
@@ -937,19 +918,37 @@
 				<ondown>998</ondown>
 				<orientation>vertical</orientation>
 				<itemgap>20</itemgap>
-				<control type="button" id="101">
+				<control type="button" id="121">
 					<include>leftBarButtonFilters</include>
 					<visible>!IsEmpty(Container.Property(PlexFilter))</visible>
 				</control>
-				<control type="button" id="102">
+				<control type="button" id="122">
 					<include>leftBarButtonPlay</include>
 				</control>
-				<control type="button" id="103">
+				<control type="button" id="123">
 					<include>leftBarButtonShuffle</include>
 				</control>
-				<control type="button" id="104">
+				<control type="button" id="124">
 					<include>leftBarButtonExtras</include>
 					<visible>!IsEmpty(Container.Property(PlexExtras))</visible>
+				</control>
+				<!-- Viewmode -->
+				<control type="button" id="125">
+					<texturefocus>left-menu-viewmode-icon-s.png</texturefocus>
+					<texturenofocus>left-menu-viewmode-icon.png</texturenofocus>
+					<onclick>Container.NextViewmode</onclick>
+					<width>30</width>
+					<height>30</height>
+					<include>leftMenuBarButton</include>
+					<animation effect="slide" end="22,0" condition="true">Conditional</animation>
+				</control>
+				<!-- Now Playing -->
+				<control type="button" id="126">
+					<texturefocus>-</texturefocus>
+					<texturenofocus>-</texturenofocus>
+					<onclick>fullscreen</onclick>
+					<include>leftMenuBarButton</include>
+					<visible>Player.HasAudio | Player.HasVideo</visible>
 				</control>
 			</control>
 			<!-- sidebar preplay -->

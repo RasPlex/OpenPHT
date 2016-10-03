@@ -1098,6 +1098,10 @@ msgctxt "#32128"
 msgid "Hide Thumbnails for Unwatched/In Progress Episodes"
 msgstr ""
 
+msgctxt "#32129"
+msgid "Hide Scrollbars"
+msgstr ""
+
 msgctxt "#32205"
 msgid "Play File"
 msgstr "Play File"

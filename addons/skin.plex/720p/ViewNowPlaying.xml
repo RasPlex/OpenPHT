@@ -294,7 +294,7 @@
 			<animation effect="fade" time="500">VisibleChange</animation>
 			<animation effect="fade" start="100" end="0" time="200" condition="Control.IsVisible(999) + Window.IsActive(home)">Conditional</animation>
 			<animation effect="fade" start="100" end="0" time="0" condition="Skin.String(SectionType,playqueue) + [Player.HasAudio | Player.HasVideo]">Conditional</animation>
-			<animation effect="slide" end="0,-120" time="0" condition="system.getbool(input.enablemouse) + [ Player.HasAudio | Player.HasVideo ] + !Window.isVisible(Home)">Conditional</animation>
+			<animation effect="slide" end="0,-70" time="0" condition="system.getbool(input.enablemouse) + [ Player.HasAudio | Player.HasVideo ] + !Window.isVisible(Home)">Conditional</animation>
 
 			<!-- music -->
 			<control type="group">
@@ -334,7 +334,7 @@
 						<texture>transparent.png</texture>
 						<bordertexture>orange.png</bordertexture>
 						<bordersize>2</bordersize>
-						<visible>Control.HasFocus(106) + Player.HasAudio</visible>
+						<visible>[ Control.HasFocus(106) | Control.HasFocus(126) ] + Player.HasAudio</visible>
 					</control>
 					<control type="image">
 						<width>50</width>
@@ -390,7 +390,7 @@
 							<texture>transparent.png</texture>
 							<bordertexture>orange.png</bordertexture>
 							<bordersize>2</bordersize>
-							<visible>Control.HasFocus(106) + Player.HasVideo + [VideoPlayer.PlexContent(episode) | VideoPlayer.PlexContent(movie)]</visible>
+							<visible>[ Control.HasFocus(106) | Control.HasFocus(126) ] + Player.HasVideo + [VideoPlayer.PlexContent(episode) | VideoPlayer.PlexContent(movie)]</visible>
 						</control>
 						<control type="image">
 							<width>50</width>
@@ -415,7 +415,7 @@
 							<texture>transparent.png</texture>
 							<bordertexture>orange.png</bordertexture>
 							<bordersize>2</bordersize>
-							<visible>Control.HasFocus(106)</visible>
+							<visible>Control.HasFocus(106) | Control.HasFocus(126)</visible>
 						</control>
 						<control type="image">
 							<width>50</width>

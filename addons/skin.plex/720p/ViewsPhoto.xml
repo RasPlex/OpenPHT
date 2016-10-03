@@ -264,7 +264,9 @@
 					<viewtype label="LibraryPhoto">panel</viewtype>
 					<onup>51</onup>
 					<ondown>51</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<posx>93</posx>
@@ -331,7 +333,9 @@
 					<viewtype label="AlbumPhoto">panel</viewtype>
 					<onup>51</onup>
 					<ondown>51</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<posx>573</posx>

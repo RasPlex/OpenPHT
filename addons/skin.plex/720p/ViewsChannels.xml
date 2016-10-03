@@ -349,7 +349,9 @@
 					<visible>Container.PlexContent(Channel) + !Window.IsActive(501)</visible>
 					<onup>99</onup>
 					<ondown>99</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<posx>28</posx>
@@ -498,7 +500,9 @@
 					<visible>Container.PlexContent(Channel) + Window.IsActive(501)</visible>
 					<onup>73</onup>
 					<ondown>73</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<posx>28</posx>

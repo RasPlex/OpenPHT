@@ -13,6 +13,8 @@
 		<include>BGGrainy</include>
 		<include>BGFanart</include>
 		<include>BGOverlay</include>
+		<!-- Scrollbar -->
+		<include>Scrollbar</include>
 		<!-- views (Views.xml & ViewsMovieTV.xml & ViewsChannels.xml & ViewsPreplay.xml & ViewsClips.xml) -->
 		<!-- ByFolder ID 40 -->
 		<include>ByFolder</include>

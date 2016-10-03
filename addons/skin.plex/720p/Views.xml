@@ -258,7 +258,9 @@
 					<posx>505</posx>
 					<width>805</width>
 					<height>655</height>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<onup>58</onup>
 					<ondown>58</ondown>
@@ -1133,4 +1135,19 @@
 			</control>
 		</control>
 	</include>
+
+	<!-- Scrollbar -->
+	<include name="Scrollbar">
+		<control type="scrollbar" id="1111">
+			<posx>1250</posx>
+			<posy>30</posy>
+			<width>20</width>
+			<height>660</height>
+			<onleft>777</onleft>
+			<texturesliderbarfocus border="0,14,0,14">scrollbar-focus.png</texturesliderbarfocus>
+			<animation effect="slide" end="5,0" condition="Container.PlexContent(episodes) | Container.PlexContent(Clips)">Conditional</animation>
+			<animation effect="fade" start="100" end="0" condition="Skin.hasSetting(HideScrollbars)">Conditional</animation>
+		</control>
+	</include>
+
 </includes>

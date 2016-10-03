@@ -527,12 +527,12 @@
 	<!-- scroll letter offset -->
 	<include name="scrollOffset">
 		<control type="group">
-			<visible>Container.Scrolling</visible>
+			<visible>Container.Scrolling | Control.hasFocus(1111)</visible>
 			<animation effect="slide" time="500" delay="400" tween="circle" easing="out" start="0,300" end="0,0">Visible</animation>
 			<animation effect="slide" time="100" tween="circle" easing="in" start="0,0" end="0,300">Hidden</animation>
 			<control type="group">
 				<posy>610</posy>
-				<posx>190r</posx>
+				<posx>140r</posx>
 				<control type="image">
 					<description>Background</description>
 					<width>100</width>
@@ -552,9 +552,7 @@
 					<include>DialogArrow</include>
 				</control>
 				<control type="label">
-					<posx>0</posx>
-					<posy>10</posy>
-					<height>60</height>
+					<height>85</height>
 					<width>100</width>
 					<aligny>center</aligny>
 					<align>center</align>

@@ -103,7 +103,9 @@
 					<height>660</height>
 					<onup>52</onup>
 					<ondown>52</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<itemlayout width="192" height="220">
@@ -267,7 +269,9 @@
 					<viewtype label="MusicLibraryAlbums">panel</viewtype>
 					<onup>53</onup>
 					<ondown>53</ondown>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onleft>998</onleft>
 					<orientation>vertical</orientation>
 					<posx>850</posx>
@@ -432,7 +436,9 @@
 					<scrolltime>200</scrolltime>
 					<pagecontrol>61</pagecontrol>
 					<onleft>998</onleft>
-					<onright>Container.NextViewMode</onright>
+					<!--<onright>Container.NextViewMode</onright>-->
+					<onright>1111</onright>
+					<pagecontrol>1111</pagecontrol>
 					<onup>54</onup>
 					<ondown>54</ondown>
 					<itemlayout height="49" width="520">
