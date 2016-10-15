@@ -30,6 +30,8 @@
 #include "GUISettings.h"
 #include "PlexPlayQueueManager.h"
 #include "ApplicationMessenger.h"
+#include "Client/PlexServerVersion.h"
+#include "dialogs/GUIDialogKaiToast.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 bool CPlexMediaDecisionEngine::checkItemPlayability(const CFileItem& item)
@@ -436,11 +438,49 @@ bool CPlexMediaDecisionJob::DoWork()
   {
     /* find the server for the item */
     CPlexServerPtr server = g_plexApplication.serverManager->FindByUUID(m_choosenMedia.GetProperty("plexserver").asString());
-    if (server && CPlexTranscoderClient::GetInstance()->ShouldTranscode(server, m_choosenMedia))
+    if (server)
     {
-      CLog::Log(LOGDEBUG, "CPlexMediaDecisionJob::DoWork Item should be transcoded");
-      m_choosenMedia.SetPath(CPlexTranscoderClient::GetTranscodeURL(server, m_choosenMedia).Get());
-      m_choosenMedia.SetProperty("plexDidTranscode", true);
+      bool shouldTranscode = CPlexTranscoderClient::GetInstance()->ShouldTranscode(server, m_choosenMedia);
+
+      CPlexServerVersion serverVersion(server->GetVersion());
+      if (serverVersion > CPlexServerVersion("1.0.3"))
+      {
+        CURL tURL = CPlexTranscoderClient::GetTranscodeURL(server, m_choosenMedia);
+        tURL.SetFileName("/video/:/transcode/universal/decision");
+        tURL.SetOption("directPlay", shouldTranscode ? "0" : "1");
+
+        XFILE::CPlexDirectory dir;
+        CFileItemList list;
+        dir.SetTimeout(2000);
+        if (dir.GetDirectory(tURL, list))
+        {
+          int64_t generalDecisionCode = list.GetProperty("generalDecisionCode").asInteger();
+          if (generalDecisionCode >= 2000)
+          {
+            std::string generalDecisionText = list.GetProperty("generalDecisionText").asString();
+            std::string directPlayDecisionText = list.GetProperty("directPlayDecisionText").asString();
+            std::string transcodeDecisionText = list.GetProperty("transcodeDecisionText").asString();
+            CLog::Log(LOGINFO, "Streaming Brain decided no playback, Code : %d, General : %s, DirectPlay : %s, Transcode : %s", generalDecisionCode, generalDecisionText.c_str(), directPlayDecisionText.c_str(), transcodeDecisionText.c_str());
+            CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "No playback", generalDecisionText);
+            return false;
+          }
+          else if (generalDecisionCode == 1001 && !shouldTranscode)
+          {
+            int64_t transcodeDecisionCode = list.GetProperty("transcodeDecisionCode").asInteger();
+            std::string transcodeDecisionText = list.GetProperty("transcodeDecisionText").asString();
+            CLog::Log(LOGINFO, "Streaming Brain decided to transcode, Code : %d, Transcode : %s", transcodeDecisionCode, transcodeDecisionText.c_str());
+            CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Transcoding", transcodeDecisionText);
+            shouldTranscode = true;
+          }
+        }
+      }
+
+      if (shouldTranscode)
+      {
+        CLog::Log(LOGDEBUG, "CPlexMediaDecisionJob::DoWork Item should be transcoded");
+        m_choosenMedia.SetPath(CPlexTranscoderClient::GetTranscodeURL(server, m_choosenMedia).Get());
+        m_choosenMedia.SetProperty("plexDidTranscode", true);
+      }
     }
   }
 

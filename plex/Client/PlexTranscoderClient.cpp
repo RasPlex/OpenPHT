@@ -288,6 +288,7 @@ CURL CPlexTranscoderClient::GetTranscodeURL(CPlexServerPtr server, const CFileIt
   CURL tURL;
 
   tURL = server->BuildPlexURL("/video/:/transcode/universal/start.mkv");
+  tURL.SetOption("hasMDE", "1");
   tURL.SetOption("protocol", "http");
   tURL.SetOption("copyts", "1");
 
@@ -308,10 +309,15 @@ CURL CPlexTranscoderClient::GetTranscodeURL(CPlexServerPtr server, const CFileIt
   tURL.SetOption("session", g_guiSettings.GetString("system.uuid"));
   tURL.SetOption("directPlay", "0");
   tURL.SetOption("directStream", "1");
+  tURL.SetOption("fastSeek", "1");
+  tURL.SetOption("location", isLocal ? "lan" : "wan");
 
   CFileItemPtr mediaItem = CPlexMediaDecisionEngine::getSelectedMediaItem(item);
   if (mediaItem)
     tURL.SetOption("mediaIndex", mediaItem->GetProperty("mediaIndex").asString());
+
+  if (!mediaItem->m_selectedMediaPart && mediaItem->m_mediaParts.size() > 0)
+    mediaItem->m_selectedMediaPart = mediaItem->m_mediaParts[0];
 
   if (mediaItem->m_selectedMediaPart)
     tURL.SetOption("partIndex", mediaItem->m_selectedMediaPart->GetProperty("partIndex").asString());
@@ -338,6 +344,14 @@ CURL CPlexTranscoderClient::GetTranscodeURL(CPlexServerPtr server, const CFileIt
       CLog::Log(LOGDEBUG, "CPlexTranscoderClient::GetTranscodeURL file has a selected subtitle that is external.");
       tURL.SetOption("skipSubtitles", "1");
     }
+  }
+
+  if (!g_guiSettings.GetBool("videoplayer.useffmpegavio") && mediaItem->m_selectedMediaPart)
+  {
+    uint64_t fileSize = mediaItem->m_selectedMediaPart->GetProperty("size").asUnsignedInteger();
+    float percent = g_guiSettings.GetInt("cache.percent") / 100.0;
+    uint64_t cacheSize = std::min((uint64_t)(fileSize * percent), (uint64_t)g_advancedSettings.m_smartCacheUpperLimit);
+    tURL.SetOption("mediaBufferSize", boost::lexical_cast<std::string>(cacheSize >> 10));
   }
   
   return tURL;

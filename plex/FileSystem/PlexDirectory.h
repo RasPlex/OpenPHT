@@ -116,6 +116,11 @@ namespace XFILE
       m_file.SetUserAgent(userAgent);
     }
 
+    void SetTimeout(int connecttimeout)
+    {
+      m_file.SetTimeout(connecttimeout);
+    }
+
     virtual DIR_CACHE_TYPE GetCacheType(const CStdString& strPath) const;
 
     virtual bool IsAllowed(const CStdString& strFile) const
