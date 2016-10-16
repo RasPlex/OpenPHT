@@ -835,6 +835,7 @@ void COMXVideo::Reset(void)
   if(m_deinterlace)
     m_omx_image_fx.FlushAll();
   m_omx_sched.FlushAll();
+  m_omx_render.ResetEos();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
