@@ -527,40 +527,32 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
 #if defined(HAS_LIBAMCODEC)
   if (aml_present())
   {
-    aml_set_audio_passthrough(m_passthrough);
-
     int aml_digital_codec = 0;
-    if (m_passthrough)
+    switch(format.m_dataFormat)
     {
-        switch(format.m_dataFormat)
-        {
-          case AE_FMT_AC3:
-            aml_digital_codec = 2;
-            break;
+      case AE_FMT_AC3:
+        aml_digital_codec = 2;
+        break;
 
-          case AE_FMT_DTS:
-            aml_digital_codec = 3;
-            break;
+      case AE_FMT_DTS:
+        aml_digital_codec = 3;
+        break;
 
-          case AE_FMT_EAC3:
-            aml_digital_codec = 4;
-            break;
+      case AE_FMT_EAC3:
+        aml_digital_codec = 4;
+        inconfig.sampleRate = 48000;
+        break;
 
-          case AE_FMT_DTSHD:
-            aml_digital_codec = 5;
-            break;
+      case AE_FMT_DTSHD:
+        aml_digital_codec = 8;
+        break;
 
-          case AE_FMT_TRUEHD:
-            aml_digital_codec = 7;
-            break;
-
-          default:
-            if (inconfig.channels > 2)
-              aml_digital_codec = 6;
-            else
-              aml_digital_codec = 0;
-        }
+      case AE_FMT_TRUEHD:
+        aml_digital_codec = 7;
+        break;
     }
+
+    aml_set_audio_passthrough(m_passthrough);
     SysfsUtils::SetInt("/sys/class/audiodsp/digital_codec", aml_digital_codec);
   }
 #endif
@@ -729,7 +721,7 @@ bool CAESinkALSA::InitializeHW(const ALSAConfig &inconfig, ALSAConfig &outconfig
         continue;
 
       if (m_passthrough && i != AE_FMT_S16BE && i != AE_FMT_S16LE)
-	continue;
+        continue;
 
       fmt = AEFormatToALSAFormat(i);
 
