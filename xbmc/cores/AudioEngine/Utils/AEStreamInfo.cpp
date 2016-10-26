@@ -388,6 +388,8 @@ unsigned int CAEStreamInfo::SyncAC3(uint8_t *data, unsigned int size)
       unsigned int framesize = (((data[2] & 0x7) << 8) | data[3]) + 1;
       uint8_t      fscod     = (data[4] >> 6) & 0x3;
       uint8_t      cod       = (data[4] >> 4) & 0x3;
+      uint8_t      acmod     = (data[4] >> 1) & 0x7;
+      uint8_t      lfeon     = data[4] & 0x1;
       uint8_t      blocks;
 
       if (fscod == 0x3)
@@ -425,7 +427,7 @@ unsigned int CAEStreamInfo::SyncAC3(uint8_t *data, unsigned int size)
       m_hasSync        = true;
       m_outputChannels = 2;
       m_channelMap     = CAEChannelInfo(OutputMaps[0]);
-      m_channels       = 8; /* FIXME: this should be read out of the stream */
+      m_channels       = AC3Channels[acmod] + lfeon;
       m_syncFunc       = &CAEStreamInfo::SyncAC3;
       m_dataType       = STREAM_TYPE_EAC3;
       m_packFunc       = &CAEPackIEC61937::PackEAC3;
