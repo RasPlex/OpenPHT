@@ -344,14 +344,14 @@ static void avi_metadata_creation_time(AVDictionary **metadata, char *date)
 
 static void avi_read_nikon(AVFormatContext *s, uint64_t end)
 {
-    while (avio_tell(s->pb) < end) {
+    while (avio_tell(s->pb) < end && !avio_feof(s->pb)) {
         uint32_t tag  = avio_rl32(s->pb);
         uint32_t size = avio_rl32(s->pb);
         switch (tag) {
         case MKTAG('n', 'c', 't', 'g'):  /* Nikon Tags */
         {
             uint64_t tag_end = avio_tell(s->pb) + size;
-            while (avio_tell(s->pb) < tag_end) {
+            while (avio_tell(s->pb) < tag_end && !avio_feof(s->pb)) {
                 uint16_t tag     = avio_rl16(s->pb);
                 uint16_t size    = avio_rl16(s->pb);
                 const char *name = NULL;
@@ -1693,6 +1693,8 @@ static int guess_ni_flag(AVFormatContext *s)
             avio_rl16(s->pb);
             size = avio_rl32(s->pb);
             if (get_stream_idx(tag) == i && pos + size > st->index_entries[1].pos)
+                last_start = INT64_MAX;
+            if (get_stream_idx(tag) == i && size == st->index_entries[0].size + 8)
                 last_start = INT64_MAX;
         }
 

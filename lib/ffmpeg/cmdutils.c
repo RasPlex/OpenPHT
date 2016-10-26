@@ -60,6 +60,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
+#if HAVE_SETDLLDIRECTORY
+#include <windows.h>
+#endif
 
 static int init_report(const char *env);
 
@@ -104,6 +107,15 @@ static void log_callback_report(void *ptr, int level, const char *fmt, va_list v
         fputs(line, report_file);
         fflush(report_file);
     }
+}
+
+void init_dynload(void)
+{
+#if HAVE_SETDLLDIRECTORY
+    /* Calling SetDllDirectory with the empty string (but not NULL) removes the
+     * current working directory from the DLL search path as a security pre-caution. */
+    SetDllDirectory("");
+#endif
 }
 
 static void (*program_exit)(int ret);
