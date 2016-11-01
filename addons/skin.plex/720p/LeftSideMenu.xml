@@ -751,6 +751,13 @@
 				<onclick>System.Exec(reboot)</onclick>
 				<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
 			</item>
+			<item id="115">
+				<description>Restart</description>
+				<label>$LOCALIZE[31072]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Reboot</onclick>
+				<visible>System.CanReboot + !System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+			</item>
 		</content>
 	</include>
 
@@ -812,6 +819,13 @@
 				<onclick>Dialog.Close(4998)</onclick>
 				<onclick>System.Exec(reboot)</onclick>
 				<visible>System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
+			</item>
+			<item id="115">
+				<description>Restart</description>
+				<label>$LOCALIZE[31072]</label>
+				<onclick>Dialog.Close(4998)</onclick>
+				<onclick>Plex.Reboot</onclick>
+				<visible>System.CanReboot + !System.isSystem(openelec) + [ !System.UserIsRestricted | Skin.HasSetting(ShowRestrictedPowerOptions) ]</visible>
 			</item>
 		</content>
 	</include>
