@@ -1048,6 +1048,18 @@ msgctxt "#52218"
 msgid "Stack TV Shows in recently added"
 msgstr "Stack TV Shows in recently added"
 
+msgctxt "#52220"
+msgid "Disable preplay screen for movies"
+msgstr "Disable preplay screen for movies"
+
+msgctxt "#52221"
+msgid "Disable preplay screen for episodes"
+msgstr "Disable preplay screen for episodes"
+
+msgctxt "#52222"
+msgid "Disable preplay screen for clips"
+msgstr "Disable preplay screen for clips"
+
 msgctxt "#52300"
 msgid "Media Server went away"
 msgstr "Media Server went away"

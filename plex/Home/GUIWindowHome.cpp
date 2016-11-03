@@ -594,7 +594,11 @@ bool CGUIWindowHome::OnClick(const CGUIMessage& message)
       g_plexApplication.playQueueManager->playId(PLEX_MEDIA_TYPE_VIDEO, playQueueItemId);
     }
     else if (iAction == ACTION_SELECT_ITEM && PlexUtils::CurrentSkinHasPreplay() &&
-        fileItem->GetPlexDirectoryType() != PLEX_DIR_TYPE_PHOTO)
+      fileItem->GetPlexDirectoryType() != PLEX_DIR_TYPE_PHOTO &&
+      fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_MOVIE && !g_guiSettings.GetBool("myplex.disablepreplaymovie") ||
+      fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE && !g_guiSettings.GetBool("myplex.disablepreplayepisode") ||
+      fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP && !g_guiSettings.GetBool("myplex.disablepreplayclip") ||
+      fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_SEASON )
     {
       OpenItem(fileItem);
     }
