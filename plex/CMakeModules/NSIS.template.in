@@ -172,13 +172,6 @@ Var AR_RegFlags
   !define MUI_HEADERIMAGE
   !define MUI_ABORTWARNING
 
-;--------------------------------
-; path functions
-
-!verbose 3
-!include "WinMessages.NSH"
-!verbose 4
-
 ;----------------------------------------
 ; based upon a script of "Written by KiCHiK 2003-01-18 05:57:02"
 ;----------------------------------------
@@ -748,6 +741,38 @@ Section "-Add to path"
   doNotAddToPath:
 SectionEnd
 
+; MCE Stuff
+Section "Media Center Launcher for OpenPHT" SecMCE
+
+  SectionIn 1 #section is in installtype Full, not minimal
+
+  ${If} $SupportedMCEDetected == "1"
+    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers /u $INSTDIR\$MCERegistrationFile"
+    StrCpy $0 "?"
+    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers /u "$INSTDIR\$MCERegistrationFile"'
+    pop $0
+    DetailPrint "RegisterMCEApp /u returned $0"
+
+    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers $INSTDIR\$MCERegistrationFile"
+    StrCpy $0 "?"
+    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers "$INSTDIR\$MCERegistrationFile"'
+    pop $0
+    DetailPrint "RegisterMCEApp returned $0"
+
+    DetailPrint "MCE integration installed"
+  ${EndIf}
+SectionEnd
+
+Section "Un.Media Center Launcher for OpenPHT" UnSecMCE
+  ${If} $SupportedMCEDetected == "1"
+    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers /u $INSTDIR\$MCERegistrationFile"
+    StrCpy $0 "?"
+    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers /u "$INSTDIR\$MCERegistrationFile"'
+    pop $0
+    DetailPrint "RegisterMCEApp /u returned $0"
+  ${EndIf}
+SectionEnd
+
 ;--------------------------------
 ; Create custom pages
 Function InstallOptionsPage
@@ -931,7 +956,7 @@ Function .onInit
 
   MessageBox MB_YESNOCANCEL|MB_ICONEXCLAMATION \
   "@CPACK_NSIS_PACKAGE_NAME@ is already installed. $\n$\nDo you want to uninstall the old version before installing the new one?" \
-  IDYES uninst IDNO inst
+  /SD IDYES IDYES uninst IDNO inst
   Abort
 
 ;Run the uninstaller
@@ -939,7 +964,7 @@ uninst:
   ClearErrors
   StrLen $2 "\Uninstall.exe"
   StrCpy $3 $0 -$2 # remove "\Uninstall.exe" from UninstallString to get path
-  ExecWait '$0 _?=$3' ;Do not copy the uninstaller to a temp file
+  ExecWait '"$0" /S _?=$3' ;Do not copy the uninstaller to a temp file
 
   IfErrors uninst_failed inst
 uninst_failed:
@@ -1025,35 +1050,3 @@ inst:
 
   noOptionsPage:
 FunctionEnd
-
-; MCE Stuff
-Section "Media Center Launcher for OpenPHT" SecMCE
-
-  SectionIn 1 #section is in installtype Full, not minimal
-
-  ${If} $SupportedMCEDetected == "1"
-    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers /u $INSTDIR\$MCERegistrationFile"
-    StrCpy $0 "?"
-    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers /u "$INSTDIR\$MCERegistrationFile"'
-    pop $0
-    DetailPrint "RegisterMCEApp /u returned $0"
-
-    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers $INSTDIR\$MCERegistrationFile"
-    StrCpy $0 "?"
-    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers "$INSTDIR\$MCERegistrationFile"'
-    pop $0
-    DetailPrint "RegisterMCEApp returned $0"
-
-    DetailPrint "MCE integration installed"
-  ${EndIf}
-SectionEnd
-
-Section "Un.Media Center Launcher for OpenPHT" UnSecMCE
-  ${If} $SupportedMCEDetected == "1"
-    DetailPrint "Running $WINDIR\eHome\RegisterMCEApp.exe /allusers /u $INSTDIR\$MCERegistrationFile"
-    StrCpy $0 "?"
-    nsExec::ExecToStack '"$WINDIR\eHome\RegisterMCEApp.exe" /allusers /u "$INSTDIR\$MCERegistrationFile"'
-    pop $0
-    DetailPrint "RegisterMCEApp /u returned $0"
-  ${EndIf}
-SectionEnd
