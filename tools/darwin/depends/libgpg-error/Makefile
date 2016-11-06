@@ -3,7 +3,7 @@ DEPS= Makefile
 
 # lib name, version
 LIBNAME=libgpg-error
-VERSION=1.21
+VERSION=1.24
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.bz2
 

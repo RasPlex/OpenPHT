@@ -3,7 +3,7 @@ DEPS= Makefile
 
 # lib name, version
 LIBNAME=libmicrohttpd
-VERSION=0.9.48
+VERSION=0.9.51
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.gz
 

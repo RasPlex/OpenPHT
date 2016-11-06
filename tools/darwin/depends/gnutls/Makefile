@@ -4,7 +4,7 @@ DEPS= Makefile size-max.patch
 # lib name, version
 BASE_URL=ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4
 LIBNAME=gnutls
-VERSION=3.4.12
+VERSION=3.4.16
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.xz
 ARCHIVE_TOOL=/usr/local/bin/gtar
