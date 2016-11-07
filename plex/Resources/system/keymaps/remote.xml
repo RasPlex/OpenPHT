@@ -51,7 +51,7 @@
       <pageplus>PageUp</pageplus>
       <pageminus>PageDown</pageminus>
       <back>Back</back>
-      <menu>PreviousMenu</menu>
+      <menu>ContextMenu</menu>
       <title>ContextMenu</title>
       <info>Info</info>
       <skipplus>SkipNext</skipplus>
@@ -147,7 +147,7 @@
       <right>StepForward</right>
       <up>ChapterOrBigStepForward</up>
       <down>ChapterOrBigStepBack</down>
-      <back>PreviousMenu</back>
+      <back>Stop</back>
       <menu>OSD</menu>
       <start>OSD</start>
       <select>OSD</select>
