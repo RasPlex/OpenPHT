@@ -245,6 +245,8 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::updateCommandID(const HTTPRequest &r
 
   std::string uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_HEADER_KIND, "X-Plex-Client-Identifier");
   if (uuid.empty())
+    uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_GET_ARGUMENT_KIND, "X-Plex-Client-Identifier");
+  if (uuid.empty())
   {
     CLog::Log(LOGWARNING, "CPlexHTTPRemoteHandler::updateCommandID subscriber didn't set X-Plex-Client-Identifier");
     return CPlexRemoteResponse(500, "When commandID is set you also need to specify X-Plex-Client-Identifier");
@@ -344,12 +346,16 @@ CPlexRemoteSubscriberPtr CPlexHTTPRemoteHandler::getSubFromRequest(const HTTPReq
   
   uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_HEADER_KIND, "X-Plex-Client-Identifier");
   if (uuid.empty())
+    uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_GET_ARGUMENT_KIND, "X-Plex-Client-Identifier");
+  if (uuid.empty())
   {
     CLog::Log(LOGWARNING, "CPlexHTTPRemoteHandler::subscribe subscriber didn't set X-Plex-Client-Identifier");
     return CPlexRemoteSubscriberPtr();
   }
 
   name = CWebServer::GetRequestHeaderValue(request.connection, MHD_HEADER_KIND, "X-Plex-Device-Name");
+  if (name.empty())
+    name = CWebServer::GetRequestHeaderValue(request.connection, MHD_GET_ARGUMENT_KIND, "X-Plex-Device-Name");
   if (name.empty())
   {
     CLog::Log(LOGWARNING, "CPlexHTTPRemoteHandler::subscribe subscriber didn't set X-Plex-Device-Name");
@@ -390,7 +396,11 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::poll(const HTTPRequest &request, con
   bool wait = false;
 
   std::string uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_HEADER_KIND, "X-Plex-Client-Identifier");
+  if (uuid.empty())
+    uuid = CWebServer::GetRequestHeaderValue(request.connection, MHD_GET_ARGUMENT_KIND, "X-Plex-Client-Identifier");
   std::string name = CWebServer::GetRequestHeaderValue(request.connection, MHD_HEADER_KIND, "X-Plex-Device-Name");
+  if (name.empty())
+    name = CWebServer::GetRequestHeaderValue(request.connection, MHD_GET_ARGUMENT_KIND, "X-Plex-Device-Name");
   int commandID = -1;
 
   if (arguments.find("commandID") != arguments.end())
