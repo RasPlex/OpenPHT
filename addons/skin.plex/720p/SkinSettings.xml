@@ -167,6 +167,13 @@
 					<onclick>Skin.ToggleSetting(HideFanart)</onclick>
 					<selected>Skin.HasSetting(HideFanart)</selected>
 				</control>
+				<control type="radiobutton" id="223">
+					<description>Hide Fanart</description>
+					<width>625</width>
+					<label>$LOCALIZE[32130]</label>
+					<onclick>Skin.ToggleSetting(HideLibraryFanart)</onclick>
+					<selected>Skin.HasSetting(HideLibraryFanart)</selected>
+				</control>
 				<control type="radiobutton" id="215">
 					<description>Hide Secure Server Icons</description>
 					<width>625</width>

@@ -22,7 +22,7 @@
 				<animation type="WindowClose" condition="!Skin.HasSetting(DisableWindowFade)">
 					<effect type="fade" start="100" end="0" time="800"/>
 				</animation>
-				<visible>Container.Content(empty)</visible>
+				<visible>Container.Content(empty) + !Skin.HasSetting(HideFanart)</visible>
 			</control>
 			<control type="largeimage">
 				<include>FullScreenScaled</include>

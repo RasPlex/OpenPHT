@@ -6,7 +6,7 @@
 	<controls>
 		<!-- bg's (Backgrounds.xml) -->
 		<include>BGGrainy</include>
-		<include>BGFanart</include>
+		<include condition="!Skin.HasSetting(HideLibraryFanart)">BGFanart</include>
 		<include>BGOverlay</include>
 		<!-- views (Views.xml & ViewsChannels.xml) -->
 		<!-- ByFolder ID 40 -->

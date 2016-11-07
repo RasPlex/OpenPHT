@@ -1102,6 +1102,10 @@ msgctxt "#32129"
 msgid "Hide Scrollbars"
 msgstr ""
 
+msgctxt "#32130"
+msgid "Hide Fanart in Library"
+msgstr ""
+
 msgctxt "#32205"
 msgid "Play File"
 msgstr "Play File"
