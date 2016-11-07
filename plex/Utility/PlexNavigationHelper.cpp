@@ -45,7 +45,7 @@ CStdString CPlexNavigationHelper::navigateToItem(CFileItemPtr item, const CURL &
   if (!item)
     return empty;
 
-  if (!item->m_bIsFolder && (!PlexUtils::CurrentSkinHasPreplay() ||
+  if (!item->m_bIsFolder && (!PlexUtils::CurrentSkinHasPreplay(item->GetPlexDirectoryType()) ||
       (item->GetPlexDirectoryType() == PLEX_DIR_TYPE_TRACK || item->GetPlexDirectoryType() == PLEX_DIR_TYPE_PHOTO)))
     return empty;
 
@@ -106,7 +106,7 @@ CStdString CPlexNavigationHelper::navigateToItem(CFileItemPtr item, const CURL &
     return empty;
   }
 
-  if (!item->m_bIsFolder && PlexUtils::CurrentSkinHasPreplay() &&
+  if (!item->m_bIsFolder && PlexUtils::CurrentSkinHasPreplay(item->GetPlexDirectoryType()) &&
       item->IsPlexMediaServer() &&
       (item->GetPlexDirectoryType() == PLEX_DIR_TYPE_MOVIE ||
        item->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE ||

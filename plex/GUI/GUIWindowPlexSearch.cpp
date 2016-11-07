@@ -266,7 +266,7 @@ bool CGUIWindowPlexSearch::OnClick(int senderId, int action)
           if (!item->m_bIsFolder)
           {
             if (action == ACTION_PLAYER_PLAY ||
-                (!PlexUtils::CurrentSkinHasPreplay() ||
+                (!PlexUtils::CurrentSkinHasPreplay(fileItem->GetPlexDirectoryType()) ||
                  fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_TRACK ||
                  fileItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_PHOTO))
             {

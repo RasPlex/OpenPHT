@@ -451,9 +451,13 @@ int usleep(useconds_t useconds)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-bool PlexUtils::CurrentSkinHasPreplay()
+bool PlexUtils::CurrentSkinHasPreplay(EPlexDirectoryType type)
 {
-  return !g_guiSettings.GetBool("myplex.disablepreplay") && g_SkinInfo->HasSkinFile("PlexPreplayVideo.xml");
+  if (type == PLEX_DIR_TYPE_MOVIE && g_guiSettings.GetBool("myplex.disablepreplaymovie") ||
+      type == PLEX_DIR_TYPE_EPISODE && g_guiSettings.GetBool("myplex.disablepreplayepisode") ||
+      type == PLEX_DIR_TYPE_CLIP && g_guiSettings.GetBool("myplex.disablepreplayclip"))
+    return false;
+  return g_SkinInfo->HasSkinFile("PlexPreplayVideo.xml");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

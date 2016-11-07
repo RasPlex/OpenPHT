@@ -37,7 +37,7 @@ namespace PlexUtils
   void SetSelectedStream(CFileItemPtr item, CFileItemPtr stream);
   CFileItemPtr GetStreamByID(CFileItemPtr item, int streamType, int plexStreamID);
 
-  bool CurrentSkinHasPreplay();
+  bool CurrentSkinHasPreplay(EPlexDirectoryType type);
   bool CurrentSkinHasFilters();
   
   std::string GetPlexCrashPath();

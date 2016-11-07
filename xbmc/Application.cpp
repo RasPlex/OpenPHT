@@ -1316,6 +1316,15 @@ bool CApplication::Initialize()
     if (g_guiSettings.GetString("services.esport") == "9778")
       g_guiSettings.SetString("services.esport", "9777");
 
+    // Migrate disable preplay option
+    if (g_guiSettings.GetBool("myplex.disablepreplay"))
+    {
+      g_guiSettings.SetBool("myplex.disablepreplaymovie", true);
+      g_guiSettings.SetBool("myplex.disablepreplayepisode", true);
+      g_guiSettings.SetBool("myplex.disablepreplayclip", true);
+      g_guiSettings.SetBool("myplex.disablepreplay", false);
+    }
+
     /* END PLEX */
 
     if (!LoadSkin(g_guiSettings.GetString("lookandfeel.skin")) && !LoadSkin(DEFAULT_SKIN))

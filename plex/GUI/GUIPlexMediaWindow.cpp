@@ -799,13 +799,10 @@ bool CGUIPlexMediaWindow::OnSelect(int iItem)
 
   if (!item->m_bIsFolder)
   {
-    if (!PlexUtils::CurrentSkinHasPreplay() || item->GetProperty("isSynthesized").asBoolean())
+    if (!PlexUtils::CurrentSkinHasPreplay(item->GetPlexDirectoryType()) || item->GetProperty("isSynthesized").asBoolean())
       return OnPlayMedia(iItem);
 
       if (item->GetPlexDirectoryType() == PLEX_DIR_TYPE_TRACK ||
-          item->GetPlexDirectoryType() == PLEX_DIR_TYPE_MOVIE && g_guiSettings.GetBool("myplex.disablepreplaymovie") ||
-          item->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE && g_guiSettings.GetBool("myplex.disablepreplayepisode") ||
-          item->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP && g_guiSettings.GetBool("myplex.disablepreplayclip") ||
           item->GetPlexDirectoryType() == PLEX_DIR_TYPE_PHOTO ||
           item->GetPlexDirectoryType() == PLEX_DIR_TYPE_VIDEO)
       return OnPlayMedia(iItem);

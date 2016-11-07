@@ -1052,6 +1052,7 @@ void CGUISettings::Initialize()
   AddBool(glaf, "myplex.queuewatched", 52217, false);
   AddBool(glaf, "myplex.hidechannels", 52213, false);
   AddBool(glaf, "myplex.hidecloudsync", 52505, false);
+  AddBool(NULL, "myplex.disablepreplay", 52214, false);
   AddBool(glaf, "myplex.disablepreplaymovie", 52220, false);
   AddBool(glaf, "myplex.disablepreplayepisode", 52221, false);
   AddBool(glaf, "myplex.disablepreplayclip", 52222, false);

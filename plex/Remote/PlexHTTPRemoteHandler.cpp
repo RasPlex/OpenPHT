@@ -175,7 +175,7 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::showDetails(const ArgMap &arguments)
     return CPlexRemoteResponse(500, "Need key argument");
   }
 
-  if (!PlexUtils::CurrentSkinHasPreplay() ||
+  if (!PlexUtils::CurrentSkinHasPreplay(PLEX_DIR_TYPE_UNKNOWN) ||
       g_application.IsPlayingFullScreenVideo() ||
       g_application.IsVisualizerActive() ||
       g_windowManager.GetActiveWindow() == WINDOW_SLIDESHOW)
@@ -194,10 +194,11 @@ CPlexRemoteResponse CPlexHTTPRemoteHandler::showDetails(const ArgMap &arguments)
 
       /* FIXME: the pre-play for Shows and Epsiodes are not really looking
        * great yet, so let's skip them for now */
-      if (item->GetPlexDirectoryType() == PLEX_DIR_TYPE_ALBUM ||
+      if (PlexUtils::CurrentSkinHasPreplay(item->GetPlexDirectoryType()) &&
+         (item->GetPlexDirectoryType() == PLEX_DIR_TYPE_ALBUM ||
           item->GetPlexDirectoryType() == PLEX_DIR_TYPE_MOVIE ||
           item->GetPlexDirectoryType() == PLEX_DIR_TYPE_ARTIST ||
-          item->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE)
+          item->GetPlexDirectoryType() == PLEX_DIR_TYPE_EPISODE))
       {
         CPlexNavigationHelper nav;
         nav.navigateToItem(item, CURL(), WINDOW_HOME, true);
