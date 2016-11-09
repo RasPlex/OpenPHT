@@ -1174,7 +1174,8 @@ CURL CGUIPlexMediaWindow::GetRealDirectoryUrl(const CStdString& url_)
       if (sectionFilter)
         url = sectionFilter->addFiltersToUrl(url);
       else
-        PlexUtils::AppendPathToURL(url, "all");
+        if (!strstr(url.GetOptions(), "?type") != NULL)
+          PlexUtils::AppendPathToURL(url, "all");
     }
 
     return url;
