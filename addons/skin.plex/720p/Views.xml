@@ -2,15 +2,15 @@
 <includes>
 	<!-- Hide Episode Thumbnails for Unwatched Episodes -->
 	<variable name="EpisodeThumbVar">
-		<value condition="ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [ListItem.Status(unwatched) | ListItem.Status(inprogress)]]">$INFO[ListItem.Art(fanart)]</value>
+		<value condition="ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [ListItem.Status(unwatched) | ListItem.Status(inprogress)]">$INFO[ListItem.Art(fanart)]</value>
 		<value>$INFO[ListItem.Art(thumb)]</value>
 	</variable>
 	<variable name="OnDeckEpisodeThumbVar">
-		<value condition="Container(11001).ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [Container(11001).ListItem.Status(unwatched) | Container(11001).ListItem.Status(inprogress)]]">$INFO[Container(11001).ListItem.Art(fanart)]</value>
+		<value condition="Container(11001).ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [Container(11001).ListItem.Status(unwatched) | Container(11001).ListItem.Status(inprogress)]">$INFO[Container(11001).ListItem.Art(fanart)]</value>
 		<value>$INFO[Container(11001).ListItem.Art(thumb)]</value>
 	</variable>
 	<variable name="RecentlyAddedEpisodeThumbVar">
-		<value condition="Container(11000).ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [Container(11000).ListItem.Status(unwatched) | Container(11000).ListItem.Status(inprogress)]]">$INFO[Container(11000).ListItem.Art(fanart)]</value>
+		<value condition="Container(11000).ListItem.Type(episode) + Skin.HasSetting(HideThumbnailForUnwatched) + [Container(11000).ListItem.Status(unwatched) | Container(11000).ListItem.Status(inprogress)]">$INFO[Container(11000).ListItem.Art(fanart)]</value>
 		<value>$INFO[Container(11000).ListItem.Art(thumb)]</value>
 	</variable>
 	<!-- Thumbs -->
