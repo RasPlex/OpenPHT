@@ -6139,6 +6139,8 @@ int CGUIInfoManager::RegisterSkinVariableString(const CSkinVariableString* info)
   CSingleLock lock(m_critInfo);
   m_skinVariableStrings.push_back(*info);
   delete info;
+  if (m_skinVariableStrings.size() > CONDITIONAL_LABEL_END - CONDITIONAL_LABEL_START + 1)
+    CLog::Log(LOGERROR, "too many skin variables registered:%d limit:%d", m_skinVariableStrings.size(), CONDITIONAL_LABEL_END - CONDITIONAL_LABEL_START + 1);
   return CONDITIONAL_LABEL_START + m_skinVariableStrings.size() - 1;
 }
 

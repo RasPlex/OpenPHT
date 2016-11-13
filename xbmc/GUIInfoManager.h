@@ -669,8 +669,8 @@ namespace INFO
 #define MUSICPLAYER_PROPERTY_OFFSET 800 // 100 id's reserved for musicplayer props.
 #define LISTITEM_ART_OFFSET         900 // 100 id's reserved for listitem art.
 
-#define CONDITIONAL_LABEL_START       LISTITEM_END + 1 // 36001
-#define CONDITIONAL_LABEL_END         37000
+#define CONDITIONAL_LABEL_START       (LISTITEM_END + 1) // 36201
+#define CONDITIONAL_LABEL_END         38000
 
 // the multiple information vector
 #define MULTI_INFO_START              40000
