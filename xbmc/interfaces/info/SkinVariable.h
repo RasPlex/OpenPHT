@@ -19,7 +19,10 @@
  *
  */
 
+#include <string>
+#include <vector>
 #include "guilib/GUIInfoTypes.h"
+#include "interfaces/info/InfoBool.h"
 
 class TiXmlElement;
 
@@ -47,7 +50,7 @@ private:
 
   struct ConditionLabelPair
   {
-    int m_condition;
+    INFO::InfoPtr m_condition;
     CGUIInfoLabel m_label;
   };
 

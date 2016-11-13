@@ -48,15 +48,24 @@ CGUIIncludes::CGUIIncludes()
   m_constantAttributes.insert("end");
   m_constantAttributes.insert("center");
   m_constantAttributes.insert("border");
-  
+  m_constantAttributes.insert("repeat");
+
   m_constantNodes.insert("posx");
   m_constantNodes.insert("posy");
+  m_constantNodes.insert("left");
+  m_constantNodes.insert("centerleft");
+  m_constantNodes.insert("right");
+  m_constantNodes.insert("centerright");
+  m_constantNodes.insert("top");
+  m_constantNodes.insert("centertop");
+  m_constantNodes.insert("bottom");
+  m_constantNodes.insert("centerbottom");
   m_constantNodes.insert("width");
   m_constantNodes.insert("height");
   m_constantNodes.insert("offsetx");
   m_constantNodes.insert("offsety");
   m_constantNodes.insert("textoffsetx");
-  m_constantNodes.insert("textoffsety");  
+  m_constantNodes.insert("textoffsety");
   m_constantNodes.insert("textwidth");
   m_constantNodes.insert("spinposx");
   m_constantNodes.insert("spinposy");
@@ -95,6 +104,7 @@ void CGUIIncludes::ClearIncludes()
   m_constants.clear();
   m_skinvariables.clear();
   m_files.clear();
+  m_expressions.clear();
 }
 
 bool CGUIIncludes::LoadIncludes(const CStdString &includeFile)
@@ -144,8 +154,21 @@ bool CGUIIncludes::LoadIncludesFromXML(const TiXmlElement *root)
         m_includes.insert({ tagName, { *includeBody, std::move(defaultParams) } });
     }
     else if (node->Attribute("file"))
-    { // load this file in as well
-      LoadIncludes(g_SkinInfo->GetSkinPath(node->Attribute("file")));
+    { 
+      const char *condition = node->Attribute("condition");
+      if (condition)
+      { // check this condition
+        INFO::InfoPtr conditionID = g_infoManager.Register(condition);
+        bool value = conditionID->Get();
+
+        if (value)
+        {
+          // load this file in as well
+          LoadIncludes(g_SkinInfo->GetSkinPath(node->Attribute("file")));
+        }
+      }
+      else
+        LoadIncludes(g_SkinInfo->GetSkinPath(node->Attribute("file")));
     }
     node = node->NextSiblingElement("include");
   }
@@ -204,7 +227,7 @@ bool CGUIIncludes::HasIncludeFile(const CStdString &file) const
   return false;
 }
 
-void CGUIIncludes::ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions /* = NULL */)
+void CGUIIncludes::ResolveIncludes(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions /* = NULL */)
 {
   if (!node)
     return;
@@ -218,7 +241,7 @@ void CGUIIncludes::ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlI
   }
 }
 
-void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions /* = NULL */)
+void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions /* = NULL */)
 {
   // we have a node, find any <include file="fileName">tagName</include> tags and replace
   // recursively with their real includes
@@ -232,12 +255,23 @@ void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<int, bool
     map<CStdString, TiXmlElement>::const_iterator it = m_defaults.find(type);
     if (it != m_defaults.end())
     {
+      // we don't insert <left> et. al. if <posx> or <posy> is specified
+      bool hasPosX(node->FirstChild("posx") != NULL);
+      bool hasPosY(node->FirstChild("posy") != NULL);
+
       const TiXmlElement &element = (*it).second;
       const TiXmlElement *tag = element.FirstChildElement();
       while (tag)
       {
+        std::string value = tag->ValueStr();
+        bool skip(false);
+        if (hasPosX && (value == "left" || value == "right" || value == "centerleft" || value == "centerright"))
+          skip = true;
+        if (hasPosY && (value == "top" || value == "bottom" || value == "centertop" || value == "centerbottom"))
+          skip = true;
         // we insert at the end of block
-        node->InsertEndChild(*tag);
+        if (!skip)
+          node->InsertEndChild(*tag);
         tag = tag->NextSiblingElement();
       }
     }
@@ -255,8 +289,8 @@ void CGUIIncludes::ResolveIncludesForNode(TiXmlElement *node, std::map<int, bool
     const char *condition = include->Attribute("condition");
     if (condition)
     { // check this condition
-      int conditionID = g_infoManager.Register(condition);
-      bool value = g_infoManager.GetBoolValue(conditionID);
+      INFO::InfoPtr conditionID = g_infoManager.Register(condition);
+      bool value = conditionID->Get();
 
       if (xmlIncludeConditions)
         (*xmlIncludeConditions)[conditionID] = value;
@@ -385,7 +419,7 @@ bool CGUIIncludes::GetParameters(const TiXmlElement *include, const char *valueA
  {
    if (!node)
      return;
-   std::string newValue;
+   CStdString newValue;
    // run through this element's attributes, resolving any parameters
    TiXmlAttribute *attribute = node->FirstAttribute();
    while (attribute)
@@ -459,7 +493,7 @@ bool CGUIIncludes::GetParameters(const TiXmlElement *include, const char *valueA
    }
  };
 
- CGUIIncludes::ResolveParamsResult CGUIIncludes::ResolveParameters(const std::string& strInput, std::string& strOutput, const Params& params)
+ CGUIIncludes::ResolveParamsResult CGUIIncludes::ResolveParameters(const CStdString& strInput, CStdString& strOutput, const Params& params)
  {
    ParamReplacer paramReplacer(params);
    if (CGUIInfoLabel::ReplaceSpecialKeywordReferences(strInput, "PARAM", std::ref(paramReplacer), strOutput))
@@ -483,10 +517,10 @@ CStdString CGUIIncludes::ResolveConstant(const CStdString &constant) const
   return value;
 }
 
-std::string CGUIIncludes::ResolveExpressions(const std::string &expression) const
+CStdString CGUIIncludes::ResolveExpressions(const CStdString &expression) const
 {
-  std::string work(expression);
-  CGUIInfoLabel::ReplaceSpecialKeywordReferences(work, "EXP", [&](const std::string &str) -> std::string {
+  CStdString work(expression);
+  CGUIInfoLabel::ReplaceSpecialKeywordReferences(work, "EXP", [&](const CStdString &str) -> CStdString {
     std::map<std::string, std::string>::const_iterator it = m_expressions.find(str);
     if (it != m_expressions.end())
       return it->second;

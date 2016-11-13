@@ -76,6 +76,10 @@ CGUIBaseContainer::CGUIBaseContainer(int parentID, int controlID, float posX, fl
   m_cacheItems = preloadItems;
   m_scrollItemsPerFrame = 0.0f;
   m_type = VIEW_TYPE_NONE;
+  m_autoScrollMoveTime = 0;
+  m_autoScrollDelayTime = 0;
+  m_autoScrollIsReversed = false;
+  m_lastRenderTime = 0;
 }
 
 CGUIBaseContainer::~CGUIBaseContainer(void)
@@ -86,13 +90,22 @@ void CGUIBaseContainer::DoProcess(unsigned int currentTime, CDirtyRegionList &di
 {
   CGUIControl::DoProcess(currentTime, dirtyregions);
 
-  if (m_pageChangeTimer.GetElapsedMilliseconds() > 200)
+  if (m_pageChangeTimer.IsRunning() && m_pageChangeTimer.GetElapsedMilliseconds() > 200)
     m_pageChangeTimer.Stop();
   m_wasReset = false;
+
+  // if not visible, we reset the autoscroll timer
+  if (!IsVisible() && m_autoScrollMoveTime)
+  {
+    ResetAutoScrolling();
+  }
 }
 
 void CGUIBaseContainer::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
+  // update our auto-scrolling as necessary
+  UpdateAutoScrolling(currentTime);
+
   ValidateOffset();
 
   if (m_bInvalidated)
@@ -133,7 +146,6 @@ void CGUIBaseContainer::Process(unsigned int currentTime, CDirtyRegionList &dirt
     if (itemNo >= 0)
     {
       CGUIListItemPtr item = m_items[itemNo];
-      long oldDirty = dirtyregions.size();
       // render our item
       if (m_orientation == VERTICAL)
 #ifndef __PLEX__
@@ -154,6 +166,8 @@ void CGUIBaseContainer::Process(unsigned int currentTime, CDirtyRegionList &dirt
   // when we are scrolling up, offset will become lower (integer division, see offset calc)
   // to have same behaviour when scrolling down, we need to set page control to offset+1
   UpdatePageControl(offset + (m_scroller.IsScrollingDown() ? 1 : 0));
+
+  m_lastRenderTime = currentTime;
 
   CGUIControl::Process(currentTime, dirtyregions);
 }
@@ -338,7 +352,7 @@ bool CGUIBaseContainer::OnAction(const CAction &action)
         m_lastHoldTime = CTimeUtils::GetFrameTime();
 
         if(m_scrollItemsPerFrame < 1.0f)//not enough hold time accumulated for one step
-          return false;
+          return true;
 
         while (m_scrollItemsPerFrame >= 1)
         {
@@ -434,6 +448,14 @@ bool CGUIBaseContainer::OnMessage(CGUIMessage& message)
       SelectItem(message.GetParam1());
       return true;
     }
+    else if (message.GetMessage() == GUI_MSG_SETFOCUS)
+    {
+      if (message.GetParam1()) // subfocus item is specified, so set the offset appropriately
+      {
+        int item = std::min(GetOffset() + (int)message.GetParam1() - 1, (int)m_items.size() - 1);
+        SelectItem(item);
+      }
+    }
     else if (message.GetMessage() == GUI_MSG_ITEM_SELECTED)
     {
       message.SetParam1(GetSelectedItem());
@@ -470,23 +492,6 @@ bool CGUIBaseContainer::OnMessage(CGUIMessage& message)
       return true;
     }
     /* PLEX */
-    else if (message.GetMessage() == GUI_MSG_SETFOCUS)
-    {
-      if (message.GetParam1()) // subfocus item is specified, so set the offset appropriately
-      {
-        int newItem = (int)message.GetParam1() - 1;
-        if (newItem != GetSelectedItem())
-        {
-          SelectItem(newItem);
-
-          // Send another SETFOCUS message to ensure focused items are displayed correctly. A bit of a hack, but seems to work.
-          CGUIMessage msg(GUI_MSG_SETFOCUS, GetID(), GetID(), 0, 0);
-          SendWindowMessage(msg);
-
-          return true;
-        }
-      }
-    }
     else if (message.GetMessage() == GUI_MSG_LIST_REMOVE_ITEM)
     {
       if (message.GetParam1())
@@ -668,6 +673,7 @@ bool CGUIBaseContainer::MoveDown(bool wrapAround)
 // scrolls the said amount
 void CGUIBaseContainer::Scroll(int amount)
 {
+  ResetAutoScrolling();
   ScrollToOffset(GetOffset() + amount);
 }
 
@@ -783,7 +789,7 @@ bool CGUIBaseContainer::OnClick(int actionID)
       if (selected >= 0 && selected < (int)m_items.size())
       {
         CGUIStaticItemPtr item = boost::static_pointer_cast<CGUIStaticItem>(m_items[selected]);
-        item->GetClickActions().ExecuteActions(GetID(), GetParentID());
+        item->GetClickActions().ExecuteActions(GetID(), GetParentID(), m_items[selected]);
       }
       return true;
     }
@@ -822,7 +828,7 @@ void CGUIBaseContainer::SetFocus(bool bOnOff)
   CGUIControl::SetFocus(bOnOff);
 }
 
-void CGUIBaseContainer::SaveStates(vector<CControlState> &states)
+void CGUIBaseContainer::SaveStates(std::vector<CControlState> &states)
 {
   if (!m_staticDefaultAlways)
     states.push_back(CControlState(GetID(), GetSelectedItem()));
@@ -867,13 +873,12 @@ void CGUIBaseContainer::UpdateLayout(bool updateAllItems)
 {
   if (updateAllItems)
   { // free memory of items
-    for (iItems it = m_items.begin(); it != m_items.end(); it++)
+    for (iItems it = m_items.begin(); it != m_items.end(); ++it)
       (*it)->FreeMemory();
   }
   // and recalculate the layout
   CalculateLayout();
   SetPageControlRange();
-  CLog::Log(LOGDEBUG, "UpdateLayout");
   MarkDirtyRegion();
 }
 
@@ -1046,6 +1051,42 @@ void CGUIBaseContainer::ScrollToOffset(int offset)
   SetOffset(offset);
 }
 
+void CGUIBaseContainer::SetAutoScrolling(const TiXmlNode *node)
+{
+  if (!node) return;
+  const TiXmlElement *scroll = node->FirstChildElement("autoscroll");
+  if (scroll)
+  {
+    scroll->Attribute("time", &m_autoScrollMoveTime);
+    if (scroll->Attribute("reverse"))
+      m_autoScrollIsReversed = true;
+    if (scroll->FirstChild())
+      m_autoScrollCondition = g_infoManager.Register(scroll->FirstChild()->ValueStr(), GetParentID());
+  }
+}
+
+void CGUIBaseContainer::ResetAutoScrolling()
+{
+  m_autoScrollDelayTime = 0;
+}
+
+void CGUIBaseContainer::UpdateAutoScrolling(unsigned int currentTime)
+{
+  if (m_autoScrollCondition && m_autoScrollCondition->Get())
+  {
+    if (m_lastRenderTime)
+      m_autoScrollDelayTime += currentTime - m_lastRenderTime;
+    if (m_autoScrollDelayTime > (unsigned int)m_autoScrollMoveTime && !m_scroller.IsScrolling())
+    { // delay is finished - start moving
+      m_autoScrollDelayTime = 0;
+      // Move up or down whether reversed moving is true or false
+      m_autoScrollIsReversed ? MoveUp(true) : MoveDown(true);
+    }
+  }
+  else
+    ResetAutoScrolling();
+}
+
 void CGUIBaseContainer::SetContainerMoving(int direction)
 {
   if (direction)
@@ -1056,7 +1097,7 @@ void CGUIBaseContainer::UpdateScrollOffset(unsigned int currentTime)
 {
   if (m_scroller.Update(currentTime))
     MarkDirtyRegion();
-  else if (m_lastScrollStartTimer.GetElapsedMilliseconds() >= SCROLLING_GAP)
+  else if (m_lastScrollStartTimer.IsRunning() && m_lastScrollStartTimer.GetElapsedMilliseconds() >= SCROLLING_GAP)
   {
     m_scrollTimer.Stop();
     m_lastScrollStartTimer.Stop();
@@ -1073,6 +1114,7 @@ void CGUIBaseContainer::Reset()
   m_wasReset = true;
   m_items.clear();
   m_lastItem.reset();
+  ResetAutoScrolling();
 }
 
 void CGUIBaseContainer::LoadLayout(TiXmlElement *layout)
@@ -1188,7 +1230,7 @@ bool CGUIBaseContainer::GetCondition(int condition, int data) const
       return layout ? (layout->GetFocusedItem() == (unsigned int)data) : false;
     }
   case CONTAINER_SCROLLING:
-    return (m_scrollTimer.GetElapsedMilliseconds() > std::max(m_scroller.GetDuration(), SCROLLING_THRESHOLD) || m_pageChangeTimer.IsRunning());
+    return ((m_scrollTimer.IsRunning() && m_scrollTimer.GetElapsedMilliseconds() > std::max(m_scroller.GetDuration(), SCROLLING_THRESHOLD)) || m_pageChangeTimer.IsRunning());
   default:
     return false;
   }
@@ -1272,7 +1314,7 @@ int CGUIBaseContainer::GetCurrentPage() const
   return GetOffset() / m_itemsPerPage + 1;
 }
 
-void CGUIBaseContainer::GetCacheOffsets(int &cacheBefore, int &cacheAfter)
+void CGUIBaseContainer::GetCacheOffsets(int &cacheBefore, int &cacheAfter) const
 {
   if (m_scroller.IsScrollingDown())
   {

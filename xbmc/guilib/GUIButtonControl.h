@@ -73,7 +73,7 @@ public:
   void PythonSetDisabledColor(color_t disabledColor);
 
   virtual void OnClick();
-  bool HasClickActions() { return m_clickActions.HasActionsMeetingCondition(); };
+  bool HasClickActions() const { return m_clickActions.HasActionsMeetingCondition(); };
 
   virtual bool UpdateColors();
 
@@ -86,7 +86,7 @@ protected:
   void OnUnFocus();
   virtual void ProcessText(unsigned int currentTime);
   virtual void RenderText();
-  CGUILabel::COLOR GetTextColor() const;
+  virtual CGUILabel::COLOR GetTextColor() const;
 
   CGUITexture m_imgFocus;
   CGUITexture m_imgNoFocus;

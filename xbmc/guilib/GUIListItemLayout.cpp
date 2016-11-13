@@ -18,6 +18,7 @@
  *
  */
 
+#include "system.h"
 #include "GUIListItemLayout.h"
 #include "FileItem.h"
 #include "GUIControlFactory.h"
@@ -26,14 +27,11 @@
 #include "GUIImage.h"
 #include "utils/XBMCTinyXML.h"
 
-using namespace std;
-
 CGUIListItemLayout::CGUIListItemLayout()
 : m_group(0, 0, 0, 0, 0, 0)
 {
   m_width = 0;
   m_height = 0;
-  m_condition = 0;
   m_focused = false;
   m_invalidated = true;
   m_group.SetPushUpdates(true);
@@ -107,16 +105,22 @@ unsigned int CGUIListItemLayout::GetFocusedItem() const
 
 void CGUIListItemLayout::SetWidth(float width)
 {
-  m_group.EnlargeWidth(width - m_width);
-  m_width = width;
-  SetInvalid();
+  if (m_width != width)
+  {
+    m_group.EnlargeWidth(width - m_width);
+    m_width = width;
+    SetInvalid();
+  }
 }
 
 void CGUIListItemLayout::SetHeight(float height)
 {
-  m_group.EnlargeHeight(height - m_height);
-  m_height = height;
-  SetInvalid();
+  if (m_height != height)
+  {
+    m_group.EnlargeHeight(height - m_height);
+    m_height = height;
+    SetInvalid();
+  }
 }
 
 void CGUIListItemLayout::SelectItemFromPoint(const CPoint &point)
@@ -136,7 +140,7 @@ bool CGUIListItemLayout::MoveRight()
 
 bool CGUIListItemLayout::CheckCondition()
 {
-  return !m_condition || g_infoManager.GetBoolValue(m_condition);
+  return !m_condition || m_condition->Get();
 }
 
 void CGUIListItemLayout::LoadControl(TiXmlElement *child, CGUIControlGroup *group)
@@ -150,10 +154,6 @@ void CGUIListItemLayout::LoadControl(TiXmlElement *child, CGUIControlGroup *grou
                                                                 // different label control + defaults.
   if (control)
   {
-    /* PLEX */
-    control->SetInitialVisibility();
-    /* END PLEX */
-
     group->AddControl(control);
     if (control->IsGroup())
     {

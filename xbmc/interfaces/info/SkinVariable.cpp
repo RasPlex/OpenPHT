@@ -22,10 +22,7 @@
 #include "GUIInfoManager.h"
 #include "utils/XBMCTinyXML.h"
 
-using namespace std;
 using namespace INFO;
-
-#define DEFAULT_VALUE -1
 
 const CSkinVariableString* CSkinVariable::CreateFromXML(const TiXmlElement& node, int context)
 {
@@ -38,22 +35,20 @@ const CSkinVariableString* CSkinVariable::CreateFromXML(const TiXmlElement& node
     const TiXmlElement* valuenode = node.FirstChildElement("value");
     while (valuenode)
     {
-      if (valuenode->FirstChild())
-      {
-        CSkinVariableString::ConditionLabelPair pair;
-        if (valuenode->Attribute("condition"))
-          pair.m_condition = g_infoManager.Register(valuenode->Attribute("condition"), context);
-        else
-          pair.m_condition = DEFAULT_VALUE;
+      CSkinVariableString::ConditionLabelPair pair;
+      const char *condition = valuenode->Attribute("condition");
+      if (condition)
+        pair.m_condition = g_infoManager.Register(condition, context);
 
-        pair.m_label = CGUIInfoLabel(valuenode->FirstChild()->Value());
-        tmp->m_conditionLabelPairs.push_back(pair);
-        if (pair.m_condition == DEFAULT_VALUE)
-          break; // once we reach default value (without condition) break iterating
-      }
+      CStdString label = valuenode->FirstChild() ? valuenode->FirstChild()->Value() : "";
+      pair.m_label = CGUIInfoLabel(label);
+      tmp->m_conditionLabelPairs.push_back(pair);
+      if (!pair.m_condition)
+        break; // once we reach default value (without condition) break iterating
+
       valuenode = valuenode->NextSiblingElement("value");
     }
-    if (tmp->m_conditionLabelPairs.size() > 0)
+    if (!tmp->m_conditionLabelPairs.empty())
       return tmp;
     delete tmp;
   }
@@ -76,9 +71,9 @@ const CStdString& CSkinVariableString::GetName() const
 
 CStdString CSkinVariableString::GetValue(bool preferImage /* = false*/, const CGUIListItem *item /* = NULL */)
 {
-  for (VECCONDITIONLABELPAIR::const_iterator it = m_conditionLabelPairs.begin() ; it != m_conditionLabelPairs.end(); it++)
+  for (VECCONDITIONLABELPAIR::const_iterator it = m_conditionLabelPairs.begin() ; it != m_conditionLabelPairs.end(); ++it)
   {
-    if (it->m_condition == DEFAULT_VALUE || g_infoManager.GetBoolValue(it->m_condition, item))
+    if (!it->m_condition || it->m_condition->Get(item))
     {
       if (item)
         return it->m_label.GetItemLabel(item, preferImage);

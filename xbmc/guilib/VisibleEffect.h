@@ -33,6 +33,7 @@ class CGUIListItem;
 #include "Geometry.h"         // for CPoint, CRect
 #include "utils/StdString.h"
 #include "boost/shared_ptr.hpp"
+#include "interfaces/info/InfoBool.h"
 
 enum ANIMATION_TYPE
 {
@@ -56,7 +57,7 @@ public:
   CAnimEffect(const CAnimEffect &src);
 
   virtual ~CAnimEffect();
-  const CAnimEffect &operator=(const CAnimEffect &src);
+  CAnimEffect& operator=(const CAnimEffect &src);
 
   void Calculate(unsigned int time, const CPoint &center);
   void ApplyState(ANIMATION_STATE state, const CPoint &center);
@@ -148,7 +149,7 @@ public:
 
   virtual ~CAnimation();
 
-  const CAnimation &operator=(const CAnimation &src);
+  CAnimation& operator=(const CAnimation &src);
 
   static CAnimation CreateFader(float start, float end, unsigned int delay, unsigned int length, ANIMATION_TYPE type = ANIM_TYPE_NONE);
 
@@ -177,14 +178,13 @@ public:
 private:
   void Calculate(const CPoint &point);
   void AddEffect(const CStdString &type, const TiXmlElement *node, const CRect &rect);
-  void AddEffect(CAnimEffect *effect);
 
   enum ANIM_REPEAT { ANIM_REPEAT_NONE = 0, ANIM_REPEAT_PULSE, ANIM_REPEAT_LOOP };
 
   // type of animation
   ANIMATION_TYPE m_type;
   bool m_reversible;
-  unsigned int m_condition;
+  INFO::InfoPtr m_condition;
 
   // conditional anims can repeat
   ANIM_REPEAT m_repeatAnim;
@@ -216,7 +216,7 @@ class CScroller
 public:
   CScroller(unsigned int duration = 200, boost::shared_ptr<Tweener> tweener = boost::shared_ptr<Tweener>());
   CScroller(const CScroller& right);
-  const CScroller &operator=(const CScroller &src);
+  CScroller& operator=(const CScroller &src);
   ~CScroller();
 
   /**

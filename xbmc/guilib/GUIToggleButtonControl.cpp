@@ -30,7 +30,6 @@ CGUIToggleButtonControl::CGUIToggleButtonControl(int parentID, int controlID, fl
     : CGUIButtonControl(parentID, controlID, posX, posY, width, height, textureFocus, textureNoFocus, labelInfo)
     , m_selectButton(parentID, controlID, posX, posY, width, height, altTextureFocus, altTextureNoFocus, labelInfo)
 {
-  m_toggleSelect = 0;
   ControlType = GUICONTROL_TOGGLEBUTTON;
 }
 
@@ -41,14 +40,8 @@ CGUIToggleButtonControl::~CGUIToggleButtonControl(void)
 void CGUIToggleButtonControl::Process(unsigned int currentTime, CDirtyRegionList &dirtyregions)
 {
   // ask our infoManager whether we are selected or not...
-  bool selected = m_bSelected;
   if (m_toggleSelect)
-    selected = g_infoManager.GetBoolValue(m_toggleSelect);
-  if (selected != m_bSelected)
-  {
-    MarkDirtyRegion();
-    m_bSelected = selected;
-  }
+    m_bSelected = m_toggleSelect->Get();
 
   if (m_bSelected)
   {
@@ -57,9 +50,25 @@ void CGUIToggleButtonControl::Process(unsigned int currentTime, CDirtyRegionList
     m_selectButton.SetVisible(IsVisible());
     m_selectButton.SetEnabled(!IsDisabled());
     m_selectButton.SetPulseOnSelect(m_pulseOnSelect);
+    ProcessToggle(currentTime);
     m_selectButton.DoProcess(currentTime, dirtyregions);
   }
-  CGUIButtonControl::Process(currentTime, dirtyregions);
+  else
+    CGUIButtonControl::Process(currentTime, dirtyregions);
+}
+
+void CGUIToggleButtonControl::ProcessToggle(unsigned int currentTime)
+{
+  bool changed = false;
+
+  changed |= m_label.SetMaxRect(m_posX, m_posY, GetWidth(), m_height);
+  changed |= m_label.SetText(GetDescription());
+  changed |= m_label.SetColor(GetTextColor());
+  changed |= m_label.SetScrolling(HasFocus());
+  changed |= m_label.Process(currentTime);
+
+  if (changed)
+    MarkDirtyRegion();
 }
 
 void CGUIToggleButtonControl::Render()

@@ -61,7 +61,7 @@ CAnimEffect::CAnimEffect(const CAnimEffect &src)
   *this = src;
 }
 
-const CAnimEffect &CAnimEffect::operator=(const CAnimEffect &src)
+CAnimEffect& CAnimEffect::operator=(const CAnimEffect &src)
 {
   if (&src == this) return *this;
 
@@ -190,7 +190,8 @@ CSlideEffect::CSlideEffect(const TiXmlElement *node) : CAnimEffect(node, EFFECT_
     StringUtils::SplitString(startPos, ",", commaSeparated);
     if (commaSeparated.size() > 1)
       m_startY = (float)atof(commaSeparated[1].c_str());
-    m_startX = (float)atof(commaSeparated[0].c_str());
+    if (!commaSeparated.empty())
+      m_startX = (float)atof(commaSeparated[0].c_str());
   }
   const char *endPos = node->Attribute("end");
   if (endPos)
@@ -199,7 +200,8 @@ CSlideEffect::CSlideEffect(const TiXmlElement *node) : CAnimEffect(node, EFFECT_
     StringUtils::SplitString(endPos, ",", commaSeparated);
     if (commaSeparated.size() > 1)
       m_endY = (float)atof(commaSeparated[1].c_str());
-    m_endX = (float)atof(commaSeparated[0].c_str());
+    if (!commaSeparated.empty())
+      m_endX = (float)atof(commaSeparated[0].c_str());
   }
 }
 
@@ -230,7 +232,8 @@ CRotateEffect::CRotateEffect(const TiXmlElement *node, EFFECT_TYPE effect) : CAn
       StringUtils::SplitString(centerPos, ",", commaSeparated);
       if (commaSeparated.size() > 1)
         m_center.y = (float)atof(commaSeparated[1].c_str());
-      m_center.x = (float)atof(commaSeparated[0].c_str());
+      if (!commaSeparated.empty())
+        m_center.x = (float)atof(commaSeparated[0].c_str());
     }
   }
 }
@@ -327,7 +330,8 @@ CZoomEffect::CZoomEffect(const TiXmlElement *node, const CRect &rect) : CAnimEff
       StringUtils::SplitString(centerPos, ",", commaSeparated);
       if (commaSeparated.size() > 1)
         m_center.y = (float)atof(commaSeparated[1].c_str());
-      m_center.x = (float)atof(commaSeparated[0].c_str());
+      if (!commaSeparated.empty())
+        m_center.x = (float)atof(commaSeparated[0].c_str());
     }
   }
   else
@@ -361,7 +365,6 @@ CAnimation::CAnimation()
 {
   m_type = ANIM_TYPE_NONE;
   m_reversible = true;
-  m_condition = 0;
   m_repeatAnim = ANIM_REPEAT_NONE;
   m_currentState = ANIM_STATE_NONE;
   m_currentProcess = ANIM_PROCESS_NONE;
@@ -385,12 +388,12 @@ CAnimation::~CAnimation()
   m_effects.clear();
 }
 
-const CAnimation &CAnimation::operator =(const CAnimation &src)
+CAnimation &CAnimation::operator =(const CAnimation &src)
 {
   if (this == &src) return *this; // same
   m_type = src.m_type;
   m_reversible = src.m_reversible;
-  m_condition = src.m_condition; // TODO: register/unregister
+  m_condition = src.m_condition;
   m_repeatAnim = src.m_repeatAnim;
   m_lastCondition = src.m_lastCondition;
   m_queuedProcess = src.m_queuedProcess;
@@ -576,18 +579,22 @@ CAnimation CAnimation::CreateFader(float start, float end, unsigned int delay, u
 {
   CAnimation anim;
   anim.m_type = type;
-  anim.AddEffect(new CFadeEffect(start, end, delay, length));
+  anim.m_delay = delay;
+  anim.m_length = length;
+  anim.m_effects.push_back(new CFadeEffect(start, end, delay, length));
   return anim;
 }
 
 bool CAnimation::CheckCondition()
 {
-  return !m_condition || g_infoManager.GetBoolValue(m_condition);
+  return !m_condition || m_condition->Get();
 }
 
 void CAnimation::UpdateCondition(const CGUIListItem *item)
 {
-  bool condition = g_infoManager.GetBoolValue(m_condition, item);
+  if (!m_condition)
+    return;
+  bool condition = m_condition->Get(item);
   if (condition && !m_lastCondition)
     QueueAnimation(ANIM_PROCESS_NORMAL);
   else if (!condition && m_lastCondition)
@@ -602,7 +609,7 @@ void CAnimation::UpdateCondition(const CGUIListItem *item)
 
 void CAnimation::SetInitialCondition()
 {
-  m_lastCondition = g_infoManager.GetBoolValue(m_condition);
+  m_lastCondition = m_condition ? m_condition->Get() : false;
   if (m_lastCondition)
     ApplyAnimation();
   else
@@ -653,7 +660,6 @@ void CAnimation::Create(const TiXmlElement *node, const CRect &rect, int context
       m_repeatAnim = ANIM_REPEAT_LOOP;
   }
 
-  m_delay = 0xffffffff;
   if (!effect)
   { // old layout:
     // <animation effect="fade" start="0" end="100" delay="10" time="2000" condition="blahdiblah" reversible="false">focus</animation>
@@ -670,6 +676,15 @@ void CAnimation::Create(const TiXmlElement *node, const CRect &rect, int context
     AddEffect(type, effect, rect);
     effect = effect->NextSiblingElement("effect");
   }
+  // compute the minimum delay and maximum length
+  m_delay = 0xffffffff;
+  unsigned int total = 0;
+  for (std::vector<CAnimEffect*>::const_iterator i = m_effects.begin(); i != m_effects.end(); ++i)
+  {
+    m_delay = std::min(m_delay, (*i)->GetDelay());
+    total   = std::max(total, (*i)->GetLength());
+  }
+  m_length = total - m_delay;
 }
 
 void CAnimation::AddEffect(const CStdString &type, const TiXmlElement *node, const CRect &rect)
@@ -689,18 +704,7 @@ void CAnimation::AddEffect(const CStdString &type, const TiXmlElement *node, con
     effect = new CZoomEffect(node, rect);
 
   if (effect)
-    AddEffect(effect);
-}
-
-void CAnimation::AddEffect(CAnimEffect *effect)
-{
-  m_effects.push_back(effect);
-  // our delay is the minimum of all the effect delays
-  if (effect->GetDelay() < m_delay)
-    m_delay = effect->GetDelay();
-  // our length is the maximum of all the effect lengths
-  if (effect->GetLength() > m_delay + m_length)
-    m_length = effect->GetLength() - m_delay;
+    m_effects.push_back(effect);
 }
 
 CScroller::CScroller(unsigned int duration /* = 200 */, boost::shared_ptr<Tweener> tweener /* = NULL */)
@@ -721,7 +725,7 @@ CScroller::CScroller(const CScroller& right)
   *this = right;
 }
 
-const CScroller &CScroller::operator=(const CScroller &right)
+CScroller& CScroller::operator=(const CScroller &right)
 {
   if (&right == this) return *this;
 

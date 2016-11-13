@@ -35,14 +35,14 @@ CGUIAction::CGUIAction(int controlID)
   SetNavigation(controlID);
 }
 
-bool CGUIAction::ExecuteActions(int controlID, int parentID) const
+bool CGUIAction::ExecuteActions(int controlID, int parentID, const CGUIListItemPtr &item /* = NULL */) const
 {
-  if (m_actions.size() == 0) return false;
+  if (m_actions.empty()) return false;
   // take a copy of actions that satisfy our conditions
-  std::vector<CStdString> actions;
+  std::vector<std::string> actions;
   for (ciActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
-    if (it->condition.IsEmpty() || g_infoManager.EvaluateBool(it->condition))
+    if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition, 0, item))
     {
       if (!StringUtils::IsInteger(it->action))
         actions.push_back(it->action);
@@ -50,9 +50,9 @@ bool CGUIAction::ExecuteActions(int controlID, int parentID) const
   }
   // execute them
   bool retval = false;
-  for (std::vector<CStdString>::iterator i = actions.begin(); i != actions.end(); ++i)
+  for (std::vector<std::string>::iterator i = actions.begin(); i != actions.end(); ++i)
   {
-    CGUIMessage msg(GUI_MSG_EXECUTE, controlID, parentID);
+    CGUIMessage msg(GUI_MSG_EXECUTE, controlID, parentID, 0, 0, item);
     msg.SetStringParam(*i);
     if (m_sendThreadMessages)
       g_windowManager.SendThreadMessage(msg);
@@ -69,7 +69,7 @@ int CGUIAction::GetNavigation() const
   {
     if (StringUtils::IsInteger(it->action))
     {
-      if (it->condition.IsEmpty() || g_infoManager.EvaluateBool(it->condition))
+      if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition))
         return atoi(it->action.c_str());
     }
   }
@@ -79,11 +79,10 @@ int CGUIAction::GetNavigation() const
 void CGUIAction::SetNavigation(int id)
 {
   if (id == 0) return;
-  CStdString strId;
-  strId.Format("%i", id);
+  std::string strId = StringUtils::Format("%i", id);
   for (iActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
-    if (StringUtils::IsInteger(it->action) && it->condition.IsEmpty())
+    if (StringUtils::IsInteger(it->action) && it->condition.empty())
     {
       it->action = strId;
       return;
@@ -98,7 +97,7 @@ bool CGUIAction::HasActionsMeetingCondition() const
 {
   for (ciActions it = m_actions.begin() ; it != m_actions.end() ; ++it)
   {
-    if (it->condition.IsEmpty() || g_infoManager.EvaluateBool(it->condition))
+    if (it->condition.empty() || g_infoManager.EvaluateBool(it->condition))
       return true;
   }
   return false;

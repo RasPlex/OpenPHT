@@ -24,6 +24,7 @@
 
 #include <map>
 #include <set>
+#include "interfaces/info/InfoBool.h"
 
 // forward definitions
 class TiXmlElement;
@@ -47,7 +48,7 @@ public:
    "bar" from the include file "foo".
    \param node an XML Element - all child elements are traversed.
    */
-  void ResolveIncludes(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions = NULL);
+  void ResolveIncludes(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions = NULL);
   const INFO::CSkinVariableString* CreateSkinVariable(const CStdString& name, int context);
 
 private:
@@ -58,13 +59,13 @@ private:
     SINGLE_UNDEFINED_PARAM_RESOLVED
   };
 
-  void ResolveIncludesForNode(TiXmlElement *node, std::map<int, bool>* xmlIncludeConditions = NULL);
+  void ResolveIncludesForNode(TiXmlElement *node, std::map<INFO::InfoPtr, bool>* xmlIncludeConditions = NULL);
   using Params = std::map<std::string, std::string>;
   static bool GetParameters(const TiXmlElement *include, const char *valueAttribute, Params& params);
   static void ResolveParametersForNode(TiXmlElement *node, const Params& params);
-  static ResolveParamsResult ResolveParameters(const std::string& strInput, std::string& strOutput, const Params& params);
+  static ResolveParamsResult ResolveParameters(const CStdString& strInput, CStdString& strOutput, const Params& params);
   CStdString ResolveConstant(const CStdString &constant) const;
-  std::string ResolveExpressions(const std::string &expression) const;
+  CStdString ResolveExpressions(const CStdString &expression) const;
   bool HasIncludeFile(const CStdString &includeFile) const;
   std::map<std::string, std::pair<TiXmlElement, Params>> m_includes;
   std::map<CStdString, TiXmlElement> m_defaults;

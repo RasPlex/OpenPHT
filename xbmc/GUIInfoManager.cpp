@@ -57,6 +57,7 @@
 #include "utils/SeekHandler.h"
 #include "URL.h"
 #include "addons/Skin.h"
+#include "boost/make_shared.hpp"
 #include "cores/DataCacheCore.h"
 
 // stuff for current song
@@ -83,6 +84,7 @@
 #include "video/VideoDatabase.h"
 #include "cores/IPlayer.h"
 #include "cores/AudioEngine/Utils/AEUtil.h"
+#include "interfaces/info/InfoExpression.h"
 
 /* PLEX */
 #include "ThumbLoader.h"
@@ -126,7 +128,6 @@ CGUIInfoManager::CGUIInfoManager(void) :
   m_currentSlide = new CFileItem;
   m_frameCounter = 0;
   m_lastFPSTime = 0;
-  m_updateTime = 1;
   m_playerShowTime = false;
   m_playerShowCodec = false;
   m_playerShowInfo = false;
@@ -841,7 +842,6 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
    *     corresponding label is between LISTITEM_START and LISTITEM_END
    *  This is achieved by setting the bool pointed at by listItemDependent, either here or in a recursive call
    */
-
   // trim whitespaces
   CStdString strTest = strCondition;
   strTest.TrimLeft(" \t\r\n");
@@ -854,8 +854,6 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
     return 0;
 
   const Property &cat = info[0];
-
-
   if (info.size() == 1)
   { // single category
     if (cat.name == "false" || cat.name == "no" || cat.name == "off")
@@ -1206,11 +1204,10 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
         return AddMultiInfo(GUIInfo(ret, ConditionalStringParameter(prop.param())));
       /* END PLEX */
 
+      if (ret)
+        listItemDependent = true;
       if (ret == LISTITEM_TYPE || ret == LISTITEM_STATUS)
-      {
         return AddMultiInfo(GUIInfo(ret, 0, offset, INFOFLAG_LISTITEM_WRAP, ConditionalStringParameter(prop.param())));
-      }
-
       if (offset || ret == LISTITEM_ISSELECTED || ret == LISTITEM_ISPLAYING || ret == LISTITEM_IS_FOLDER)
         return AddMultiInfo(GUIInfo(ret, 0, offset, INFOFLAG_LISTITEM_WRAP));
       return ret;
@@ -1221,7 +1218,6 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
       int ret = TranslateListItem(prop);
       if (ret)
         listItemDependent = true;
-
       if (offset || ret == LISTITEM_ISSELECTED || ret == LISTITEM_ISPLAYING || ret == LISTITEM_IS_FOLDER)
         return AddMultiInfo(GUIInfo(ret, 0, offset, INFOFLAG_LISTITEM_POSITION));
       return ret;
@@ -1232,7 +1228,6 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
       int ret = TranslateListItem(prop);
       if (ret)
         listItemDependent = true;
-
       if (offset || ret == LISTITEM_ISSELECTED || ret == LISTITEM_ISPLAYING || ret == LISTITEM_IS_FOLDER)
         return AddMultiInfo(GUIInfo(ret, 0, offset));
       return ret;
@@ -1289,10 +1284,8 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
         { // TODO: The parameter for these should really be on the first not the second property
           if (prop.param().Find("xml") >= 0)
             return AddMultiInfo(GUIInfo(window_bools[i].val, 0, ConditionalStringParameter(prop.param())));
-          int winID = prop.param().IsEmpty() ? 0 : CButtonTranslator::TranslateWindow(prop.param());
-          if (winID != WINDOW_INVALID)
-            return AddMultiInfo(GUIInfo(window_bools[i].val, winID, 0));
-          return 0;
+          int winID = prop.param().IsEmpty() ? WINDOW_INVALID : CButtonTranslator::TranslateWindow(prop.param());
+          return winID != WINDOW_INVALID ? AddMultiInfo(GUIInfo(window_bools[i].val, winID, 0)) : window_bools[i].val;
         }
       }
     }
@@ -1360,7 +1353,7 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
         return AddMultiInfo(GUIInfo(value, 1, position));
       }
     }
-   else if (info[0].name == "container")
+    else if (info[0].name == "container")
     {
       int id = atoi(info[0].param().c_str());
       int offset = atoi(info[1].param().c_str());
@@ -1376,10 +1369,8 @@ int CGUIInfoManager::TranslateSingleString(const CStdString &strCondition, bool 
       }
       else if (info[1].name == "listitem")
       {
+        listItemDependent = true;
         int ret = TranslateListItem(info[2]);
-        if (ret)
-          listItemDependent = true;
-
         if (ret == LISTITEM_TYPE || ret == LISTITEM_STATUS)
           return AddMultiInfo(GUIInfo(ret, id, offset, INFOFLAG_LISTITEM_WRAP, ConditionalStringParameter(info[2].param())));
         else
@@ -2286,64 +2277,44 @@ bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUI
   return false;
 }
 
-unsigned int CGUIInfoManager::Register(const CStdString &expression, int context)
+// functor for comparison InfoPtr's
+struct InfoBoolFinder
+{
+  InfoBoolFinder(const std::string &expression, int context) : m_bool(expression, context) {};
+  bool operator() (const InfoPtr &right) const { return m_bool == *right; };
+  InfoBool m_bool;
+};
+
+INFO::InfoPtr CGUIInfoManager::Register(const CStdString &expression, int context)
 {
   CStdString condition(CGUIInfoLabel::ReplaceLocalize(expression));
   condition.TrimLeft(" \t\r\n");
   condition.TrimRight(" \t\r\n");
 
   if (condition.IsEmpty())
-    return 0;
+    return INFO::InfoPtr();
 
   CSingleLock lock(m_critInfo);
   // do we have the boolean expression already registered?
-  InfoBool test(condition, context);
-  for (unsigned int i = 0; i < m_bools.size(); ++i)
-  {
-    if (*m_bools[i] == test)
-      return i+1;
-  }
+  vector<InfoPtr>::const_iterator i = find_if(m_bools.begin(), m_bools.end(), InfoBoolFinder(condition, context));
+  if (i != m_bools.end())
+    return *i;
 
   if (condition.find_first_of("|+[]!") != condition.npos)
-    m_bools.push_back(new InfoExpression(condition, context));
+    m_bools.push_back(boost::make_shared<InfoExpression>(condition, context));
   else
-    m_bools.push_back(new InfoSingle(condition, context));
+    m_bools.push_back(boost::make_shared<InfoSingle>(condition, context));
 
-  return m_bools.size();
+  return m_bools.back();
 }
 
-bool CGUIInfoManager::EvaluateBool(const CStdString &expression, int contextWindow)
+bool CGUIInfoManager::EvaluateBool(const CStdString &expression, int contextWindow /* = 0 */, const CGUIListItemPtr &item /* = NULL */)
 {
   bool result = false;
-  unsigned int info = Register(expression, contextWindow);
+  INFO::InfoPtr info = Register(expression, contextWindow);
   if (info)
-    result = GetBoolValue(info);
+    result = info->Get(item.get());
   return result;
-}
-
-/*
- TODO: what to do with item-based infobools...
- these crop up:
- 1. if condition is between LISTITEM_START and LISTITEM_END
- 2. if condition is STRING_IS_EMPTY, STRING_COMPARE, STRING_STR, INTEGER_GREATER_THAN and the
-    corresponding label is between LISTITEM_START and LISTITEM_END
-
- In both cases they shouldn't be in our cache as they depend on items outside of our control atm.
-
- We only pass a listitem object in for controls inside a listitemlayout, so I think it's probably OK
- to not cache these, as they're "pushed" out anyway.
-
- The problem is how do we avoid these?  The only thing we have to go on is the expression here, so I
- guess what we have to do is call through via Update.  One thing we don't handle, however, is that the
- majority of conditions (even inside lists) don't depend on the listitem at all.
-
- Advantage is that we know this at creation time I think, so could perhaps signal it in IsDirty()?
- */
-bool CGUIInfoManager::GetBoolValue(unsigned int expression, const CGUIListItem *item)
-{
-  if (expression && --expression < m_bools.size())
-    return m_bools[expression]->Get(m_updateTime, item);
-  return false;
 }
 
 // checks the condition and returns it as necessary.  Currently used
@@ -4799,11 +4770,22 @@ CStdString CGUIInfoManager::GetAudioScrobblerLabel(int item)
 void CGUIInfoManager::Clear()
 {
   CSingleLock lock(m_critInfo);
-  for (unsigned int i = 0; i < m_bools.size(); ++i)
-    delete m_bools[i];
-  m_bools.clear();
-
   m_skinVariableStrings.clear();
+
+  /*
+    Erase any info bools that are unused. We do this repeatedly as each run
+    will remove those bools that are no longer dependencies of other bools
+    in the vector.
+   */
+  vector<InfoPtr>::iterator i = remove_if(m_bools.begin(), m_bools.end(), std::mem_fun_ref(&InfoPtr::unique));
+  while (i != m_bools.end())
+  {
+    m_bools.erase(i, m_bools.end());
+    i = remove_if(m_bools.begin(), m_bools.end(), std::mem_fun_ref(&InfoPtr::unique));
+  }
+  // log which ones are used - they should all be gone by now
+  for (vector<InfoPtr>::const_iterator i = m_bools.begin(); i != m_bools.end(); ++i)
+    CLog::Log(LOGDEBUG, "Infobool '%s' still used by %u instances", (*i)->GetExpression().c_str(), (unsigned int) i->use_count());
 }
 
 void CGUIInfoManager::UpdateFPS()
@@ -5851,7 +5833,10 @@ void CGUIInfoManager::ResetCache()
 {
   // reset any animation triggers as well
   m_containerMoves.clear();
-  m_updateTime++;
+  // mark our infobools as dirty
+  CSingleLock lock(m_critInfo);
+  for (vector<InfoPtr>::iterator i = m_bools.begin(); i != m_bools.end(); ++i)
+    (*i)->SetDirty();
 }
 
 // Called from tuxbox service thread to update current status
@@ -6179,11 +6164,11 @@ CStdString CGUIInfoManager::GetSkinVariableString(int info,
   return "";
 }
 
-bool CGUIInfoManager::ConditionsChangedValues(const std::map<int, bool>& map)
+bool CGUIInfoManager::ConditionsChangedValues(const std::map<INFO::InfoPtr, bool>& map)
 {
-  for (std::map<int, bool>::const_iterator it = map.begin() ; it != map.end() ; it++)
+  for (std::map<INFO::InfoPtr, bool>::const_iterator it = map.begin() ; it != map.end() ; it++)
   {
-    if (GetBoolValue(it->first) != it->second)
+    if (it->first->Get() != it->second)
       return true;
   }
   return false;

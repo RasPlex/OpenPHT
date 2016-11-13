@@ -29,7 +29,10 @@
  */
 
 #include "utils/StdString.h"
+#include <vector>
+#include <stdint.h>
 #include <functional>
+#include "interfaces/info/InfoBool.h"
 
 class CGUIListItem;
 
@@ -44,7 +47,7 @@ public:
   void Update(const CGUIListItem *item = NULL);
   void Parse(const CStdString &expression, int context);
 private:
-  unsigned int m_info;
+  INFO::InfoPtr m_info;
   bool m_value;
 };
 
@@ -55,8 +58,8 @@ class CGUIInfoColor
 public:
   CGUIInfoColor(color_t color = 0);
 
-  const CGUIInfoColor &operator=(const CGUIInfoColor &color);
-  const CGUIInfoColor &operator=(color_t color);
+  CGUIInfoColor& operator=(const CGUIInfoColor &color);
+  CGUIInfoColor& operator=(color_t color);
   operator color_t() const { return m_color; };
 
   bool Update();
@@ -82,8 +85,16 @@ public:
    \param preferImage caller is specifically wanting an image rather than a label. Defaults to false.
    \param fallback if non-NULL, is set to an alternate value to use should the actual value be not appropriate. Defaults to NULL.
    \return label (or image).
-   */  
-  CStdString GetLabel(int contextWindow, bool preferImage = false, CStdString *fallback = NULL) const;
+   */
+  const CStdString &GetLabel(int contextWindow, bool preferImage = false, CStdString *fallback = NULL) const;
+
+  /*!
+   \brief Gets the label and returns it as an int value
+   \param contextWindow the context in which to evaluate the expression.
+   \return int value.
+   \sa GetLabel
+   */
+  int GetIntValue(int contextWindow) const;
 
   /*!
    \brief Gets a label (or image) for a given listitem from the info manager.
@@ -92,14 +103,15 @@ public:
    \param fallback if non-NULL, is set to an alternate value to use should the actual value be not appropriate. Defaults to NULL.
    \return label (or image).
    */
-  CStdString GetItemLabel(const CGUIListItem *item, bool preferImage = false, CStdString *fallback = NULL) const;
+  const CStdString &GetItemLabel(const CGUIListItem *item, bool preferImage = false, CStdString *fallback = NULL) const;
 
   bool IsConstant() const;
   bool IsEmpty() const;
 
-  const CStdString GetFallback() const { return m_fallback; };
+  const CStdString &GetFallback() const { return m_fallback; };
 
   static CStdString GetLabel(const CStdString &label, int contextWindow = 0, bool preferImage = false);
+  static CStdString GetItemLabel(const CStdString &label, const CGUIListItem *item, bool preferImage = false);
 
   /*!
    \brief Replaces instances of $LOCALIZE[number] with the appropriate localized string
@@ -125,7 +137,7 @@ public:
    \param strOutput the output string
    \return whether anything has been replaced.
    */
-  static bool ReplaceSpecialKeywordReferences(const std::string &strInput, const std::string &strKeyword, const StringReplacerFunc &func, std::string &strOutput);
+  static bool ReplaceSpecialKeywordReferences(const CStdString &strInput, const CStdString &strKeyword, const StringReplacerFunc &func, CStdString &strOutput);
 
   /*!
    \brief Replaces instances of $strKeyword[value] with the appropriate resolved string in-place
@@ -134,23 +146,33 @@ public:
    \param func function that does the actual replacement of each bracketed value found
    \return whether anything has been replaced.
    */
-  static bool ReplaceSpecialKeywordReferences(std::string &work, const std::string &strKeyword, const StringReplacerFunc &func);
+  static bool ReplaceSpecialKeywordReferences(CStdString &work, const CStdString &strKeyword, const StringReplacerFunc &func);
 
 private:
   void Parse(const CStdString &label, int context);
+
+  /*! \brief return (and cache) built label from info portions.
+   \param rebuild whether we need to rebuild the label
+   \sa GetLabel, GetItemLabel
+   */
+  const CStdString &CacheLabel(bool rebuild) const;
 
   class CInfoPortion
   {
   public:
     CInfoPortion(int info, const CStdString &prefix, const CStdString &postfix, bool escaped = false);
-    CStdString GetLabel(const CStdString &info) const;
+    bool NeedsUpdate(const CStdString &label) const;
+    CStdString Get() const;
     int m_info;
-    CStdString m_prefix;
-    CStdString m_postfix;
   private:
     bool m_escaped;
+    mutable CStdString m_label;
+    CStdString m_prefix;
+    CStdString m_postfix;
   };
 
+  mutable bool       m_dirty;
+  mutable CStdString m_label;
   CStdString m_fallback;
   std::vector<CInfoPortion> m_info;
 };

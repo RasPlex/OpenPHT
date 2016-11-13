@@ -29,6 +29,7 @@
 #include "GUIListItemLayout.h"
 #include "boost/shared_ptr.hpp"
 #include "utils/Stopwatch.h"
+#include "utils/XBMCTinyXML.h"
 
 typedef boost::shared_ptr<CGUIListItem> CGUIListItemPtr;
 
@@ -104,6 +105,10 @@ public:
    \param offset CPoint holding the offset in skin coordinates.
    */
   void SetRenderOffset(const CPoint &offset);
+
+  void SetAutoScrolling(const TiXmlNode *node);
+  void ResetAutoScrolling();
+  void UpdateAutoScrolling(unsigned int currentTime);
 
   /* PLEX */
   virtual int GetSelectedItemID() const;
@@ -187,7 +192,7 @@ protected:
                     // changing around)
 
   void UpdateScrollByLetter();
-  void GetCacheOffsets(int &cacheBefore, int &cacheAfter);
+  void GetCacheOffsets(int &cacheBefore, int &cacheAfter) const;
   int GetCacheCount() const { return m_cacheItems; };
   bool ScrollingDown() const { return m_scroller.IsScrollingDown(); };
   bool ScrollingUp() const { return m_scroller.IsScrollingUp(); };
@@ -209,7 +214,24 @@ protected:
    this also marks the control as dirty (if needed)
    */
   void SetOffset(int offset);
+  /*! \brief Returns the index of the first visible row
+   returns the first row. This may be outside of the range of available items. Use GetItemOffset() to retrieve the first visible item in the list.
+   \sa GetItemOffset
+  */
   inline int GetOffset() const { return m_offset; };
+  /*! \brief Returns the index of the first visible item
+   returns the first visible item. This will always be in the range of available items. Use GetOffset() to retrieve the first visible row in the list.
+   \sa GetOffset
+  */
+  inline int GetItemOffset() const { return CorrectOffset(GetOffset(), 0); }
+
+  // autoscrolling
+  INFO::InfoPtr m_autoScrollCondition;
+  int           m_autoScrollMoveTime;   // time between to moves
+  unsigned int  m_autoScrollDelayTime;  // current offset into the delay
+  bool          m_autoScrollIsReversed; // scroll backwards
+
+  unsigned int m_lastRenderTime;
 
 private:
   int m_cursor;
