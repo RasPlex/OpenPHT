@@ -5088,6 +5088,14 @@ bool CApplication::OnMessage(CGUIMessage& message)
       if (url.GetProtocol() == "plugin")
         XFILE::CPluginDirectory::GetPluginResult(url.Get(), file);
 
+      if (file.IsPlexMediaServer())
+      {
+        CFileItem newItem;
+        CPlexMediaDecisionEngine plexMDE;
+        if (plexMDE.resolveItem(file, newItem))
+          file.SetPath(newItem.GetPath());
+      }
+
       // Don't queue if next media type is different from current one
       if ((!file.IsVideo() && m_pPlayer->IsPlayingVideo())
           || ((!file.IsAudio() || file.IsVideo()) && m_pPlayer->IsPlayingAudio()))
