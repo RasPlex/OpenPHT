@@ -12,7 +12,7 @@ private:
 
 public:
   CGUIPlexWindowFocusSaver();
-  void SaveFocus(CGUIWindow* window);
+  void SaveFocus(CGUIWindow* window, bool keepItem = true);
   void RestoreFocus(bool reset);
 
   inline int getLastFocusedControlID() { return m_lastFocusedControlID; }

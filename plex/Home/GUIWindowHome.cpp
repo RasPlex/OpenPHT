@@ -150,6 +150,16 @@ bool CGUIWindowHome::OnAction(const CAction &action)
     
     return true;
   }
+
+  if (action.GetID() == ACTION_PLAYER_PLAY)
+  {
+    // save current focused controls
+    m_focusSaver.SaveFocus(this, false);
+
+    CFileItemPtr fileItem = GetCurrentFanoutItem();
+    if (!fileItem)
+      m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
+  }
   
   bool ret = g_plexApplication.defaultActionHandler->OnAction(WINDOW_HOME, action, GetCurrentFanoutItem(), CFileItemListPtr());
   
@@ -325,10 +335,14 @@ bool CGUIWindowHome::OnPopupMenu()
   if (choice == -1)
     return false;
 
-  if (choice == ACTION_PLEX_GOTO_SHOW || choice == ACTION_PLEX_GOTO_SEASON)
+  if (choice == ACTION_PLEX_GOTO_SHOW || choice == ACTION_PLEX_GOTO_SEASON || choice == ACTION_PLEX_PQ_PLAYFROMHERE)
   {
     // save current focused controls
-    m_focusSaver.SaveFocus(this);
+    m_focusSaver.SaveFocus(this, false);
+
+    CFileItemPtr fileItem = GetCurrentFanoutItem();
+    if (!fileItem)
+      m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
   }
 
   if (g_plexApplication.defaultActionHandler->OnAction(WINDOW_HOME, choice, GetCurrentFanoutItem(), CFileItemListPtr()))
@@ -546,13 +560,16 @@ void CGUIWindowHome::OnSectionLoaded(const CGUIMessage& message)
           GetContentListFromSection(url, p, list);
           if(list.Size() > 0)
           {
-            int selectedItem = 0;
-            if (!m_lastSelectedSubItem.empty())
+            int selectedItem = -1;
+            if (!m_lastSelectedSubItem.empty() && p == m_focusSaver.getLastFocusedControlID())
             {
               for (int i = 0; i < list.Size(); i ++)
               {
                 if (list.Get(i)->GetPath() == m_lastSelectedSubItem)
+                {
                   selectedItem = i;
+                  break;
+                }
               }
             }
 
@@ -681,7 +698,7 @@ void CGUIWindowHome::OpenItem(CFileItemPtr item)
   }
   
   // save current focused controls
-  m_focusSaver.SaveFocus(this);
+  m_focusSaver.SaveFocus(this, false);
 
   CStdString url = m_navHelper.navigateToItem(item, CURL(), GetID());
   if (!url.empty())

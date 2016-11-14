@@ -13,7 +13,7 @@ CGUIPlexWindowFocusSaver::CGUIPlexWindowFocusSaver()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void CGUIPlexWindowFocusSaver::SaveFocus(CGUIWindow* window)
+void CGUIPlexWindowFocusSaver::SaveFocus(CGUIWindow* window, bool keepItem)
 {
   if (!window)
     return;
@@ -22,6 +22,13 @@ void CGUIPlexWindowFocusSaver::SaveFocus(CGUIWindow* window)
 
   // save current focused controls
   m_lastFocusedControlID = m_window->GetFocusedControlID();
+
+  if (!keepItem)
+  {
+    m_lastFocusedControlItem = -1;
+    return;
+  }
+
   const CGUIControl* control = m_window->GetControl(m_lastFocusedControlID);
   if (control && control->IsContainer())
   {
