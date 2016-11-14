@@ -4948,6 +4948,7 @@ CStdString CGUIInfoManager::GetItemLabel(const CFileItem *item, int info, CStdSt
       CStdString args = m_stringParameters[multiInfo.GetData1()];
       return PlexUtils::GetCompositeImageUrl(*item, args);
     }
+    return GetMultiInfoLabel(multiInfo, 0, fallback);
   }
   /* END PLEX */
 
