@@ -443,7 +443,7 @@ bool CPlexMediaDecisionJob::DoWork()
       bool shouldTranscode = CPlexTranscoderClient::GetInstance()->ShouldTranscode(server, m_choosenMedia);
 
       CPlexServerVersion serverVersion(server->GetVersion());
-      if (serverVersion > CPlexServerVersion("1.0.3"))
+      if (serverVersion > CPlexServerVersion("1.0.3.0"))
       {
         CURL tURL = CPlexTranscoderClient::GetTranscodeURL(server, m_choosenMedia);
         tURL.SetFileName("/video/:/transcode/universal/decision");
