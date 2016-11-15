@@ -118,6 +118,7 @@ private:
   CStdString                 m_lastSelectedItem;
   CStdString                 m_currentFanArt;
   CStdString                 m_lastSelectedSubItem;
+  int                        m_lastFocusedList;
   CEvent                     m_loadNavigationEvent;
   bool                       m_cacheLoadFail;
   CPlexNavigationHelper      m_navHelper;

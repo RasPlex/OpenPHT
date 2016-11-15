@@ -113,7 +113,7 @@ using namespace boost;
 typedef std::pair<CStdString, CPlexSectionFanout*> nameSectionPair;
 
 //////////////////////////////////////////////////////////////////////////////
-CGUIWindowHome::CGUIWindowHome(void) : CGUIWindow(WINDOW_HOME, "Home.xml"), m_globalArt(false), m_lastSelectedItem("Search")
+CGUIWindowHome::CGUIWindowHome(void) : CGUIWindow(WINDOW_HOME, "Home.xml"), m_globalArt(false), m_lastSelectedItem("Search"), m_lastFocusedList(0)
 {
   m_loadType = LOAD_ON_GUI_INIT;
   AddSection("global://art/", CPlexSectionFanout::SECTION_TYPE_GLOBAL_FANART, true);
@@ -158,7 +158,10 @@ bool CGUIWindowHome::OnAction(const CAction &action)
 
     CFileItemPtr fileItem = GetCurrentFanoutItem();
     if (!fileItem)
+    {
       m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
+      m_lastFocusedList = GetFocusedControlID();
+    }
   }
   
   bool ret = g_plexApplication.defaultActionHandler->OnAction(WINDOW_HOME, action, GetCurrentFanoutItem(), CFileItemListPtr());
@@ -179,6 +182,7 @@ bool CGUIWindowHome::OnAction(const CAction &action)
         HideAllLists();
         m_lastSelectedItem = GetCurrentItemName();
         m_lastSelectedSubItem.Empty();
+        m_lastFocusedList = 0;
         if (g_plexApplication.timer)
           g_plexApplication.timer->RestartTimeout(200, this);
       }
@@ -204,6 +208,7 @@ bool CGUIWindowHome::OnAction(const CAction &action)
       if (pItem)
       {
         m_lastSelectedSubItem = pItem->GetProperty("key").asString();
+        m_lastFocusedList = focusedControl;
       }
     }
   }
@@ -342,7 +347,10 @@ bool CGUIWindowHome::OnPopupMenu()
 
     CFileItemPtr fileItem = GetCurrentFanoutItem();
     if (!fileItem)
+    {
       m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
+      m_lastFocusedList = GetFocusedControlID();
+    }
   }
 
   if (g_plexApplication.defaultActionHandler->OnAction(WINDOW_HOME, choice, GetCurrentFanoutItem(), CFileItemListPtr()))
@@ -560,8 +568,8 @@ void CGUIWindowHome::OnSectionLoaded(const CGUIMessage& message)
           GetContentListFromSection(url, p, list);
           if(list.Size() > 0)
           {
-            int selectedItem = -1;
-            if (!m_lastSelectedSubItem.empty() && p == m_focusSaver.getLastFocusedControlID())
+            int selectedItem = 0;
+            if (!m_lastSelectedSubItem.empty() && p == m_lastFocusedList)
             {
               for (int i = 0; i < list.Size(); i ++)
               {
