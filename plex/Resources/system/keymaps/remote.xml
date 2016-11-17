@@ -147,7 +147,7 @@
       <right>StepForward</right>
       <up>ChapterOrBigStepForward</up>
       <down>ChapterOrBigStepBack</down>
-      <back>Stop</back>
+      <back>PreviousMenu</back>
       <menu>OSD</menu>
       <start>OSD</start>
       <select>OSD</select>
