@@ -500,7 +500,7 @@ CFileItemPtr CPlexDirectory::NewPlexElement(XML_ELEMENT *element, const CFileIte
     newItem->SetProperty("type", "clip");
   }
 
-  if (newItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP && newItem->HasProperty("url"))
+  if (newItem->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP && newItem->HasProperty("url") && baseUrl.GetHostName() == "myplex")
     newItem->SetProperty("key", "plexserver://best/system/services/url/lookup?url=" + CURL::Encode(newItem->GetProperty("url").asString()));
 
   if (newItem->HasProperty("key"))
