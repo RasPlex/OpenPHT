@@ -30,8 +30,8 @@ else
   platform_gcc_version=4.2
   platform_sdk_version=@use_sdk@
   host_alias=@use_arch@-apple-darwin
-  export MACOSX_DEPLOYMENT_TARGET=10.7
-  platform_min_version=macosx-version-min=10.7
+  export MACOSX_DEPLOYMENT_TARGET=@use_sdk_min@
+  platform_min_version=macosx-version-min=@use_sdk_min@
 fi
 
 platform_path=@use_xcodepath@/Toolchains/XcodeDefault.xctoolchain

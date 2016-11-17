@@ -16,6 +16,11 @@ AC_ARG_WITH([sdk],
   [AS_HELP_STRING([--with-sdk],
   [build depend libs using sdk 10.6 (default osx) or 4.2 (default ios).])],
   [use_sdk=$withval],)
+
+AC_ARG_WITH([sdk-min],
+  [AS_HELP_STRING([--with-sdk-min],
+  [build depend libs using min sdk 10.6 (default osx) or 4.2 (default ios).])],
+  [use_sdk_min=$withval],)
   
 AC_ARG_WITH([rootpath],
   [AS_HELP_STRING([--with-rootpath],
@@ -64,6 +69,7 @@ case $use_darwin in
      10.9);;
      10.10);;
      10.11);;
+     10.12);;
      *)
        AC_MSG_ERROR(error in configure of --with-sdk=$use_sdk)
      esac
@@ -125,6 +131,7 @@ AC_SUBST(use_xcode)
 AC_SUBST(use_xcodepath)
 
 AC_SUBST(use_sdk)
+AC_SUBST(use_sdk_min)
 AC_SUBST(use_arch)
 AC_SUBST(use_darwin)
 AC_SUBST(use_prefix)

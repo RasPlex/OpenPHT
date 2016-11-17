@@ -7,6 +7,7 @@ FFMPEG_HASH=$(git rev-list -1 HEAD -- $ROOT/lib/ffmpeg | cut -c1-8)
 
 target_os=$1
 sdkversion=$2
+sdkminversion=$3
 
 if [ -z $target_os ]; then
   target_os="osx"
@@ -31,6 +32,9 @@ if [ $darwin = "osx" ]; then
   if [ -z $sdkversion ]; then
     sdkversion=10.10
   fi
+  if [ -z $sdkminversion ]; then
+    sdkminversion=10.7
+  fi
 else
   sdkversion=$($xcodebuild -showsdks | grep iphoneos | sort | tail -n 1 | awk '{ print $2}')
 fi
@@ -46,7 +50,7 @@ outputpath=$ROOT/plex/Dependencies/xbmc-depends/$outputdir
 echo $outputpath
 cd $DEPENDDIR
 ./bootstrap
-./configure --with-sdk=${sdkversion} --with-rootpath=$ROOT/plex/Dependencies/xbmc-depends --with-toolchain=/Users/Shared/xbmc-depends/toolchain --with-darwin=$darwin --with-arch=$arch
+./configure --with-sdk=${sdkversion} --with-sdk-min=${sdkminversion} --with-rootpath=$ROOT/plex/Dependencies/xbmc-depends --with-toolchain=/Users/Shared/xbmc-depends/toolchain --with-darwin=$darwin --with-arch=$arch
 make || exit 1
 
 cd $ROOT

@@ -10,6 +10,10 @@ endif()
 
 find_package(OSXSDK)
 
+if(NOT DEFINED OSX_SDK_MIN_VERSION)
+  set(OSX_SDK_MIN_VERSION 10.7)
+endif()
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch ${OSX_ARCH}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${OSX_ARCH} -stdlib=libc++")
 
@@ -48,7 +52,7 @@ if(DEFINED XCODE_VERSION)
 endif()
 
 ######################### Compiler CFLAGS
-set(EXTRA_CFLAGS "-Qunused-arguments -mmacosx-version-min=10.7 -isysroot ${OSX_SDK_PATH}")
+set(EXTRA_CFLAGS "-Qunused-arguments -mmacosx-version-min=${OSX_SDK_MIN_VERSION} -isysroot ${OSX_SDK_PATH}")
 
 ######################### CHECK LIBRARIES / FRAMEWORKS
 #### Frameworks for MacOSX
