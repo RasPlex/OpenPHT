@@ -1,0 +1,31 @@
+NEW:
+  - Mouse Support
+  - Improved iOS companion support
+  - Improved Streaming Brain support
+  - Support for showing imdb rating
+  - New preference category for OpenPHT options
+  - Preference option to stack recently added
+  - Preference option to include watched in watch later and recommended
+  - Preference option to disable preplay screen based on content
+  - Skin option to hide fanart in library
+  - Added reboot option on supported systems (default skin)
+  - Support for 3rd-party Kodi remote apps (e.g. Yatse)
+  - Lots of skinning engine improvements
+  - FileManager and SystemInfo support (requires skin support)
+  - Quick filter support (requires skin support)
+  - Reinstated Screenshot key
+  - V.L. System M-Play Blast remote support
+  - Updated Italian translation (thanks @NicolaIsotta)
+  - Updated help and version branding (running on command line with -v or -h now say OpenPHT instead of XBMC)
+  - Changed linux install path and support for building on 32-bit ubuntu/debian
+
+FIXES:
+  - Performance/smoothness and CPU usage optimizations (fixed cpu spike when browsing library)
+  - Fix search window focus issue
+  - Fix reconnecting to the adapter upon libcec callback CEC_ALERT_CONNECTION_LOST
+  - Fix typo ('Video resolution to large' now 'Video resolution too large')
+  - Fix missing overlay/episode info for focused deck item
+  - Fix selected item when returning to home window
+  - Allow shared servers to be used as best server (fixes channel issue when only shared servers is available)
+  - Only use best server service lookup for myplex clips
+  - Fix for broken music volume with Apple Remote (@WN1188)
