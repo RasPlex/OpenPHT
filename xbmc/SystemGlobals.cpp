@@ -22,7 +22,6 @@
 #include "cores/VideoRenderers/RenderManager.h"
 #include "cores/DataCacheCore.h"
 #include "input/MouseStat.h"
-#include "Application.h"
 #include "GUILargeTextureManager.h"
 #include "guilib/TextureManager.h"
 #include "settings/GUISettings.h"
@@ -38,7 +37,6 @@
 #include "PartyModeManager.h"
 #include "PlayListPlayer.h"
 #include "guilib/LocalizeStrings.h"
-#include "guilib/GUIWindowManager.h"
 #ifdef HAS_PYTHON
 #include "interfaces/python/XBPython.h"
 #endif
