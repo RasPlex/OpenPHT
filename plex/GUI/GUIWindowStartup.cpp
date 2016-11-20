@@ -164,7 +164,7 @@ bool CGUIWindowStartup::OnMessage(CGUIMessage& message)
     g_windowManager.PreviousWindow();
   }
 
-  if (message.GetMessage() == GUI_MSG_PLEX_USERLIST_FETCHED)
+  if (message.GetMessage() == GUI_MSG_PLEX_USERLIST_FETCHED && IsActive())
   {
     setUsersList(m_users);
     return true;
