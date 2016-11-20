@@ -157,7 +157,7 @@ bool CGUIWindowHome::OnAction(const CAction &action)
     m_focusSaver.SaveFocus(this, false);
 
     CFileItemPtr fileItem = GetCurrentFanoutItem();
-    if (!fileItem)
+    if (fileItem && fileItem->HasProperty("key"))
     {
       m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
       m_lastFocusedList = GetFocusedControlID();
@@ -205,7 +205,7 @@ bool CGUIWindowHome::OnAction(const CAction &action)
     if (pControl)
     {
       CGUIListItemPtr pItem = pControl->GetListItem(0);
-      if (pItem)
+      if (pItem && pItem->HasProperty("key"))
       {
         m_lastSelectedSubItem = pItem->GetProperty("key").asString();
         m_lastFocusedList = focusedControl;
@@ -346,7 +346,7 @@ bool CGUIWindowHome::OnPopupMenu()
     m_focusSaver.SaveFocus(this, false);
 
     CFileItemPtr fileItem = GetCurrentFanoutItem();
-    if (!fileItem)
+    if (fileItem && fileItem->HasProperty("key"))
     {
       m_lastSelectedSubItem = fileItem->GetProperty("key").asString();
       m_lastFocusedList = GetFocusedControlID();
