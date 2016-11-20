@@ -416,8 +416,10 @@ bool CGUIPlexDefaultActionHandler::OnAction(int windowID, CAction action, CFileI
           if (CGUIKeyboardFactory::ShowAndGetInput(playlistName, g_localizeStrings.Get(52614), false))
           {
             CPlexServerPtr server = g_plexApplication.serverManager->FindFromItem(item);
-
-            g_plexApplication.mediaServerClient->createPlayList(server, playlistName, item, false, true);
+            if (server)
+              g_plexApplication.mediaServerClient->createPlayList(server, playlistName, item, false, true);
+            else
+              CLog::Log(LOGERROR, "CGUIPlexDefaultActionHandler : Can't find a valid server for selected item");
           }
           return true;
         }
