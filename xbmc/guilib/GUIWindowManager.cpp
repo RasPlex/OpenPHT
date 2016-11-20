@@ -729,9 +729,11 @@ void CGUIWindowManager::PreviousWindow()
   }
   // get the previous window in our stack
   if (m_windowHistory.size() < 2)
-  { // no previous window history yet - check if we should just activate home
+  {
+    // no previous window history yet - check if we should just activate home
     if (GetActiveWindow() != WINDOW_INVALID && GetActiveWindow() != WINDOW_HOME)
     {
+      CloseWindowSync(pCurrentWindow);
       ClearWindowHistory();
       ActivateWindow(WINDOW_HOME);
     }
@@ -745,6 +747,7 @@ void CGUIWindowManager::PreviousWindow()
   if (!pNewWindow)
   {
     CLog::Log(LOGERROR, "Unable to activate the previous window");
+    CloseWindowSync(pCurrentWindow);
     ClearWindowHistory();
     ActivateWindow(WINDOW_HOME);
     return;
@@ -888,7 +891,7 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const vector<CStd
   // as all messages done in WINDOW_INIT will want to be sent to the new
   // topmost window).  If we are swapping windows, we pop the old window
   // off the history stack
-  if (swappingWindows && m_windowHistory.size())
+  if (swappingWindows && !m_windowHistory.empty())
     m_windowHistory.pop();
   AddToWindowHistory(iWindowID);
 
@@ -990,7 +993,7 @@ void CGUIWindowManager::MarkDirty(const CRect& rect)
   m_tracker.MarkDirtyRegion(rect);
 }
 
-void CGUIWindowManager::RenderPass()
+void CGUIWindowManager::RenderPass() const
 {
   CGUIWindow* pWindow = GetWindow(GetActiveWindow());
   if (pWindow)
@@ -1044,7 +1047,7 @@ bool CGUIWindowManager::Render()
   }
   else if (g_advancedSettings.m_guiAlgorithmDirtyRegions == DIRTYREGION_SOLVER_FILL_VIEWPORT_ON_CHANGE)
   {
-    if (dirtyRegions.size() > 0)
+    if (!dirtyRegions.empty())
     {
       RenderPass();
       hasRendered = true;
@@ -1453,7 +1456,7 @@ void CGUIWindowManager::AddToWindowHistory(int newWindowID)
   // and if so, pop all the other windows off the stack so that we
   // always have a predictable "Back" behaviour for each window
   stack<int> historySave = m_windowHistory;
-  while (historySave.size())
+  while (!historySave.empty())
   {
     if (historySave.top() == newWindowID)
       break;
@@ -1513,7 +1516,7 @@ bool CGUIWindowManager::IsWindowTopMost(const CStdString &xmlFile) const
 
 void CGUIWindowManager::ClearWindowHistory()
 {
-  while (m_windowHistory.size())
+  while (!m_windowHistory.empty())
     m_windowHistory.pop();
 }
 
