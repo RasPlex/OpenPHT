@@ -643,6 +643,13 @@ bool CPlexDirectory::ReadMediaContainer(XML_ELEMENT* root, CFileItemList& mediaC
       /* See https://github.com/plexinc/plex/issues/737 for a discussion around this workaround */
       mediaContainer.SetPlexDirectoryType(PLEX_DIR_TYPE_PHOTO);
     }
+    else if (boost::starts_with(m_url.GetFileName(), "library/sections/") &&
+             mediaContainer.Size() > 0 &&
+             mediaContainer.Get(0)->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP &&
+             mediaContainer.GetProperty("viewGroup").asString() == "photo")
+    {
+      mediaContainer.SetPlexDirectoryType(PLEX_DIR_TYPE_PHOTO);
+    }
     else if (boost::starts_with(m_url.GetFileName(), "library/metadata/") &&
              mediaContainer.Size() > 0 &&
              mediaContainer.Get(0)->GetPlexDirectoryType() == PLEX_DIR_TYPE_PHOTO)
