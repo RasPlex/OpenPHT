@@ -89,6 +89,8 @@ void CPlexAutoUpdate::OnTimeout()
   CStdString currentVersion = g_infoManager.GetVersion();
   m_url.SetOption("version", currentVersion);
   m_url.SetOption("build", PLEX_BUILD_TAG);
+  m_url.SetOption("skin", g_guiSettings.GetString("lookandfeel.skin"));
+  m_url.SetOption("forced", m_forced ? "1" : "0");
 
 #if defined(TARGET_DARWIN)
   m_url.SetOption("distribution", "macosx");
@@ -199,7 +201,6 @@ void CPlexAutoUpdate::OnTimeout()
     if (m_forced)
     {
       CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Update available!", "A new version requires manual update", 10000, false);
-      m_forced = false;
     }
   }
   else
@@ -209,10 +210,10 @@ void CPlexAutoUpdate::OnTimeout()
     if (m_forced)
     {
       CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "No update available!", "You are up-to-date!", 10000, false);
-      m_forced = false;
     }
   }
 
+  m_forced = false;
   if (g_guiSettings.GetBool("updates.auto"))
     g_plexApplication.timer->SetTimeout(m_searchFrequency, this);
 
