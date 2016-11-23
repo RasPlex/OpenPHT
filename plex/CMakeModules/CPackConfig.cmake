@@ -38,11 +38,15 @@ set(CPACK_RESOURCE_FILE_LICENSE ${root}/LICENSE.GPL)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 
 set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS
-  "IfFileExists \\\"$INSTDIR\\\\Dependencies\\\\vcredist_2013_x86.exe\\\" 0 +2
+  "SimpleFC::AdvAddRule \\\"OpenPHT\\\" \\\"OpenPHT\\\" 256 1 1 2147483647 1 \\\"$INSTDIR\\\\OpenPHT.exe\\\" \\\"\\\" \\\"\\\" \\\"\\\" \\\"\\\" \\\"\\\" \\\"\\\" \\\"\\\"
+   IfFileExists \\\"$INSTDIR\\\\Dependencies\\\\vcredist_2013_x86.exe\\\" 0 +2
    ExecWait \\\"$INSTDIR\\\\Dependencies\\\\vcredist_2013_x86.exe /q /norestart\\\"
    IfFileExists \\\"$INSTDIR\\\\Dependencies\\\\dxsetup\\\\dxsetup.exe\\\" 0 +2
    ExecWait \\\"$INSTDIR\\\\Dependencies\\\\dxsetup\\\\dxsetup.exe /silent\\\"
    RMDir /r \\\"$INSTDIR\\\\Dependencies\\\"")
+
+set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS
+  "SimpleFC::AdvRemoveRule \\\"OpenPHT\\\"")
 
 if(TARGET_OSX)
   set(CPACK_GENERATOR "ZIP")
