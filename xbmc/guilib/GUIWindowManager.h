@@ -67,12 +67,12 @@ public:
   void ActivateWindow(int iWindowID, const std::vector<CStdString>& params, bool swappingWindows = false);
   void PreviousWindow();
 
-  void CloseDialogs(bool forceClose = false);
+  void CloseDialogs(bool forceClose = false) const;
 
   // OnAction() runs through our active dialogs and windows and sends the message
   // off to the callbacks (application, python, playlist player) and to the
   // currently focused window(s).  Returns true only if the message is handled.
-  bool OnAction(const CAction &action);
+  bool OnAction(const CAction &action) const;
 
   /*! \brief Process active controls allowing them to animate before rendering.
    */
@@ -131,8 +131,11 @@ public:
   void SetCallback(IWindowManagerCallback& callback);
   void DeInitialize();
 
-  void RouteToWindow(CGUIWindow* dialog);
-  void AddModeless(CGUIWindow* dialog);
+  /*! \brief Register a dialog as active dialog
+   *
+   * \param dialog The dialog to register as active dialog
+   */
+  void RegisterDialog(CGUIWindow* dialog);
   void RemoveDialog(int id);
   int GetTopMostModalDialogID(bool ignoreClosing = false) const;
 

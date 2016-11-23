@@ -641,12 +641,15 @@ void CGUIWindowManager::AddCustomWindow(CGUIWindow* pWindow)
   m_vecCustomWindows.push_back(pWindow);
 }
 
-void CGUIWindowManager::AddModeless(CGUIWindow* dialog)
+void CGUIWindowManager::RegisterDialog(CGUIWindow* dialog)
 {
   CSingleLock lock(g_graphicsContext);
-  // only add the window if it's not already added
-  for (iDialog it = m_activeDialogs.begin(); it != m_activeDialogs.end(); ++it)
-    if (*it == dialog) return;
+  // only add the window if it does not exists
+  for (const auto& activeDialog : m_activeDialogs)
+  {
+    if (activeDialog->GetID() == dialog->GetID())
+      return;
+  }
   m_activeDialogs.push_back(dialog);
 }
 
@@ -903,17 +906,23 @@ void CGUIWindowManager::ActivateWindow_Internal(int iWindowID, const vector<CStd
 //  g_infoManager.SetPreviousWindow(WINDOW_INVALID);
 }
 
-void CGUIWindowManager::CloseDialogs(bool forceClose)
+void CGUIWindowManager::CloseDialogs(bool forceClose) const
 {
   CSingleLock lock(g_graphicsContext);
-  while (m_activeDialogs.size() > 0)
+
+  //This is to avoid an assert about out of bounds iterator
+  //when m_activeDialogs happens to be empty
+  if (m_activeDialogs.empty())
+    return;
+
+  auto activeDialogs = m_activeDialogs;
+  for (const auto& dialog : activeDialogs)
   {
-    CGUIWindow* win = m_activeDialogs[0];
-    win->Close(forceClose);
+    dialog->Close(forceClose);
   }
 }
 
-bool CGUIWindowManager::OnAction(const CAction &action)
+bool CGUIWindowManager::OnAction(const CAction &action) const
 {
   CSingleLock lock(g_graphicsContext);
   unsigned int topMost = m_activeDialogs.size();
@@ -1198,18 +1207,6 @@ void CGUIWindowManager::DeInitialize()
   m_initialized = false;
 }
 
-/// \brief Route to a window
-/// \param pWindow Window to route to
-void CGUIWindowManager::RouteToWindow(CGUIWindow* dialog)
-{
-  CSingleLock lock(g_graphicsContext);
-  // Just to be sure: Unroute this window,
-  // #we may have routed to it before
-  RemoveDialog(dialog->GetID());
-
-  m_activeDialogs.push_back(dialog);
-}
-
 /// \brief Unroute window
 /// \param id ID of the window routed
 void CGUIWindowManager::RemoveDialog(int id)
@@ -1230,11 +1227,11 @@ bool CGUIWindowManager::HasModalDialog() const
   CSingleLock lock(g_graphicsContext);
   for (ciDialog it = m_activeDialogs.begin(); it != m_activeDialogs.end(); ++it)
   {
-    CGUIWindow *window = *it;
-    if (window->IsModalDialog())
-    { // have a modal window
-      if (!window->IsAnimating(ANIM_TYPE_WINDOW_CLOSE))
-        return true;
+    if ((*it)->IsDialog() &&
+        (*it)->IsModalDialog() &&
+        !(*it)->IsAnimating(ANIM_TYPE_WINDOW_CLOSE))
+    {
+      return true;
     }
   }
   return false;
