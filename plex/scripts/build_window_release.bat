@@ -1,6 +1,4 @@
 @echo off
-rem java why you so annoying?
-set path=%path:"C:\Program Files (x86)\Java\jre7\bin"=%
 
 call "%VS120COMNTOOLS%vsvars32.bat" || exit /b 1
 
@@ -21,4 +19,3 @@ move c:\tmp\OpenPHT*exe %WORKSPACE%\upload
 move OpenPHT*7z %WORKSPACE%\upload
 move OpenPHT*symsrv*zip %WORKSPACE%\upload
 move c:\tmp\OpenPHT*zip %WORKSPACE%\upload
-move c:\tmp\OpenPHT*manifest.xml %WORKSPACE%\upload
