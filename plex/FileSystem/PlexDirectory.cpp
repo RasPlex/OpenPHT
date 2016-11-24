@@ -656,6 +656,13 @@ bool CPlexDirectory::ReadMediaContainer(XML_ELEMENT* root, CFileItemList& mediaC
     {
       mediaContainer.SetPlexDirectoryType(PLEX_DIR_TYPE_PHOTOALBUM);
     }
+    else if (boost::starts_with(m_url.GetFileName(), "library/metadata/") &&
+             mediaContainer.Size() > 0 &&
+             mediaContainer.Get(0)->GetPlexDirectoryType() == PLEX_DIR_TYPE_CLIP &&
+             mediaContainer.GetProperty("viewGroup").asString() == "photo")
+    {
+      mediaContainer.SetPlexDirectoryType(PLEX_DIR_TYPE_PHOTOALBUM);
+    }
     else if (boost::starts_with(m_url.GetFileName(), "playlists/"))
     {
       std::vector<std::string> arr = StringUtils::Split(m_url.GetFileName(), "/");
