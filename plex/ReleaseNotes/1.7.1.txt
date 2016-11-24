@@ -1,0 +1,4 @@
+FIXES:
+  - Fixes a crash on home screen
+  - Fixes videos inside a photo library
+  - Improved support for newer libmicrohttpd
