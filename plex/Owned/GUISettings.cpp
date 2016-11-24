@@ -651,7 +651,6 @@ void CGUISettings::Initialize()
   AddBool(advs, "debug.showloginfo", 20191, false);
   AddBool(NULL, "debug.networklogging", 52404, false);
   AddBool(NULL, "advanced.collectanalytics", 52504, false);
-  AddPath(NULL, "debug.screenshotpath",20004,"select writable folder",BUTTON_CONTROL_PATH_INPUT,false,657);
 
   // Unused/hidden network settings
   if (g_application.IsStandAlone())
@@ -850,6 +849,7 @@ void CGUISettings::Initialize()
   AddInt(pic, "slideshow.staytime", 12378, 5, 1, 1, 100, SPIN_CONTROL_INT_PLUS, MASK_SECS);
   AddBool(pic, "slideshow.displayeffects", 12379, true);
   AddBool(NULL, "slideshow.shuffle", 13319, false);
+  AddPath(pic, "debug.screenshotpath", 20004, "select writable folder", BUTTON_CONTROL_PATH_INPUT, false, 657);
 
 
   // Playback/Advanced Video

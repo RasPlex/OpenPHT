@@ -38,6 +38,7 @@
 #endif
 
 #include "filesystem/File.h"
+#include "filesystem/SpecialProtocol.h"
 #include "guilib/GraphicContext.h"
 
 #include "utils/JobManager.h"
@@ -249,7 +250,8 @@ void CScreenShot::TakeScreenshot()
 
     if (!file.IsEmpty())
     {
-      TakeScreenshot(file, false);
+      CStdString translatedPath = CSpecialProtocol::TranslatePath(file);
+      TakeScreenshot(translatedPath, false);
       if (savingScreenshots)
         screenShots.push_back(file);
       if (promptUser)
