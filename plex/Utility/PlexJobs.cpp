@@ -167,7 +167,8 @@ bool CPlexThemeMusicPlayerJob::DoWork()
 
   m_fileToPlay = "special://masterprofile/ThemeMusicCache/" + hex + ".mp3";
 
-  if (!XFILE::CFile::Exists(m_fileToPlay))
+  struct __stat64 stat = {};
+  if (XFILE::CFile::Stat(m_fileToPlay, &stat) != 0 || stat.st_size <= 0)
   {
     CPlexFile plex;
     CFile localFile;
@@ -202,11 +203,16 @@ bool CPlexThemeMusicPlayerJob::DoWork()
         }
       }
     }
+    else
+      failed = true;
 
     CLog::Log(LOGDEBUG, "CPlexThemeMusicPlayerJob::DoWork cached %s => %s", m_themeUrl.c_str(), m_fileToPlay.c_str());
 
     plex.Close();
     localFile.Close();
+
+    if (failed)
+      XFILE::CFile::Delete(m_fileToPlay);
 
     return !failed;
   }
