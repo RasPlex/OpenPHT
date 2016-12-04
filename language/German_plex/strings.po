@@ -550,6 +550,14 @@ msgid "I am Special!"
 msgstr "Ich bin etwas Besonderes!"
 
 
+msgctxt "#40007"
+msgid "Pre-release"
+msgstr "Pre-release"
+
+msgctxt "#40008"
+msgid "Beta"
+msgstr "Beta"
+
 msgctxt "#40016"
 msgid "Check for update now..."
 msgstr "Jetzt nach Updates suchen…"
@@ -565,14 +573,14 @@ msgid "Update and restart"
 msgstr "Aktualisieren und neu starten"
 
 
-msgctxt "#40029"
-msgid "Current version"
-msgstr "Aktuelle Version"
-
-
 msgctxt "#40028"
 msgid "Update Available!"
 msgstr "Update verfügbar!"
+
+
+msgctxt "#40029"
+msgid "Current version"
+msgstr "Aktuelle Version"
 
 
 msgctxt "#40030"
@@ -699,6 +707,12 @@ msgstr "Qualität"
 
 
 #empty strings from id 40215 to 40299
+
+msgctxt "#40215"
+msgid "Scan localhost"
+msgstr "Scan localhost"
+
+#empty strings from id 40216 to 40299
 
 msgctxt "#40300"
 msgid "Set Quit Timer"
@@ -915,6 +929,10 @@ msgid "20 Mbps"
 msgstr "20 MBit/s"
 
 
+msgctxt "#43010"
+msgid "Maximum"
+msgstr "Maximum"
+
 msgctxt "#44000"
 msgid "Email"
 msgstr "E-Mail"
@@ -967,7 +985,7 @@ msgstr "Freigegebene Inhalte"
 
 msgctxt "#44021"
 msgid "Watch Later"
-msgstr ""
+msgstr "Später ansehen"
 
 
 msgctxt "#44022"
@@ -1052,32 +1070,32 @@ msgstr "Bedienung von Plex/HT durch Plex-Clients zulassen"
 
 msgctxt "#44400"
 msgid "Pre-Caching - Select Servers"
-msgstr ""
+msgstr "Pre-Caching - Server auswählen"
 
 
 msgctxt "#44401"
 msgid "Processing"
-msgstr ""
+msgstr "Verarbeite"
 
 
 msgctxt "#44402"
 msgid "Retrieving Section"
-msgstr ""
+msgstr "Empfange Sektion"
 
 
 msgctxt "#44403"
 msgid "Precaching Section"
-msgstr ""
+msgstr "Precache Sektion"
 
 
 msgctxt "#44404"
 msgid "Precaching item"
-msgstr ""
+msgstr "Precache Objekt"
 
 
 msgctxt "#44405"
 msgid "Progress"
-msgstr ""
+msgstr "Fortschritt"
 
 
 msgctxt "#44406"
@@ -1087,7 +1105,7 @@ msgstr "FFMPEG AVIO für Netzwerk-Transport benutzen"
 
 msgctxt "#44407"
 msgid "Number of cinema trailers before movies"
-msgstr ""
+msgstr "Anzahl der Kino-Trailern vor dem Film"
 
 
 msgctxt "#44408"
@@ -1131,7 +1149,7 @@ msgstr ""
 ### other Extras related strings
 msgctxt "#44550"
 msgid "Play Trailer"
-msgstr ""
+msgstr "Trailer abspielen"
 
 
 #### These are error strings shown from channels
@@ -1212,10 +1230,58 @@ msgid "Online video quality"
 msgstr "Online-Videos"
 
 
+msgctxt "#52209"
+msgid "Show shared libraries in menu"
+msgstr "Zeige geteilte Bibliotheken im Menu"
+
 msgctxt "#52210"
 msgid "Show queue and recommendations"
 msgstr "Wiedergabeliste und Empfehlungen anzeigen"
 
+
+msgctxt "#52211"
+msgid "Automatic sign in"
+msgstr "Automische anmeldung"
+
+msgctxt "#52212"
+msgid "Show watched in recently added"
+msgstr "Zeige gesehen in kürzliche hinzugefügte"
+
+msgctxt "#52213"
+msgid "Hide channels in menu"
+msgstr "Verstecke Kanäle im Menu"
+
+msgctxt "#52214"
+msgid "Disable preplay screen"
+msgstr "Deaktiviere Vorschaubild"
+
+msgctxt "#52215"
+msgid "Disable server side scaling of fanart"
+msgstr "Deaktiviere serverseitige Skalierung von Fanarts"
+
+msgctxt "#52216"
+msgid "Disable server side scaling of photos"
+msgstr "Deaktiviere serverseitige Skalierung von Fotos"
+
+msgctxt "#52217"
+msgid "Show watched in watch later and recommended"
+msgstr "Zeige gesehene in später ansehen und empfohlene"
+
+msgctxt "#52218"
+msgid "Stack TV Shows in recently added"
+msgstr "Staple TV Serien in kürzlich hinzugefügte"
+
+msgctxt "#52220"
+msgid "Disable preplay screen for movies"
+msgstr "Deaktive Vorscheibild für Filme"
+
+msgctxt "#52221"
+msgid "Disable preplay screen for episodes"
+msgstr "Deaktive Vorscheibild für Folgen"
+
+msgctxt "#52222"
+msgid "Disable preplay screen for clips"
+msgstr "Deaktive Vorscheibild für Videoclips"
 
 msgctxt "#52300"
 msgid "Media Server went away"
@@ -1282,6 +1348,10 @@ msgid "Hide CloudSync sections"
 msgstr "Cloud Sync-Sektionen ausblenden"
 
 
+msgctxt "#52506"
+msgid "External"
+msgstr "Externe"
+
 msgctxt "#52600"
 msgid "Shuffle all"
 msgstr "Zufallswiedergabe für alle"
@@ -1329,42 +1399,42 @@ msgstr ""
 
 msgctxt "#52609"
 msgid "Force Transcode"
-msgstr ""
+msgstr "Erzwinge Transkodierung"
 
 
 msgctxt "#52610"
 msgid "Cannot open Playlist"
-msgstr ""
+msgstr "Wiedergabeliste kann nicht geöffnet werden"
 
 
 msgctxt "#52611"
 msgid "Playlist is empty"
-msgstr ""
+msgstr "Wiedergabeliste ist leer"
 
 
 msgctxt "#52612"
 msgid "Add to Playlist"
-msgstr ""
+msgstr "Hinzufügen zur Wiedergabeliste"
 
 
 msgctxt "#52613"
 msgid "Create Playlist"
-msgstr ""
+msgstr "Wiedergabeliste erstellen"
 
 
 msgctxt "#52614"
 msgid "Enter playlist name"
-msgstr ""
+msgstr "Name für Wiedergabeliste eingeben"
 
 
 msgctxt "#52615"
 msgid "Playlist could not be created."
-msgstr ""
+msgstr "Wiedergabeliste konnte nicht erstellt werden."
 
 
 msgctxt "#52620"
 msgid "MyPlex provides a number of features which requires a login"
-msgstr ""
+msgstr "MyPlex bietet einige Funktionen, welche eine Anmeldung benötigen"
 
 
 msgctxt "#52621"
@@ -1377,3 +1447,66 @@ msgid "Queueing and recommending video, Sharing your media"
 msgstr ""
 
 
+msgctxt "#52623"
+msgid "Subtitle offset"
+msgstr "Untertitel offset"
+
+msgctxt "#52630"
+msgid "Please try again"
+msgstr "Bitte nochmal versuchen"
+
+msgctxt "#52631"
+msgid "Please sign in again"
+msgstr "Bitte wieder anmelden"
+
+msgctxt "#52632"
+msgid "Your credentials have expired. Please sign in again."
+msgstr "Deine Zugangsdaten sind abgelaufen. Bitte wieder anmelden."
+
+msgctxt "#52633"
+msgid "Play extra"
+msgstr "Spiele Extra ab"
+
+msgctxt "#52634"
+msgid "Play from here"
+msgstr "Ab hier abspielen"
+
+msgctxt "#52635"
+msgid "Go to Show"
+msgstr "Gehe zur Serie"
+
+msgctxt "#52636"
+msgid "Go to Season"
+msgstr "Gehe zur Staffel"
+
+msgctxt "#52639"
+msgid "Direct Play HEVC up to"
+msgstr ""
+
+msgctxt "#52640"
+msgid "None"
+msgstr ""
+
+msgctxt "#52641"
+msgid "540p"
+msgstr "540p"
+
+msgctxt "#52642"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#52643"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#52644"
+msgid "1440p"
+msgstr "1440p"
+
+msgctxt "#52645"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#52646"
+msgid "Unlimited"
+msgstr "Unbegrenzt"
