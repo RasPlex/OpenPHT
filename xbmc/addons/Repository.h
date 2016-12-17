@@ -61,7 +61,7 @@ namespace ADDON
   class CRepositoryUpdateJob : public CJob
   {
   public:
-    CRepositoryUpdateJob(const VECADDONS& repos);
+    CRepositoryUpdateJob(const VECADDONS& repos, bool force = false);
     virtual ~CRepositoryUpdateJob() {}
 
     virtual const char *GetType() const { return "repoupdate"; };
@@ -70,6 +70,7 @@ namespace ADDON
     VECADDONS GrabAddons(RepositoryPtr& repo);
 
     VECADDONS m_repos;
+    bool m_force;
   };
 }
 

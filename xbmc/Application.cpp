@@ -1420,6 +1420,8 @@ bool CApplication::Initialize()
 #endif
   }
 
+  CAddonInstaller::Get().UpdateRepos(true);
+
   m_slowTimer.StartZero();
 
   CAddonMgr::Get().StartServices(true);

@@ -179,8 +179,8 @@ VECADDONS CRepository::Parse()
   return result;
 }
 
-CRepositoryUpdateJob::CRepositoryUpdateJob(const VECADDONS &repos)
-  : m_repos(repos)
+CRepositoryUpdateJob::CRepositoryUpdateJob(const VECADDONS &repos, bool force)
+  : m_repos(repos), m_force(force)
 {
 }
 
@@ -270,7 +270,7 @@ VECADDONS CRepositoryUpdateJob::GrabAddons(RepositoryPtr& repo)
   int idRepo = database.GetRepoChecksum(repo->ID(),checksum);
   CStdString reposum = repo->Checksum();
   VECADDONS addons;
-  if (!checksum.Equals(reposum) || checksum.empty())
+  if (m_force || !checksum.Equals(reposum) || checksum.empty())
   {
     addons = repo->Parse();
     if (addons.empty())
@@ -278,11 +278,13 @@ VECADDONS CRepositoryUpdateJob::GrabAddons(RepositoryPtr& repo)
       CLog::Log(LOGERROR,"Repository %s returned no add-ons, listing may have failed",repo->Name().c_str());
       reposum = checksum; // don't update the checksum
     }
-    database.AddRepository(repo->ID(),addons,reposum);
+    if (!addons.empty())
+      database.AddRepository(repo->ID(),addons,reposum);
   }
   else
     database.GetRepository(repo->ID(),addons);
-  database.SetRepoTimestamp(repo->ID(),CDateTime::GetCurrentDateTime().GetAsDBDateTime());
+  if (!addons.empty())
+    database.SetRepoTimestamp(repo->ID(),CDateTime::GetCurrentDateTime().GetAsDBDateTime());
 
   return addons;
 }
