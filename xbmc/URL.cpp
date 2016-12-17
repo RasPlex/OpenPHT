@@ -839,8 +839,16 @@ void CURL::RemoveOption(const CStdString &key)
 CStdString CURL::GetUrlWithoutOptions() const
 {
   CURL t(Get());
+
+  CStdString parent;
+  if (HasOption("parent"))
+    parent = GetOption("parent");
+
   t.SetProtocolOptions("");
   t.SetOptions("");
+
+  if (!parent.IsEmpty())
+    t.SetOption("parent", parent);
 
   CLog::Log(LOGDEBUG, "CURL::GetUrlWithoutOptions %s > %s", Get().c_str(), t.Get().c_str());
 
