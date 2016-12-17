@@ -259,12 +259,16 @@ bool CGUIPlexMediaWindow::RestoreSelection()
       if (m_vecItems->Get(i)->GetProperty("index").asInteger() == idx)
       {
         m_viewControl.SetSelectedItem(i);
+        if (m_viewControl.GetCurrentControl() == m_focusedControl || m_focusedControl == 0)
+          m_viewControl.SetFocused();
         CLog::Log(LOGDEBUG, "RestoreSelection index for %s is %d", key.c_str(), m_lastSelectedIndex[key]);
         return (currentSelection != i);
       }
     }
   }
   m_viewControl.SetSelectedItem(0);
+  if (m_viewControl.GetCurrentControl() == m_focusedControl || m_focusedControl == 0)
+    m_viewControl.SetFocused();
   return false;
 }
 
