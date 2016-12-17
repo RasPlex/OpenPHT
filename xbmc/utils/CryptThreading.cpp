@@ -26,10 +26,12 @@
 #include "threads/Thread.h"
 #include "utils/log.h"
 
-#if (defined HAVE_CONFIG_H) && (!defined WIN32)
+#if (defined HAVE_CONFIG_H) && (!defined TARGET_WINDOWS)
   #include "config.h"
 #else
+#ifndef HAVE_OPENSSL
 #define HAVE_OPENSSL
+#endif
 #endif
 
 #ifdef HAVE_OPENSSL
@@ -40,11 +42,15 @@
 #include <gcrypt.h>
 #include <errno.h>
 
+#if GCRYPT_VERSION_NUMBER < 0x010600
 GCRY_THREAD_OPTION_PTHREAD_IMPL;
+#endif
+
 #endif
 
 /* ========================================================================= */
 /* openssl locking implementation for curl */
+#if defined(HAVE_OPENSSL)
 static CCriticalSection* getlock(int index)
 {
   return g_cryptThreadingInitializer.get_lock(index);
@@ -52,7 +58,7 @@ static CCriticalSection* getlock(int index)
 
 static void lock_callback(int mode, int type, const char* file, int line)
 {
-  if (mode & 0x01 /* CRYPTO_LOCK from openssl/crypto.h */ )
+  if (mode & CRYPTO_LOCK)
     getlock(type)->lock();
   else
     getlock(type)->unlock();
@@ -62,12 +68,15 @@ static unsigned long thread_id()
 {
   return (unsigned long)CThread::GetCurrentThreadId();
 }
+#endif
 /* ========================================================================= */
 
 CryptThreadingInitializer::CryptThreadingInitializer()
 {
+  CLog::Log(LOGINFO, "CryptThreadingInitializer");
+
   bool attemptedToSetSSLMTHook = false;
-#ifdef HAVE_OPENSSL
+#if defined(HAVE_OPENSSL)
   // set up OpenSSL
   numlocks = CRYPTO_num_locks();
   CRYPTO_set_id_callback(thread_id);
@@ -82,9 +91,11 @@ CryptThreadingInitializer::CryptThreadingInitializer()
     locks[i] = NULL;
 
 #ifdef HAVE_GCRYPT
+#if GCRYPT_VERSION_NUMBER < 0x010600
   // set up gcrypt
   gcry_control(GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
   attemptedToSetSSLMTHook = true;
+#endif
 #endif
 
   if (!attemptedToSetSSLMTHook)
@@ -95,7 +106,7 @@ CryptThreadingInitializer::CryptThreadingInitializer()
 CryptThreadingInitializer::~CryptThreadingInitializer()
 {
   CSingleLock l(locksLock);
-#ifdef HAVE_OPENSSL
+#if defined(HAVE_OPENSSL)
   CRYPTO_set_locking_callback(NULL);
 #endif
 

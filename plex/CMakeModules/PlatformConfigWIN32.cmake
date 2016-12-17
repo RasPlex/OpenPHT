@@ -63,6 +63,7 @@ set(external_libs
   liblzo2
   dnssd
   zlib
+  libeay32
 )
 
 set(non_link_libs

@@ -23,9 +23,41 @@
 #include "DllLibCurl.h"
 #include "threads/SingleLock.h"
 #include "utils/log.h"
-#include "utils/TimeUtils.h"
 
 #include <assert.h>
+
+#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+#include "threads/Thread.h"
+#include "openssl/crypto.h"
+
+static CCriticalSection** m_sslLockArray = NULL;
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+void ssl_lock_callback(int mode, int type, char *file, int line)
+{
+  if (!m_sslLockArray)
+    return;
+
+  if (mode & CRYPTO_LOCK)
+    m_sslLockArray[type]->lock();
+  else
+    m_sslLockArray[type]->unlock();
+}
+
+unsigned long ssl_thread_id(void)
+{
+  return (unsigned long)CThread::GetCurrentThreadId();
+}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // HAVE_OPENSSL
 
 using namespace XCURL;
 
@@ -59,6 +91,20 @@ bool DllLibCurlGlobal::Load()
   /* check idle will clean up the last one */
   g_curlReferences = 2;
 
+#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+  // Initialize ssl locking array
+  m_sslLockArray = new CCriticalSection*[CRYPTO_num_locks()];
+  for (int i=0; i<CRYPTO_num_locks(); i++)
+    m_sslLockArray[i] = new CCriticalSection;
+
+#if defined(HAS_CURL_STATIC)
+  crypto_set_id_callback((unsigned long (*)())ssl_thread_id);
+  crypto_set_locking_callback((void (*)(int, int, const char*, int))ssl_lock_callback);
+#else
+  CRYPTO_set_locking_callback((void(*)(int, int, const char*, int))ssl_lock_callback);
+#endif
+#endif
+
   return true;
 }
 
@@ -72,6 +118,20 @@ void DllLibCurlGlobal::Unload()
 
     // close libcurl
     global_cleanup();
+
+#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+    // Cleanup ssl locking array
+#if defined(HAS_CURL_STATIC)
+    crypto_set_id_callback(NULL);
+    crypto_set_locking_callback(NULL);
+#else
+    CRYPTO_set_locking_callback(NULL);
+#endif
+    for (int i = 0; i<CRYPTO_num_locks(); i++)
+      delete m_sslLockArray[i];
+
+    delete[] m_sslLockArray;
+#endif
 
     DllDynamic::Unload();
   }
@@ -100,19 +160,19 @@ void DllLibCurlGlobal::CheckIdle()
     {
       CLog::Log(LOGINFO, "%s - Closing session to %s://%s (easy=%p, multi=%p)\n", __FUNCTION__, it->m_protocol.c_str(), it->m_hostname.c_str(), (void*)it->m_easy, (void*)it->m_multi);
 
-      // It's important to clean up multi *before* cleaning up easy, because the multi cleanup
-      // code accesses stuff in the easy's structure.
-      if(it->m_multi)
-        multi_cleanup(it->m_multi);
+      if(it->m_multi && it->m_easy)
+        multi_remove_handle(it->m_multi, it->m_easy);
       if(it->m_easy)
         easy_cleanup(it->m_easy);
+      if(it->m_multi)
+        multi_cleanup(it->m_multi);
 
       Unload();
 
       it = m_sessions.erase(it);
       continue;
     }
-    it++;
+    ++it;
   }
 
   /* check if we should unload the dll */
@@ -129,7 +189,7 @@ void DllLibCurlGlobal::easy_aquire(const char *protocol, const char *hostname, C
   CSingleLock lock(m_critSection);
 
   VEC_CURLSESSIONS::iterator it;
-  for(it = m_sessions.begin(); it != m_sessions.end(); it++)
+  for(it = m_sessions.begin(); it != m_sessions.end(); ++it)
   {
     if( !it->m_busy )
     {
@@ -208,7 +268,7 @@ void DllLibCurlGlobal::easy_release(CURL_HANDLE** easy_handle, CURLM** multi_han
   }
 
   VEC_CURLSESSIONS::iterator it;
-  for(it = m_sessions.begin(); it != m_sessions.end(); it++)
+  for(it = m_sessions.begin(); it != m_sessions.end(); ++it)
   {
     if( it->m_easy == easy && (multi == NULL || it->m_multi == multi) )
     {
@@ -227,7 +287,7 @@ CURL_HANDLE* DllLibCurlGlobal::easy_duphandle(CURL_HANDLE* easy_handle)
   CSingleLock lock(m_critSection);
 
   VEC_CURLSESSIONS::iterator it;
-  for(it = m_sessions.begin(); it != m_sessions.end(); it++)
+  for(it = m_sessions.begin(); it != m_sessions.end(); ++it)
   {
     if( it->m_easy == easy_handle )
     {
@@ -252,7 +312,7 @@ void DllLibCurlGlobal::easy_duplicate(CURL_HANDLE* easy, CURLM* multi, CURL_HAND
     *multi_out = DllLibCurl::multi_init();
 
   VEC_CURLSESSIONS::iterator it;
-  for(it = m_sessions.begin(); it != m_sessions.end(); it++)
+  for(it = m_sessions.begin(); it != m_sessions.end(); ++it)
   {
     if( it->m_easy == easy )
     {

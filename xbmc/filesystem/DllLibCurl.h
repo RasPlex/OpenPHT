@@ -21,6 +21,8 @@
 
 #include "DynamicDll.h"
 #include "threads/CriticalSection.h"
+#include <stdio.h>
+#include <vector>
 
 /* put types of curl in namespace to avoid namespace pollution */
 namespace XCURL
@@ -38,6 +40,7 @@ namespace XCURL
     virtual CURL_HANDLE * easy_init(void)=0;
     //virtual CURLcode easy_setopt(CURL_HANDLE *handle, CURLoption option, ...)=0;
     virtual CURLcode easy_perform(CURL_HANDLE * handle )=0;
+    virtual CURLcode easy_pause(CURL_HANDLE * handle, int bitmask )=0;
     virtual void easy_reset(CURL_HANDLE * handle)=0;
     //virtual CURLcode easy_getinfo(CURL_HANDLE *curl, CURLINFO info, ... )=0;
     virtual void easy_cleanup(CURL_HANDLE * handle )=0;
@@ -49,12 +52,9 @@ namespace XCURL
     virtual CURLMcode multi_fdset(CURLM *multi_handle, fd_set *read_fd_set, fd_set *write_fd_set, fd_set *exc_fd_set, int *max_fd)=0;
     virtual CURLMcode multi_timeout(CURLM *multi_handle, long *timeout)=0;
     virtual CURLMsg*  multi_info_read(CURLM *multi_handle, int *msgs_in_queue)=0;
-    virtual void multi_cleanup(CURL_HANDLE * handle )=0;
+    virtual CURLMcode multi_cleanup(CURLM * handle )=0;
     virtual struct curl_slist* slist_append(struct curl_slist *, const char *)=0;
     virtual void  slist_free_all(struct curl_slist *)=0;
-    /* PLEX */
-    virtual const char* easy_strerror(CURLcode)=0;
-    /* END PLEX */
   };
 
   class DllLibCurl : public DllDynamic, DllLibCurlInterface
@@ -65,6 +65,7 @@ namespace XCURL
     DEFINE_METHOD0(CURL_HANDLE *, easy_init)
     DEFINE_METHOD_FP(CURLcode, easy_setopt, (CURL_HANDLE *p1, CURLoption p2, ...))
     DEFINE_METHOD1(CURLcode, easy_perform, (CURL_HANDLE * p1 ))
+    DEFINE_METHOD2(CURLcode, easy_pause, (CURL_HANDLE * p1, int p2 ))
     DEFINE_METHOD1(void, easy_reset, (CURL_HANDLE * p1 ))
     DEFINE_METHOD_FP(CURLcode, easy_getinfo, (CURL_HANDLE *p1, CURLINFO p2, ... ))
     DEFINE_METHOD1(void, easy_cleanup, (CURL_HANDLE * p1))
@@ -76,18 +77,22 @@ namespace XCURL
     DEFINE_METHOD5(CURLMcode, multi_fdset, (CURLM *p1, fd_set *p2, fd_set *p3, fd_set *p4, int *p5))
     DEFINE_METHOD2(CURLMcode, multi_timeout, (CURLM *p1, long *p2))
     DEFINE_METHOD2(CURLMsg*,  multi_info_read, (CURLM *p1, int *p2))
-    DEFINE_METHOD1(void, multi_cleanup, (CURLM *p1))
+    DEFINE_METHOD1(CURLMcode, multi_cleanup, (CURLM *p1))
     DEFINE_METHOD2(struct curl_slist*, slist_append, (struct curl_slist * p1, const char * p2))
     DEFINE_METHOD1(void, slist_free_all, (struct curl_slist * p1))
-    /* PLEX */
-    DEFINE_METHOD1(const char*, easy_strerror, (CURLcode p1))
-    /* END PLEX */
+    DEFINE_METHOD1(const char *, easy_strerror, (CURLcode p1))
+#if defined(HAS_CURL_STATIC)
+    DEFINE_METHOD1(void, crypto_set_id_callback, (unsigned long (*p1)(void)))
+    DEFINE_METHOD1(void, crypto_set_locking_callback, (void (*p1)(int, int, const char *, int)))
+#endif
     BEGIN_METHOD_RESOLVE()
       RESOLVE_METHOD_RENAME(curl_global_init, global_init)
       RESOLVE_METHOD_RENAME(curl_global_cleanup, global_cleanup)
       RESOLVE_METHOD_RENAME(curl_easy_init, easy_init)
+      RESOLVE_METHOD_RENAME(curl_easy_strerror, easy_strerror)
       RESOLVE_METHOD_RENAME_FP(curl_easy_setopt, easy_setopt)
       RESOLVE_METHOD_RENAME(curl_easy_perform, easy_perform)
+      RESOLVE_METHOD_RENAME(curl_easy_pause, easy_pause)
       RESOLVE_METHOD_RENAME(curl_easy_reset, easy_reset)
       RESOLVE_METHOD_RENAME_FP(curl_easy_getinfo, easy_getinfo)
       RESOLVE_METHOD_RENAME(curl_easy_cleanup, easy_cleanup)
@@ -102,9 +107,10 @@ namespace XCURL
       RESOLVE_METHOD_RENAME(curl_multi_cleanup, multi_cleanup)
       RESOLVE_METHOD_RENAME(curl_slist_append, slist_append)
       RESOLVE_METHOD_RENAME(curl_slist_free_all, slist_free_all)
-      /* PLEX */
-      RESOLVE_METHOD_RENAME(curl_easy_strerror, easy_strerror)
-      /* END PLEX */
+#if defined(HAS_CURL_STATIC)
+      RESOLVE_METHOD_RENAME(CRYPTO_set_id_callback, crypto_set_id_callback)
+      RESOLVE_METHOD_RENAME(CRYPTO_set_locking_callback, crypto_set_locking_callback)
+#endif
     END_METHOD_RESOLVE()
 
   };
