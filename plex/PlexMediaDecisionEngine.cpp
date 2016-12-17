@@ -446,7 +446,10 @@ bool CPlexMediaDecisionJob::DoWork()
       if (serverVersion > CPlexServerVersion("1.0.3.0"))
       {
         CURL tURL = CPlexTranscoderClient::GetTranscodeURL(server, m_choosenMedia);
-        tURL.SetFileName("/video/:/transcode/universal/decision");
+        if (m_item.IsVideo())
+          tURL.SetFileName("video/:/transcode/universal/decision");
+        else
+          tURL.SetFileName("music/:/transcode/universal/decision");
         tURL.SetOption("directPlay", shouldTranscode ? "0" : "1");
 
         XFILE::CPlexDirectory dir;
@@ -471,6 +474,18 @@ bool CPlexMediaDecisionJob::DoWork()
             CLog::Log(LOGINFO, "Streaming Brain decided to transcode, Code : %d, Transcode : %s", transcodeDecisionCode, transcodeDecisionText.c_str());
             CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Info, "Transcoding", transcodeDecisionText);
             shouldTranscode = true;
+          }
+
+          if (!m_item.IsVideo() && !list.IsEmpty())
+          {
+            m_choosenMedia = *list.Get(0);
+            mediaItem = CPlexMediaDecisionEngine::getSelectedMediaItem(m_choosenMedia);
+            if (mediaItem && mediaItem->m_mediaParts.size() == 1)
+            {
+              m_choosenMedia.SetPath(GetPartURL(mediaItem->m_mediaParts[0]));
+              m_choosenMedia.m_selectedMediaPart = mediaItem->m_mediaParts[0];
+            }
+            m_choosenMedia.m_lStartOffset = m_item.m_lStartOffset;
           }
         }
       }
