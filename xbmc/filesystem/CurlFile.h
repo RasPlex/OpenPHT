@@ -114,6 +114,8 @@ namespace XFILE
           int64_t         m_filePos;
           bool            m_bFirstLoop;
           bool            m_sendRange;
+          bool            m_bLastError;
+          bool            m_bRetry;
 
           /* returned http header */
           CHttpHeader m_httpheader;
@@ -125,7 +127,7 @@ namespace XFILE
           bool         Seek(int64_t pos);
           unsigned int Read(void* lpBuf, int64_t uiBufSize);
           bool         ReadString(char *szLine, int iLineLength);
-          bool         FillBuffer(unsigned int want);
+          int8_t       FillBuffer(unsigned int want);
 
           void         SetResume(void);
           long         Connect(unsigned int size);
@@ -133,23 +135,7 @@ namespace XFILE
 
           /* PLEX */
           CStdString    m_strDeadEndUrl; // If we can't redirect, this holds the last URL.
-          SOCKET        m_ticklePipe[2];
           std::string   m_url; // this is the URL that we are fetching, mostly for debug purpose.
-          bool          m_hasTicklePipe;
-
-          void Cancel()
-          {
-            if (m_hasTicklePipe)
-            {
-#ifndef TARGET_WINDOWS
-              if (::write(m_ticklePipe[1], "Q", 1) != 1)
-#else
-              if (::send(m_ticklePipe[1], "Q", 1, 0) != 1)
-#endif
-                CLog::Log(LOGWARNING, "CCurlFile::ReadState::Cancel ERROR sending wakeup packet. %d", errno);
-            }
-            m_cancelled = true;
-          }
           /* END PLEX */
       };
 
@@ -188,6 +174,7 @@ namespace XFILE
       bool            m_multisession;
       bool            m_skipshout;
       bool            m_postdataset;
+      bool            m_allowRetry;
 
       CRingBuffer     m_buffer;           // our ringhold buffer
       char *          m_overflowBuffer;   // in the rare case we would overflow the above buffer
@@ -210,6 +197,3 @@ namespace XFILE
       /* END PLEX */
   };
 }
-
-
-

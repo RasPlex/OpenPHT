@@ -26,11 +26,12 @@
 #include "settings/GUISettings.h"
 #include "settings/Settings.h"
 #include "File.h"
+#include "threads/SystemClock.h"
 
 #include <vector>
 #include <climits>
 
-#ifdef _LINUX
+#ifdef TARGET_POSIX
 #include <errno.h>
 #include <inttypes.h>
 #include "../linux/XFileUtils.h"
@@ -58,7 +59,9 @@ using namespace XCURL;
 #define XMIN(a,b) ((a)<(b)?(a):(b))
 #define FITS_INT(a) (((a) <= INT_MAX) && ((a) >= INT_MIN))
 
-#define dllselect select
+#define FILLBUFFER_OK         0
+#define FILLBUFFER_NO_DATA    1
+#define FILLBUFFER_FAIL       2
 
 // curl calls this routine to debug
 extern "C" int debug_callback(CURL_HANDLE *handle, curl_infotype info, char *output, size_t size, void *data)
@@ -99,6 +102,31 @@ extern "C" size_t header_callback(void *ptr, size_t size, size_t nmemb, void *st
 {
   CCurlFile::CReadState *state = (CCurlFile::CReadState *)stream;
   return state->HeaderCallback(ptr, size, nmemb);
+}
+
+extern "C" int transfer_cancel_callback(void *clientp,
+                curl_off_t dltotal,
+                curl_off_t dlnow,
+                curl_off_t ultotal,
+                curl_off_t ulnow)
+{
+  if (clientp == NULL) return 0;
+
+  CCurlFile::CReadState *state = (CCurlFile::CReadState *)clientp;
+  return state->m_cancelled ? 1 : 0;
+}
+
+/* used only by CCurlFile::Stat to bail out of unwanted transfers */
+extern "C" int transfer_abort_callback(void *clientp,
+               curl_off_t dltotal,
+               curl_off_t dlnow,
+               curl_off_t ultotal,
+               curl_off_t ulnow)
+{
+  if(dlnow > 0)
+    return 1;
+  else
+    return 0;
 }
 
 /* fix for silly behavior of realloc */
@@ -232,28 +260,16 @@ CCurlFile::CReadState::CReadState()
   m_bFirstLoop = true;
   m_sendRange = true;
   m_headerdone = false;
-
-  /* PLEX */
-  m_hasTicklePipe = PlexUtils::MakeWakeupPipe(m_ticklePipe);
-  /* END PLEX */
+  m_bLastError = false;
+  m_bRetry = true;
 }
 
 CCurlFile::CReadState::~CReadState()
 {
   Disconnect();
 
-  if(m_easyHandle && g_curlInterface.IsLoaded()) /* PLEX */
+  if(m_easyHandle)
     g_curlInterface.easy_release(&m_easyHandle, &m_multiHandle);
-
-  /* PLEX */
-  if (m_hasTicklePipe)
-  {
-    ::shutdown(m_ticklePipe[0], 2);
-    ::closesocket(m_ticklePipe[0]);
-    ::shutdown(m_ticklePipe[1], 2);
-    ::closesocket(m_ticklePipe[1]);
-  }
-  /* END PLEX */
 }
 
 bool CCurlFile::CReadState::Seek(int64_t pos)
@@ -272,7 +288,7 @@ bool CCurlFile::CReadState::Seek(int64_t pos)
     int len = m_buffer.getMaxReadSize();
     m_filePos += len;
     m_buffer.SkipBytes(len);
-    if(!FillBuffer(m_bufferSize))
+    if (FillBuffer(m_bufferSize) != FILLBUFFER_OK)
     {
       if(!m_buffer.SkipBytes(-len))
         CLog::Log(LOGERROR, "%s - Failed to restore position after failed fill", __FUNCTION__);
@@ -316,6 +332,9 @@ void CCurlFile::CReadState::SetResume(void)
 
 long CCurlFile::CReadState::Connect(unsigned int size)
 {
+  if (m_filePos != 0)
+    CLog::Log(LOGDEBUG,"CurlFile::CReadState::Connect - Resume from position %" PRId64, m_filePos);
+
   SetResume();
   g_curlInterface.multi_add_handle(m_multiHandle, m_easyHandle);
 
@@ -327,12 +346,16 @@ long CCurlFile::CReadState::Connect(unsigned int size)
   // read some data in to try and obtain the length
   // maybe there's a better way to get this info??
   m_stillRunning = 1;
-  if (!FillBuffer(1))
+
+  // (Try to) fill buffer
+  if (FillBuffer(1) != FILLBUFFER_OK)
   {
-#ifndef __PLEX__
-    CLog::Log(LOGERROR, "CCurlFile::CReadState::Open, didn't get any data from stream.");
-#endif
-    return -1;
+    // Check response code
+    long response;
+    if (CURLE_OK == g_curlInterface.easy_getinfo(m_easyHandle, CURLINFO_RESPONSE_CODE, &response))
+      return response;
+    else 
+      return -1;
   }
 
   double length;
@@ -352,7 +375,7 @@ long CCurlFile::CReadState::Connect(unsigned int size)
 
 void CCurlFile::CReadState::Disconnect()
 {
-  if(m_multiHandle && m_easyHandle && g_curlInterface.IsLoaded()) // PLEX
+  if(m_multiHandle && m_easyHandle)
     g_curlInterface.multi_remove_handle(m_multiHandle, m_easyHandle);
 
   m_buffer.Clear();
@@ -396,6 +419,7 @@ CCurlFile::CCurlFile()
   m_state = new CReadState();
   m_skipshout = false;
   m_httpresponse = -1;
+  m_allowRetry = true;
 
   /* PLEX */
   m_clearCookies = false;
@@ -450,6 +474,14 @@ void CCurlFile::SetCommonOptions(CReadState* state)
 
   g_curlInterface.easy_setopt(h, CURLOPT_WRITEDATA, state);
   g_curlInterface.easy_setopt(h, CURLOPT_WRITEFUNCTION, write_callback);
+
+  g_curlInterface.easy_setopt(h, CURLOPT_PROGRESSDATA, state);
+#if LIBCURL_VERSION_NUM >= 0x072000 // 7.32.0
+  g_curlInterface.easy_setopt(h, CURLOPT_XFERINFOFUNCTION, transfer_cancel_callback);
+#else
+  g_curlInterface.easy_setopt(h, CURLOPT_PROGRESSFUNCTION, transfer_cancel_callback);
+#endif
+  g_curlInterface.easy_setopt(h, CURLOPT_NOPROGRESS, 0);
 
   // set username and password for current handle
   if (m_username.length() > 0 && m_password.length() > 0)
@@ -962,9 +994,6 @@ bool CCurlFile::IsInternet(bool checkDNS /* = true */)
 void CCurlFile::Cancel()
 {
   m_state->m_cancelled = true;
-  /* PLEX */
-  m_state->Cancel();
-  /* END PLEX */
   while (m_opened)
     Sleep(1);
 }
@@ -976,6 +1005,11 @@ void CCurlFile::Reset()
 
 bool CCurlFile::Open(const CURL& url)
 {
+  if (!g_curlInterface.IsLoaded())
+  {
+    CLog::Log(LOGERROR, "CurlFile::Open: curl interface not loaded");
+    return false;
+  }
 
   m_opened = true;
 
@@ -996,14 +1030,18 @@ bool CCurlFile::Open(const CURL& url)
   SetCommonOptions(m_state);
   SetRequestHeaders(m_state);
   m_state->m_sendRange = m_seekable;
+  m_state->m_bRetry = m_allowRetry;
 
   m_httpresponse = m_state->Connect(m_bufferSize);
 #ifndef __PLEX__
-  if( m_httpresponse < 0 || m_httpresponse >= 400)
+  if (m_httpresponse <= 0 || m_httpresponse >= 400)
 #else
-  if ((m_httpresponse < 0 || m_httpresponse >= 400) && m_state->m_strDeadEndUrl.empty())
+  if ((m_httpresponse <= 0 || m_httpresponse >= 400) && m_state->m_strDeadEndUrl.empty())
 #endif
+  {
+    CLog::Log(LOGERROR, "CCurlFile::Open failed with code %li for %s", m_httpresponse, url.Get().c_str());
     return false;
+  }
 
   SetCorrectHeaders(m_state);
 
@@ -1075,7 +1113,7 @@ bool CCurlFile::CReadState::ReadString(char *szLine, int iLineLength)
 {
   unsigned int want = (unsigned int)iLineLength;
 
-  if((m_fileSize == 0 || m_filePos < m_fileSize) && !FillBuffer(want))
+  if((m_fileSize == 0 || m_filePos < m_fileSize) && FillBuffer(want) != FILLBUFFER_OK)
     return false;
 
   // ensure only available data is considered
@@ -1143,6 +1181,17 @@ bool CCurlFile::Exists(const CURL& url)
 
   if (result == CURLE_WRITE_ERROR || result == CURLE_OK)
     return true;
+
+  if (result == CURLE_HTTP_RETURNED_ERROR)
+  {
+    long code;
+    if(g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_RESPONSE_CODE, &code) == CURLE_OK && code != 404 )
+      CLog::Log(LOGERROR, "CCurlFile::Exists - Failed: HTTP returned error %ld for %s", code, url.Get().c_str());
+  }
+  else if (result != CURLE_REMOTE_FILE_NOT_FOUND && result != CURLE_FTP_COULDNT_RETR_FILE)
+  {
+    CLog::Log(LOGERROR, "CCurlFile::Exists - Failed: %s(%d) for %s", g_curlInterface.easy_strerror(result), result, url.Get().c_str());
+  }
 
   errno = ENOENT;
   return false;
@@ -1291,37 +1340,39 @@ int CCurlFile::Stat(const CURL& url, struct __stat64* buffer)
   || result == CURLE_RECV_ERROR /* some silly shoutcast servers */ )
   {
     /* some http servers and shoutcast servers don't give us any data on a head request */
-    /* request normal and just fail out, it's their loss */
+    /* request normal and just bail out via progress meter callback after we received data */
     /* somehow curl doesn't reset CURLOPT_NOBODY properly so reset everything */
     SetCommonOptions(m_state);
     SetRequestHeaders(m_state);
     g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_TIMEOUT, 5);
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_RANGE, "0-0");
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_WRITEDATA, NULL); /* will cause write failure*/
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_FILETIME , 1); 
+    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_FILETIME, 1);
+#if LIBCURL_VERSION_NUM >= 0x072000 // 0.7.32
+    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_XFERINFOFUNCTION, transfer_abort_callback);
+#else
+    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_PROGRESSFUNCTION, transfer_abort_callback);
+#endif
+    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_NOPROGRESS, 0);
+
     result = g_curlInterface.easy_perform(m_state->m_easyHandle);
+
   }
 
-  if( result == CURLE_HTTP_RANGE_ERROR )
-  {
-    /* crap can't use the range option, disable it and try again */
-    g_curlInterface.easy_setopt(m_state->m_easyHandle, CURLOPT_RANGE, NULL);
-    result = g_curlInterface.easy_perform(m_state->m_easyHandle);
-  }
-
-  if( result != CURLE_WRITE_ERROR && result != CURLE_OK )
+  if( result != CURLE_ABORTED_BY_CALLBACK && result != CURLE_OK )
   {
     g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
     errno = ENOENT;
+    CLog::Log(LOGERROR, "CCurlFile::Stat - Failed: %s(%d) for %s", g_curlInterface.easy_strerror(result), result, url.Get().c_str());
     return -1;
   }
 
   double length;
-  if (CURLE_OK != g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &length) || length < 0.0)
+  result = g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &length);
+  if (result != CURLE_OK || length < 0.0)
   {
     if (url.GetProtocol() == "ftp")
     {
       g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
+      CLog::Log(LOGNOTICE, "CCurlFile::Stat - Content length failed: %s(%d) for %s", g_curlInterface.easy_strerror(result), result, url.Get().c_str());
       errno = ENOENT;
       return -1;
     }
@@ -1334,8 +1385,10 @@ int CCurlFile::Stat(const CURL& url, struct __stat64* buffer)
   if(buffer)
   {
     char *content;
-    if (CURLE_OK != g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_CONTENT_TYPE, &content))
+    result = g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_CONTENT_TYPE, &content);
+    if (result != CURLE_OK)
     {
+      CLog::Log(LOGNOTICE, "CCurlFile::Stat - Content type failed: %s(%d) for %s", g_curlInterface.easy_strerror(result), result, url.Get().c_str());
       g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
       errno = ENOENT;
       return -1;
@@ -1350,17 +1403,15 @@ int CCurlFile::Stat(const CURL& url, struct __stat64* buffer)
         buffer->st_mode = _S_IFREG;
     }
     long filetime;
-    if (CURLE_OK != g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_FILETIME, &filetime))
+    result = g_curlInterface.easy_getinfo(m_state->m_easyHandle, CURLINFO_FILETIME, &filetime);
+    if (result != CURLE_OK)
     {
-      CLog::Log(LOGWARNING, "%s - Cannot get curl filetime", __FUNCTION__);
+      CLog::Log(LOGNOTICE, "CCurlFile::Stat - Filetime failed: %s(%d) for %s", g_curlInterface.easy_strerror(result), result, url.Get().c_str());
     }
     else
     {
       if (filetime != -1)
-      {
-        CLog::Log(LOGDEBUG, "%s - curl filetime: %ld", __FUNCTION__, filetime);
         buffer->st_mtime = filetime;
-      }
     }
   }
   g_curlInterface.easy_release(&m_state->m_easyHandle, NULL);
@@ -1370,8 +1421,15 @@ int CCurlFile::Stat(const CURL& url, struct __stat64* buffer)
 unsigned int CCurlFile::CReadState::Read(void* lpBuf, int64_t uiBufSize)
 {
   /* only request 1 byte, for truncated reads (only if not eof) */
-  if((m_fileSize == 0 || m_filePos < m_fileSize) && !FillBuffer(1))
-    return 0;
+  if (m_fileSize == 0 || m_filePos < m_fileSize)
+  {
+    int8_t result = FillBuffer(1);
+    if (result == FILLBUFFER_FAIL)
+      return 0; // Fatal error
+
+    if (result == FILLBUFFER_NO_DATA)
+      return 0;
+  }
 
   /* ensure only available data is considered */
   unsigned int want = (unsigned int)XMIN(m_buffer.getMaxReadSize(), uiBufSize);
@@ -1394,7 +1452,7 @@ unsigned int CCurlFile::CReadState::Read(void* lpBuf, int64_t uiBufSize)
 }
 
 /* use to attempt to fill the read buffer up to requested number of bytes */
-bool CCurlFile::CReadState::FillBuffer(unsigned int want)
+int8_t CCurlFile::CReadState::FillBuffer(unsigned int want)
 {
   int retry = 0;
   fd_set fdread;
@@ -1406,7 +1464,7 @@ bool CCurlFile::CReadState::FillBuffer(unsigned int want)
   while ((unsigned int)m_buffer.getMaxReadSize() < want && m_buffer.getMaxWriteSize() > 0 )
   {
     if (m_cancelled)
-      return false;
+      return FILLBUFFER_NO_DATA;
 
     /* if there is data in overflow buffer, try to use that first */
     if (m_overflowSize)
@@ -1430,50 +1488,66 @@ bool CCurlFile::CReadState::FillBuffer(unsigned int want)
       {
         /* if we still have stuff in buffer, we are fine */
         if (m_buffer.getMaxReadSize())
-          return true;
+          return FILLBUFFER_OK;
 
-        /* verify that we are actually okey */
+        // check for errors
         int msgs;
-        CURLcode CURLresult = CURLE_OK;
         CURLMsg* msg;
+        bool bRetryNow = true;
+        bool bError = false;
         while ((msg = g_curlInterface.multi_info_read(m_multiHandle, &msgs)))
         {
           if (msg->msg == CURLMSG_DONE)
           {
             if (msg->data.result == CURLE_OK)
-              return true;
+              return FILLBUFFER_OK;
 
-#ifndef __PLEX__
-            CLog::Log(LOGWARNING, "%s: curl failed with code %i", __FUNCTION__, msg->data.result);
-#else
-            CLog::Log(LOGWARNING, "CCurlFile::FillBuffer [%s] failed: %s", m_url.c_str(), g_curlInterface.easy_strerror(msg->data.result));
-#endif
+            long httpCode = 0;
+            if (msg->data.result == CURLE_HTTP_RETURNED_ERROR)
+            {
+              g_curlInterface.easy_getinfo(msg->easy_handle, CURLINFO_RESPONSE_CODE, &httpCode);
 
-            // We need to check the result here as we don't want to retry on every error
+              // Don't log 404 not-found errors to prevent log-spam
+              if (httpCode != 404)
+                CLog::Log(LOGERROR, "CCurlFile::FillBuffer - Failed: HTTP returned error %ld", httpCode);
+            }
+            else
+            {
+              CLog::Log(LOGERROR, "CCurlFile::FillBuffer - Failed: %s(%d)", g_curlInterface.easy_strerror(msg->data.result), msg->data.result);
+            }
+
             if ( (msg->data.result == CURLE_OPERATION_TIMEDOUT ||
                   msg->data.result == CURLE_PARTIAL_FILE       ||
                   msg->data.result == CURLE_COULDNT_CONNECT    ||
                   msg->data.result == CURLE_RECV_ERROR)        &&
                   !m_bFirstLoop)
-              CURLresult = msg->data.result;
-            else if ( (msg->data.result == CURLE_HTTP_RANGE_ERROR     ||
-                       msg->data.result == CURLE_HTTP_RETURNED_ERROR) &&
+            {
+              bRetryNow = false; // Leave it to caller whether the operation is retried
+              bError = true;
+            }
+            else if ( (msg->data.result == CURLE_HTTP_RANGE_ERROR              ||
+                       httpCode == 416 /* = Requested Range Not Satisfiable */ ||
+                       httpCode == 406 /* = Not Acceptable (fixes issues with non compliant HDHomerun servers */) &&
                        m_bFirstLoop                                   &&
                        m_filePos == 0                                 &&
                        m_sendRange)
             {
-              // If server returns a range or http error, retry with range disabled
-              CURLresult = msg->data.result;
+              // If server returns a (possible) range error, disable range and retry (handled below)
+              bRetryNow = true;
+              bError = true;
               m_sendRange = false;
             }
             else
-              return false;
+            {
+              // For all other errors, abort the operation
+              return FILLBUFFER_FAIL;
+            }
           }
         }
 
-        // Don't retry when we didn't "see" any error
-        if (CURLresult == CURLE_OK)
-          return false;
+        // Check for an actual error, if not, just return no-data
+        if (!bError && !m_bLastError)
+          return FILLBUFFER_NO_DATA;
 
         // Close handle
         if (m_multiHandle && m_easyHandle)
@@ -1484,34 +1558,34 @@ bool CCurlFile::CReadState::FillBuffer(unsigned int want)
         free(m_overflowBuffer);
         m_overflowBuffer = NULL;
         m_overflowSize = 0;
+        m_bLastError = true; // Flag error for the next run
 
-        // If we got here something is wrong
-        if (++retry > g_advancedSettings.m_curlretries)
+        // Retry immediately or leave it up to the caller?
+        if ((m_bRetry && retry < g_advancedSettings.m_curlretries) || (bRetryNow && retry == 0))
         {
-          CLog::Log(LOGWARNING, "%s: Reconnect failed!", __FUNCTION__);
-          // Reset the rest of the variables like we would in Disconnect()
-          m_filePos = 0;
-          m_fileSize = 0;
-          m_bufferSize = 0;
+          retry++;
 
-          return false;
+          // Connect + seek to current position (again)
+          SetResume();
+          g_curlInterface.multi_add_handle(m_multiHandle, m_easyHandle);
+
+          CLog::Log(LOGWARNING, "CCurlFile::FillBuffer - Reconnect, (re)try %i", retry);
+
+          // Return to the beginning of the loop:
+          continue;
         }
 
-        CLog::Log(LOGWARNING, "%s: Reconnect, (re)try %i", __FUNCTION__, retry);
-
-        // Connect + seek to current position (again)
-        SetResume();
-        g_curlInterface.multi_add_handle(m_multiHandle, m_easyHandle);
-
-        // Return to the beginning of the loop:
-        continue;
+        return FILLBUFFER_NO_DATA; // We failed but flag no data to caller, so it can retry the operation
       }
-      return false;
+      return FILLBUFFER_FAIL;
     }
 
     // We've finished out first loop
     if(m_bFirstLoop && m_buffer.getMaxReadSize() > 0)
       m_bFirstLoop = false;
+
+    // No error this run
+    m_bLastError = false;
 
     switch (result)
     {
@@ -1529,45 +1603,57 @@ bool CCurlFile::CReadState::FillBuffer(unsigned int want)
         if (CURLM_OK != g_curlInterface.multi_timeout(m_multiHandle, &timeout) || timeout == -1 || timeout < 200)
           timeout = 200;
 
-        struct timeval t = { (int)timeout / 1000, ((int)timeout % 1000) * 1000 };
+        XbmcThreads::EndTime endTime(timeout);
+        int rc;
 
-        /* PLEX */
-        // Add the tickle pipe
-        if (maxfd != -1 && m_hasTicklePipe)
+        do
         {
-          FD_SET(m_ticklePipe[0], &fdread);
-          if (m_ticklePipe[0] > maxfd)
-            maxfd = m_ticklePipe[0];
-        }
-        /* END PLEX */
-
-
-        /* Wait until data is available or a timeout occurs.
-           We call dllselect(maxfd + 1, ...), specially in case of (maxfd == -1),
-           we call dllselect(0, ...), which is basically equal to sleep. */
-        if (SOCKET_ERROR == dllselect(maxfd + 1, &fdread, &fdwrite, &fdexcep, &t))
-        {
-          CLog::Log(LOGERROR, "%s - curl failed with socket error", __FUNCTION__);
-          return false;
-        }
-
-        /* PLEX */
-        // Read the byte from the tickle socket if there was one
-        if (m_hasTicklePipe)
-        {
-          if (FD_ISSET(m_ticklePipe[0], &fdread))
+          /* On success the value of maxfd is guaranteed to be >= -1. We call
+           * select(maxfd + 1, ...); specially in case of (maxfd == -1) there are
+           * no fds ready yet so we call select(0, ...) --or Sleep() on Windows--
+           * to sleep 100ms, which is the minimum suggested value in the
+           * curl_multi_fdset() doc.
+           */
+          if (maxfd == -1)
           {
-            CLog::Log(LOGINFO, "CCurlFile::CReadState::FillBuffer [%s] terminated", m_url.c_str());
-            char theTickleByte;
 #ifdef TARGET_WINDOWS
-            ::recv(m_ticklePipe[0], &theTickleByte, 1, 0);
+            /* Windows does not support using select() for sleeping without a dummy
+             * socket. Instead use Windows' Sleep() and sleep for 100ms which is the
+             * minimum suggested value in the curl_multi_fdset() doc.
+             */
+            Sleep(100);
+            rc = 0;
 #else
-            ::read(m_ticklePipe[0], &theTickleByte, 1);
+            /* Portable sleep for platforms other than Windows. */
+            struct timeval wait = { 0, 100 * 1000 }; /* 100ms */
+            rc = select(0, NULL, NULL, NULL, &wait);
 #endif
           }
-        }
-        /* END PLEX */
+          else
+          {
+            unsigned int time_left = endTime.MillisLeft();
+            struct timeval wait = { (int)time_left / 1000, ((int)time_left % 1000) * 1000 };
+            rc = select(maxfd + 1, &fdread, &fdwrite, &fdexcep, &wait);
+          }
+#ifdef TARGET_WINDOWS
+        } while(rc == SOCKET_ERROR && WSAGetLastError() == WSAEINTR);
+#else
+        } while(rc == SOCKET_ERROR && errno == EINTR);
+#endif
 
+        if(rc == SOCKET_ERROR)
+        {
+#ifdef TARGET_WINDOWS
+          char buf[256];
+          strerror_s(buf, 256, WSAGetLastError());
+          CLog::Log(LOGERROR, "CCurlFile::FillBuffer - Failed with socket error:%s", buf);
+#else
+          char const * str = strerror(errno);
+          CLog::Log(LOGERROR, "CCurlFile::FillBuffer - Failed with socket error:%s", str);
+#endif
+
+          return FILLBUFFER_FAIL;
+        }
       }
       break;
       case CURLM_CALL_MULTI_PERFORM:
@@ -1580,13 +1666,13 @@ bool CCurlFile::CReadState::FillBuffer(unsigned int want)
       break;
       default:
       {
-        CLog::Log(LOGERROR, "%s - curl multi perform failed with code %d, aborting", __FUNCTION__, result);
-        return false;
+        CLog::Log(LOGERROR, "CCurlFile::FillBuffer - Multi perform failed with code %d, aborting", result);
+        return FILLBUFFER_FAIL;
       }
       break;
     }
   }
-  return true;
+  return FILLBUFFER_OK;
 }
 
 void CCurlFile::ClearRequestHeaders()
