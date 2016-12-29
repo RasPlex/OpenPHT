@@ -675,7 +675,7 @@ int ff_read_packet(AVFormatContext *s, AVPacket *pkt)
                 return ret;
             for (i = 0; i < s->nb_streams; i++) {
                 st = s->streams[i];
-                if (st->probe_packets)
+                if (st->probe_packets || st->request_probe > 0)
                     if ((err = probe_codec(s, st, NULL)) < 0)
                         return err;
                 av_assert0(st->request_probe <= 0);
@@ -2365,11 +2365,14 @@ static void update_stream_timings(AVFormatContext *ic)
             if (ic->nb_programs) {
                 for (i = 0; i < ic->nb_programs; i++) {
                     p = ic->programs[i];
-                    if (p->start_time != AV_NOPTS_VALUE && p->end_time > p->start_time)
+                    if (p->start_time != AV_NOPTS_VALUE &&
+                        p->end_time > p->start_time &&
+                        p->end_time - (uint64_t)p->start_time <= INT64_MAX)
                         duration = FFMAX(duration, p->end_time - p->start_time);
                 }
-            } else
+            } else if (end_time >= start_time && end_time - (uint64_t)start_time <= INT64_MAX) {
                 duration = FFMAX(duration, end_time - start_time);
+            }
         }
     }
     if (duration != INT64_MIN && duration > 0 && ic->duration == AV_NOPTS_VALUE) {
