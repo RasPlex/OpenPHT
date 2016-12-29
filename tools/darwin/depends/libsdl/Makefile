@@ -5,7 +5,6 @@ LIBNAME=SDL
 VERSION=1.2.15
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.gz
-BASE_URL=http://mirrors.xbmc.org/build-deps/sources/
 
 # configuration settings
 CONFIGURE=./configure --prefix=$(PREFIX) \
