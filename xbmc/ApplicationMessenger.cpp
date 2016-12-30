@@ -466,7 +466,7 @@ void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)
 
         if (items.Size() > 0)
         {
-          for (int i=0;i<items.Size();++i)
+          for (int i=0;i<items.Size() && i < 200;++i)
             pSlideShow->Add(items[i].get());
 
           /* PLEX */
