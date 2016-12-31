@@ -1241,7 +1241,7 @@ msgstr "Wiedergabeliste und Empfehlungen anzeigen"
 
 msgctxt "#52211"
 msgid "Automatic sign in"
-msgstr "Automische anmeldung"
+msgstr "Automatische Anmeldung"
 
 msgctxt "#52212"
 msgid "Show watched in recently added"
@@ -1273,15 +1273,15 @@ msgstr "Staple TV Serien in kürzlich hinzugefügte"
 
 msgctxt "#52220"
 msgid "Disable preplay screen for movies"
-msgstr "Deaktive Vorscheibild für Filme"
+msgstr "Deaktiviere Vorscheibild für Filme"
 
 msgctxt "#52221"
 msgid "Disable preplay screen for episodes"
-msgstr "Deaktive Vorscheibild für Folgen"
+msgstr "Deaktiviere Vorscheibild für Folgen"
 
 msgctxt "#52222"
 msgid "Disable preplay screen for clips"
-msgstr "Deaktive Vorscheibild für Videoclips"
+msgstr "Deaktiviere Vorscheibild für Videoclips"
 
 msgctxt "#52300"
 msgid "Media Server went away"
