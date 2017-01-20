@@ -1,16 +1,16 @@
 //
 //  HIDRemote.m
-//  HIDRemote V1.2 (27th May 2011)
+//  HIDRemote V1.4 (18th February 2015)
 //
 //  Created by Felix Schwarz on 06.04.07.
-//  Copyright 2007-2011 IOSPIRIT GmbH. All rights reserved.
+//  Copyright 2007-2015 IOSPIRIT GmbH. All rights reserved.
 //
 //  The latest version of this class is available at
 //     http://www.iospirit.com/developers/hidremote/
 //
 //  ** LICENSE *************************************************************************
 //
-//  Copyright (c) 2007-2011 IOSPIRIT GmbH (http://www.iospirit.com/)
+//  Copyright (c) 2007-2014 IOSPIRIT GmbH (http://www.iospirit.com/)
 //  All rights reserved.
 //  
 //  Redistribution and use in source and binary forms, with or without modification,
@@ -75,7 +75,7 @@ static HIDRemote *sHIDRemote = nil;
 
 @implementation HIDRemote
 
-#pragma mark -- Init, dealloc & shared instance --
+#pragma mark - Init, dealloc & shared instance
 
 + (HIDRemote *)sharedHIDRemote
 {
@@ -163,7 +163,7 @@ static HIDRemote *sHIDRemote = nil;
 	[super dealloc];
 }
 
-#pragma mark -- PUBLIC: System Information --
+#pragma mark - PUBLIC: System Information
 + (BOOL)isCandelairInstalled
 {
 	mach_port_t	masterPort = 0;
@@ -187,34 +187,78 @@ static HIDRemote *sHIDRemote = nil;
 
 + (BOOL)isCandelairInstallationRequiredForRemoteMode:(HIDRemoteMode)remoteMode
 {
-	SInt32 systemVersion = 0;
-	
 	// Determine OS version
-	if (Gestalt(gestaltSystemVersion, &systemVersion) == noErr)
+	switch ([self OSXVersion])
 	{
-		switch (systemVersion)
-		{
-			case 0x1060: // OS 10.6
-			case 0x1061: // OS 10.6.1
-				// OS X 10.6(.0) and OS X 10.6.1 require the Candelair driver for to be installed,
-				// so that third party apps can acquire an exclusive lock on the receiver HID Device
-				// via IOKit.
+		case 0x1060: // OS 10.6
+		case 0x1061: // OS 10.6.1
+			// OS X 10.6(.0) and OS X 10.6.1 require the Candelair driver for to be installed,
+			// so that third party apps can acquire an exclusive lock on the receiver HID Device
+			// via IOKit.
 
-				switch (remoteMode)
-				{
-					case kHIDRemoteModeExclusive:
-					case kHIDRemoteModeExclusiveAuto:
-						if (![self isCandelairInstalled])
-						{
-							return (YES);
-						}
-					break;
-				}
-			break;
-		}
+			switch (remoteMode)
+			{
+				case kHIDRemoteModeExclusive:
+				case kHIDRemoteModeExclusiveAuto:
+					if (![self isCandelairInstalled])
+					{
+						return (YES);
+					}
+				break;
+				
+				default:
+					return (NO);
+				break;
+			}
+		break;
 	}
 	
 	return (NO);
+}
+
+// Drop-in replacement for Gestalt(gestaltSystemVersion, &osXVersion) that avoids use of Gestalt for code targeting 10.10 or later
++ (SInt32)OSXVersion
+{
+	static SInt32 sHRGestaltOSXVersion = 0;
+
+	if (sHRGestaltOSXVersion==0)
+	{
+		#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_9
+		// Code for builds targeting OS X 10.10+
+		NSOperatingSystemVersion osVersion;
+
+		osVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
+		
+		sHRGestaltOSXVersion = (SInt32)(0x01000 | ((osVersion.majorVersion-10)<<8) | (osVersion.minorVersion<<4) | osVersion.patchVersion);
+		#else
+			#if MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_9
+			// Code for builds using the OS X 10.10 SDK or later
+			NSOperatingSystemVersion osVersion;
+
+			if ([[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)])
+			{
+				osVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
+				
+				sHRGestaltOSXVersion = (SInt32)(0x01000 | ((osVersion.majorVersion-10)<<8) | (osVersion.minorVersion<<4) | osVersion.patchVersion);
+			}
+			else
+			{
+				#pragma clang diagnostic push
+				#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+				Gestalt (gestaltSystemVersion, &sHRGestaltOSXVersion);
+				#pragma clang diagnostic pop
+			}
+			#else /* MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_9 */
+				// Code for builds using an SDK older than 10.10
+				#pragma clang diagnostic push
+				#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+				Gestalt (gestaltSystemVersion, &sHRGestaltOSXVersion);
+				#pragma clang diagnostic pop
+			#endif /* MAC_OS_X_VERSION_MAX_ALLOWED > MAC_OS_X_VERSION_10_9 */
+		#endif /*  MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_9 */
+	}
+	
+	return (sHRGestaltOSXVersion);
 }
 
 - (HIDRemoteAluminumRemoteSupportLevel)aluminiumRemoteSystemSupportLevel
@@ -241,7 +285,7 @@ static HIDRemote *sHIDRemote = nil;
 	return (supportLevel);
 }
 
-#pragma mark -- PUBLIC: Interface / API --
+#pragma mark - PUBLIC: Interface / API
 - (BOOL)startRemoteControl:(HIDRemoteMode)hidRemoteMode
 {
 	if ((_mode == kHIDRemoteModeNone) && (hidRemoteMode != kHIDRemoteModeNone))
@@ -316,6 +360,9 @@ static HIDRemote *sHIDRemote = nil;
 			
 			[self _postStatusWithAction:kHIDRemoteDNStatusActionStart];
 			
+			// Register for system wake notifications
+			[[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(_computerDidWake:) name:NSWorkspaceDidWakeNotification object:nil];
+			
 			return (YES);
 
 		}while(0);
@@ -339,7 +386,7 @@ static HIDRemote *sHIDRemote = nil;
 
 	_autoRecover = NO;
 	_isStopping = YES;
-	
+
 	if (_autoRecoveryTimer!=nil)
 	{
 		[_autoRecoveryTimer invalidate];
@@ -430,6 +477,9 @@ static HIDRemote *sHIDRemote = nil;
 				}
 			}
 		}
+
+		// Unregister from system wake notifications
+		[[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self name:NSWorkspaceDidWakeNotification object:nil];
 	}
 	
 	_mode = kHIDRemoteModeNone;
@@ -501,7 +551,7 @@ static HIDRemote *sHIDRemote = nil;
 	return (_delegate);
 }
 
-#pragma mark -- PUBLIC: Expert APIs --
+#pragma mark - PUBLIC: Expert APIs
 - (void)setEnableSecureEventInputWorkaround:(BOOL)newEnableSecureEventInputWorkaround
 {
 	_secureEventInputWorkAround = newEnableSecureEventInputWorkaround;
@@ -557,7 +607,7 @@ static HIDRemote *sHIDRemote = nil;
 	return (_isStopping);
 }
 
-#pragma mark -- PRIVATE: Application becomes active / inactive handling for kHIDRemoteModeExclusiveAuto --
+#pragma mark - PRIVATE: Application becomes active / inactive handling for kHIDRemoteModeExclusiveAuto
 - (void)_appStatusChanged:(NSNotification *)notification
 {
 	#ifdef HIDREMOTE_THREADSAFETY_HARDENED_NOTIFICATION_HANDLING
@@ -646,7 +696,7 @@ static HIDRemote *sHIDRemote = nil;
 }
 
 
-#pragma mark -- PRIVATE: Distributed notifiations handling --
+#pragma mark - PRIVATE: Distributed notifiations handling
 - (void)_postStatusWithAction:(NSString *)action
 {
 	if (_sendStatusNotifications)
@@ -862,7 +912,7 @@ static HIDRemote *sHIDRemote = nil;
 	return (_sendStatusNotifications);
 }
 
-#pragma mark -- PRIVATE: Service setup and destruction --
+#pragma mark - PRIVATE: Service setup and destruction
 - (BOOL)_prematchService:(io_object_t)service
 {
 	BOOL serviceMatches = NO;
@@ -1405,22 +1455,17 @@ static HIDRemote *sHIDRemote = nil;
 					{
 						if ([(NSString *)ioKitClassName isEqual:@"AppleIRController"])
 						{
-							SInt32 systemVersion;
-							
-							if (Gestalt(gestaltSystemVersion, &systemVersion) == noErr)
+							if ([HIDRemote OSXVersion] >= 0x1062)
 							{
-								if (systemVersion >= 0x1062)
-								{
-									// Support for the Aluminum Remote was added only with OS 10.6.2. Previous versions can not distinguish
-									// between the Center and the new, seperate Play/Pause button. They'll recognize both as presses of the
-									// "Center" button.
-									//
-									// You CAN, however, receive Aluminum Remote button presses even under OS 10.5 when using Remote Buddy's
-									// Virtual Remote. While Remote Buddy does support the Aluminum Remote across all OS releases it runs on,
-									// its Virtual Remote can only emulate Aluminum Remote button presses under OS 10.5 and up in order not to
-									// break compatibility with applications whose IR Remote code relies on driver internals. [13-Nov-09]
-									supportLevel = kHIDRemoteAluminumRemoteSupportLevelNative;
-								}
+								// Support for the Aluminum Remote was added only with OS 10.6.2. Previous versions can not distinguish
+								// between the Center and the new, seperate Play/Pause button. They'll recognize both as presses of the
+								// "Center" button.
+								//
+								// You CAN, however, receive Aluminum Remote button presses even under OS 10.5 when using Remote Buddy's
+								// Virtual Remote. While Remote Buddy does support the Aluminum Remote across all OS releases it runs on,
+								// its Virtual Remote can only emulate Aluminum Remote button presses under OS 10.5 and up in order not to
+								// break compatibility with applications whose IR Remote code relies on driver internals. [13-Nov-09]
+								supportLevel = kHIDRemoteAluminumRemoteSupportLevelNative;
 							}
 						}
 						
@@ -1633,7 +1678,7 @@ static HIDRemote *sHIDRemote = nil;
 }
 
 
-#pragma mark -- PRIVATE: HID Event handling --
+#pragma mark - PRIVATE: HID Event handling
 - (void)_simulateHoldEvent:(NSTimer *)aTimer
 {
 	NSMutableDictionary *hidAttribsDict;
@@ -1862,7 +1907,7 @@ static HIDRemote *sHIDRemote = nil;
 	}
 }
 
-#pragma mark -- PRIVATE: Notification handling --
+#pragma mark - PRIVATE: Notification handling
 - (void)_serviceMatching:(io_iterator_t)iterator
 {
 	io_object_t matchingService = 0;
@@ -1902,6 +1947,7 @@ static HIDRemote *sHIDRemote = nil;
 				{
 					UInt64 secureEventInputPIDSum = 0;
 					uid_t frontUserSession = 0;
+					BOOL screenIsLocked = NO;
 					NSDictionary *consoleUserDict;
 					
 					while ((consoleUserDict = [consoleUsersEnum nextObject]) != nil)
@@ -1911,6 +1957,7 @@ static HIDRemote *sHIDRemote = nil;
 							NSNumber *secureInputPID;
 							NSNumber *onConsole;
 							NSNumber *userID;
+							NSNumber *screenIsLockedBool;
 						
 							if ((secureInputPID = [consoleUserDict objectForKey:@"kCGSSessionSecureInputPID"]) != nil)
 							{
@@ -1931,11 +1978,20 @@ static HIDRemote *sHIDRemote = nil;
 									}
 								}
 							}
+							
+							if ((screenIsLockedBool = [consoleUserDict objectForKey:@"CGSSessionScreenIsLocked"]) != nil)
+							{
+								if ([screenIsLockedBool isKindOfClass:[NSNumber class]])
+								{
+									screenIsLocked = [screenIsLockedBool boolValue];
+								}
+							}
 						}
 					}
 
 					_lastSecureEventInputPIDSum = secureEventInputPIDSum;
 					_lastFrontUserSession	    = frontUserSession;
+					_lastScreenIsLocked	    = screenIsLocked;
 				}
 			}
 		
@@ -1946,33 +2002,77 @@ static HIDRemote *sHIDRemote = nil;
 	}
 }
 
+- (void)_silentRestart
+{
+	if ((_mode == kHIDRemoteModeExclusive) || (_mode == kHIDRemoteModeExclusiveAuto))
+	{
+		HIDRemoteMode restartInMode = _mode;
+		unsigned checkActiveRemoteControlCount = [self activeRemoteControlCount];
+		
+		// Only restart when we already have active remote controls - to avoid race conditions with other applications using kHIDRemoteModeExclusive mode (new in V1.2.1)
+		if (checkActiveRemoteControlCount > 0)
+		{
+			_isRestarting = YES;
+			[self stopRemoteControl];
+			[self startRemoteControl:restartInMode];
+			_isRestarting = NO;
+			
+			// Check whether we lost a remote control due to restarting/secure input change notification handling (new in V1.2.1)
+			if (checkActiveRemoteControlCount != [self activeRemoteControlCount])
+			{
+				// Log message
+				NSLog(@"Lost access (mode %d) to %d IR Remote Receiver(s) after handling SecureInput change notification - please quit other apps trying to use the Remote exclusively", restartInMode, checkActiveRemoteControlCount);
+			}
+		}
+	}
+}
+
 - (void)_secureInputNotificationFor:(io_service_t)service messageType:(natural_t)messageType messageArgument:(void *)messageArgument
 {
 	if (messageType == kIOMessageServiceBusyStateChange)
 	{
 		UInt64 old_lastSecureEventInputPIDSum = _lastSecureEventInputPIDSum;
 		uid_t  old_lastFrontUserSession = _lastFrontUserSession;
+		BOOL   old_lastScreenIsLocked = _lastScreenIsLocked;
 		
 		[self _updateSessionInformation];
 		
-		if (((old_lastSecureEventInputPIDSum != _lastSecureEventInputPIDSum) || (old_lastFrontUserSession != _lastFrontUserSession)) && _secureEventInputWorkAround)
+		if (((old_lastSecureEventInputPIDSum != _lastSecureEventInputPIDSum) ||
+		     (old_lastFrontUserSession != _lastFrontUserSession) ||
+		     (old_lastScreenIsLocked != _lastScreenIsLocked)) && _secureEventInputWorkAround)
 		{
-			if ((_mode == kHIDRemoteModeExclusive) || (_mode == kHIDRemoteModeExclusiveAuto))
+			[self _silentRestart];
+		}
+	}
+}
+
+- (void)_computerDidWake:(NSNotification *)aNotification
+{
+	// Work around for a bug in 10.8, where exclusive connections may be degraded to shared connections after a sleep/wakeup cycle (credit: Paul Duggan from Galaxy Software)
+	#ifdef NSAppKitVersionNumber10_8
+	if (NSAppKitVersionNumber >= NSAppKitVersionNumber10_8)
+	#else
+	if (NSAppKitVersionNumber >= 1187)
+	#endif
+	{
+		#ifdef HIDREMOTE_THREADSAFETY_HARDENED_NOTIFICATION_HANDLING
+		if ([self respondsToSelector:@selector(performSelector:onThread:withObject:waitUntilDone:)]) // OS X 10.5+ only
+		{
+			if ([NSThread currentThread] != _runOnThread)
 			{
-				HIDRemoteMode restartInMode = _mode;
-			
-				_isRestarting = YES;
-				[self stopRemoteControl];
-				[self startRemoteControl:restartInMode];
-				_isRestarting = NO;
+				[self performSelector:@selector(_computerDidWake:) onThread:_runOnThread withObject:aNotification waitUntilDone:NO];
+				return;
 			}
 		}
+		#endif
+
+		[self _silentRestart];
 	}
 }
 
 @end
 
-#pragma mark -- PRIVATE: IOKitLib Callbacks --
+#pragma mark - PRIVATE: IOKitLib Callbacks
 
 static void HIDEventCallback(	void * target, 
 				IOReturn result,

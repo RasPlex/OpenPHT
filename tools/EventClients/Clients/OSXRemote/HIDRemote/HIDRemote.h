@@ -1,16 +1,16 @@
 //
 //  HIDRemote.h
-//  HIDRemote V1.2
+//  HIDRemote V1.4 (18th February 2015)
 //
 //  Created by Felix Schwarz on 06.04.07.
-//  Copyright 2007-2011 IOSPIRIT GmbH. All rights reserved.
+//  Copyright 2007-2015 IOSPIRIT GmbH. All rights reserved.
 //
 //  The latest version of this class is available at
 //     http://www.iospirit.com/developers/hidremote/
 //
 //  ** LICENSE *************************************************************************
 //
-//  Copyright (c) 2007-2011 IOSPIRIT GmbH (http://www.iospirit.com/)
+//  Copyright (c) 2007-2014 IOSPIRIT GmbH (http://www.iospirit.com/)
 //  All rights reserved.
 //  
 //  Redistribution and use in source and binary forms, with or without modification,
@@ -50,10 +50,22 @@
 //
 //  ************************************************************************************
 
-
 #import <Cocoa/Cocoa.h>
 
+// For legacy SDKs
+#ifndef MAC_OS_X_VERSION_10_9
+#define MAC_OS_X_VERSION_10_9 1090
+#endif /* MAC_OS_X_VERSION_10_9 */
+
+#ifndef MAC_OS_X_VERSION_10_10
+#define MAC_OS_X_VERSION_10_10 101000
+#endif /* MAC_OS_X_VERSION_10_10 */
+
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
+// Carbon is only required on OS X versions prior to 10.10 (for getting the OS version via Gestalt() -
+// replaced by [[NSProcessInfo processInfo] operatingSystemVersion] in 10.10)
 #include <Carbon/Carbon.h>
+#endif
 
 #include <unistd.h>
 #include <mach/mach.h>
@@ -240,6 +252,7 @@ typedef enum
 	BOOL _secureEventInputWorkAround;
 	UInt64 _lastSecureEventInputPIDSum;
 	uid_t _lastFrontUserSession;
+	BOOL _lastScreenIsLocked;
 	
 	// Exclusive lock lending
 	BOOL _exclusiveLockLending;
@@ -268,6 +281,7 @@ typedef enum
 #pragma mark -- PUBLIC: System Information --
 + (BOOL)isCandelairInstalled;
 + (BOOL)isCandelairInstallationRequiredForRemoteMode:(HIDRemoteMode)remoteMode;
++ (SInt32)OSXVersion;
 - (HIDRemoteAluminumRemoteSupportLevel)aluminiumRemoteSystemSupportLevel;
 
 #pragma mark -- PUBLIC: Interface / API --
