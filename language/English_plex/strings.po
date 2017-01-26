@@ -1255,3 +1255,7 @@ msgstr "2160p"
 msgctxt "#52646"
 msgid "Unlimited"
 msgstr "Unlimited"
+
+msgctxt "#52647"
+msgid "Show server name for all libraries"
+msgstr "Show server name for all libraries"

@@ -730,7 +730,7 @@ CGUIStaticItemPtr CGUIWindowHome::ItemToSection(CFileItemPtr item)
 {
   CGUIStaticItemPtr newItem = CGUIStaticItemPtr(new CGUIStaticItem);
   newItem->SetLabel(item->GetLabel());
-  if (item->HasProperty("serverOwner"))
+  if (item->HasProperty("serverOwner") && !g_guiSettings.GetBool("myplex.servernameshared"))
     newItem->SetLabel2(item->GetProperty("serverOwner").asString());
   else
     newItem->SetLabel2(item->GetProperty("serverName").asString());

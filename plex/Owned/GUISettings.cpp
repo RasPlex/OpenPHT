@@ -1046,6 +1046,7 @@ void CGUISettings::Initialize()
   // Plex "Appearance" General
   CSettingsCategory* glaf = AddCategory(SETTINGS_APPEARANCE, "myplex", 128);
   AddBool(glaf, "myplex.sharedsectionsonhome", 52209, false);
+  AddBool(glaf, "myplex.servernameshared", 52647, false);
   AddBool(glaf, "myplex.recentlywatched", 52212, false);
   AddBool(glaf, "myplex.recentlystacked", 52218, false);
   AddBool(glaf, "myplex.enablequeueandrec", 52210, true);
