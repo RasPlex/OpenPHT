@@ -635,6 +635,8 @@ static int mov_read_hdlr(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     title_size = atom.size - 24;
     if (title_size > 0) {
+        if (title_size > FFMIN(INT_MAX, SIZE_MAX-1))
+            return AVERROR_INVALIDDATA;
         title_str = av_malloc(title_size + 1); /* Add null terminator */
         if (!title_str)
             return AVERROR(ENOMEM);
@@ -3808,7 +3810,7 @@ static int mov_read_uuid(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         0xba, 0x2f, 0x08, 0x00, 0x20, 0x0c, 0x9a, 0x66
     };
 
-    if (atom.size < sizeof(uuid) || atom.size == INT64_MAX)
+    if (atom.size < sizeof(uuid) || atom.size >= FFMIN(INT_MAX, SIZE_MAX))
         return AVERROR_INVALIDDATA;
 
     ret = avio_read(pb, uuid, sizeof(uuid));

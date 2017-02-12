@@ -1076,6 +1076,10 @@ static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
 
     for (mb_y = 0; mb_y < s->mb_height; mb_y++) {
         for (mb_x = 0; mb_x < s->mb_width; mb_x++) {
+            if (get_bits_left(&s->gb) < 1) {
+                av_log(s->avctx, AV_LOG_ERROR, "bitstream end in yuv_scan\n");
+                return AVERROR_INVALIDDATA;
+            }
             if (s->restart_interval && !s->restart_count){
                 s->restart_count = s->restart_interval;
                 resync_mb_x = mb_x;
@@ -1387,6 +1391,10 @@ static int mjpeg_decode_scan_progressive_ac(MJpegDecodeContext *s, int ss,
         int block_idx    = mb_y * s->block_stride[c];
         int16_t (*block)[64] = &s->blocks[c][block_idx];
         uint8_t *last_nnz    = &s->last_nnz[c][block_idx];
+        if (get_bits_left(&s->gb) <= 0) {
+            av_log(s->avctx, AV_LOG_ERROR, "bitstream truncated in mjpeg_decode_scan_progressive_ac\n");
+            return AVERROR_INVALIDDATA;
+        }
         for (mb_x = 0; mb_x < s->mb_width; mb_x++, block++, last_nnz++) {
                 int ret;
                 if (s->restart_interval && !s->restart_count)
@@ -2308,7 +2316,7 @@ the_end:
             }
         }
     }
-    if (s->flipped) {
+    if (s->flipped && !s->rgb) {
         int j;
         avcodec_get_chroma_sub_sample(s->avctx->pix_fmt, &hshift, &vshift);
         for (index=0; index<4; index++) {
