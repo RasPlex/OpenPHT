@@ -3,7 +3,7 @@ DEPS= Makefile
 
 # lib name, version
 LIBNAME=pcre
-VERSION=8.38
+VERSION=8.40
 SOURCE=$(LIBNAME)-$(VERSION)
 ARCHIVE=$(SOURCE).tar.gz
 
