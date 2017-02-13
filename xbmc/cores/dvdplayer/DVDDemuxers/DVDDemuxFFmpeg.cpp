@@ -508,6 +508,8 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
 
   // check if plex transcoding
   m_bPlexTranscode = av_dict_get(m_pFormatContext->metadata, "plex.total_duration", NULL, 0) != NULL;
+  if (!m_bPlexTranscode && strFile.find("/video/:/transcode/universal/start.") != std::string::npos)
+    m_bPlexTranscode = true;
 
   UpdateCurrentPTS();
 
