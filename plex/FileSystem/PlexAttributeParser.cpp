@@ -188,7 +188,10 @@ CStdString CPlexAttributeParserMediaUrl::GetImageURL(const CURL &url, const CStd
 
   options.AddOption("width", swidth);
   options.AddOption("height", sheight);
-  options.AddOption("url", imageURL.Get());
+  if (imageURL.GetHostName() == "127.0.0.1")
+    options.AddOption("url", "/" + imageURL.GetFileName() + imageURL.GetOptions());
+  else
+    options.AddOption("url", imageURL.Get());
   if (g_advancedSettings.m_bForceJpegImageFormat)
     options.AddOption("format", "jpg");
 
