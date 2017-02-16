@@ -173,6 +173,7 @@ protected:
 
   /* PLEX */
   bool m_bPlexTranscode;
+  int m_plexDuration;
   /* END PLEX */
 };
 

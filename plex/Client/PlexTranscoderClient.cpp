@@ -313,8 +313,10 @@ CURL CPlexTranscoderClient::GetTranscodeURL(CPlexServerPtr server, const CFileIt
   tURL.SetOption("location", isLocal ? "lan" : "wan");
 
   CFileItemPtr mediaItem = CPlexMediaDecisionEngine::getSelectedMediaItem(item);
-  if (mediaItem)
+  if (mediaItem) {
+    tURL.SetOption("duration", mediaItem->GetProperty("duration").asString());
     tURL.SetOption("mediaIndex", mediaItem->GetProperty("mediaIndex").asString());
+  }
 
   if (!mediaItem->m_selectedMediaPart && mediaItem->m_mediaParts.size() > 0)
     mediaItem->m_selectedMediaPart = mediaItem->m_mediaParts[0];

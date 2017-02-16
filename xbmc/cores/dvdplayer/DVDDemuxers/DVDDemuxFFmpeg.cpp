@@ -188,6 +188,7 @@ CDVDDemuxFFmpeg::CDVDDemuxFFmpeg() : CDVDDemux()
   m_streaminfo = true; /* set to true if we want to look for streams before playback */
   m_checkvideo = false;
   m_bPlexTranscode = false;
+  m_plexDuration = 0;
 }
 
 CDVDDemuxFFmpeg::~CDVDDemuxFFmpeg()
@@ -217,6 +218,7 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
   m_speed = DVD_PLAYSPEED_NORMAL;
   m_program = UINT_MAX;
   m_bPlexTranscode = false;
+  m_plexDuration = 0;
   const AVIOInterruptCB int_cb = { interrupt_cb, this };
 
   if (!pInput) return false;
@@ -507,9 +509,13 @@ bool CDVDDemuxFFmpeg::Open(CDVDInputStream* pInput, bool streaminfo, bool filein
   av_dump_format(m_pFormatContext, 0, strFile.c_str(), 0);
 
   // check if plex transcoding
+  CURL url(strFile);
   m_bPlexTranscode = av_dict_get(m_pFormatContext->metadata, "plex.total_duration", NULL, 0) != NULL;
-  if (!m_bPlexTranscode && strFile.find("/video/:/transcode/universal/start.") != std::string::npos)
+  if (!m_bPlexTranscode && url.GetFileName() == "video/:/transcode/universal/start.mkv")
     m_bPlexTranscode = true;
+
+  if (m_bPlexTranscode && url.HasOption("duration"))
+    m_plexDuration = atoi(url.GetOption("duration").c_str());
 
   UpdateCurrentPTS();
 
@@ -1026,6 +1032,9 @@ int CDVDDemuxFFmpeg::GetStreamLength()
 {
   if (!m_pFormatContext)
     return 0;
+
+  if (m_bPlexTranscode && m_plexDuration > 0)
+    return m_plexDuration;
 
   if (m_pFormatContext->duration < 0)
     return 0;
