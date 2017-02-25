@@ -26,7 +26,11 @@
 
 #include <assert.h>
 
-#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+#ifndef HAVE_OPENSSL
+#define HAVE_OPENSSL
+#endif
+
+#ifdef HAVE_OPENSSL
 #include "threads/Thread.h"
 #include "openssl/crypto.h"
 
@@ -91,7 +95,7 @@ bool DllLibCurlGlobal::Load()
   /* check idle will clean up the last one */
   g_curlReferences = 2;
 
-#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+#if defined(HAVE_OPENSSL) && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER))
   // Initialize ssl locking array
   m_sslLockArray = new CCriticalSection*[CRYPTO_num_locks()];
   for (int i=0; i<CRYPTO_num_locks(); i++)
@@ -101,6 +105,9 @@ bool DllLibCurlGlobal::Load()
   crypto_set_id_callback((unsigned long (*)())ssl_thread_id);
   crypto_set_locking_callback((void (*)(int, int, const char*, int))ssl_lock_callback);
 #else
+#if !defined(TARGET_WINDOWS)
+  CRYPTO_set_id_callback((unsigned long(*)())ssl_thread_id);
+#endif
   CRYPTO_set_locking_callback((void(*)(int, int, const char*, int))ssl_lock_callback);
 #endif
 #endif
@@ -119,12 +126,15 @@ void DllLibCurlGlobal::Unload()
     // close libcurl
     global_cleanup();
 
-#if defined(HAS_CURL_STATIC) || defined(TARGET_WINDOWS)
+#if defined(HAVE_OPENSSL) && (OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER))
     // Cleanup ssl locking array
 #if defined(HAS_CURL_STATIC)
     crypto_set_id_callback(NULL);
     crypto_set_locking_callback(NULL);
 #else
+#if !defined(TARGET_WINDOWS)
+    CRYPTO_set_id_callback(NULL);
+#endif
     CRYPTO_set_locking_callback(NULL);
 #endif
     for (int i = 0; i<CRYPTO_num_locks(); i++)
