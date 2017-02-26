@@ -796,6 +796,9 @@ bool CApplication::Create()
 
   g_mediaManager.Initialize();
 
+  g_curlInterface.Load();
+  g_curlInterface.Unload();
+
   m_lastFrameTime = XbmcThreads::SystemClockMillis();
   m_lastRenderTime = m_lastFrameTime;
   return true;

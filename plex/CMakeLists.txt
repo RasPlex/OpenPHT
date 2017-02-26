@@ -43,7 +43,7 @@ endif(ENABLE_AUTOUPDATE)
 
 if(TARGET_WIN32)
   # disable safe seh
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /DELAYLOAD:dnssd.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:libeay32.dll /DELAYLOAD:libmicrohttpd-dll.dll /DELAYLOAD:sqlite3.dll /DELAYLOAD:avcodec-56.dll /DELAYLOAD:avfilter-5.dll /DELAYLOAD:avformat-56.dll /DELAYLOAD:avutil-54.dll /DELAYLOAD:postproc-53.dll /DELAYLOAD:swresample-1.dll /DELAYLOAD:swscale-3.dll /MANIFEST:NO")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO /DELAYLOAD:dnssd.dll /DELAYLOAD:dwmapi.dll /DELAYLOAD:libeay32.dll /DELAYLOAD:ssleay32.dll /DELAYLOAD:libmicrohttpd-dll.dll /DELAYLOAD:sqlite3.dll /DELAYLOAD:avcodec-56.dll /DELAYLOAD:avfilter-5.dll /DELAYLOAD:avformat-56.dll /DELAYLOAD:avutil-54.dll /DELAYLOAD:postproc-53.dll /DELAYLOAD:swresample-1.dll /DELAYLOAD:swscale-3.dll /MANIFEST:NO")
 endif(TARGET_WIN32)
 
 OPTION(USE_RAPIDXML "Use RAPIDXML instead of TinyXML - Faster" ON)
