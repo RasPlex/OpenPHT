@@ -137,6 +137,30 @@ int CPlexHTTPRemoteHandler::HandleHTTPRequest(const HTTPRequest &request)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+int CPlexHTTPRemoteHandler::HandleRemoteCommand(const CStdString& path, const ArgMap& argumentMap)
+{
+  CPlexRemoteResponse response;
+
+  if (boost::starts_with(path, "/resources"))
+    response = resources();
+  else if (path.Equals("/player/playback/playMedia") ||
+    /* LEGACY */ path.Equals("/player/application/playMedia"))
+    response = playHandler->handle(path, argumentMap);
+  else if (boost::starts_with(path, "/player/playback"))
+    response = playbackHandler->handle(path, argumentMap);
+  else if (boost::starts_with(path, "/player/navigation"))
+    response = navigationHandler->handle(path, argumentMap);
+  else if (boost::starts_with(path, "/player/application"))
+    response = applicationHandler->handle(path, argumentMap);
+  else if (path.Equals("/player/mirror/details"))
+    response = showDetails(argumentMap);
+  else
+    response = CPlexRemoteResponse(500, "Not implemented");
+
+  return response.code;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 class NavigationTimeout : public IPlexGlobalTimeout
 {
   public:

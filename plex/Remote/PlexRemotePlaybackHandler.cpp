@@ -68,10 +68,10 @@ CPlexRemoteResponse CPlexRemotePlaybackHandler::skipNext(const ArgMap &arguments
   if (arguments.find("type") != arguments.end())
     type = arguments.find("type")->second;
 
-  if (type == "video" || type == "music")
+  if (type == "video" || type == "music" || type == "all")
     /* WINDOW_INVALID gets AppMessenger to send to send the action the application instead */
     CApplicationMessenger::Get().SendAction(CAction(ACTION_NEXT_ITEM), WINDOW_INVALID);
-  else if (type == "photo")
+  if (type == "photo" || type == "all")
     CApplicationMessenger::Get().SendAction(CAction(ACTION_NEXT_PICTURE), WINDOW_SLIDESHOW);
 
   return CPlexRemoteResponse();
@@ -84,10 +84,10 @@ CPlexRemoteResponse CPlexRemotePlaybackHandler::skipPrevious(const ArgMap &argum
   if (arguments.find("type") != arguments.end())
     type = arguments.find("type")->second;
 
-  if (type == "video" || type == "music")
+  if (type == "video" || type == "music" || type == "all")
     /* WINDOW_INVALID gets AppMessenger to send to send the action the application instead */
     CApplicationMessenger::Get().SendAction(CAction(ACTION_PREV_ITEM), WINDOW_INVALID);
-  else if (type == "photo")
+  if (type == "photo" || type == "all")
     CApplicationMessenger::Get().SendAction(CAction(ACTION_PREV_PICTURE), WINDOW_SLIDESHOW);
   return CPlexRemoteResponse();
 }
@@ -99,9 +99,9 @@ CPlexRemoteResponse CPlexRemotePlaybackHandler::pausePlay(const ArgMap &argument
   if (arguments.find("type") != arguments.end())
     type = arguments.find("type")->second;
 
-  if (type == "video" || type == "music")
+  if (type == "video" || type == "music" || type == "all")
     CApplicationMessenger::Get().MediaPause();
-  else if (type == "photo")
+  if (type == "photo" || type == "all")
     CApplicationMessenger::Get().SendAction(CAction(ACTION_PAUSE), WINDOW_SLIDESHOW);
   return CPlexRemoteResponse();
 }
@@ -113,9 +113,9 @@ CPlexRemoteResponse CPlexRemotePlaybackHandler::stop(const ArgMap &arguments)
   if (arguments.find("type") != arguments.end())
     type = arguments.find("type")->second;
 
-  if (type == "video" || type == "music")
+  if (type == "video" || type == "music" || type == "all")
     CApplicationMessenger::Get().MediaStop();
-  else if (type == "photo")
+  if (type == "photo" || type == "all")
     CApplicationMessenger::Get().SendAction(CAction(ACTION_STOP), WINDOW_SLIDESHOW);
   return CPlexRemoteResponse();
 }

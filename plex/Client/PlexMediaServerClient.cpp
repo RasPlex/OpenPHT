@@ -149,7 +149,7 @@ void CPlexMediaServerClient::publishDevice()
   CStdString optList;
   StringUtils::JoinString(interfaceOptions, "&", optList);
 
-  CStdString url = u.Get() + "&" + optList;
+  CStdString url = u.Get() + "&" + optList + "|X-Plex-Provides=player,pubsub-player";
 
   CLog::Log(LOGDEBUG, "CPlexMediaServerClient::publishDevice Going to call url: %s", url.c_str());
 

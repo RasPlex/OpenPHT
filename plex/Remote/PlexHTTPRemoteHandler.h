@@ -69,6 +69,7 @@ public:
 
   virtual bool CheckHTTPRequest(const HTTPRequest& request);
   virtual int HandleHTTPRequest(const HTTPRequest& request);
+  int HandleRemoteCommand(const CStdString& path, const ArgMap& arguments);
 
   virtual void* GetHTTPResponseData() const;
   virtual size_t GetHTTPResonseDataLength() const;

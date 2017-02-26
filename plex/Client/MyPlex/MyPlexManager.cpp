@@ -179,12 +179,14 @@ void CMyPlexManager::BroadcastState()
     case STATE_LOGGEDIN:
     {
       g_guiSettings.SetString("myplex.status", g_localizeStrings.Get(44011) + " (" + CStdString(m_currentUserInfo.username) + ")");
+      g_plexApplication.StartPubsub();
 
       break;
     }
     case STATE_NOT_LOGGEDIN:
     {
       g_guiSettings.SetString("myplex.status", g_localizeStrings.Get(44010));
+      g_plexApplication.StopPubsub();
 
       if (m_lastError == ERROR_WRONG_CREDS && g_windowManager.GetActiveWindow() != WINDOW_SETTINGS_SYSTEM && m_homeId != -1)
         CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Warning, g_localizeStrings.Get(20117), g_localizeStrings.Get(52630), 3000, false);

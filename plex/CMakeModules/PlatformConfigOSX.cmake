@@ -92,6 +92,7 @@ set(external_libs
   yajl
   jpeg
   crypto
+  ssl
   SDL
   tinyxml
   boost_thread

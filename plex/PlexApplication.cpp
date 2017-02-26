@@ -36,6 +36,7 @@
 #include "music/tags/MusicInfoTag.h"
 #include "FileSystem/PlexDirectoryCache.h"
 #include "GUI/GUIPlexDefaultActionHandler.h"
+#include "Client/PlexPubsubManager.h"
 
 #include "network/UdpClient.h"
 #include "DNSNameCache.h"
@@ -73,6 +74,7 @@ void PlexApplication::Start()
   playQueueManager = CPlexPlayQueueManagerPtr(new CPlexPlayQueueManager);
   directoryCache = CPlexDirectoryCachePtr(new CPlexDirectoryCache);
   defaultActionHandler = CGUIPlexDefaultActionHandlerPtr(new CGUIPlexDefaultActionHandler);
+  pubsubManager = CPlexPubsubManagerPtr(new CPlexPubsubManager);
 
   serverManager->load();
 
@@ -262,6 +264,7 @@ void PlexApplication::preShutdown()
 
   NetworkInterface::ClearObservers();
 
+  pubsubManager->Stop();
   timer->StopAllTimers();
   analytics->stopLogging();
   remoteSubscriberManager->Stop();
@@ -288,6 +291,7 @@ void PlexApplication::Shutdown()
   SAFE_DELETE(myPlexManager);
   SAFE_DELETE(analytics);
 
+  pubsubManager.reset();
   timer.reset();
 
   serverManager.reset();
@@ -321,6 +325,20 @@ void PlexApplication::Shutdown()
 #endif
 
   SAFE_DELETE(thumbCacher);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void PlexApplication::StartPubsub()
+{
+  if (pubsubManager)
+    pubsubManager->Start();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void PlexApplication::StopPubsub()
+{
+  if (pubsubManager)
+    pubsubManager->Stop();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

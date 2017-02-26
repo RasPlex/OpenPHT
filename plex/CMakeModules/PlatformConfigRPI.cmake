@@ -31,6 +31,7 @@ set(LINK_PKG
   YAJL
   microhttpd
   Crypto
+  OpenSSL
   TinyXML
   Iconv
   Avahi

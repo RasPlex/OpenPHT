@@ -73,6 +73,10 @@ typedef boost::shared_ptr<CPlexDirectoryCache> CPlexDirectoryCachePtr;
 
 class CGUIPlexDefaultActionHandler;
 typedef boost::shared_ptr<CGUIPlexDefaultActionHandler> CGUIPlexDefaultActionHandlerPtr;
+
+class CPlexPubsubManager;
+typedef boost::shared_ptr<CPlexPubsubManager> CPlexPubsubManagerPtr;
+
 ///
 /// The hub of all Plex goodness.
 ///
@@ -126,6 +130,7 @@ public:
   CPlexBusyIndicator busy;
   CPlexDirectoryCachePtr directoryCache;
   CGUIPlexDefaultActionHandlerPtr defaultActionHandler;
+  CPlexPubsubManagerPtr pubsubManager;
 
   void setNetworkLogging(bool);
   void OnTimeout();
@@ -147,6 +152,8 @@ public:
     PlexApplication::m_hasAuthed = hasAuthed;
   }
 
+  void StartPubsub();
+  void StopPubsub();
 
 private:
   /// Members

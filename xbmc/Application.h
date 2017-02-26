@@ -313,6 +313,7 @@ public:
   CHTTPWebinterfaceAddonsHandler& m_httpWebinterfaceAddonsHandler;
 #endif
 #endif
+  CPlexHTTPRemoteHandler& m_plexRemoteHandler;
 
   inline bool IsInScreenSaver() { return m_bScreenSave; };
   inline bool IsDPMSActive() { return m_dpmsIsActive; };
@@ -537,7 +538,6 @@ protected:
   BreakpadScope *m_breakpad;
 #endif
 
-  CPlexHTTPRemoteHandler& m_plexRemoteHandler;
   LaunchHost *m_pLaunchHost;
   bool m_returnFromAutoUpdate;
   /* END PLEX */
