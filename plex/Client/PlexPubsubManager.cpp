@@ -12,8 +12,6 @@
 CPlexPubsubManager::CPlexPubsubManager()
   : m_bStop(true), m_event(false)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   m_client.clear_access_channels(websocketpp::log::alevel::all);
   m_client.clear_error_channels(websocketpp::log::elevel::all);
 
@@ -28,13 +26,10 @@ CPlexPubsubManager::CPlexPubsubManager()
 
 CPlexPubsubManager::~CPlexPubsubManager()
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
 }
 
 void CPlexPubsubManager::Start()
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   CMyPlexUserInfo info = g_plexApplication.myPlexManager->GetCurrentUserInfo();
   if (info.id > 0)
   {
@@ -55,8 +50,6 @@ void CPlexPubsubManager::Start()
 
 void CPlexPubsubManager::Stop()
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   m_bStop = true;
   m_event.Set();
 
@@ -77,8 +70,6 @@ void CPlexPubsubManager::Stop()
 
 void CPlexPubsubManager::Run()
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   while (!m_bStop)
   {
     CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - Connecting", __FUNCTION__);
@@ -106,8 +97,6 @@ void CPlexPubsubManager::Run()
 
 CPlexWebsocketContextPtr CPlexPubsubManager::OnTlsInit(websocketpp::connection_hdl hdl)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   boost::system::error_code ec;
   CPlexWebsocketContextPtr ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
 
@@ -119,21 +108,16 @@ CPlexWebsocketContextPtr CPlexPubsubManager::OnTlsInit(websocketpp::connection_h
 
 void CPlexPubsubManager::OnOpen(websocketpp::connection_hdl hdl)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
 }
 
 void CPlexPubsubManager::OnFail(websocketpp::connection_hdl hdl)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   CPlexWebsocketClient::connection_ptr con = m_client.get_con_from_hdl(hdl);
   CLog::Log(LOGWARNING, "CPlexPubsubManager::%s - Failed: %s", __FUNCTION__, con->get_ec().message().c_str());
 }
 
 void CPlexPubsubManager::OnClose(websocketpp::connection_hdl hdl)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   CPlexWebsocketClient::connection_ptr con = m_client.get_con_from_hdl(hdl);
   std::stringstream s;
   s << "close code: " << con->get_remote_close_code() << " ("
@@ -145,8 +129,6 @@ void CPlexPubsubManager::OnClose(websocketpp::connection_hdl hdl)
 
 void CPlexPubsubManager::OnMessage(websocketpp::connection_hdl, CPlexWebsocketClient::message_ptr msg)
 {
-  CLog::Log(LOGDEBUG, "CPlexPubsubManager::%s - called", __FUNCTION__);
-
   if (msg->get_opcode() == websocketpp::frame::opcode::text)
   {
     CXBMCTinyXML doc;
