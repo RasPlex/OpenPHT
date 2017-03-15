@@ -449,5 +449,6 @@ void CGUIWindowPlexSearch::OnJobComplete(unsigned int jobID, bool success, CJob 
   }
 
   CSingleLock lk(m_threadsSection);
-  m_currentSearchId.erase(std::remove(m_currentSearchId.begin(), m_currentSearchId.end(), jobID));
+  if (!m_currentSearchId.empty())
+    m_currentSearchId.erase(std::remove(m_currentSearchId.begin(), m_currentSearchId.end(), jobID));
 }
