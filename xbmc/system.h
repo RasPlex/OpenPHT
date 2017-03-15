@@ -75,11 +75,11 @@
 #endif
 
 #ifdef HAVE_LIBPLIST
-  #define HAS_AIRPLAY
+  //#define HAS_AIRPLAY
 #endif
 
 #if defined(HAVE_LIBSHAIRPORT) || defined(HAVE_LIBSHAIRPLAY)
-  #define HAS_AIRTUNES
+  //#define HAS_AIRTUNES
 #endif
 
 #ifdef HAVE_MYSQL
@@ -130,8 +130,10 @@
 #define HAS_FILESYSTEM_NFS
 #endif
 #define HAS_ZEROCONF
+#ifndef __PLEX__
 #define HAS_AIRPLAY
 #define HAS_AIRTUNES
+#endif
 #define HAVE_LIBSHAIRPLAY
 #define HAVE_LIBCEC
 #ifndef __PLEX__

@@ -520,7 +520,7 @@ void CGUISettings::Initialize()
 #endif
 #ifdef HAS_AIRPLAY
   //CSettingsCategory* srvAirplay = AddCategory(SETTINGS_SERVICE, "airplay", 1273);
-  AddBool(srvGeneral, "services.airplay", 1270, false);
+  AddBool(NULL, "services.airplay", 1270, false);
   AddBool(NULL, "services.useairplaypassword", 1272, false);
   AddString(NULL, "services.airplaypassword", 733, "", EDIT_CONTROL_HIDDEN_INPUT, false, 733);
 #endif
