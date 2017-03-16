@@ -38,6 +38,7 @@
 #include "NetworkInterface.h"
 #include "PlexPlayQueueManager.h"
 #include "PlexServerDataLoader.h"
+#include "ApplicationMessenger.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 CURL CPlexMediaServerClient::GetItemURL(CFileItemPtr item)
@@ -79,8 +80,34 @@ void CPlexMediaServerClient::OnJobComplete(unsigned int jobID, bool success, CJo
     CPlexMediaServerClientTimelineJob* tljob = static_cast<CPlexMediaServerClientTimelineJob*>(job);
     if (tljob && success)
     {
+      bool terminated = false;
+      if (!tljob->m_data.IsEmpty())
+      {
+        TiXmlDocument doc;
+        doc.Parse(tljob->m_data.c_str());
+
+        TiXmlElement* root = doc.RootElement();
+        if (!doc.Error() && root != NULL && root->ValueStr() == "MediaContainer")
+        {
+          std::string terminationText;
+          int terminationCode = 0;
+          root->QueryIntAttribute("terminationCode", &terminationCode);
+          root->QueryStringAttribute("terminationText", &terminationText);
+
+          if (terminationCode > 0 && !terminationText.empty())
+          {
+            CLog::Log(LOGINFO, "Server terminated playback, code=%d, text=%s", terminationCode, terminationText.c_str());
+            if (terminationText.find("Admin terminated playback with reason: ") != std::string::npos)
+              terminationText = terminationText.substr(39);
+            CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Error, "Playback terminated", terminationText, 5000, false);
+            CApplicationMessenger::Get().MediaStop(false);
+            terminated = true;
+          }
+        }
+      }
+
       CFileItemPtr item = tljob->m_item;
-      if (item->HasProperty("playQueueID"))
+      if (!terminated && tljob->m_url.GetOption("state") != "stopped" && item->HasProperty("playQueueID"))
       {
         ePlexMediaType type = PlexUtils::GetMediaTypeFromItem(item);
         int time = boost::lexical_cast<int>(tljob->m_url.GetOption("time"));
