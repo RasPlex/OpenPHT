@@ -1,0 +1,17 @@
+NEW:
+  - Voice Control (Alexa) support
+  - Support server terminated playback
+  - Use music metadata from Streaming Brain
+  - Only load first 200 items in a photo slideshow
+  - Addon repository is refresed on start
+  - Non-working Airplay setting is removed from preferences
+  - Updates the HIDRemote class to the latest version (thanks @xzcvczx)
+  - Update german language file (thanks @Eloo)
+  - Option to display server name instead of user name in home listing (thanks @Fmstrat)
+
+FIXES:
+  - Fixes transcoding issues when using PMS 1.3.x or newer
+  - Re-downloads theme music if it failed first time
+  - Fixes a crash in search
+  - Fixes a crash due to missing openssl locking
+  - Fixes a memory leak when using ssa subtitles
