@@ -581,7 +581,7 @@
 				<visible allowhiddenfocus="true">ControlGroup(500).HasFocus</visible>
 				<animation effect="slide" start="0,0" end="0,200" time="200">Visible</animation>
 				<posy>288</posy>
-				<posx>100</posx>
+				<posx>-25</posx>
 				<itemgap>1</itemgap>
 				<width>1280</width>
 				<height>200</height>
