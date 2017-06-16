@@ -32,6 +32,7 @@ private:
 
   void OnJobComplete(unsigned int jobID, bool success, CJob *job);
 
+  bool loadPhotos();
   void moveLabels();
   void getXYPosition(int &x, int &y, int &alignment);
 
