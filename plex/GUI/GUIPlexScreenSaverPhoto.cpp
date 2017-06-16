@@ -43,10 +43,6 @@ bool CGUIPlexScreenSaverPhoto::OnMessage(CGUIMessage &message)
     {
       if (!m_multiImage)
       {
-        CPlexServerPtr server = g_plexApplication.serverManager->GetBestServer();
-        if (!server)
-          return false;
-
         CLabelInfo info;
         info.textColor = 0xfff5f5f5;
         info.font = g_fontManager.GetFont("Regular-30", true);
@@ -109,24 +105,8 @@ bool CGUIPlexScreenSaverPhoto::OnMessage(CGUIMessage &message)
         else
           m_showType = FANART;
 
-        CURL art = server->BuildPlexURL("/library/arts");
-        art.SetOption("sort", "random");
-
-        if (m_showType == PHOTOS)
-        {
-          art.SetOption("type", boost::lexical_cast<std::string>(PLEX_MEDIA_FILTER_TYPE_PHOTO));
-        }
-        else
-        {
-          std::stringstream optval;
-          optval << PLEX_MEDIA_FILTER_TYPE_MOVIE << "," << PLEX_MEDIA_FILTER_TYPE_SHOW << ","
-                 << PLEX_MEDIA_FILTER_TYPE_ARTIST;
-          art.SetOption("type", optval.str());
-        }
-
-        art.SetOption("X-Plex-Container-Start", "0");
-        art.SetOption("X-Plex-Container-Size", "50");
-        CJobManager::GetInstance().AddJob(new CPlexDirectoryFetchJob(art), this);
+        if (!loadPhotos())
+          return false;
 
         m_moveTimer.restart();
       }
@@ -161,32 +141,53 @@ bool CGUIPlexScreenSaverPhoto::OnMessage(CGUIMessage &message)
       }
     }
     case GUI_MSG_PLEX_MULTIIMAGE_ROLLOVER:
+    {
       if (m_multiImage && message.GetSenderId() == m_multiImage->GetID())
       {
-        CPlexServerPtr server = g_plexApplication.serverManager->GetBestServer();
-        if (!server)
+        if (!loadPhotos())
           return false;
-        CURL art = server->BuildPlexURL("/library/arts");
-        art.SetOption("sort", "random");
-
-        if (m_showType == PHOTOS)
-        {
-          art.SetOption("type", boost::lexical_cast<std::string>(PLEX_MEDIA_FILTER_TYPE_PHOTO));
-        }
-        else
-        {
-          std::stringstream optval;
-          optval << PLEX_MEDIA_FILTER_TYPE_MOVIE << "," << PLEX_MEDIA_FILTER_TYPE_SHOW << ","
-            << PLEX_MEDIA_FILTER_TYPE_ARTIST;
-          art.SetOption("type", optval.str());
-        }
-
-        art.SetOption("X-Plex-Container-Start", "0");
-        art.SetOption("X-Plex-Container-Size", "50");
-        CJobManager::GetInstance().AddJob(new CPlexDirectoryFetchJob(art), this);
       }
+    }
   }
   return CGUIDialog::OnMessage(message);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool CGUIPlexScreenSaverPhoto::loadPhotos()
+{
+  PlexServerList servers = g_plexApplication.serverManager->GetAllServers(CPlexServerManager::SERVER_OWNED, true);
+  
+  if (servers.empty())
+    servers = g_plexApplication.serverManager->GetAllServers(CPlexServerManager::SERVER_ALL, true);
+
+  if (servers.empty())
+    return false;
+  
+  m_images = CFileItemListPtr(new CFileItemList());
+
+  BOOST_FOREACH(const CPlexServerPtr& server, servers)
+  {
+    CURL art = server->BuildPlexURL("/library/arts");
+    art.SetOption("sort", "random");
+
+    if (m_showType == PHOTOS)
+    {
+      art.SetOption("type", boost::lexical_cast<std::string>(PLEX_MEDIA_FILTER_TYPE_PHOTO));
+    }
+    else
+    {
+      std::stringstream optval;
+      optval << PLEX_MEDIA_FILTER_TYPE_MOVIE << "," << PLEX_MEDIA_FILTER_TYPE_SHOW << ","
+        << PLEX_MEDIA_FILTER_TYPE_ARTIST;
+      art.SetOption("type", optval.str());
+    }
+
+    art.SetOption("X-Plex-Container-Start", "0");
+    art.SetOption("X-Plex-Container-Size", "50");
+    CJobManager::GetInstance().AddJob(new CPlexDirectoryFetchJob(art), this);
+  }
+  
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,8 +338,7 @@ void CGUIPlexScreenSaverPhoto::OnJobComplete(unsigned int jobID, bool success, C
     CPlexDirectoryFetchJob *fj = static_cast<CPlexDirectoryFetchJob*>(job);
     if (fj)
     {
-      m_images = CFileItemListPtr(new CFileItemList());
-      m_images->Assign(fj->m_items);
+      m_images->Assign(fj->m_items, true);
 
       if (!m_multiImage)
         m_multiImage = new CGUIMultiImage(GetID(), 1234, 0, 0,
