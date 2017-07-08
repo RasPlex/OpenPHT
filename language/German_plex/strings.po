@@ -1273,15 +1273,15 @@ msgstr "Staple TV Serien in kürzlich hinzugefügte"
 
 msgctxt "#52220"
 msgid "Disable preplay screen for movies"
-msgstr "Deaktiviere Vorscheibild für Filme"
+msgstr "Deaktiviere Vorschaubild für Filme"
 
 msgctxt "#52221"
 msgid "Disable preplay screen for episodes"
-msgstr "Deaktiviere Vorscheibild für Folgen"
+msgstr "Deaktiviere Vorschaubild für Folgen"
 
 msgctxt "#52222"
 msgid "Disable preplay screen for clips"
-msgstr "Deaktiviere Vorscheibild für Videoclips"
+msgstr "Deaktiviere Vorschaubild für Videoclips"
 
 msgctxt "#52300"
 msgid "Media Server went away"
