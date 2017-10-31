@@ -165,8 +165,12 @@ CUrlOptions CPlexTimeline::getTimeline(bool forServer)
       if (m_type == PLEX_MEDIA_TYPE_VIDEO && g_application.m_pPlayer->IsPlayingVideo())
       {
         int subid = g_application.m_pPlayer->GetSubtitleVisible() ? g_application.m_pPlayer->GetSubtitlePlexID() : -1;
-        options.AddOption("subtitleStreamID", subid);
-        options.AddOption("audioStreamID", g_application.m_pPlayer->GetAudioStreamPlexID());
+        if (subid != -1)
+          options.AddOption("subtitleStreamID", subid);
+
+        int audid = g_application.m_pPlayer->GetAudioStreamPlexID();
+        if (audid != -1)
+          options.AddOption("audioStreamID", audid);
       }
     }
 
