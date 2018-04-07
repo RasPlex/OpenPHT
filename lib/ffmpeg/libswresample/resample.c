@@ -171,6 +171,14 @@ static int build_filter(ResampleContext *c, void *filter, double factor, int tap
     return 0;
 }
 
+static void resample_free(ResampleContext **cc){
+    ResampleContext *c = *cc;
+    if(!c)
+        return;
+    av_freep(&c->filter_bank);
+    av_freep(cc);
+}
+
 static ResampleContext *resample_init(ResampleContext *c, int out_rate, int in_rate, int filter_size, int phase_shift, int linear,
                                     double cutoff0, enum AVSampleFormat format, enum SwrFilterType filter_type, int kaiser_beta,
                                     double precision, int cheby)
@@ -182,6 +190,7 @@ static ResampleContext *resample_init(ResampleContext *c, int out_rate, int in_r
     if (!c || c->phase_shift != phase_shift || c->linear!=linear || c->factor != factor
            || c->filter_length != FFMAX((int)ceil(filter_size/factor), 1) || c->format != format
            || c->filter_type != filter_type || c->kaiser_beta != kaiser_beta) {
+        resample_free(&c);
         c = av_mallocz(sizeof(*c));
         if (!c)
             return NULL;
@@ -249,13 +258,6 @@ error:
     av_freep(&c->filter_bank);
     av_free(c);
     return NULL;
-}
-
-static void resample_free(ResampleContext **c){
-    if(!*c)
-        return;
-    av_freep(&(*c)->filter_bank);
-    av_freep(c);
 }
 
 static int set_compensation(ResampleContext *c, int sample_delta, int compensation_distance){

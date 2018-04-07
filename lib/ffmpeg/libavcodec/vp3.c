@@ -951,9 +951,11 @@ static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
     Vp3Fragment *all_fragments = s->all_fragments;
     VLC_TYPE(*vlc_table)[2] = table->table;
 
-    if (num_coeffs < 0)
+    if (num_coeffs < 0) {
         av_log(s->avctx, AV_LOG_ERROR,
                "Invalid number of coefficents at level %d\n", coeff_index);
+        return AVERROR_INVALIDDATA;
+    }
 
     if (eob_run > num_coeffs) {
         coeff_i      =
@@ -977,6 +979,9 @@ static int unpack_vlcs(Vp3DecodeContext *s, GetBitContext *gb,
             eob_run = eob_run_base[token];
             if (eob_run_get_bits[token])
                 eob_run += get_bits(gb, eob_run_get_bits[token]);
+
+            if (!eob_run)
+                eob_run = INT_MAX;
 
             // record only the number of blocks ended in this plane,
             // any spill will be recorded in the next plane.
@@ -1071,6 +1076,9 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
 
     s->dct_tokens[0][0] = s->dct_tokens_base;
 
+    if (get_bits_left(gb) < 16)
+        return AVERROR_INVALIDDATA;
+
     /* fetch the DC table indexes */
     dc_y_table = get_bits(gb, 4);
     dc_c_table = get_bits(gb, 4);
@@ -1080,6 +1088,8 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
                                    0, residual_eob_run);
     if (residual_eob_run < 0)
         return residual_eob_run;
+    if (get_bits_left(gb) < 8)
+        return AVERROR_INVALIDDATA;
 
     /* reverse prediction of the Y-plane DC coefficients */
     reverse_dc_prediction(s, 0, s->fragment_width[0], s->fragment_height[0]);
@@ -1102,6 +1112,8 @@ static int unpack_dct_coeffs(Vp3DecodeContext *s, GetBitContext *gb)
                               s->fragment_width[1], s->fragment_height[1]);
     }
 
+    if (get_bits_left(gb) < 8)
+        return AVERROR_INVALIDDATA;
     /* fetch the AC table indexes */
     ac_y_table = get_bits(gb, 4);
     ac_c_table = get_bits(gb, 4);
@@ -2020,16 +2032,18 @@ static int vp3_decode_frame(AVCodecContext *avctx,
                 ret = vp3_decode_init(avctx);
             if (ret < 0) {
                 vp3_decode_end(avctx);
+                return ret;
             }
-            return ret;
+            return buf_size;
         } else if (type == 2) {
             ret = theora_decode_tables(avctx, &gb);
             if (ret >= 0)
                 ret = vp3_decode_init(avctx);
             if (ret < 0) {
                 vp3_decode_end(avctx);
+                return ret;
             }
-            return ret;
+            return buf_size;
         }
 
         av_log(avctx, AV_LOG_ERROR,

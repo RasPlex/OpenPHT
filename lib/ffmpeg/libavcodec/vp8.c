@@ -260,6 +260,7 @@ static int setup_partitions(VP8Context *s, const uint8_t *buf, int buf_size)
 {
     const uint8_t *sizes = buf;
     int i;
+    int ret;
 
     s->num_coeff_partitions = 1 << vp8_rac_get_uint(&s->c, 2);
 
@@ -273,13 +274,13 @@ static int setup_partitions(VP8Context *s, const uint8_t *buf, int buf_size)
         if (buf_size - size < 0)
             return -1;
 
-        ff_vp56_init_range_decoder(&s->coeff_partition[i], buf, size);
+        ret = ff_vp56_init_range_decoder(&s->coeff_partition[i], buf, size);
+        if (ret < 0)
+            return ret;
         buf      += size;
         buf_size -= size;
     }
-    ff_vp56_init_range_decoder(&s->coeff_partition[i], buf, buf_size);
-
-    return 0;
+    return ff_vp56_init_range_decoder(&s->coeff_partition[i], buf, buf_size);
 }
 
 static void vp7_get_quants(VP8Context *s)
@@ -517,7 +518,9 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
 
     memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_epel_pixels_tab, sizeof(s->put_pixels_tab));
 
-    ff_vp56_init_range_decoder(c, buf, part1_size);
+    ret = ff_vp56_init_range_decoder(c, buf, part1_size);
+    if (ret < 0)
+        return ret;
     buf      += part1_size;
     buf_size -= part1_size;
 
@@ -569,7 +572,9 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
     s->lf_delta.enabled        = 0;
 
     s->num_coeff_partitions = 1;
-    ff_vp56_init_range_decoder(&s->coeff_partition[0], buf, buf_size);
+    ret = ff_vp56_init_range_decoder(&s->coeff_partition[0], buf, buf_size);
+    if (ret < 0)
+        return ret;
 
     if (!s->macroblocks_base || /* first frame */
         width != s->avctx->width || height != s->avctx->height ||
@@ -600,6 +605,8 @@ static int vp7_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
             s->fade_present = vp8_rac_get(c);
     }
 
+    if (c->end <= c->buffer && c->bits >= 0)
+        return AVERROR_INVALIDDATA;
     /* E. Fading information for previous frame */
     if (s->fade_present && vp8_rac_get(c)) {
         if ((ret = vp7_fade_frame(s ,c)) < 0)
@@ -698,7 +705,9 @@ static int vp8_decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_si
         memset(&s->lf_delta, 0, sizeof(s->lf_delta));
     }
 
-    ff_vp56_init_range_decoder(c, buf, header_size);
+    ret = ff_vp56_init_range_decoder(c, buf, header_size);
+    if (ret < 0)
+        return ret;
     buf      += header_size;
     buf_size -= header_size;
 
@@ -2274,7 +2283,7 @@ static void vp8_decode_mv_mb_modes(AVCodecContext *avctx, VP8Frame *cur_frame,
 #define update_pos(td, mb_y, mb_x) while(0)
 #endif
 
-static av_always_inline void decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
+static av_always_inline int decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
                                         int jobnr, int threadnr, int is_vp7)
 {
     VP8Context *s = avctx->priv_data;
@@ -2290,6 +2299,10 @@ static av_always_inline void decode_mb_row_no_filter(AVCodecContext *avctx, void
         curframe->tf.f->data[1] +  8 * mb_y * s->uvlinesize,
         curframe->tf.f->data[2] +  8 * mb_y * s->uvlinesize
     };
+
+    if (c->end <= c->buffer && c->bits >= 0)
+         return AVERROR_INVALIDDATA;
+
     if (mb_y == 0)
         prev_td = td;
     else
@@ -2318,6 +2331,8 @@ static av_always_inline void decode_mb_row_no_filter(AVCodecContext *avctx, void
     s->mv_max.x = ((s->mb_width - 1) << 6) + MARGIN;
 
     for (mb_x = 0; mb_x < s->mb_width; mb_x++, mb_xy++, mb++) {
+        if (c->end <= c->buffer && c->bits >= 0)
+            return AVERROR_INVALIDDATA;
         // Wait for previous thread to read mb_x+2, and reach mb_y-1.
         if (prev_td != td) {
             if (threadnr != 0) {
@@ -2393,18 +2408,19 @@ static av_always_inline void decode_mb_row_no_filter(AVCodecContext *avctx, void
             update_pos(td, mb_y, mb_x);
         }
     }
+    return 0;
 }
 
-static void vp7_decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
+static int vp7_decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
                                         int jobnr, int threadnr)
 {
-    decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr, 1);
+    return decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr, 1);
 }
 
-static void vp8_decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
+static int vp8_decode_mb_row_no_filter(AVCodecContext *avctx, void *tdata,
                                         int jobnr, int threadnr)
 {
-    decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr, 0);
+    return decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr, 0);
 }
 
 static av_always_inline void filter_mb_row(AVCodecContext *avctx, void *tdata,
@@ -2487,13 +2503,16 @@ int vp78_decode_mb_row_sliced(AVCodecContext *avctx, void *tdata, int jobnr,
     VP8ThreadData *next_td = NULL, *prev_td = NULL;
     VP8Frame *curframe = s->curframe;
     int mb_y, num_jobs = s->num_jobs;
+    int ret;
 
     td->thread_nr = threadnr;
     for (mb_y = jobnr; mb_y < s->mb_height; mb_y += num_jobs) {
-        if (mb_y >= s->mb_height)
-            break;
         td->thread_mb_pos = mb_y << 16;
-        s->decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr);
+        ret = s->decode_mb_row_no_filter(avctx, tdata, jobnr, threadnr);
+        if (ret < 0) {
+            update_pos(td, s->mb_height, INT_MAX & 0xFFFF);
+            return ret;
+        }
         if (s->deblock_filter)
             s->filter_mb_row(avctx, tdata, jobnr, threadnr);
         update_pos(td, mb_y, INT_MAX & 0xFFFF);
@@ -2529,6 +2548,8 @@ int vp78_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
     int ret, i, referenced, num_jobs;
     enum AVDiscard skip_thresh;
     VP8Frame *av_uninit(curframe), *prev_frame;
+
+    av_assert0(avctx->pix_fmt == AV_PIX_FMT_YUVA420P || avctx->pix_fmt == AV_PIX_FMT_YUV420P);
 
     if (is_vp7)
         ret = vp7_decode_frame_header(s, avpkt->data, avpkt->size);

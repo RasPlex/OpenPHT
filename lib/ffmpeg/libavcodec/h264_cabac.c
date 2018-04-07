@@ -1732,7 +1732,7 @@ decode_cabac_residual_internal(const H264Context *h, H264SliceContext *sl,
 \
             if( coeff_abs >= 15 ) { \
                 int j = 0; \
-                while (get_cabac_bypass(CC) && j < 30) { \
+                while (get_cabac_bypass(CC) && j < 16+7) { \
                     j++; \
                 } \
 \
@@ -1740,7 +1740,7 @@ decode_cabac_residual_internal(const H264Context *h, H264SliceContext *sl,
                 while( j-- ) { \
                     coeff_abs += coeff_abs + get_cabac_bypass( CC ); \
                 } \
-                coeff_abs+= 14; \
+                coeff_abs+= 14U; \
             } \
 \
             if( is_dc ) { \
@@ -2339,21 +2339,40 @@ decode_intra_mb:
     if (CHROMA444(h) && IS_8x8DCT(mb_type)){
         int i;
         uint8_t *nnz_cache = sl->non_zero_count_cache;
-        for (i = 0; i < 2; i++){
-            if (sl->left_type[LEFT(i)] && !IS_8x8DCT(sl->left_type[LEFT(i)])) {
-                nnz_cache[3+8* 1 + 2*8*i]=
-                nnz_cache[3+8* 2 + 2*8*i]=
-                nnz_cache[3+8* 6 + 2*8*i]=
-                nnz_cache[3+8* 7 + 2*8*i]=
-                nnz_cache[3+8*11 + 2*8*i]=
-                nnz_cache[3+8*12 + 2*8*i]= IS_INTRA(mb_type) ? 64 : 0;
+        if (h->x264_build < 151U) {
+            for (i = 0; i < 2; i++){
+                if (sl->left_type[LEFT(i)] && !IS_8x8DCT(sl->left_type[LEFT(i)])) {
+                    nnz_cache[3+8* 1 + 2*8*i]=
+                    nnz_cache[3+8* 2 + 2*8*i]=
+                    nnz_cache[3+8* 6 + 2*8*i]=
+                    nnz_cache[3+8* 7 + 2*8*i]=
+                    nnz_cache[3+8*11 + 2*8*i]=
+                    nnz_cache[3+8*12 + 2*8*i]= IS_INTRA(mb_type) ? 64 : 0;
+                }
             }
-        }
-        if (sl->top_type && !IS_8x8DCT(sl->top_type)){
-            uint32_t top_empty = CABAC(h) && !IS_INTRA(mb_type) ? 0 : 0x40404040;
-            AV_WN32A(&nnz_cache[4+8* 0], top_empty);
-            AV_WN32A(&nnz_cache[4+8* 5], top_empty);
-            AV_WN32A(&nnz_cache[4+8*10], top_empty);
+            if (sl->top_type && !IS_8x8DCT(sl->top_type)){
+                uint32_t top_empty = !IS_INTRA(mb_type) ? 0 : 0x40404040;
+                AV_WN32A(&nnz_cache[4+8* 0], top_empty);
+                AV_WN32A(&nnz_cache[4+8* 5], top_empty);
+                AV_WN32A(&nnz_cache[4+8*10], top_empty);
+            }
+        } else {
+            for (i = 0; i < 2; i++){
+                if (sl->left_type[LEFT(i)] && !IS_8x8DCT(sl->left_type[LEFT(i)])) {
+                    nnz_cache[3+8* 1 + 2*8*i]=
+                    nnz_cache[3+8* 2 + 2*8*i]=
+                    nnz_cache[3+8* 6 + 2*8*i]=
+                    nnz_cache[3+8* 7 + 2*8*i]=
+                    nnz_cache[3+8*11 + 2*8*i]=
+                    nnz_cache[3+8*12 + 2*8*i]= !IS_INTRA_PCM(sl->left_type[LEFT(i)]) ? 0 : 64;
+                }
+            }
+            if (sl->top_type && !IS_8x8DCT(sl->top_type)){
+                uint32_t top_empty = !IS_INTRA_PCM(sl->top_type) ? 0 : 0x40404040;
+                AV_WN32A(&nnz_cache[4+8* 0], top_empty);
+                AV_WN32A(&nnz_cache[4+8* 5], top_empty);
+                AV_WN32A(&nnz_cache[4+8*10], top_empty);
+            }
         }
     }
     h->cur_pic.mb_type[mb_xy] = mb_type;
@@ -2361,14 +2380,6 @@ decode_intra_mb:
     if( cbp || IS_INTRA16x16( mb_type ) ) {
         const uint8_t *scan, *scan8x8;
         const uint32_t *qmul;
-
-        if(IS_INTERLACED(mb_type)){
-            scan8x8 = sl->qscale ? h->field_scan8x8 : h->field_scan8x8_q0;
-            scan    = sl->qscale ? h->field_scan : h->field_scan_q0;
-        }else{
-            scan8x8 = sl->qscale ? h->zigzag_scan8x8 : h->zigzag_scan8x8_q0;
-            scan    = sl->qscale ? h->zigzag_scan : h->zigzag_scan_q0;
-        }
 
         // decode_cabac_mb_dqp
         if(get_cabac_noinline( &sl->cabac, &sl->cabac_state[60 + (sl->last_qscale_diff != 0)])){
@@ -2399,6 +2410,14 @@ decode_intra_mb:
             sl->chroma_qp[1] = get_chroma_qp(h, 1, sl->qscale);
         }else
             sl->last_qscale_diff=0;
+
+        if(IS_INTERLACED(mb_type)){
+            scan8x8 = sl->qscale ? h->field_scan8x8 : h->field_scan8x8_q0;
+            scan    = sl->qscale ? h->field_scan : h->field_scan_q0;
+        }else{
+            scan8x8 = sl->qscale ? h->zigzag_scan8x8 : h->zigzag_scan8x8_q0;
+            scan    = sl->qscale ? h->zigzag_scan : h->zigzag_scan_q0;
+        }
 
         decode_cabac_luma_residual(h, sl, scan, scan8x8, pixel_shift, mb_type, cbp, 0);
         if (CHROMA444(h)) {

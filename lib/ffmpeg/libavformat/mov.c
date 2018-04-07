@@ -2206,6 +2206,8 @@ static int mov_read_stsc(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     avio_rb24(pb); /* flags */
 
     entries = avio_rb32(pb);
+    if ((uint64_t)entries * 12 + 4 > atom.size)
+        return AVERROR_INVALIDDATA;
 
     av_log(c->fc, AV_LOG_TRACE, "track[%i].stsc.entries = %i\n", c->fc->nb_streams-1, entries);
 
@@ -3979,7 +3981,7 @@ static int mov_read_default(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     if (atom.size < 0)
         atom.size = INT64_MAX;
-    while (total_size + 8 <= atom.size && !avio_feof(pb)) {
+    while (total_size <= atom.size - 8 && !avio_feof(pb)) {
         int (*parse)(MOVContext*, AVIOContext*, MOVAtom) = NULL;
         a.size = atom.size;
         a.type=0;
@@ -4408,6 +4410,13 @@ static int read_tfra(MOVContext *mov, AVIOContext *f)
     }
     for (i = 0; i < index->item_count; i++) {
         int64_t time, offset;
+
+        if (avio_feof(f)) {
+            index->item_count = 0;
+            av_freep(&index->items);
+            return AVERROR_INVALIDDATA;
+        }
+
         if (version == 1) {
             time   = avio_rb64(f);
             offset = avio_rb64(f);
@@ -4665,6 +4674,7 @@ static int should_retry(AVIOContext *pb, int error_code) {
 
 static int mov_switch_root(AVFormatContext *s, int64_t target)
 {
+    int ret;
     MOVContext *mov = s->priv_data;
     int i, j;
     int already_read = 0;
@@ -4701,8 +4711,10 @@ static int mov_switch_root(AVFormatContext *s, int64_t target)
 
     mov->found_mdat = 0;
 
-    if (mov_read_default(mov, s->pb, (MOVAtom){ AV_RL32("root"), INT64_MAX }) < 0 ||
-        avio_feof(s->pb))
+    ret = mov_read_default(mov, s->pb, (MOVAtom){ AV_RL32("root"), INT64_MAX });
+    if (ret < 0)
+        return ret;
+    if (avio_feof(s->pb))
         return AVERROR_EOF;
     av_log(s, AV_LOG_TRACE, "read fragments, offset 0x%"PRIx64"\n", avio_tell(s->pb));
 

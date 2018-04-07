@@ -1635,6 +1635,12 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
                 h->missing_fields ++;
                 h->cur_pic_ptr = NULL;
                 h->first_field = FIELD_PICTURE(h);
+            } else if (h->cur_pic_ptr->reference & DELAYED_PIC_REF) {
+                /* This frame was already output, we cannot draw into it
+                 * anymore.
+                 */
+                h->first_field = 1;
+                h->cur_pic_ptr = NULL;
             } else {
                 h->missing_fields = 0;
                 if (h->cur_pic_ptr->frame_num != h->frame_num) {
@@ -1836,17 +1842,19 @@ int ff_h264_decode_slice_header(H264Context *h, H264SliceContext *sl)
             sl->deblocking_filter ^= 1;  // 1<->0
 
         if (sl->deblocking_filter) {
-            sl->slice_alpha_c0_offset = get_se_golomb(&sl->gb) * 2;
-            sl->slice_beta_offset     = get_se_golomb(&sl->gb) * 2;
-            if (sl->slice_alpha_c0_offset >  12 ||
-                sl->slice_alpha_c0_offset < -12 ||
-                sl->slice_beta_offset >  12     ||
-                sl->slice_beta_offset < -12) {
+            int slice_alpha_c0_offset_div2 = get_se_golomb(&sl->gb);
+            int slice_beta_offset_div2     = get_se_golomb(&sl->gb);
+            if (slice_alpha_c0_offset_div2 >  6 ||
+                slice_alpha_c0_offset_div2 < -6 ||
+                slice_beta_offset_div2 >  6     ||
+                slice_beta_offset_div2 < -6) {
                 av_log(h->avctx, AV_LOG_ERROR,
                        "deblocking filter parameters %d %d out of range\n",
-                       sl->slice_alpha_c0_offset, sl->slice_beta_offset);
+                       slice_alpha_c0_offset_div2, slice_beta_offset_div2);
                 return AVERROR_INVALIDDATA;
             }
+            sl->slice_alpha_c0_offset = slice_alpha_c0_offset_div2 * 2;
+            sl->slice_beta_offset     = slice_beta_offset_div2 * 2;
         }
     }
 

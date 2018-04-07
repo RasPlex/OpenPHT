@@ -557,6 +557,11 @@ static int decode_ihdr_chunk(AVCodecContext *avctx, PNGDecContext *s,
         return AVERROR_INVALIDDATA;
     }
     s->bit_depth        = bytestream2_get_byte(&s->gb);
+    if (s->bit_depth != 1 && s->bit_depth != 2 && s->bit_depth != 4 &&
+        s->bit_depth != 8 && s->bit_depth != 16) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid bit depth\n");
+        goto error;
+    }
     s->color_type       = bytestream2_get_byte(&s->gb);
     s->compression_type = bytestream2_get_byte(&s->gb);
     s->filter_type      = bytestream2_get_byte(&s->gb);
@@ -570,6 +575,10 @@ static int decode_ihdr_chunk(AVCodecContext *avctx, PNGDecContext *s,
                 s->compression_type, s->filter_type, s->interlace_type);
 
     return 0;
+error:
+    s->cur_w = s->cur_h = s->width = s->height = 0;
+    s->bit_depth = 8;
+    return AVERROR_INVALIDDATA;
 }
 
 static int decode_phys_chunk(AVCodecContext *avctx, PNGDecContext *s)
@@ -600,8 +609,9 @@ static int decode_idat_chunk(AVCodecContext *avctx, PNGDecContext *s,
     }
     if (!(s->state & PNG_IDAT)) {
         /* init image info */
-        avctx->width  = s->width;
-        avctx->height = s->height;
+        ret = ff_set_dimensions(avctx, s->width, s->height);
+        if (ret < 0)
+            return ret;
 
         s->channels       = ff_png_get_nb_channels(s->color_type);
         s->bits_per_pixel = s->bit_depth * s->channels;
@@ -785,7 +795,7 @@ static int decode_trns_chunk(AVCodecContext *avctx, PNGDecContext *s,
             return AVERROR_INVALIDDATA;
 
         for (i = 0; i < length; i++) {
-            v = bytestream2_get_byte(&s->gb);
+            unsigned v = bytestream2_get_byte(&s->gb);
             s->palette[i] = (s->palette[i] & 0x00ffffff) | (v << 24);
         }
     } else if (s->color_type == PNG_COLOR_TYPE_GRAY || s->color_type == PNG_COLOR_TYPE_RGB) {
@@ -1293,7 +1303,7 @@ static int decode_frame_png(AVCodecContext *avctx,
         goto the_end;
 
     if ((ret = av_frame_ref(data, s->picture.f)) < 0)
-        return ret;
+        goto the_end;
 
     *got_frame = 1;
 

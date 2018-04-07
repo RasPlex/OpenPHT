@@ -285,7 +285,7 @@ static const int qoffset_inter_tab[MAX_QUANT+1] = {
 /* magic number division by 3 from schroedinger */
 static inline int divide3(int x)
 {
-    return ((x+1)*21845 + 10922) >> 16;
+    return (int)((x+1U)*21845 + 10922) >> 16;
 }
 
 static DiracFrame *remove_frame(DiracFrame *framelist[], int picnum)
@@ -532,16 +532,16 @@ static inline void codeblock(DiracContext *s, SubBand *b,
     }
 
     if (s->codeblock_mode && !(s->old_delta_quant && blockcnt_one)) {
-        int quant = b->quant;
+        int quant;
         if (is_arith)
-            quant += dirac_get_arith_int(c, CTX_DELTA_Q_F, CTX_DELTA_Q_DATA);
+            quant = dirac_get_arith_int(c, CTX_DELTA_Q_F, CTX_DELTA_Q_DATA);
         else
-            quant += dirac_get_se_golomb(gb);
-        if (quant < 0) {
+            quant = dirac_get_se_golomb(gb);
+        if (quant > INT_MAX - b->quant || b->quant + quant < 0) {
             av_log(s->avctx, AV_LOG_ERROR, "Invalid quant\n");
             return;
         }
-        b->quant = quant;
+        b->quant += quant;
     }
 
     b->quant = FFMIN(b->quant, MAX_QUANT);
@@ -960,6 +960,10 @@ static int dirac_unpack_prediction_parameters(DiracContext *s)
                 s->globalmc[ref].perspective[0]  = dirac_get_se_golomb(gb);
                 s->globalmc[ref].perspective[1]  = dirac_get_se_golomb(gb);
             }
+            if (s->globalmc[ref].perspective_exp + (uint64_t)s->globalmc[ref].zrs_exp > 30) {
+                return AVERROR_INVALIDDATA;
+            }
+
         }
     }
 
@@ -1205,7 +1209,7 @@ static void decode_block_params(DiracContext *s, DiracArith arith[8], DiracBlock
     if (!block->ref) {
         pred_block_dc(block, stride, x, y);
         for (i = 0; i < 3; i++)
-            block->u.dc[i] += dirac_get_arith_int(arith+1+i, CTX_DC_F1, CTX_DC_DATA);
+            block->u.dc[i] += (unsigned)dirac_get_arith_int(arith+1+i, CTX_DC_F1, CTX_DC_DATA);
         return;
     }
 
@@ -1833,9 +1837,9 @@ static int get_delayed_pic(DiracContext *s, AVFrame *picture, int *got_frame)
 
     if (out) {
         out->reference ^= DELAYED_PIC_REF;
-        *got_frame = 1;
         if((ret = av_frame_ref(picture, out->avframe)) < 0)
             return ret;
+        *got_frame = 1;
     }
 
     return 0;

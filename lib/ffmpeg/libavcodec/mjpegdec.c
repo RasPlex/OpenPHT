@@ -686,8 +686,8 @@ static int decode_block(MJpegDecodeContext *s, int16_t *block, int component,
         av_log(s->avctx, AV_LOG_ERROR, "error dc\n");
         return AVERROR_INVALIDDATA;
     }
-    val = val * quant_matrix[0] + s->last_dc[component];
-    val = FFMIN(val, 32767);
+    val = val * (unsigned)quant_matrix[0] + s->last_dc[component];
+    val = av_clip_int16(val);
     s->last_dc[component] = val;
     block[0] = val;
     /* AC coefs */
@@ -728,7 +728,7 @@ static int decode_dc_progressive(MJpegDecodeContext *s, int16_t *block,
                                  int component, int dc_index,
                                  int16_t *quant_matrix, int Al)
 {
-    int val;
+    unsigned val;
     s->bdsp.clear_block(block);
     val = mjpeg_decode_dc(s, dc_index);
     if (val == 0xfffff) {
@@ -747,7 +747,8 @@ static int decode_block_progressive(MJpegDecodeContext *s, int16_t *block,
                                     int16_t *quant_matrix,
                                     int ss, int se, int Al, int *EOBRUN)
 {
-    int code, i, j, level, val, run;
+    int code, i, j, val, run;
+    unsigned level;
 
     if (*EOBRUN) {
         (*EOBRUN)--;
@@ -1131,7 +1132,7 @@ static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
                         if (s->interlaced && s->bottom_field)
                             ptr += linesize >> 1;
                         pred &= mask;
-                        *ptr= pred + (dc << point_transform);
+                        *ptr= pred + ((unsigned)dc << point_transform);
                         }else{
                             ptr16 = (uint16_t*)(s->picture_ptr->data[c] + 2*(linesize * (v * mb_y + y)) + 2*(h * mb_x + x)); //FIXME optimize this crap
                             if(y==0 && toprow){
@@ -1151,7 +1152,7 @@ static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
                             if (s->interlaced && s->bottom_field)
                                 ptr16 += linesize >> 1;
                             pred &= mask;
-                            *ptr16= pred + (dc << point_transform);
+                            *ptr16= pred + ((unsigned)dc << point_transform);
                         }
                         if (++x == h) {
                             x = 0;
@@ -1190,13 +1191,13 @@ static int ljpeg_decode_yuv_scan(MJpegDecodeContext *s, int predictor,
                             PREDICT(pred, ptr[-linesize-1], ptr[-linesize], ptr[-1], predictor);
 
                             pred &= mask;
-                            *ptr = pred + (dc << point_transform);
+                            *ptr = pred + ((unsigned)dc << point_transform);
                         }else{
                             ptr16 = (uint16_t*)(s->picture_ptr->data[c] + 2*(linesize * (v * mb_y + y)) + 2*(h * mb_x + x)); //FIXME optimize this crap
                             PREDICT(pred, ptr16[-linesize-1], ptr16[-linesize], ptr16[-1], predictor);
 
                             pred &= mask;
-                            *ptr16= pred + (dc << point_transform);
+                            *ptr16= pred + ((unsigned)dc << point_transform);
                         }
 
                         if (++x == h) {
@@ -1466,6 +1467,15 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s, const uint8_t *mb_bitmask,
         av_log(s->avctx, AV_LOG_WARNING,
                 "Can not process SOS before SOF, skipping\n");
         return -1;
+    }
+
+    if (reference) {
+        if (reference->width  != s->picture_ptr->width  ||
+            reference->height != s->picture_ptr->height ||
+            reference->format != s->picture_ptr->format) {
+            av_log(s->avctx, AV_LOG_ERROR, "Reference mismatching\n");
+            return AVERROR_INVALIDDATA;
+        }
     }
 
     av_assert0(s->picture_ptr->data[0]);
