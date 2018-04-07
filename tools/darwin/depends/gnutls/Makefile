@@ -2,7 +2,7 @@ include ../Makefile.include
 DEPS= Makefile size-max.patch
 
 # lib name, version
-BASE_URL=ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4
+BASE_URL=https://www.gnupg.org/ftp/gcrypt/gnutls/v3.4
 LIBNAME=gnutls
 VERSION=3.4.16
 SOURCE=$(LIBNAME)-$(VERSION)
