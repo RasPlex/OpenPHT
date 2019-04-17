@@ -142,7 +142,7 @@ void CPlexTimelineManager::ReportProgress(const CFileItemPtr &newItem, ePlexMedi
 
   if ((oldTimeline && !oldTimeline->getItem()) || timeline->getItem()->GetPath() != oldTimeline->getItem()->GetPath())
   {
-    if (oldTimeline->getState() != PLEX_MEDIA_STATE_STOPPED && oldTimeline)
+    if (oldTimeline->getState() != PLEX_MEDIA_STATE_CANCELLED && oldTimeline)
     {
       CFileItemPtr oldItem = oldTimeline->getItem();
       if (oldItem->HasProperty("playQueueID") && newItem->HasProperty("playQueueID") && oldItem->GetProperty("playQueueID").asString() == newItem->GetProperty("playQueueID").asString())
@@ -190,7 +190,7 @@ void CPlexTimelineManager::ReportProgress(const CFileItemPtr &newItem, ePlexMedi
 
   ReportProgress(timeline, reallyForce);
 
-  if (timeline->getState() == PLEX_MEDIA_STATE_STOPPED)
+  if (timeline->getState() == PLEX_MEDIA_STATE_FINISHED) // || Should this OR with cancelled?
   {
     /* Now we need to make sure that if this item is cached it's removed */
     if (timeline->getItem())

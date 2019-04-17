@@ -784,8 +784,14 @@ std::string PlexUtils::GetMediaStateString(ePlexMediaState state)
 {
   CStdString strstate;
   switch (state) {
-    case PLEX_MEDIA_STATE_STOPPED:
-      strstate = "stopped";
+    case PLEX_MEDIA_STATE_FINISHED:
+      strstate = "finished";
+      break;
+    case PLEX_MEDIA_STATE_CANCELLED:
+      strstate = "cancelled";
+      break;
+    case PLEX_MEDIA_STATE_ERROR:
+      strstate = "error";
       break;
     case PLEX_MEDIA_STATE_BUFFERING:
       strstate = "buffering";
@@ -802,8 +808,12 @@ std::string PlexUtils::GetMediaStateString(ePlexMediaState state)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ePlexMediaState PlexUtils::GetMediaStateFromString(const std::string& statestr)
-{ if (statestr == "stopped")
-    return PLEX_MEDIA_STATE_STOPPED;
+{ if (statestr == "finished")
+    return PLEX_MEDIA_STATE_FINISHED;
+  else if (statestr == "cancelled")
+    return PLEX_MEDIA_STATE_CANCELLED;
+  else if (statestr == "error")
+    return PLEX_MEDIA_STATE_ERROR;
   else if (statestr == "buffering")
     return PLEX_MEDIA_STATE_BUFFERING;
   else if (statestr == "playing")
@@ -811,7 +821,7 @@ ePlexMediaState PlexUtils::GetMediaStateFromString(const std::string& statestr)
   else if (statestr == "paused")
     return PLEX_MEDIA_STATE_PAUSED;
 
-  return PLEX_MEDIA_STATE_STOPPED;
+  return PLEX_MEDIA_STATE_FINISHED;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
