@@ -1313,7 +1313,7 @@ msgstr "Tous les épisodes"
 
 msgctxt "#32103"
 msgid "There is no description available for this "
-msgstr "Il n'y a pas de description pour ce"
+msgstr "Il n'y a pas de description pour cet "
 
 
 msgctxt "#32104"
