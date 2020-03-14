@@ -119,8 +119,8 @@ macro(plex_find_library lib framework nodefaultpath searchpath addtolinklist)
       get_filename_component(FNAME ${REALNAME} NAME)
       
       # set the SONAME variable, needed for DllPaths_generated.h
-      set(${LIBN}_SONAME ${FNAME} CACHE string "the soname for the current library")
-      set(LIB${LIBN}_SONAME ${FNAME} CACHE string "the soname for the current library")
+      set(${LIBN}_SONAME ${FNAME} CACHE STRING "the soname for the current library")
+      set(LIB${LIBN}_SONAME ${FNAME} CACHE STRING "the soname for the current library")
 
       # set the HAVE_LIBX variable
       set(HAVE_LIB${LIBN} 1 CACHE string "the HAVE_LIBX variable")      
@@ -172,7 +172,7 @@ macro(plex_find_package package required addtolinklist)
       list(APPEND CONFIG_PLEX_INSTALL_LIBRARIES ${PKG_LIB})
     endif()
 
-    set(HAVE_LIB${PKG_NO_LIB_NAME} 1 CACHE string "if this lib is around or not")
+    set(HAVE_LIB${PKG_NO_LIB_NAME} 1 CACHE STRING "if this lib is around or not")
   else()
     if(${required})
       message(FATAL_ERROR "Missing ${PKG_NAME}")
