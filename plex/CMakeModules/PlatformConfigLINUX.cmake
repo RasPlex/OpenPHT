@@ -64,6 +64,12 @@ foreach(l ${LINK_PKG})
   plex_find_package(${l} 1 1)
 endforeach()
 
+if(SQLite3_FOUND)
+  include_directories(${SQLite3_INCLUDE_DIRS})
+  list(APPEND CONFIG_PLEX_LINK_LIBRARIES ${SQLite3_LIBRARIES})
+  set(HAVE_SQLITE3 1)
+ endif()
+
 find_package(Boost COMPONENTS thread system timer REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
