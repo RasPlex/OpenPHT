@@ -148,7 +148,7 @@ void NetworkInterface::WatchForChanges()
 {
   // Start the thread.
   dprintf("NetworkInterface: Starting watch thread.");
-  thread t = thread(boost::bind(&RunWatchingForChanges));
+  boost::thread t = boost::thread(boost::bind(&RunWatchingForChanges));
   t.detach();
   
   // Start with a change, because otherwise we're in steady state.
