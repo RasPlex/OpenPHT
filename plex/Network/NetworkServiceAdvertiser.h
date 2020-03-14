@@ -192,7 +192,7 @@ class NetworkServiceAdvertiser : public NetworkServiceBase
     }
     else
     {
-      eprintf("Network Service: Error in advertiser handle read: %d (%s) socket=%d", error.value(), error.message().c_str(), socket->native());
+      eprintf("Network Service: Error in advertiser handle read: %d (%s) socket=%d", error.value(), error.message().c_str(), socket->native_handle());
       usleep(1000 * 100);
     }
     
