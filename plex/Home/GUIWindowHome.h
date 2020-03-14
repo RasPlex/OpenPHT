@@ -27,7 +27,6 @@
 #include "guilib/GUIWindow.h"
 #include "guilib/GUIStaticItem.h"
 #include "Job.h"
-#include <boost/timer.hpp>
 
 #include "VideoThumbLoader.h"
 #include "MusicThumbLoader.h"

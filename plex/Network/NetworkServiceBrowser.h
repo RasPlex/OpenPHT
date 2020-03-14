@@ -17,7 +17,6 @@
 #include <boost/asio.hpp>
 #include <boost/foreach.hpp>
 #include <boost/thread.hpp>
-#include <boost/timer.hpp>
 
 #include "NetworkInterface.h"
 #include "NetworkServiceBase.h"

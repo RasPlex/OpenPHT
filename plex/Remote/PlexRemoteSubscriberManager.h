@@ -11,7 +11,6 @@
 
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include <boost/timer.hpp>
 #include "PlexGlobalTimer.h"
 #include "threads/Event.h"
 #include "URL.h"
