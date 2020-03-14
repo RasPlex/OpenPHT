@@ -312,7 +312,7 @@ public:
      */
     timer_ptr set_timer(long duration, timer_handler callback) {
         timer_ptr new_timer = lib::make_shared<lib::asio::steady_timer>(
-            lib::ref(*m_io_service),
+            *m_io_service,
             lib::asio::milliseconds(duration)
         );
 
@@ -461,8 +461,7 @@ protected:
         m_io_service = io_service;
 
         if (config::enable_multithreading) {
-            m_strand = lib::make_shared<lib::asio::io_service::strand>(
-                lib::ref(*io_service));
+            m_strand = lib::make_shared<lib::asio::io_service::strand>(*io_service);
         }
 
         lib::error_code ec = socket_con_type::init_asio(io_service, m_strand,

@@ -168,8 +168,7 @@ protected:
             return socket::make_error_code(socket::error::invalid_state);
         }
 
-        m_socket = lib::make_shared<lib::asio::ip::tcp::socket>(
-            lib::ref(*service));
+        m_socket = lib::make_shared<lib::asio::ip::tcp::socket>(*service);
 
         m_state = READY;
 
