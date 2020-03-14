@@ -12,7 +12,6 @@
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
-#include <boost/timer.hpp>
 
 #include "NetworkService.h"
 #include "NetworkServiceBase.h"

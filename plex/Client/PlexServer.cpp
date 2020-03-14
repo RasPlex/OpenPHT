@@ -9,7 +9,7 @@
 #include "PlexTranscoderClient.h"
 
 #include <boost/foreach.hpp>
-#include <boost/timer.hpp>
+#include <boost/timer/timer.hpp>
 #include <settings/AdvancedSettings.h>
 
 using namespace std;
@@ -233,7 +233,7 @@ bool CPlexServer::UpdateReachability()
   if (m_connections.size() == 0)
     return false;
 
-  m_connTestTimer.restart();
+  boost::timer::cpu_timer timer; // start timer
   CLog::Log(LOGDEBUG, "CPlexServer::UpdateReachability Updating reachability for %s with %ld connections.", m_name.c_str(), m_connections.size());
 
   m_bestConnection.reset();
@@ -281,9 +281,10 @@ bool CPlexServer::UpdateReachability()
   CSingleLock tlk(m_testingLock);
   m_complete = true;
   m_activeConnection = m_bestConnection;
+  timer.stop();
 
-  CLog::Log(LOGDEBUG, "CPlexServer::UpdateReachability Connectivity test to %s completed in %.1f Seconds -> %s",
-            m_name.c_str(), m_connTestTimer.elapsed(), m_activeConnection ? m_activeConnection->toString().c_str() : "FAILED");
+  CLog::Log(LOGDEBUG, "CPlexServer::UpdateReachability Connectivity test to %s completed in %s Seconds -> %s",
+            m_name.c_str(), timer.format(1, "%w").c_str(), m_activeConnection ? m_activeConnection->toString().c_str() : "FAILED");
 
   return (bool)m_bestConnection;
 }

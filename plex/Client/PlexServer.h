@@ -5,7 +5,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include <boost/timer.hpp>
 
 #include "threads/CriticalSection.h"
 #include "Job.h"
@@ -150,8 +149,6 @@ private:
 
   int m_connectionsLeft;
   bool m_complete;
-
-  boost::timer m_connTestTimer;
 
   CCriticalSection m_serverLock;
 
