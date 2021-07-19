@@ -141,10 +141,10 @@ CUrlOptions CPlexTimeline::getTimeline(bool forServer)
       controllable.push_back("skipNext");
     }
 
-    if (controllable.size() > 0 && m_state != PLEX_MEDIA_STATE_STOPPED)
+    if (controllable.size() > 0 && m_state != PLEX_MEDIA_STATE_FINISHED)
       options.AddOption("controllable", StringUtils::Join(controllable, ","));
 
-    if (g_application.m_pPlayer->IsPlaying() && m_state != PLEX_MEDIA_STATE_STOPPED)
+    if (g_application.m_pPlayer->IsPlaying() && m_state != PLEX_MEDIA_STATE_FINISHED)
     {
       options.AddOption("volume", g_application.GetVolume());
 
@@ -174,7 +174,7 @@ CUrlOptions CPlexTimeline::getTimeline(bool forServer)
       }
     }
 
-    if (m_state != PLEX_MEDIA_STATE_STOPPED)
+    if (m_state != PLEX_MEDIA_STATE_FINISHED)
     {
       std::string location = "navigation";
 
