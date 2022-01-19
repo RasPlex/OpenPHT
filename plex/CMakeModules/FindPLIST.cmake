@@ -5,7 +5,7 @@ endif(PLIST_INCLUDE_DIR)
 
 find_package(PkgConfig)
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(_PLIST libplist)
+  pkg_check_modules(_PLIST libplist-2.0 libplist)
 endif (PKG_CONFIG_FOUND)
 
 Find_Path(PLIST_INCLUDE_DIR
@@ -15,7 +15,7 @@ Find_Path(PLIST_INCLUDE_DIR
 )
 
 Find_Library(PLIST_LIBRARY
-  NAMES plist
+  NAMES plist-2.0 plist
   PATHS /usr/lib usr/local/lib
   HINTS ${_PLIST_LIBDIR}
 )
