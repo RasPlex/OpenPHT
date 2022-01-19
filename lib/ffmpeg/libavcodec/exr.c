@@ -1166,13 +1166,25 @@ static int decode_header(EXRContext *s)
             continue;
         } else if ((var_size = check_header_variable(s, "dataWindow", "box2i",
                                                      31)) >= 0) {
+            int xmin, ymin, xmax, ymax;
             if (!var_size)
                 return AVERROR_INVALIDDATA;
 
-            s->xmin   = bytestream2_get_le32(&s->gb);
-            s->ymin   = bytestream2_get_le32(&s->gb);
-            s->xmax   = bytestream2_get_le32(&s->gb);
-            s->ymax   = bytestream2_get_le32(&s->gb);
+            xmin   = bytestream2_get_le32(&s->gb);
+            ymin   = bytestream2_get_le32(&s->gb);
+            xmax   = bytestream2_get_le32(&s->gb);
+            ymax   = bytestream2_get_le32(&s->gb);
+
+            if (xmin > xmax || ymin > ymax ||
+                ymax == INT_MAX || xmax == INT_MAX ||
+                (unsigned)xmax - xmin >= INT_MAX ||
+                (unsigned)ymax - ymin >= INT_MAX) {
+                return AVERROR_INVALIDDATA;
+            }
+            s->xmin = xmin;
+            s->xmax = xmax;
+            s->ymin = ymin;
+            s->ymax = ymax;
             s->xdelta = (s->xmax - s->xmin) + 1;
             s->ydelta = (s->ymax - s->ymin) + 1;
 
@@ -1311,7 +1323,9 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         s->ymin > s->ymax                  ||
         s->xdelta != s->xmax - s->xmin + 1 ||
         s->xmax >= s->w                    ||
-        s->ymax >= s->h) {
+        s->ymax >= s->h                    ||
+        s->ydelta == 0xFFFFFFFF || s->xdelta == 0xFFFFFFFF
+    ) {
         av_log(avctx, AV_LOG_ERROR, "Wrong or missing size information.\n");
         return AVERROR_INVALIDDATA;
     }
@@ -1338,7 +1352,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     ptr         = picture->data[0];
 
     // Zero out the start if ymin is not 0
-    for (y = 0; y < s->ymin; y++) {
+    for (y = 0; y < FFMIN(s->ymin, s->h); y++) {
         memset(ptr, 0, out_line_size);
         ptr += picture->linesize[0];
     }

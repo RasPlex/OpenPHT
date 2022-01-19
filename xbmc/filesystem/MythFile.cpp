@@ -518,7 +518,7 @@ bool CMythFile::SkipNext()
 {
   HandleEvents();
   if(m_recorder)
-    return m_dll->recorder_is_recording(m_recorder) > 0;
+    return m_dll->recorder_is_recording(m_recorder) > (void *)0;
 
   return false;
 }

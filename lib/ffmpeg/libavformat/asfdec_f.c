@@ -319,8 +319,7 @@ static void get_tag(AVFormatContext *s, const char *key, int type, int len, int 
     int64_t off = avio_tell(s->pb);
 #define LEN 22
 
-    if ((unsigned)len >= (UINT_MAX - LEN) / 2)
-        return;
+    av_assert0((unsigned)len < (INT_MAX - LEN) / 2);
 
     if (!asf->export_xmp && !strncmp(key, "xmp", 3))
         goto finish;
@@ -423,7 +422,7 @@ static int asf_read_stream_properties(AVFormatContext *s, int64_t size)
     if (!(asf->hdr.flags & 0x01)) { // if we aren't streaming...
         int64_t fsize = avio_size(pb);
         if (fsize <= 0 || (int64_t)asf->hdr.file_size <= 0 ||
-            20*FFABS(fsize - (int64_t)asf->hdr.file_size) < FFMIN(fsize, asf->hdr.file_size))
+            FFABS(fsize - (int64_t)asf->hdr.file_size) < FFMIN(fsize, asf->hdr.file_size)/20)
             st->duration = asf->hdr.play_time /
                        (10000000 / 1000) - start_time;
     }
@@ -606,6 +605,8 @@ static int asf_read_ext_stream_properties(AVFormatContext *s, int64_t size)
         ff_get_guid(pb, &g);
         size = avio_rl16(pb);
         ext_len = avio_rl32(pb);
+        if (ext_len < 0)
+            return AVERROR_INVALIDDATA;
         avio_skip(pb, ext_len);
         if (stream_num < 128 && i < FF_ARRAY_ELEMS(asf->streams[stream_num].payload)) {
             ASFPayload *p = &asf->streams[stream_num].payload[i];
@@ -710,6 +711,9 @@ static int asf_read_metadata(AVFormatContext *s, int64_t size)
         value_type = avio_rl16(pb); /* value_type */
         value_len  = avio_rl32(pb);
 
+        if (value_len < 0 || value_len > UINT16_MAX)
+            return AVERROR_INVALIDDATA;
+
         name_len_utf8 = 2*name_len_utf16 + 1;
         name          = av_malloc(name_len_utf8);
         if (!name)
@@ -765,6 +769,8 @@ static int asf_read_marker(AVFormatContext *s, int64_t size)
         avio_rl32(pb);             // send time
         avio_rl32(pb);             // flags
         name_len = avio_rl32(pb);  // name length
+        if ((unsigned)name_len > INT_MAX / 2)
+            return AVERROR_INVALIDDATA;
         if ((ret = avio_get_str16le(pb, name_len * 2, name,
                                     sizeof(name))) < name_len)
             avio_skip(pb, name_len - ret);
@@ -855,11 +861,20 @@ static int asf_read_header(AVFormatContext *s)
                         return ret;
                     av_hex_dump_log(s, AV_LOG_DEBUG, pkt.data, pkt.size);
                     av_free_packet(&pkt);
+
                     len= avio_rl32(pb);
+                    if (len > UINT16_MAX)
+                        return AVERROR_INVALIDDATA;
                     get_tag(s, "ASF_Protection_Type", -1, len, 32);
+
                     len= avio_rl32(pb);
+                    if (len > UINT16_MAX)
+                        return AVERROR_INVALIDDATA;
                     get_tag(s, "ASF_Key_ID", -1, len, 32);
+
                     len= avio_rl32(pb);
+                    if (len > UINT16_MAX)
+                        return AVERROR_INVALIDDATA;
                     get_tag(s, "ASF_License_URL", -1, len, 32);
                 } else if (!ff_guidcmp(&g, &ff_asf_ext_content_encryption)) {
                     av_log(s, AV_LOG_WARNING,

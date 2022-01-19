@@ -513,7 +513,11 @@ static int http_accept(URLContext *s, URLContext **c)
         goto fail;
     cc->hd = cl;
     cc->is_multi_client = 1;
+    return 0;
 fail:
+    if (c) {
+        ffurl_closep(c);
+    }
     return ret;
 }
 
@@ -740,7 +744,7 @@ static int process_line(URLContext *h, char *line, int line_count,
             while (av_isspace(*p))
                 p++;
             resource = p;
-            while (!av_isspace(*p))
+            while (*p && !av_isspace(*p))
                 p++;
             *(p++) = '\0';
             av_log(h, AV_LOG_TRACE, "Requested resource: %s\n", resource);

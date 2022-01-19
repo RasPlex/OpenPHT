@@ -75,14 +75,18 @@ static int read_close(AVFormatContext *s)
     return 0;
 }
 
-static void read_table(AVFormatContext *s, uint32_t *table, uint32_t count)
+static int read_table(AVFormatContext *s, uint32_t *table, uint32_t count)
 {
     int i;
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < count; i++) {
+        if (avio_feof(s->pb))
+            return AVERROR_INVALIDDATA;
         table[i] = avio_rl32(s->pb);
+    }
 
     avio_skip(s->pb, 4 * (FFALIGN(count, 512) - count));
+    return 0;
 }
 
 static int read_header(AVFormatContext *s)
@@ -132,6 +136,10 @@ static int read_header(AVFormatContext *s)
     p->start_offset   = avio_rl32(pb);
     p->max_video_blks = avio_rl32(pb);
     p->max_audio_blks = avio_rl32(pb);
+
+    if (avio_feof(pb))
+        return AVERROR_INVALIDDATA;
+
     if (p->buffer_size    < 175  ||
         p->max_audio_blks < 2    ||
         p->max_video_blks < 1    ||
@@ -171,9 +179,15 @@ static int read_header(AVFormatContext *s)
 
     avio_seek(pb, p->buffer_size, SEEK_SET);
 
-    read_table(s, p->blocks_count_table,  p->nb_frames);
-    read_table(s, p->frames_offset_table, p->nb_frames);
-    read_table(s, p->blocks_offset_table, p->frame_blks);
+    ret = read_table(s, p->blocks_count_table,  p->nb_frames);
+    if (ret < 0)
+        goto fail;
+    ret = read_table(s, p->frames_offset_table, p->nb_frames);
+    if (ret < 0)
+        goto fail;
+    ret = read_table(s, p->blocks_offset_table, p->frame_blks);
+    if (ret < 0)
+        goto fail;
 
     p->got_audio = 0;
     p->current_frame = 0;

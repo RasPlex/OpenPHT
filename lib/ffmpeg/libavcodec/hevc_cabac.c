@@ -629,11 +629,11 @@ int ff_hevc_cu_qp_delta_abs(HEVCContext *s)
     }
     if (prefix_val >= 5) {
         int k = 0;
-        while (k < CABAC_MAX_BIN && get_cabac_bypass(&s->HEVClc->cc)) {
+        while (k < 7 && get_cabac_bypass(&s->HEVClc->cc)) {
             suffix_val += 1 << k;
             k++;
         }
-        if (k == CABAC_MAX_BIN) {
+        if (k == 7) {
             av_log(s->avctx, AV_LOG_ERROR, "CABAC_MAX_BIN : %d\n", k);
             return AVERROR_INVALIDDATA;
         }
@@ -985,7 +985,7 @@ static av_always_inline int coeff_abs_level_remaining_decode(HEVCContext *s, int
     } else {
         int prefix_minus3 = prefix - 3;
 
-        if (prefix == CABAC_MAX_BIN || prefix_minus3 + rc_rice_param >= 31) {
+        if (prefix == CABAC_MAX_BIN || prefix_minus3 + rc_rice_param > 16 + 6) {
             av_log(s->avctx, AV_LOG_ERROR, "CABAC_MAX_BIN : %d\n", prefix);
             return 0;
         }

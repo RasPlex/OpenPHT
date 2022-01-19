@@ -151,7 +151,7 @@ static int read_ints(AVIOContext *pb, uint32_t *data, int count)
  * @param depth         File allocation table depth
  * @return NULL on error
  */
-static AVIOContext * wtvfile_open_sector(int first_sector, uint64_t length, int depth, AVFormatContext *s)
+static AVIOContext * wtvfile_open_sector(unsigned first_sector, uint64_t length, int depth, AVFormatContext *s)
 {
     AVIOContext *pb;
     WtvFile *wf;
@@ -274,6 +274,11 @@ static AVIOContext * wtvfile_open2(AVFormatContext *s, const uint8_t *buf, int b
         if (name_size < 0) {
             av_log(s, AV_LOG_ERROR,
                    "bad filename length, remaining directory entries ignored\n");
+            break;
+        }
+        if (dir_length == 0) {
+            av_log(s, AV_LOG_ERROR,
+                   "bad dir length, remaining directory entries ignored\n");
             break;
         }
         if (48 + (int64_t)name_size > buf_end - buf) {
@@ -660,6 +665,8 @@ static AVStream * parse_media_type(AVFormatContext *s, AVStream *st, int sid,
         avio_skip(pb, size - 32);
         ff_get_guid(pb, &actual_subtype);
         ff_get_guid(pb, &actual_formattype);
+        if (avio_feof(pb))
+            return NULL;
         avio_seek(pb, -size, SEEK_CUR);
 
         st = parse_media_type(s, st, sid, mediatype, actual_subtype, actual_formattype, size - 32);
@@ -794,7 +801,7 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
 
         ff_get_guid(pb, &g);
         len = avio_rl32(pb);
-        if (len < 32) {
+        if (len < 32 || len > INT_MAX - 7) {
             int ret;
             if (avio_feof(pb))
                 return AVERROR_EOF;
@@ -817,6 +824,8 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
                 avio_skip(pb, 12);
                 ff_get_guid(pb, &formattype);
                 size = avio_rl32(pb);
+                if (size < 0 || size > INT_MAX - 92 - consumed)
+                    return AVERROR_INVALIDDATA;
                 parse_media_type(s, 0, sid, mediatype, subtype, formattype, size);
                 consumed += 92 + size;
             }
@@ -831,6 +840,8 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
                 avio_skip(pb, 12);
                 ff_get_guid(pb, &formattype);
                 size = avio_rl32(pb);
+                if (size < 0 || size > INT_MAX - 76 - consumed)
+                    return AVERROR_INVALIDDATA;
                 parse_media_type(s, s->streams[stream_index], sid, mediatype, subtype, formattype, size);
                 consumed += 76 + size;
             }
@@ -961,7 +972,8 @@ static int parse_chunks(AVFormatContext *s, int mode, int64_t seekts, int *len_p
 static int read_header(AVFormatContext *s)
 {
     WtvContext *wtv = s->priv_data;
-    int root_sector, root_size;
+    unsigned root_sector;
+    int root_size;
     uint8_t root[WTV_SECTOR_SIZE];
     AVIOContext *pb;
     int64_t timeline_pos;
@@ -1028,23 +1040,21 @@ static int read_header(AVFormatContext *s)
                 pb = wtvfile_open(s, root, root_size, ff_timeline_table_0_entries_Events_le16);
                 if (pb) {
                     int i;
-                    AVIndexEntry *e = wtv->index_entries;
-                    AVIndexEntry *e_end = wtv->index_entries + wtv->nb_index_entries - 1;
-                    uint64_t last_position = 0;
                     while (1) {
                         uint64_t frame_nb = avio_rl64(pb);
                         uint64_t position = avio_rl64(pb);
-                        while (frame_nb > e->size && e <= e_end) {
-                           e->pos = last_position;
-                           e++;
-                        }
                         if (avio_feof(pb))
                             break;
-                        last_position = position;
+                        for (i = wtv->nb_index_entries - 1; i >= 0; i--) {
+                            AVIndexEntry *e = wtv->index_entries + i;
+                            if (frame_nb > e->size)
+                                break;
+                            if (position > e->pos)
+                                e->pos = position;
+                        }
                     }
-                    e_end->pos = last_position;
                     wtvfile_close(pb);
-                    st->duration = e_end->timestamp;
+                    st->duration = wtv->index_entries[wtv->nb_index_entries - 1].timestamp;
                 }
             }
         }

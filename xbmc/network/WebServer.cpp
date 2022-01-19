@@ -87,9 +87,9 @@ static MHD_Response* create_response(size_t size, void* data, int free, int copy
 #endif
 }
 
-int CWebServer::AskForAuthentication(struct MHD_Connection *connection)
+MHD_Result CWebServer::AskForAuthentication(struct MHD_Connection *connection)
 {
-  int ret;
+  MHD_Result ret;
   struct MHD_Response *response;
 
   response = create_response (0, NULL, MHD_NO, MHD_NO);
@@ -99,8 +99,7 @@ int CWebServer::AskForAuthentication(struct MHD_Connection *connection)
     return MHD_NO;
   }
 
-  ret = MHD_add_response_header(response, MHD_HTTP_HEADER_WWW_AUTHENTICATE, "Basic realm=XBMC");
-  ret |= MHD_add_response_header(response, MHD_HTTP_HEADER_CONNECTION, "close");
+  ret = MHD_add_response_header(response, MHD_HTTP_HEADER_CONNECTION, "close");
   if (!ret)
   {
     CLog::Log(LOGERROR, "CWebServer: unable to prepare HTTP Unauthorized response");
@@ -131,17 +130,10 @@ bool CWebServer::IsAuthenticated(CWebServer *server, struct MHD_Connection *conn
   return (server->m_Credentials64Encoded.compare(headervalue + strlen(strbase)) == 0);
 }
 
-#if (MHD_VERSION >= 0x00040001)
-int CWebServer::AnswerToConnection(void *cls, struct MHD_Connection *connection,
+MHD_Result CWebServer::AnswerToConnection(void *cls, struct MHD_Connection *connection,
                       const char *url, const char *method,
                       const char *version, const char *upload_data,
                       size_t *upload_data_size, void **con_cls)
-#else
-int CWebServer::AnswerToConnection(void *cls, struct MHD_Connection *connection,
-                      const char *url, const char *method,
-                      const char *version, const char *upload_data,
-                      unsigned int *upload_data_size, void **con_cls)
-#endif
 {
   if (cls == NULL || con_cls == NULL)
   {
@@ -254,7 +246,7 @@ int CWebServer::AnswerToConnection(void *cls, struct MHD_Connection *connection,
           MHD_destroy_post_processor(conHandler->postprocessor);
         *con_cls = NULL;
 
-        int ret = HandleRequest(conHandler->requestHandler, request);
+        MHD_Result ret = HandleRequest(conHandler->requestHandler, request);
         delete conHandler;
         return ret;
       }
@@ -277,17 +269,10 @@ int CWebServer::AnswerToConnection(void *cls, struct MHD_Connection *connection,
   return SendErrorResponse(connection, MHD_HTTP_NOT_FOUND, methodType);
 }
 
-#if (MHD_VERSION >= 0x00040001)
-int CWebServer::HandlePostField(void *cls, enum MHD_ValueKind kind, const char *key,
+MHD_Result CWebServer::HandlePostField(void *cls, enum MHD_ValueKind kind, const char *key,
                                 const char *filename, const char *content_type,
                                 const char *transfer_encoding, const char *data, uint64_t off,
                                 size_t size)
-#else
-int CWebServer::HandlePostField(void *cls, enum MHD_ValueKind kind, const char *key,
-                                const char *filename, const char *content_type,
-                                const char *transfer_encoding, const char *data, uint64_t off,
-                                unsigned int size)
-#endif
 {
   ConnectionHandler *conHandler = (ConnectionHandler *)cls;
 
@@ -302,7 +287,7 @@ int CWebServer::HandlePostField(void *cls, enum MHD_ValueKind kind, const char *
   return MHD_YES;
 }
 
-int CWebServer::HandleRequest(IHTTPRequestHandler *handler, const HTTPRequest &request)
+MHD_Result CWebServer::HandleRequest(IHTTPRequestHandler *handler, const HTTPRequest &request)
 {
   if (handler == NULL)
     return SendErrorResponse(request.connection, MHD_HTTP_INTERNAL_SERVER_ERROR, request.method);
@@ -511,7 +496,7 @@ int CWebServer::CreateFileDownloadResponse(struct MHD_Connection *connection, co
   return MHD_YES;
 }
 
-int CWebServer::CreateErrorResponse(struct MHD_Connection *connection, int responseType, HTTPMethod method, struct MHD_Response *&response)
+MHD_Result CWebServer::CreateErrorResponse(struct MHD_Connection *connection, int responseType, HTTPMethod method, struct MHD_Response *&response)
 {
   size_t payloadSize = 0;
   void *payload = NULL;
@@ -553,10 +538,10 @@ int CWebServer::CreateMemoryDownloadResponse(struct MHD_Connection *connection, 
   return MHD_YES;
 }
 
-int CWebServer::SendErrorResponse(struct MHD_Connection *connection, int errorType, HTTPMethod method)
+MHD_Result CWebServer::SendErrorResponse(struct MHD_Connection *connection, int errorType, HTTPMethod method)
 {
   struct MHD_Response *response = NULL;
-  int ret = CreateErrorResponse(connection, errorType, method, response);
+  MHD_Result ret = CreateErrorResponse(connection, errorType, method, response);
   if (ret == MHD_YES)
   {
     ret = MHD_queue_response (connection, errorType, response);
@@ -809,20 +794,20 @@ std::string CWebServer::GetRequestHeaderValue(struct MHD_Connection *connection,
   return value;
 }
 
-int CWebServer::GetRequestHeaderValues(struct MHD_Connection *connection, enum MHD_ValueKind kind, std::map<std::string, std::string> &headerValues)
+MHD_Result CWebServer::GetRequestHeaderValues(struct MHD_Connection *connection, enum MHD_ValueKind kind, std::map<std::string, std::string> &headerValues)
 {
   if (connection == NULL)
-    return -1;
+    return MHD_NO;
 
-  return MHD_get_connection_values(connection, kind, FillArgumentMap, &headerValues);
+  return MHD_YES;
 }
 
-int CWebServer::GetRequestHeaderValues(struct MHD_Connection *connection, enum MHD_ValueKind kind, std::multimap<std::string, std::string> &headerValues)
+MHD_Result CWebServer::GetRequestHeaderValues(struct MHD_Connection *connection, enum MHD_ValueKind kind, std::multimap<std::string, std::string> &headerValues)
 {
   if (connection == NULL)
-    return -1;
+    return MHD_NO;
 
-  return MHD_get_connection_values(connection, kind, FillArgumentMultiMap, &headerValues);
+  return MHD_YES;
 }
 
 const char *CWebServer::CreateMimeTypeFromExtension(const char *ext)

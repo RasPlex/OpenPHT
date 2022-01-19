@@ -177,6 +177,10 @@ static void mpc8_parse_seektable(AVFormatContext *s, int64_t off)
         av_add_index_entry(s->streams[0], pos, i, 0, 0, AVINDEX_KEYFRAME);
     }
     for(; i < size; i++){
+        if (get_bits_left(&gb) < 13) {
+            av_free(buf);
+            return;
+        }
         t = get_unary(&gb, 1, 33) << 12;
         t += get_bits(&gb, 12);
         if(t & 1)
@@ -196,8 +200,11 @@ static void mpc8_handle_chunk(AVFormatContext *s, int tag, int64_t chunk_pos, in
 
     switch(tag){
     case TAG_SEEKTBLOFF:
-        pos = avio_tell(pb) + size;
+        pos = avio_tell(pb);
         off = ffio_read_varlen(pb);
+        if (pos > INT64_MAX - size || off < 0 || off > INT64_MAX - chunk_pos)
+            return;
+        pos += size;
         mpc8_parse_seektable(s, chunk_pos + off);
         avio_seek(pb, pos, SEEK_SET);
         break;
@@ -287,7 +294,7 @@ static int mpc8_read_packet(AVFormatContext *s, AVPacket *pkt)
             return AVERROR_EOF;
 
         mpc8_get_chunk_header(s->pb, &tag, &size);
-        if (size < 0)
+        if (size < 0 || size > INT_MAX)
             return -1;
         if(tag == TAG_AUDIOPACKET){
             if(av_get_packet(s->pb, pkt, size) < 0)

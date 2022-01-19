@@ -130,7 +130,7 @@ static inline int get_duration(AVIStream *ast, int len)
     if (ast->sample_size)
         return len;
     else if (ast->dshow_block_align)
-        return (len + ast->dshow_block_align - 1) / ast->dshow_block_align;
+        return (len + (int64_t)ast->dshow_block_align - 1) / ast->dshow_block_align;
     else
         return 1;
 }
@@ -240,7 +240,7 @@ static int read_braindead_odml_indx(AVFormatContext *s, int frame_num)
             avio_rl32(pb);       /* size */
             duration = avio_rl32(pb);
 
-            if (avio_feof(pb))
+            if (avio_feof(pb) || offset > INT64_MAX - 8)
                 return AVERROR_INVALIDDATA;
 
             pos = avio_tell(pb);
@@ -442,7 +442,7 @@ static int calculate_bitrate(AVFormatContext *s)
         maxpos = FFMAX(maxpos, st->index_entries[j-1].pos);
         lensum += len;
     }
-    if (maxpos < avi->io_fsize*9/10) // index does not cover the whole file
+    if (maxpos < av_rescale(avi->io_fsize, 9, 10)) // index does not cover the whole file
         return 0;
     if (lensum*9/10 > maxpos || lensum < maxpos*9/10) // frame sum and filesize mismatch
         return 0;
@@ -665,7 +665,7 @@ static int avi_read_header(AVFormatContext *s)
             st->start_time = 0;
             avio_rl32(pb); /* buffer size */
             avio_rl32(pb); /* quality */
-            if (ast->cum_len*ast->scale/ast->rate > 3600) {
+            if (ast->cum_len > 3600LL * ast->rate / ast->scale) {
                 av_log(s, AV_LOG_ERROR, "crazy start time, iam scared, giving up\n");
                 ast->cum_len = 0;
             }
@@ -1233,7 +1233,7 @@ start_sync:
                 AVStream *st1   = s->streams[1];
                 AVIStream *ast1 = st1->priv_data;
                 // workaround for broken small-file-bug402.avi
-                if (   d[2] == 'w' && d[3] == 'b'
+                if (ast1 && d[2] == 'w' && d[3] == 'b'
                    && n == 0
                    && st ->codec->codec_type == AVMEDIA_TYPE_VIDEO
                    && st1->codec->codec_type == AVMEDIA_TYPE_AUDIO
@@ -1395,6 +1395,7 @@ resync:
     if (avi->stream_index >= 0) {
         AVStream *st   = s->streams[avi->stream_index];
         AVIStream *ast = st->priv_data;
+        int dv_demux = CONFIG_DV_DEMUXER && avi->dv_demux;
         int size, err;
 
         if (get_subtitle_pkt(s, st, pkt))
@@ -1417,7 +1418,7 @@ resync:
             return err;
         size = err;
 
-        if (ast->has_pal && pkt->size < (unsigned)INT_MAX / 2) {
+        if (ast->has_pal && pkt->size < (unsigned)INT_MAX / 2 && !dv_demux) {
             uint8_t *pal;
             pal = av_packet_new_side_data(pkt,
                                           AV_PKT_DATA_PALETTE,
@@ -1431,7 +1432,7 @@ resync:
             }
         }
 
-        if (CONFIG_DV_DEMUXER && avi->dv_demux) {
+        if (dv_demux) {
             AVBufferRef *avbuf = pkt->buf;
 #if FF_API_DESTRUCT_PACKET
 FF_DISABLE_DEPRECATION_WARNINGS
@@ -1521,11 +1522,12 @@ FF_ENABLE_DEPRECATION_WARNINGS
         if (!avi->non_interleaved && st->nb_index_entries>1 && avi->index_loaded>1) {
             int64_t dts= av_rescale_q(pkt->dts, st->time_base, AV_TIME_BASE_Q);
 
-            if (avi->dts_max - dts > 2*AV_TIME_BASE) {
+            if (avi->dts_max < dts) {
+                avi->dts_max = dts;
+            } else if (avi->dts_max - (uint64_t)dts > 2*AV_TIME_BASE) {
                 avi->non_interleaved= 1;
                 av_log(s, AV_LOG_INFO, "Switching to NI mode, due to poor interleaving\n");
-            }else if (avi->dts_max < dts)
-                avi->dts_max = dts;
+            }
         }
 
         return 0;
@@ -1734,7 +1736,10 @@ static int avi_load_index(AVFormatContext *s)
         size = avio_rl32(pb);
         if (avio_feof(pb))
             break;
-        next = avio_tell(pb) + size + (size & 1);
+        next = avio_tell(pb);
+        if (next < 0 || next > INT64_MAX - size - (size & 1))
+            break;
+        next += size + (size & 1LL);
 
         av_log(s, AV_LOG_TRACE, "tag=%c%c%c%c size=0x%x\n",
                  tag        & 0xff,

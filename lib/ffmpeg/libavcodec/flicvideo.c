@@ -178,7 +178,7 @@ static int flic_decode_frame_8BPP(AVCodecContext *avctx,
     int lines;
     int compressed_lines;
     int starting_line;
-    signed short line_packets;
+    int line_packets;
     int y_ptr;
     int byte_run;
     int pixel_skip;
@@ -277,7 +277,7 @@ static int flic_decode_frame_8BPP(AVCodecContext *avctx,
                     break;
                 if (y_ptr > pixel_limit)
                     return AVERROR_INVALIDDATA;
-                line_packets = bytestream2_get_le16(&g2);
+                line_packets = sign_extend(bytestream2_get_le16(&g2), 16);
                 if ((line_packets & 0xC000) == 0xC000) {
                     // line skip opcode
                     line_packets = -line_packets;
@@ -505,7 +505,7 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
 
     int lines;
     int compressed_lines;
-    signed short line_packets;
+    int line_packets;
     int y_ptr;
     int byte_run;
     int pixel_skip;
@@ -569,7 +569,7 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
                     break;
                 if (y_ptr > pixel_limit)
                     return AVERROR_INVALIDDATA;
-                line_packets = bytestream2_get_le16(&g2);
+                line_packets = sign_extend(bytestream2_get_le16(&g2), 16);
                 if (line_packets < 0) {
                     line_packets = -line_packets;
                     if (line_packets > s->avctx->height)
@@ -732,6 +732,8 @@ static int flic_decode_frame_15_16BPP(AVCodecContext *avctx,
                 bytestream2_skip(&g2, chunk_size - 6);
             } else {
 
+                if (bytestream2_get_bytes_left(&g2) < 2 * s->avctx->width * s->avctx->height )
+                    return AVERROR_INVALIDDATA;
                 for (y_ptr = 0; y_ptr < s->frame->linesize[0] * s->avctx->height;
                      y_ptr += s->frame->linesize[0]) {
 

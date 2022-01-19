@@ -232,7 +232,7 @@ static av_always_inline av_const int av_clip_intp2_c(int a, int p)
  */
 static av_always_inline av_const unsigned av_clip_uintp2_c(int a, int p)
 {
-    if (a & ~((1<<p) - 1)) return -a >> 31 & ((1<<p) - 1);
+    if (a & ~((1<<p) - 1)) return (~a) >> 31 & ((1<<p) - 1);
     else                   return  a;
 }
 
@@ -311,7 +311,7 @@ static av_always_inline av_const double av_clipd_c(double a, double amin, double
  */
 static av_always_inline av_const int av_ceil_log2_c(int x)
 {
-    return av_log2((x - 1) << 1);
+    return av_log2((x - 1U) << 1);
 }
 
 /**
