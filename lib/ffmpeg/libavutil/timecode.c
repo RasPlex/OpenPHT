@@ -49,7 +49,7 @@ int av_timecode_adjust_ntsc_framenum2(int framenum, int fps)
     d = framenum / frames_per_10mins;
     m = framenum % frames_per_10mins;
 
-    return framenum + 9 * drop_frames * d + drop_frames * ((m - drop_frames) / (frames_per_10mins / 10));
+    return framenum + 9U * drop_frames * d + drop_frames * ((m - drop_frames) / (frames_per_10mins / 10));
 }
 
 uint32_t av_timecode_get_smpte_from_framenum(const AVTimecode *tc, int framenum)
@@ -96,8 +96,8 @@ char *av_timecode_make_string(const AVTimecode *tc, char *buf, int framenum)
     }
     ff = framenum % fps;
     ss = framenum / fps        % 60;
-    mm = framenum / (fps*60)   % 60;
-    hh = framenum / (fps*3600);
+    mm = framenum / (fps*60LL) % 60;
+    hh = framenum / (fps*3600LL);
     if (tc->flags & AV_TIMECODE_FLAG_24HOURSMAX)
         hh = hh % 24;
     snprintf(buf, AV_TIMECODE_STR_SIZE, "%s%02d:%02d:%02d%c%02d",

@@ -82,7 +82,7 @@ static int chunk_mux_init(AVFormatContext *s)
     return 0;
 }
 
-static int get_chunk_filename(AVFormatContext *s, int is_header, char *filename)
+static int get_chunk_filename(AVFormatContext *s, int is_header, char filename[MAX_FILENAME_SIZE])
 {
     WebMChunkContext *wc = s->priv_data;
     AVFormatContext *oc = wc->avf;
@@ -90,10 +90,15 @@ static int get_chunk_filename(AVFormatContext *s, int is_header, char *filename)
         return AVERROR(EINVAL);
     }
     if (is_header) {
+        int len;
         if (!wc->header_filename) {
             return AVERROR(EINVAL);
         }
-        av_strlcpy(filename, wc->header_filename, strlen(wc->header_filename) + 1);
+        len = av_strlcpy(filename, wc->header_filename, MAX_FILENAME_SIZE);
+        if (len >= MAX_FILENAME_SIZE) {
+            av_log(oc, AV_LOG_ERROR, "Header filename too long\n");
+            return AVERROR(EINVAL);
+        }
     } else {
         if (av_get_frame_filename(filename, MAX_FILENAME_SIZE,
                                   s->filename, wc->chunk_index - 1) < 0) {

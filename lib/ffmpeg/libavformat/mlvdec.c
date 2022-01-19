@@ -76,7 +76,7 @@ static int check_file_header(AVIOContext *pb, uint64_t guid)
     return 0;
 }
 
-static void read_string(AVFormatContext *avctx, AVIOContext *pb, const char *tag, int size)
+static void read_string(AVFormatContext *avctx, AVIOContext *pb, const char *tag, unsigned size)
 {
     char * value = av_malloc(size + 1);
     if (!value) {
@@ -384,10 +384,14 @@ static int read_packet(AVFormatContext *avctx, AVPacket *pkt)
 {
     MlvContext *mlv = avctx->priv_data;
     AVIOContext *pb;
-    AVStream *st = avctx->streams[mlv->stream_index];
+    AVStream *st;
     int index, ret;
     unsigned int size, space;
 
+    if (!avctx->nb_streams)
+        return AVERROR_EOF;
+
+    st = avctx->streams[mlv->stream_index];
     if (mlv->pts >= st->duration)
         return AVERROR_EOF;
 

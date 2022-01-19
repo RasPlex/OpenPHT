@@ -181,6 +181,7 @@ static int str_to_time(const char *str, int64_t *rtime)
     char *end;
     int hours, minutes;
     double seconds = 0;
+    int64_t ts = 0;
 
     if (*cur < '0' || *cur > '9')
         return 0;
@@ -196,8 +197,9 @@ static int str_to_time(const char *str, int64_t *rtime)
         seconds = strtod(cur + 1, &end);
         if (end > cur + 1)
             cur = end;
+        ts = av_clipd(seconds * AV_TIME_BASE, INT64_MIN/2, INT64_MAX/2);
     }
-    *rtime = (hours * 3600 + minutes * 60 + seconds) * AV_TIME_BASE;
+    *rtime = (hours * 3600LL + minutes * 60LL) * AV_TIME_BASE + ts;
     return cur - str;
 }
 
@@ -1279,6 +1281,10 @@ static int generate_intervals(void *log, struct sbg_script *s, int sample_rate,
         ev1 = &s->events[i];
         ev2 = &s->events[(i + 1) % s->nb_events];
         ev1->ts_int   = ev1->ts;
+
+        if (!ev1->fade.slide && ev1 >= ev2 && ev2->ts > INT64_MAX - period)
+            return AVERROR_INVALIDDATA;
+
         ev1->ts_trans = ev1->fade.slide ? ev1->ts
                                         : ev2->ts + (ev1 < ev2 ? 0 : period);
     }
@@ -1410,6 +1416,11 @@ static av_cold int sbg_read_header(AVFormatContext *avf)
     r = generate_intervals(avf, &script, sbg->sample_rate, &inter);
     if (r < 0)
         goto fail;
+
+    if (script.end_ts != AV_NOPTS_VALUE && script.end_ts < script.start_ts) {
+        r = AVERROR_INVALIDDATA;
+        goto fail;
+    }
 
     st = avformat_new_stream(avf, NULL);
     if (!st)

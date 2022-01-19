@@ -103,7 +103,7 @@ static AVRational read_fps(const char* line, int* error)
         // Truncate any numerator too large to fit into an int64_t
         if (num > (INT64_MAX - 9) / 10 || den > INT64_MAX / 10)
             break;
-        num  = 10 * num + *line - '0';
+        num  = 10 * num + (*line - '0');
         den *= 10;
     }
     if (!num)
@@ -230,6 +230,9 @@ static int rpl_read_header(AVFormatContext *s)
             error |= read_line(pb, line, sizeof(line));
     }
 
+    if (s->nb_streams == 0)
+        return AVERROR_INVALIDDATA;
+
     rpl->frames_per_chunk = read_line_and_int(pb, &error);  // video frames per chunk
     if (rpl->frames_per_chunk > 1 && vst->codec->codec_tag != 124)
         av_log(s, AV_LOG_WARNING,
@@ -304,7 +307,7 @@ static int rpl_read_packet(AVFormatContext *s, AVPacket *pkt)
 
         avio_skip(pb, 4); /* flags */
         frame_size = avio_rl32(pb);
-        if (avio_seek(pb, -8, SEEK_CUR) < 0)
+        if (avio_feof(pb) || avio_seek(pb, -8, SEEK_CUR) < 0 || !frame_size)
             return AVERROR(EIO);
 
         ret = av_get_packet(pb, pkt, frame_size);

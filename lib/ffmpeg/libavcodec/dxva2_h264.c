@@ -248,7 +248,7 @@ static void fill_slice_long(AVCodecContext *avctx, DXVA_Slice_H264_Long *slice,
                 else
                     index = get_refpic_index(pp, ff_dxva2_get_surface_index(avctx, ctx, r->f));
                 fill_picture_entry(&slice->RefPicList[list][i], index,
-                                   sl->ref_list[list][i].reference == PICT_BOTTOM_FIELD);
+                                   r->reference == PICT_BOTTOM_FIELD);
                 for (plane = 0; plane < 3; plane++) {
                     int w, o;
                     if (plane == 0 && sl->luma_weight_flag[list]) {
@@ -497,14 +497,6 @@ static int dxva2_h264_end_frame(AVCodecContext *avctx)
 
     if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
         return -1;
-
-    // Wait for an I-frame before start decoding. Workaround for ATI UVD and UVD+ GPUs
-    if (!h->got_first_iframe) {
-        if (!(ctx_pic->pp.wBitFields & (1 << 15)))
-            return -1;
-        h->got_first_iframe = 1;
-    }
-
     ret = ff_dxva2_common_end_frame(avctx, h->cur_pic_ptr->f,
                                     &ctx_pic->pp, sizeof(ctx_pic->pp),
                                     &ctx_pic->qm, sizeof(ctx_pic->qm),

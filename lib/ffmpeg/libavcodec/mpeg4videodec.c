@@ -391,7 +391,7 @@ static int mpeg4_decode_sprite_trajectory(Mpeg4DecContext *ctx, GetBitContext *g
                 llabs(sprite_offset[0][i] + sprite_delta[i][1] * (h+16LL)) >= INT_MAX ||
                 llabs(sprite_offset[0][i] + sprite_delta[i][0] * (w+16LL) + sprite_delta[i][1] * (h+16LL)) >= INT_MAX ||
                 llabs(sprite_delta[i][0] * (w+16LL)) >= INT_MAX ||
-                llabs(sprite_delta[i][1] * (w+16LL)) >= INT_MAX ||
+                llabs(sprite_delta[i][1] * (h+16LL)) >= INT_MAX ||
                 llabs(sd[0]) >= INT_MAX ||
                 llabs(sd[1]) >= INT_MAX ||
                 llabs(sprite_offset[0][i] + sd[0] * (w+16LL)) >= INT_MAX ||
@@ -537,7 +537,7 @@ static inline int get_amv(Mpeg4DecContext *ctx, int n)
         len >>= s->quarter_sample;
 
     if (s->real_sprite_warping_points == 1) {
-        if (ctx->divx_version == 500 && ctx->divx_build == 413)
+        if (ctx->divx_version == 500 && ctx->divx_build == 413 && a >= s->quarter_sample)
             sum = s->sprite_offset[0][n] / (1 << (a - s->quarter_sample));
         else
             sum = RSHIFT(s->sprite_offset[0][n] * (1 << s->quarter_sample), a);
@@ -549,7 +549,7 @@ static inline int get_amv(Mpeg4DecContext *ctx, int n)
             dy -= 1 << (shift + a + 1);
         else
             dx -= 1 << (shift + a + 1);
-        mb_v = s->sprite_offset[0][n] + dx * s->mb_x * 16 + dy * s->mb_y * 16;
+        mb_v = s->sprite_offset[0][n] + dx * s->mb_x * 16U + dy * s->mb_y * 16U;
 
         sum = 0;
         for (y = 0; y < 16; y++) {
@@ -2242,9 +2242,6 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
 
         if (ctx->divx_version >= 0)
             s->workaround_bugs |= FF_BUG_HPEL_CHROMA;
-
-        if (ctx->num_sprite_warping_points > 1)
-            s->workaround_bugs |= FF_BUG_GMC_UNSUPPORTED;
     }
 
     if (s->workaround_bugs & FF_BUG_STD_QPEL) {
@@ -2269,7 +2266,6 @@ int ff_mpeg4_workaround_bugs(AVCodecContext *avctx)
                s->workaround_bugs, ctx->lavc_build, ctx->xvid_build,
                ctx->divx_version, ctx->divx_build, s->divx_packed ? "p" : "");
 
-    avctx->workaround_bugs = s->workaround_bugs;
     if (CONFIG_MPEG4_DECODER && ctx->xvid_build >= 0 &&
         s->codec_id == AV_CODEC_ID_MPEG4 &&
         avctx->idct_algo == FF_IDCT_AUTO) {

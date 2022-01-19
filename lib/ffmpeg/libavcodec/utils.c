@@ -396,6 +396,16 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
             w_align = 8;
             h_align = 8;
         }
+        if (s->codec_id == AV_CODEC_ID_MJPEG   ||
+            s->codec_id == AV_CODEC_ID_MJPEGB  ||
+            s->codec_id == AV_CODEC_ID_LJPEG   ||
+            s->codec_id == AV_CODEC_ID_SMVJPEG ||
+            s->codec_id == AV_CODEC_ID_AMV     ||
+            s->codec_id == AV_CODEC_ID_SP5X    ||
+            s->codec_id == AV_CODEC_ID_JPEGLS) {
+            w_align =   8;
+            h_align = 2*8;
+        }
         break;
     case AV_PIX_FMT_BGR24:
         if ((s->codec_id == AV_CODEC_ID_MSZH) ||
@@ -420,7 +430,10 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
 
     *width  = FFALIGN(*width, w_align);
     *height = FFALIGN(*height, h_align);
-    if (s->codec_id == AV_CODEC_ID_H264 || s->lowres) {
+    if (s->codec_id == AV_CODEC_ID_H264 || s->lowres ||
+        s->codec_id == AV_CODEC_ID_VP5  || s->codec_id == AV_CODEC_ID_VP6 ||
+        s->codec_id == AV_CODEC_ID_VP6F || s->codec_id == AV_CODEC_ID_VP6A
+    ) {
         // some of the optimized chroma MC reads one line too much
         // which is also done in mpeg decoders with lowres > 0
         *height += 2;
@@ -1463,6 +1476,16 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         av_freep(&avctx->subtitle_header);
 
     if (avctx->channels > FF_SANE_NB_CHANNELS) {
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
+    if (avctx->sample_rate < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid sample rate: %d\n", avctx->sample_rate);
+        ret = AVERROR(EINVAL);
+        goto free_and_end;
+    }
+    if (avctx->block_align < 0) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid block align: %d\n", avctx->block_align);
         ret = AVERROR(EINVAL);
         goto free_and_end;
     }
@@ -3460,8 +3483,11 @@ int av_get_audio_frame_duration(AVCodecContext *avctx, int frame_bytes)
 
         if (ch > 0) {
             /* calc from sample rate and channels */
-            if (id == AV_CODEC_ID_BINKAUDIO_DCT)
+            if (id == AV_CODEC_ID_BINKAUDIO_DCT) {
+                if (sr / 22050 > 22)
+                    return 0;
                 return (480 << (sr / 22050)) / ch;
+            }
         }
     }
 
@@ -3505,7 +3531,10 @@ int av_get_audio_frame_duration(AVCodecContext *avctx, int frame_bytes)
             case AV_CODEC_ID_ADPCM_AFC:
                 return frame_bytes / (9 * ch) * 16;
             case AV_CODEC_ID_ADPCM_DTK:
-                return frame_bytes / (16 * ch) * 28;
+                frame_bytes /= 16 * ch;
+                if (frame_bytes > INT_MAX / 28)
+                    return 0;
+                return frame_bytes * 28;
             case AV_CODEC_ID_ADPCM_4XM:
             case AV_CODEC_ID_ADPCM_IMA_ISS:
                 return (frame_bytes - 4 * ch) * 2 / ch;

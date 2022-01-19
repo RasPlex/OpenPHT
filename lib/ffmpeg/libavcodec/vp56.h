@@ -88,6 +88,7 @@ typedef struct VP56RangeCoder {
     const uint8_t *buffer;
     const uint8_t *end;
     unsigned int code_word;
+    int end_reached;
 } VP56RangeCoder;
 
 typedef struct VP56RefDc {
@@ -225,6 +226,16 @@ int ff_vp56_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
 
 extern const uint8_t ff_vp56_norm_shift[256];
 int ff_vp56_init_range_decoder(VP56RangeCoder *c, const uint8_t *buf, int buf_size);
+
+/**
+ * vp5689 returns 1 if the end of the stream has been reached, 0 otherwise.
+ */
+static av_always_inline int vpX_rac_is_end(VP56RangeCoder *c)
+{
+    if (c->end <= c->buffer && c->bits >= 0)
+        c->end_reached ++;
+    return c->end_reached > 10;
+}
 
 static av_always_inline unsigned int vp56_rac_renorm(VP56RangeCoder *c)
 {

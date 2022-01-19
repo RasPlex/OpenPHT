@@ -471,7 +471,7 @@ static av_cold int decode_init(AVCodecContext *avctx)
     for (i = 0; i < WMAPRO_BLOCK_SIZES; i++)
         ff_mdct_init(&s->mdct_ctx[i], WMAPRO_BLOCK_MIN_BITS+1+i, 1,
                      1.0 / (1 << (WMAPRO_BLOCK_MIN_BITS + i - 1))
-                     / (1 << (s->bits_per_sample - 1)));
+                     / (1ll << (s->bits_per_sample - 1)));
 
     /** init MDCT windows: simple sine window */
     for (i = 0; i < WMAPRO_BLOCK_SIZES; i++) {
@@ -1488,9 +1488,9 @@ static void save_bits(WMAProDecodeCtx *s, GetBitContext* gb, int len,
         s->frame_offset = get_bits_count(gb) & 7;
         s->num_saved_bits = s->frame_offset;
         init_put_bits(&s->pb, s->frame_data, MAX_FRAMESIZE);
-    }
-
-    buflen = (put_bits_count(&s->pb) + len + 8) >> 3;
+        buflen = (s->num_saved_bits      + len + 7) >> 3;
+    } else
+        buflen = (put_bits_count(&s->pb) + len + 7) >> 3;
 
     if (len <= 0 || buflen > MAX_FRAMESIZE) {
         avpriv_request_sample(s->avctx, "Too small input buffer");
@@ -1548,6 +1548,7 @@ static int decode_packet(AVCodecContext *avctx, void *data,
         if (buf_size < avctx->block_align) {
             av_log(avctx, AV_LOG_ERROR, "Input packet too small (%d < %d)\n",
                    buf_size, avctx->block_align);
+            s->packet_loss = 1;
             return AVERROR_INVALIDDATA;
         }
 
@@ -1606,6 +1607,12 @@ static int decode_packet(AVCodecContext *avctx, void *data,
 
     } else {
         int frame_size;
+
+        if (avpkt->size < s->next_packet_start) {
+            s->packet_loss = 1;
+            return AVERROR_INVALIDDATA;
+        }
+
         s->buf_bit_size = (avpkt->size - s->next_packet_start) << 3;
         init_get_bits(gb, avpkt->data, s->buf_bit_size);
         skip_bits(gb, s->packet_offset);

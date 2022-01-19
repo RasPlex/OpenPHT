@@ -108,7 +108,7 @@ static void filter181(int16_t *data, int width, int height, int stride)
             dc = -prev_dc +
                  data[x     + y * stride] * 8 -
                  data[x + 1 + y * stride];
-            dc = (dc * 10923 + 32768) >> 16;
+            dc = (av_clip(dc, INT_MIN/10923, INT_MAX/10923 - 32768) * 10923 + 32768) >> 16;
             prev_dc = data[x + y * stride];
             data[x + y * stride] = dc;
         }
@@ -124,7 +124,7 @@ static void filter181(int16_t *data, int width, int height, int stride)
             dc = -prev_dc +
                  data[x +  y      * stride] * 8 -
                  data[x + (y + 1) * stride];
-            dc = (dc * 10923 + 32768) >> 16;
+            dc = (av_clip(dc, INT_MIN/10923, INT_MAX/10923 - 32768) * 10923 + 32768) >> 16;
             prev_dc = data[x + y * stride];
             data[x + y * stride] = dc;
         }
@@ -417,7 +417,7 @@ static void guess_mv(ERContext *s)
     }
 
     if ((!(s->avctx->error_concealment&FF_EC_GUESS_MVS)) ||
-        num_avail <= mb_width / 2) {
+        num_avail <= FFMAX(mb_width, mb_height) / 2) {
         for (mb_y = 0; mb_y < mb_height; mb_y++) {
             for (mb_x = 0; mb_x < s->mb_width; mb_x++) {
                 const int mb_xy = mb_x + mb_y * s->mb_stride;

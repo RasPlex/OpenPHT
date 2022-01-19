@@ -140,10 +140,13 @@ static inline av_flatten int get_symbol(RangeCoder *c, uint8_t *state, int is_si
     if(get_rac(c, state+0))
         return 0;
     else{
-        int i, e, a;
+        int i, e;
+        unsigned a;
         e= 0;
         while(get_rac(c, state+1 + FFMIN(e,9))){ //1..10
             e++;
+            if (e > 31)
+                return AVERROR_INVALIDDATA;
         }
 
         a= 1;
@@ -472,13 +475,13 @@ static int predictor_calc_error(int *k, int *state, int order, int error)
     for (i = order-2; i >= 0; i--, k_ptr--, state_ptr--)
     {
         int k_value = *k_ptr, state_value = *state_ptr;
-        x -= shift_down(k_value * state_value, LATTICE_SHIFT);
-        state_ptr[1] = state_value + shift_down(k_value * x, LATTICE_SHIFT);
+        x -= (unsigned)shift_down(k_value * (unsigned)state_value, LATTICE_SHIFT);
+        state_ptr[1] = state_value + shift_down(k_value * (unsigned)x, LATTICE_SHIFT);
     }
 #else
     for (i = order-2; i >= 0; i--)
     {
-        x -= shift_down(k[i] * state[i], LATTICE_SHIFT);
+        x -= (unsigned)shift_down(k[i] * state[i], LATTICE_SHIFT);
         state[i+1] = state[i] + shift_down(k[i] * x, LATTICE_SHIFT);
     }
 #endif
@@ -977,9 +980,7 @@ static av_cold int sonic_decode_close(AVCodecContext *avctx)
     av_freep(&s->int_samples);
     av_freep(&s->tap_quant);
     av_freep(&s->predictor_k);
-
-    for (i = 0; i < s->channels; i++)
-    {
+    for (i = 0; i < MAX_CHANNELS; i++) {
         av_freep(&s->predictor_state[i]);
         av_freep(&s->coded_samples[i]);
     }
@@ -1042,7 +1043,7 @@ static int sonic_decode_frame(AVCodecContext *avctx,
                 x += s->channels;
             }
 
-            s->int_samples[x] = predictor_calc_error(s->predictor_k, s->predictor_state[ch], s->num_taps, s->coded_samples[ch][i] * quant);
+            s->int_samples[x] = predictor_calc_error(s->predictor_k, s->predictor_state[ch], s->num_taps, s->coded_samples[ch][i] * (unsigned)quant);
             x += s->channels;
         }
 

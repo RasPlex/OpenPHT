@@ -293,12 +293,9 @@ const uint8_t *ff_h264_decode_nal(H264Context *h, H264SliceContext *sl,
     if(i>=length-1){ //no escaped 0
         *dst_length= length;
         *consumed= length+1; //+1 for the header
-        if(h->avctx->flags2 & AV_CODEC_FLAG2_FAST){
-            return src;
-        }else{
-            memcpy(dst, src, length);
-            return dst;
-        }
+
+        memcpy(dst, src, length);
+        return dst;
     }
 
     memcpy(dst, src, i);
@@ -1087,7 +1084,6 @@ void ff_h264_flush_change(H264Context *h)
 
     h->next_outputed_poc = INT_MIN;
     h->prev_interlaced_frame = 1;
-    h->got_first_iframe = 0;
     idr(h);
 
     h->prev_frame_num = -1;

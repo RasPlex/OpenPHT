@@ -64,24 +64,6 @@ static void yuv_a_to_rgba(const uint8_t *ycbcr, const uint8_t *alpha, uint32_t *
     }
 }
 
-static void ayvu_to_argb(const uint8_t *ayvu, uint32_t *argb, int num_values)
-{
-    uint8_t *cm = ff_crop_tab + MAX_NEG_CROP;
-    uint8_t r, g, b;
-    int i, y, cb, cr, a;
-    int r_add, g_add, b_add;
-
-    for (i = num_values; i > 0; i--) {
-        a = *ayvu++;
-        y = *ayvu++;
-        cr = *ayvu++;
-        cb = *ayvu++;
-        YUV_TO_RGB1_CCIR(cb, cr);
-        YUV_TO_RGB2_CCIR(r, g, b, y);
-        *argb++ = (a << 24) | (r << 16) | (g << 8) | b;
-    }
-}
-
 static int decode_run_2bit(GetBitContext *gb, int *color)
 {
     unsigned int v, t;
@@ -100,10 +82,7 @@ static int decode_run_8bit(GetBitContext *gb, int *color)
 {
     int len;
     int has_run = get_bits1(gb);
-    if (get_bits1(gb))
-        *color = get_bits(gb, 8);
-    else
-        *color = get_bits(gb, 2);
+    *color = get_bits(gb, 2 + 6*get_bits1(gb));
     if (has_run) {
         if (get_bits1(gb)) {
             len = get_bits(gb, 7);
@@ -145,6 +124,8 @@ static int decode_rle(uint8_t *bitmap, int linesize, int w, int h,
             len = decode_run_8bit(&gb, &color);
         else
             len = decode_run_2bit(&gb, &color);
+        if (len != INT_MAX && len > w - x)
+            return AVERROR_INVALIDDATA;
         len = FFMIN(len, w - x);
         memset(d + x, color, len);
         x += len;
@@ -727,12 +708,6 @@ static av_cold int dvdsub_init(AVCodecContext *avctx)
         parse_ifo_palette(ctx, ctx->ifo_str);
     if (ctx->palette_str)
         parse_palette(ctx, ctx->palette_str);
-
-    if (!ctx->has_palette && avctx->extradata_size == 64) {
-        ayvu_to_argb((uint8_t*)avctx->extradata, ctx->palette, 16);
-        ctx->has_palette = 1;
-    }
-
     if (ctx->has_palette) {
         int i;
         av_log(avctx, AV_LOG_DEBUG, "palette:");

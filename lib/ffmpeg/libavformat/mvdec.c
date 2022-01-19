@@ -258,6 +258,8 @@ static void read_index(AVIOContext *pb, AVStream *st)
         uint32_t pos  = avio_rb32(pb);
         uint32_t size = avio_rb32(pb);
         avio_skip(pb, 8);
+        if (avio_feof(pb))
+            return ;
         av_add_index_entry(st, pos, timestamp, size, 0, AVINDEX_KEYFRAME);
         if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
             timestamp += size / (st->codec->channels * 2);
@@ -350,6 +352,12 @@ static int mv_read_header(AVFormatContext *avctx)
 
         if ((ret = read_table(avctx, NULL, parse_global_var)) < 0)
             return ret;
+
+        if (mv->nb_audio_tracks < 0  || mv->nb_video_tracks < 0 ||
+           (mv->nb_audio_tracks == 0 && mv->nb_video_tracks == 0)) {
+            av_log(avctx, AV_LOG_ERROR, "Stream count is invalid.\n");
+            return AVERROR_INVALIDDATA;
+        }
 
         if (mv->nb_audio_tracks > 1) {
             avpriv_request_sample(avctx, "Multiple audio streams support");
